@@ -1,0 +1,17 @@
+language: python
+python:
+  - "3.4"
+  - "3.5"
+  - "nightly"
+install:
+  - pip install .
+  - pip install coveralls
+script:
+  - coverage run --source=quantiphy setup.py test
+deploy:
+    provider: pypi
+    user: messenger
+    on:
+        tags: true
+after_success:
+    coveralls
