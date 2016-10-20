@@ -1,14 +1,14 @@
 QuantiPhy - Physical Quantities
 ===============================
 
-Version = 0.0.1
-Released = 2016-10-19
+Version = 0.0.2
+Released = 2016-10-20
 
-.. image:: https://travis-ci.org/KenKundert/quanitphy.svg?branch=master
-    :target: https://travis-ci.org/KenKundert/quanitphy
+.. image:: https://travis-ci.org/KenKundert/quantiphy.svg?branch=master
+    :target: https://travis-ci.org/KenKundert/quantiphy
 
-.. image:: https://coveralls.io/repos/github/KenKundert/quanitphy/badge.svg?branch=master
-    :target: https://coveralls.io/github/KenKundert/quanitphy?branch=master
+.. image:: https://coveralls.io/repos/github/KenKundert/quantiphy/badge.svg?branch=master
+    :target: https://coveralls.io/github/KenKundert/quantiphy?branch=master
 
 Use 'pip install quantiphy' to install. Requires Python2.7 or Python3.3 or 
 better.
@@ -348,6 +348,11 @@ Plank's constant:
    >>> print(plank)
    662.61e-36J-s
 
+   >>> rplank = Quantity('hbar')
+   >>> print(rplank)
+   105.46e-36J-s
+
+Boltzmann's constant:
 Boltzmann's constant:
 
 .. code-block:: python
