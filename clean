@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set nonomatch
+rm -f fvi.1 fvi.1.rst fvi.1.pdf MANIFEST
+rm -rf generated_settings
+
+# the rest is common to all python directories
+rm -f *.pyc *.pyo .test*.sum expected result install.out
+rm -rf build *.egg-info dist __pycache__ .coverage .coverage-html htmlcov
+for i in */clean
+do
+    if [[ "$i" == '*/clean' ]]
+    then
+        break
+    fi
+    #echo $i
+    ( cd ${i%/*}; ./clean )
+done
+for i in */Makefile
+do
+    if [[ "$i" == '*/Makefile' ]]
+    then
+        break
+    fi
+    #echo $i
+    ( cd ${i%/*}; make clean )
+done
