@@ -79,8 +79,8 @@ CONSTANTS = {
 
 
 # Constants {{{1
-__version__ = '0.0.2'
-__released__ = '2016-10-20'
+__version__ = '0.0.3'
+__released__ = '2016-10-21'
 
 MAPPINGS = {
     'Y': ('e24',  1e24 ),

@@ -1,8 +1,8 @@
 QuantiPhy - Physical Quantities
 ===============================
 
-Version = 0.0.2
-Released = 2016-10-20
+Version = 0.0.3
+Released = 2016-10-21
 
 .. image:: https://travis-ci.org/KenKundert/quantiphy.svg?branch=master
     :target: https://travis-ci.org/KenKundert/quantiphy
@@ -183,7 +183,9 @@ You can also access the full precision of the quantity::
 
 Full precision implies whatever precision was used when specifying the quantity 
 if it was specified as a string. If it was specified as a real number, then 
-a fixed, user controllable number of digits are used (default=12).
+a fixed, user controllable number of digits are used (default=12). Generally one 
+uses 'full' when generating output that will be read by a machine. Conversely it 
+is best not to use 'full' when generating output meant for humans to read.
 
 If you specify *fmt* to render, it will generally include the name and perhaps 
 the description if they are available. The formatting is controlled by 
@@ -210,6 +212,12 @@ that you can use it in expressions and it will evaluate to its real value::
     >>> frequency = 1/period
     >>> print(frequency)
     1000000.0
+
+    >>> type(period)
+    <class 'quantiphy.Quantity'>
+
+    >>> type(frequency)
+    <class 'float'>
 
 Notice that when performing arithmetic operations on quantities the units are 
 completely ignored.
