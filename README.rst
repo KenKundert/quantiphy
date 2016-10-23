@@ -1,7 +1,7 @@
 QuantiPhy - Physical Quantities
 ===============================
 
-| Version: 0.2.0
+| Version: 0.2.1
 | Released: 2016-10-23
 
 .. image:: https://img.shields.io/travis/KenKundert/quantiphy/master.svg
@@ -38,15 +38,12 @@ bandwidth of a simple RC circuit:
     >>> from quantiphy import Quantity
     >>> from math import pi
 
-    >>> r = Quantity('R = 1kOhm')
-    >>> c = Quantity('C = 1nF')
-    >>> tau = Quantity(r*c, 'Tau s')
-    >>> bw = Quantity(1/(2*pi*tau), 'BW Hz')
-    >>> print('Given: {0:Q}, {1:Q}.'.format(r, c))
-    Given: R = 1kOhm, C = 1nF.
-
-    >>> print('Computed: {0:Q}, {1:Q}.'.format(tau, bw))
-    Computed: Tau = 1us, BW = 159.15kHz.
+    >>> r = Quantity('1kOhm')
+    >>> c = Quantity('1nF')
+    >>> tau = Quantity(r*c, 's')
+    >>> bw = Quantity(1/(2*pi*tau), 'Hz')
+    >>> print('R = {}, C = {} → τ = {}, BW = {}.'.format(r, c, tau, bw))
+    R = 1kOhm, C = 1nF → τ = 1us, BW = 159.15kHz.
 
 A quantity is the pairing of a real number and units, though the units are 
 optional. The Quantity class is used to combine the pair into a single object, 
@@ -54,23 +51,22 @@ and then provides methods to provide access to the pair in useful ways. In the
 above example quantities were created from strings that contained the value and 
 unit (ex. '1nF') or from arguments where the value and units were specified 
 explicitly (ex. r*c, 's'). Once created, the quantity objects can be treated 
-like simple real values, but when printed, their values presented with their 
-units using SI scale factors.
+like simple real values, but when printed, their values are presented using SI 
+scale factors along with their units.
 
 
 Quantities
 ----------
 
 The *Quantity* class is used to create a quantity (an object with both a value 
-and units). *QuantiPhy* also allows a name and description to be associated with 
-the quantity.  Normally, creating a quantity takes one or two arguments.  The 
-first is taken to be the value, and the second, if given, is taken to be the 
-model, which is a source of default values.  More on this in a bit, but for the 
-time being you can assume the model is a string that contains the units for the 
+and units). Normally, creating a quantity takes one or two arguments.  The first 
+is taken to be the value, and the second, if given, is taken to be the model, 
+which is a source of default values.  More on this in a bit, but for the time 
+being you can assume the model is a string that contains the units for the 
 quantity.  The value may be given as a float or as a string.  The string may be 
-in floating point notation, in scientific notation, or with SI scale factors and 
-may include the units.  In addition, you may give a name and description.  For 
-example, any of the following ways can be used to specify 1ns:
+in floating point notation, in scientific notation, or use SI scale factors and 
+may include the units.  For example, any of the following ways can be used to 
+specify 1ns:
 
 .. code-block:: python
 
@@ -90,14 +86,14 @@ example, any of the following ways can be used to specify 1ns:
     >>> print(period)
     1ns
 
-So far our 1ns is just a value. But it can be given a name and/or description as 
-follows:
+So far our 1ns is just a value. However, you may also give a name and 
+description.  For example:
 
 .. code-block:: python
 
-    >>> period = Quantity('period = 10ns -- clock period')
+    >>> period = Quantity('Tclk = 10ns -- clock period')
     >>> print(period.name, '=', period, '#', period.desc)
-    period = 10ns # clock period
+    Tclk = 10ns # clock period
 
 If you only specify a real number for the value, then the units, name, and 
 description do not get values. This is where the second argument, the model, 
@@ -142,6 +138,8 @@ the model.
 Finally, you can overwrite the quantities attributes to override the units, 
 name, or description.
 
+.. code-block:: python
+
     >>> out_period = Quantity(10*period)
     >>> out_period.units = 's'
     >>> out_period.name = 'output period'
@@ -167,7 +165,9 @@ From a quantity object, you access its value in various ways:
     >>> h_line.render(si=False)
     '1.4204e9Hz'
 
-You can also access the value without the units::
+You can also access the value without the units:
+
+.. code-block:: python
 
     >>> float(h_line)
     1420405751.786
@@ -178,12 +178,16 @@ You can also access the value without the units::
     >>> h_line.render(False, si=False)
     '1.4204e9'
 
-Or you can access just the units::
+Or you can access just the units:
+
+.. code-block:: python
 
     >>> h_line.units
     'Hz'
 
-You can also access the full precision of the quantity::
+You can also access the full precision of the quantity:
+
+.. code-block:: python
 
     >>> h_line.render(prec='full')
     '1.420405751786GHz'
@@ -201,6 +205,8 @@ If you specify *fmt* to render, it will generally include the name and perhaps
 the description if they are available. The formatting is controlled by 
 'assign_fmt', which is described later. With the default formatting, the 
 description is not printed.
+
+.. code-block:: python
 
     >>> h_line.render(fmt=True)
     '1.4204GHz'
@@ -230,7 +236,7 @@ that you can use it in expressions and it will evaluate to its real value::
     <class 'float'>
 
 Notice that when performing arithmetic operations on quantities the units are 
-completely ignored.
+completely ignored and do not propagate in any to the newly computed result.
 
 
 Preferences
@@ -286,34 +292,47 @@ spacer (str):
     Default is ''.
 
 unity_sf (str):
-    The output scale factor for unity, generally '' or '_'.  Default is ''.
+    The output scale factor for unity, generally '' or '_'.  Default is ''.  
+    Generally '' is used if only humans are expected to read the result and '_' 
+    is used if you expect to parse the numbers again. Using '_' eliminates the 
+    ambiguity between units and scale factors.
 
 output_sf (str):
     Which scale factors to output, generally one would only use familiar scale 
     factors.  Default is 'TGMkmunpfa'.
 
 ignore_sf (bool):
-    Whether scale factors should be ignored by default. Default is False.
+    Whether scale factors should be ignored by default when converting strings 
+    into numbers.  Default is False.
 
 reltol (real):
-    Relative tolerance, used by is_close() when determining equivalence.
+    Relative tolerance, used by is_close() when determining equivalence. Default 
+    is 10\ :sup:`-6`.
 
 abstol (real):
-    Absolute tolerance, used by is_close() when determining equivalence.
+    Absolute tolerance, used by is_close() when determining equivalence. Default 
+    is 10\ :sup:`-12`.
 
 keep_components (bool):
     Whether components of number should be kept if the quantities' value was 
     given as string.  Doing so takes a bit of space, but allows the original 
     precision of the number to be recreated when full precision is requested.
 
-assign_fmt (str):
-    Format string for an assignment. Will be passed through string format 
-    method.  Format string takes three possible arguments named n,
-    q, and d for the name, value and description.  The default is '{n} = {v}'
+assign_fmt (str or tuple):
+    Format string for an assignment. Will be passed through string format method 
+    to generate a string that includes the quantity name.  Format string takes 
+    three possible arguments named n, q, and d for the name, value and 
+    description. The default is ``'{n} = {v}'``.
+
+    If two strings are given as a tuple, then the first is used if the 
+    description is present and the second used otherwise. For example, an 
+    alternate specification that prints the description in the form of a Python 
+    comment if it is available is: ``({n} = {v}  # {d}', '{n} = {v}')``.
 
 assign_rec (str):
-    Regular expression used to recognize an assignment. Used in 
-    add_to_namespace(). Default recognizes the form:
+    Regular expression used to recognize an assignment. Used in Quantity and
+    add_to_namespace() to convert a string to a quantity when a name is present.  
+    Default recognizes the form:
 
         "Temp = 300_K -- Temperature".
 
@@ -448,6 +467,8 @@ a simple number. The benefit of using a string in this case is that *QuantiPhy*
 will recognize the significant figures and use them as the full precision for 
 the quantity.
 
+.. code-block:: python
+
    >>> CONSTANTS['lambda'] = 'λ = 211.0611405389mm -- wavelength of hydrogen line'
    >>> print('{:S}'.format(Quantity('lambda')))
    λ = 211.06mm
@@ -468,6 +489,8 @@ the quantity.
    >>> print('{:S}'.format(Quantity('lambda')))
    λ = 211.06mm
 
+In the last example the description is added to the quantity but it is not 
+displayed because by default the S format does not show the description.
 
 String Formatting
 -----------------
@@ -482,10 +505,10 @@ Quantities can be passed into the string *format* method:
    >>> print('{:s}'.format(h_line))
    1.4204GHz
 
-In these cases the preferences for use of SI scale factors and outputting of 
-units is honored.
+In these cases the preferences for SI scale factors, units, and precision are 
+honored.
 
-You can specify the precision as part of the format specification
+You can override the precision as part of the format specification
 
 .. code-block:: python
 
@@ -544,6 +567,8 @@ Use 'u' to indicate that only the units are desired:
 
 Access the name or description of the quantity using 'n' and 'd'.
 
+.. code-block:: python
+
    >>> wavelength = Quantity('lambda')
    >>> print('{:n}'.format(wavelength))
    λ
@@ -586,8 +611,10 @@ preference.
    >>> print('{:S}'.format(wavelength))
    λ = 211.06mm -- wavelength of hydrogen line
 
-   You can also specify two values to *assign_fmt*, in which case the first is 
-   used if there is a description and the second used otherwise.
+You can also specify two values to *assign_fmt*, in which case the first is used 
+if there is a description and the second used otherwise.
+
+.. code-block:: python
 
    >>> Quantity.set_preferences(assign_fmt=('{n} = {v} -- {d}', '{n} = {v}'))
 
@@ -640,8 +667,8 @@ namespace that is used to hold the quantity. The text after the '--' is used as
 a description of the quantity.
 
 
-Scale Factors and Units
------------------------
+Ambiguity of Scale Factors and Units
+------------------------------------
 
 By default, *QuantiPhy* treats both the scale factor and the units as being 
 optional.  With the scale factor being optional, the meaning of some 
@@ -679,6 +706,8 @@ Subclassing Quantity
 By subclassing Quantity you can create difference sets of default behaviors that 
 are active simultaneously. For example:
 
+.. code-block:: python
+
    >>> class ConventionalQuantity(Quantity):
    ...     pass
 
@@ -688,4 +717,3 @@ are active simultaneously. For example:
    >>> period2 = ConventionalQuantity(1e-9, 's')
    >>> print(period1, period2)
    1ns 1e-9
-
