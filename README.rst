@@ -1,8 +1,8 @@
 QuantiPhy - Physical Quantities
 ===============================
 
-Version = 0.0.3
-Released = 2016-10-21
+| Version= 0.1.0
+| Released= 2016-10-22
 
 .. image:: https://travis-ci.org/KenKundert/quantiphy.svg?branch=master
     :target: https://travis-ci.org/KenKundert/quantiphy
@@ -10,8 +10,7 @@ Released = 2016-10-21
 .. image:: https://coveralls.io/repos/github/KenKundert/quantiphy/badge.svg?branch=master
     :target: https://coveralls.io/github/KenKundert/quantiphy?branch=master
 
-Use 'pip install quantiphy' to install. Requires Python2.7 or Python3.3 or 
-better.
+Use 'pip install quantiphy' to install. Requires Python3.4 or better.
 
 
 Introduction
@@ -53,14 +52,15 @@ Quantities
 ----------
 
 The *Quantity* class is used to create a quantity (an object with both a value 
-and units). It takes one or two arguments. The first is taken to be the value, 
-and the second, if given, is taken to be the model, which is a source of default 
-values. More on this in a bit, but for the time being you can assume the model 
-is a string that contains the units for the quantity.  The value may be given as 
-a float or as a string.  The string may be in floating point notation, in 
-scientific notation, or with SI scale factors and may include the units.  In 
-addition, you may give a name and description.  For example, any of the 
-following ways can be used to specify 1ns:
+and units). *QuantiPhy* also allows a name and description to be associated with 
+the quantity.  Normally, creating a quantity takes one or two arguments.  The 
+first is taken to be the value, and the second, if given, is taken to be the 
+model, which is a source of default values.  More on this in a bit, but for the 
+time being you can assume the model is a string that contains the units for the 
+quantity.  The value may be given as a float or as a string.  The string may be 
+in floating point notation, in scientific notation, or with SI scale factors and 
+may include the units.  In addition, you may give a name and description.  For 
+example, any of the following ways can be used to specify 1ns:
 
 .. code-block:: python
 

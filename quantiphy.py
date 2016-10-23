@@ -2,7 +2,7 @@
 '''
 QuantiPhy: Support for Physical Quantities
 
-Utilities for converting too and from physical quantities (numbers with units).
+Utilities for converting to and from physical quantities (numbers with units).
 '''
 
 # License {{{1
@@ -79,9 +79,10 @@ CONSTANTS = {
 
 
 # Constants {{{1
-__version__ = '0.0.3'
-__released__ = '2016-10-21'
+__version__ = '0.1.0'
+__released__ = '2016-10-22'
 
+# These mappings are only used when reading numbers
 MAPPINGS = {
     'Y': ('e24',  1e24 ),
     'Z': ('e21',  1e21 ),
@@ -94,6 +95,8 @@ MAPPINGS = {
     'k': ('e3',   1e3  ),
     '_': ('',     1    ),
     '' : ('',     1    ),
+    'c': ('e-2',  1e-2 ),  # only available for input, not used in output
+    '%': ('e-2',  1e-2 ),  # only available for input, not used in output
     'm': ('e-3',  1e-3 ),
     'u': ('e-6',  1e-6 ),
     'n': ('e-9',  1e-9 ),
@@ -104,6 +107,7 @@ MAPPINGS = {
     'y': ('e-24', 1e-24),
 }
 
+# These mappings are only used when writing numbers
 BIG_SCALE_FACTORS = 'kMGTPEZY'
     # These must be given in order, one for every three decades.
     # Use k rather than K, because K looks like a temperature when used alone.
@@ -451,6 +455,8 @@ class Quantity(float):
             return format(_combine(str(self.real), '', units, ' '))
 
         # convert into scientific notation with proper precision
+        if prec is None:
+            prec = self._prec
         if prec == 'full' and hasattr(self, '_mantissa'):
             mantissa = self._mantissa
             sf = self._scale_factor
@@ -469,12 +475,8 @@ class Quantity(float):
             exp += len(whole) - 1
         else:
             # determine precision
-            if prec is None:
-                prec = self._prec
-            elif prec == 'full':
+            if prec == 'full':
                 prec = self._full_prec
-            else:
-                prec = int(prec)
             assert (prec >= 0)
 
             # get components of number
