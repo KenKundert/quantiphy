@@ -1,14 +1,24 @@
 QuantiPhy - Physical Quantities
 ===============================
 
-| Version= 0.1.0
-| Released= 2016-10-22
+| Version= 0.1.1
+| Released= 2016-10-23
 
-.. image:: https://travis-ci.org/KenKundert/quantiphy.svg?branch=master
+.. image:: https://img.shields.io/travis/KenKundert/quantiphy/master.svg
     :target: https://travis-ci.org/KenKundert/quantiphy
 
-.. image:: https://coveralls.io/repos/github/KenKundert/quantiphy/badge.svg?branch=master
-    :target: https://coveralls.io/github/KenKundert/quantiphy?branch=master
+.. image:: https://img.shields.io/coveralls/KenKundert/quantiphy.svg
+    :target: https://coveralls.io/r/KenKundert/quantiphy
+
+.. image:: https://img.shields.io/pypi/v/quantiphy.svg
+    :target: https://pypi.python.org/pypi/quantiphy
+
+.. image:: https://img.shields.io/pypi/pyversions/quantiphy.svg
+    :target: https://pypi.python.org/pypi/quantiphy/
+
+.. image:: https://img.shields.io/pypi/dd/quantiphy.svg
+    :target: https://pypi.python.org/pypi/quantiphy/
+
 
 Use 'pip install quantiphy' to install. Requires Python3.4 or better.
 
