@@ -79,8 +79,8 @@ CONSTANTS = {
 
 
 # Constants {{{1
-__version__ = '0.2.1'
-__released__ = '2016-10-23'
+__version__ = '0.2.2'
+__released__ = '2016-10-24'
 
 # These mappings are only used when reading numbers
 MAPPINGS = {
@@ -529,7 +529,7 @@ class Quantity(float):
                 self.real, float(other),
                 rel_tol=self._reltol, abs_tol=self._abstol
             )
-        except AttributeError:
+        except AttributeError:  # pragma: no cover
             delta = abs(self.real-float(other))
             reference = max(abs(self.real), abs(float(other)))
             return delta <= max(self._reltol * reference, self._abs_tol)
@@ -588,7 +588,7 @@ class Quantity(float):
                     value = getattr(self, 'name', '')
                 elif ftype == 'd':
                     value = getattr(self, 'desc', '')
-                else:
+                else:  # pragma: no cover
                     raise AssertionError(ftype)
                 return '{0:{1}{2}s}'.format(value, align, width)
             fmt = ftype.isupper()

@@ -1,8 +1,8 @@
 QuantiPhy - Physical Quantities
 ===============================
 
-| Version: 0.2.1
-| Released: 2016-10-23
+| Version: 0.2.2
+| Released: 2016-10-24
 
 .. image:: https://img.shields.io/travis/KenKundert/quantiphy/master.svg
     :target: https://travis-ci.org/KenKundert/quantiphy
@@ -108,7 +108,7 @@ taken to be the description. For example:
 
     >>> out_period = Quantity(10*period, period)
     >>> print(out_period.name, '=', out_period, '#', out_period.desc)
-    period = 100ns # clock period
+    Tclk = 100ns # clock period
 
     >>> freq = Quantity(100e6, 'Hz')
     >>> print(freq)
@@ -616,13 +616,13 @@ if there is a description and the second used otherwise.
 
 .. code-block:: python
 
-   >>> Quantity.set_preferences(assign_fmt=('{n} = {v} -- {d}', '{n} = {v}'))
+   >>> Quantity.set_preferences(assign_fmt=('{n} = {v}  # {d}', '{n} = {v}'))
 
    >>> print('{:S}'.format(trise))
    trise = 10ns
 
    >>> print('{:S}'.format(wavelength))
-   λ = 211.06mm -- wavelength of hydrogen line
+   λ = 211.06mm  # wavelength of hydrogen line
 
 
 Exceptions

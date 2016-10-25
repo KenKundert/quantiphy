@@ -53,6 +53,8 @@ def test_misc():
     q=Quantity('inf Hz')
     assert q.is_infinite() == True
 
+    assert repr(q) == "Quantity('inf Hz')"
+
     with pytest.raises(ValueError):
         q=Quantity('x*y = z')
 
@@ -61,3 +63,29 @@ def test_misc():
 
     with pytest.raises(ValueError):
         Quantity.add_to_namespace('x*y = z')
+
+    with pytest.raises(ValueError):
+        Quantity('x\ny = z')
+
+    Quantity.set_preferences(assign_fmt='{x}')
+    with pytest.raises(KeyError):
+        '{:S}'.format(Quantity('f = 1kHz'))
+
+    Quantity.set_preferences(assign_fmt=('{n} = {v}  # {d}', '{n} = {v}'))
+    q1 = Quantity('10ns', name='trise')
+    q2 = Quantity('10ns', name='trise', desc='rise time')
+    assert '{:G}'.format(q1) == 'trise = 1e-08'
+    assert '{:G}'.format(q2) == 'trise = 1e-08  # rise time'
+
+    q3 = Quantity('10cm', name='foo')
+    q4 = Quantity('10%', name='bar', desc='buzz')
+    assert '{:G}'.format(q3) == 'foo = 0.1'
+    assert '{:G}'.format(q4) == 'bar = 0.1  # buzz'
+
+    class Derived(Quantity):
+        pass
+    Derived.set_preferences(prec=8)
+    mu = Derived('mu0')
+    assert mu.render() == '1.25663706 uH/m'
+    Derived.set_preferences(prec=None)
+    assert mu.render() == '1.2566 uH/m'
