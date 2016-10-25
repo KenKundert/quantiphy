@@ -1,62 +1,62 @@
 # encoding: utf8
 
-from quantiphy import Quantity
+from quantiphy import Quantity, CONSTANTS
 import pytest
 
 def test_misc():
     Quantity.set_preferences(spacer=' ')
-    q=Quantity(1420405751.786, 'Hz')
+    q = Quantity(1420405751.786, 'Hz')
     assert q.render(si=False, units=False) == '1.4204e9'
 
-    t=Quantity('1420405751.786 Hz').as_tuple()
+    t = Quantity('1420405751.786 Hz').as_tuple()
     assert t == (1420405751.786, 'Hz')
 
-    t=Quantity('1420405751.786 Hz').render(si=True, units=True, prec='full')
+    t = Quantity('1420405751.786 Hz').render(si=True, units=True, prec='full')
     assert t == '1.420405751786 GHz'
 
-    s=Quantity('1420405751.786 Hz').render(si=False, units=True, prec='full')
+    s = Quantity('1420405751.786 Hz').render(si=False, units=True, prec='full')
     assert s == '1.420405751786e9 Hz'
 
     f=float(Quantity('1420405751.786 Hz'))
     assert f == 1420405751.786
 
-    t=Quantity('1420405751.786 Hz').render(si=True, units=False)
+    t = Quantity('1420405751.786 Hz').render(si=True, units=False)
     assert t == '1.4204G'
 
-    s=Quantity('1420405751.786 Hz').render(si=False, units=False)
+    s = Quantity('1420405751.786 Hz').render(si=False, units=False)
     assert s == '1.4204e9'
 
-    s=Quantity(1420405751.786, 'Hz').render(si=False, units=False, prec='full')
+    s = Quantity(1420405751.786, 'Hz').render(si=False, units=False, prec='full')
     assert s == '1.420405751786e9'
 
-    f=Quantity('14204.05751786MHz').render(si=True, units=False, prec='full')
+    f = Quantity('14204.05751786MHz').render(si=True, units=False, prec='full')
     assert f == '14.20405751786G'
 
-    q=Quantity('1420405751.786 Hz', units='HZ').render()
+    q = Quantity('1420405751.786 Hz', units='HZ').render()
     assert q == '1.4204 GHZ'
 
-    q=Quantity('1420405751.786 Hz')
+    q = Quantity('1420405751.786 Hz')
     assert q.is_nan() == False
 
-    q=Quantity('1420405751.786 Hz')
+    q = Quantity('1420405751.786 Hz')
     assert q.is_infinite() == False
 
-    q=Quantity('NaN Hz')
+    q = Quantity('NaN Hz')
     assert q.is_nan() == True
 
-    q=Quantity('NaN Hz')
+    q = Quantity('NaN Hz')
     assert q.is_infinite() == False
 
-    q=Quantity('inf Hz')
+    q = Quantity('inf Hz')
     assert q.is_nan() == False
 
-    q=Quantity('inf Hz')
+    q = Quantity('inf Hz')
     assert q.is_infinite() == True
 
     assert repr(q) == "Quantity('inf Hz')"
 
     with pytest.raises(ValueError):
-        q=Quantity('x*y = z')
+        q = Quantity('x*y = z')
 
     with pytest.raises(ValueError):
         Quantity.add_to_namespace('1ns')
@@ -89,3 +89,21 @@ def test_misc():
     assert mu.render() == '1.25663706 uH/m'
     Derived.set_preferences(prec=None)
     assert mu.render() == '1.2566 uH/m'
+
+    q = Quantity('Tclk = 10ns -- clock period')
+    assert q.render(fmt=True) == 'Tclk = 10 ns  # clock period'
+
+    q = Quantity('Tclk = 10ns')
+    assert q.render(fmt=True) == 'Tclk = 10 ns'
+    assert q.is_close(1e-8) is True
+    assert q.is_close(1.001e-8) is False
+
+    CONSTANTS['h_line'] = 'F_hy = 1420405751.786 Hz -- frequency of hydrogen line'
+    h_line = Quantity('h_line')
+    assert h_line.render(fmt=True) == 'F_hy = 1.4204 GHz  # frequency of hydrogen line'
+
+    h_line2 = Quantity(h_line, h_line)
+    assert h_line2.render(fmt=True) == 'F_hy = 1.4204 GHz  # frequency of hydrogen line'
+
+    h_line3 = Quantity(1420405751.786, 'F_hy Hz frequency of hydrogen line')
+    assert h_line3.render(fmt=True) == 'F_hy = 1.4204 GHz  # frequency of hydrogen line'
