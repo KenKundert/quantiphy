@@ -530,6 +530,7 @@ class Quantity(float):
                 rel_tol=self._reltol, abs_tol=self._abstol
             )
         except AttributeError:  # pragma: no cover
+            # used by python3.4 and earlier
             delta = abs(self.real-float(other))
             reference = max(abs(self.real), abs(float(other)))
             return delta <= max(self._reltol * reference, self._abstol)

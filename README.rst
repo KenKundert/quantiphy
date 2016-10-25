@@ -703,7 +703,7 @@ factors, you can specify the *ignore_sf* preference:
 Subclassing Quantity
 --------------------
 
-By subclassing Quantity you can create difference sets of default behaviors that 
+By subclassing Quantity you can create different sets of default behaviors that 
 are active simultaneously. For example:
 
 .. code-block:: python
