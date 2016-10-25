@@ -79,7 +79,7 @@ CONSTANTS = {
 
 
 # Constants {{{1
-__version__ = '0.2.3'
+__version__ = '0.2.4'
 __released__ = '2016-10-25'
 
 # These mappings are only used when reading numbers
@@ -532,7 +532,7 @@ class Quantity(float):
         except AttributeError:  # pragma: no cover
             delta = abs(self.real-float(other))
             reference = max(abs(self.real), abs(float(other)))
-            return delta <= max(self._reltol * reference, self._abs_tol)
+            return delta <= max(self._reltol * reference, self._abstol)
 
     # __float__() {{{2
     def __float__(self):
