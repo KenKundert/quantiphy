@@ -1,8 +1,8 @@
 QuantiPhy - Physical Quantities
 ===============================
 
-| Version: 0.3.2
-| Released: 2016-10-25
+| Version: 0.3.3
+| Released: 2016-10-26
 
 .. image:: https://img.shields.io/travis/KenKundert/quantiphy/master.svg
     :target: https://travis-ci.org/KenKundert/quantiphy
@@ -20,7 +20,8 @@ QuantiPhy - Physical Quantities
     :target: https://pypi.python.org/pypi/quantiphy/
 
 
-Use 'pip install quantiphy' to install. Requires Python3.4 or better.
+Use 'pip install quantiphy' to install. Requires Python2.7 or Python3.3 or 
+better.
 
 
 Introduction
