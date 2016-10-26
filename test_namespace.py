@@ -39,7 +39,7 @@ def test_namespace():
         boltz = k  -- Boltzmann's constant
         ec = q  -- Elementary charge
         speed_of_light = c -- Speed of light
-        zero_celsius = C0 -- Zero degree Celcius in Kelvin
+        zero_celsius = 0C -- Zero degree Celsius in Kelvin
         epsilon0 = eps0 -- Permittivity of free space
         mu0 = mu0 -- Permeability of free space
         Z0 = Z0 -- Characteristic impedance of free space
