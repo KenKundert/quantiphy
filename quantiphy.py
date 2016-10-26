@@ -79,7 +79,7 @@ CONSTANTS = {
 
 
 # Constants {{{1
-__version__ = '0.3.1'
+__version__ = '0.3.2'
 __released__ = '2016-10-25'
 
 # These mappings are only used when reading numbers
@@ -330,9 +330,24 @@ class Quantity(float):
             than 1 milli.
         """
         ignore_sf = cls._ignore_sf if ignore_sf is None else ignore_sf
+        data = {}
+
+        # process model to get values for name, units, and desc if available
+        if is_str(model):
+            components = model.split(None, 2)
+            if len(components) == 1:
+                data['units'] = components[0]
+            else:
+                data['name'] = components[0]
+                data['units'] = components[1]
+                if len(components) == 3:
+                    data['desc'] = components[2]
+        else:
+            data['name'] = getattr(model, 'name', '')
+            data['units'] = getattr(model, 'units', '')
+            data['desc'] = getattr(model, 'desc', '')
 
         def recognize_all(value):
-            nonlocal name, units, desc, mantissa, sf
             try:
                 number, u, mantissa, sf = recognize_number(value, ignore_sf)
             except ValueError:
@@ -341,58 +356,46 @@ class Quantity(float):
                 if match:
                     n, val, d = match.groups()
                     number, u, mantissa, sf = recognize_number(val, ignore_sf)
-                    if name is None:
-                        name = n
-                    if desc is None:
-                        desc = d
+                    data['name'] = n
+                    data['desc'] = d
                 else:
                     raise
-            if units is None:
-                units = u
-            return number
+            data['units'] = u
+            return number, mantissa, sf
 
         # process the value
         if is_str(value):
             if value in CONSTANTS:
                 value = CONSTANTS[value]
                 if is_str(value):
-                    number = recognize_all(value)
+                    number, mantissa, sf = recognize_all(value)
                 else:
                     number = value[0]
                     if is_str(number):
                         number, _, mantissa, sf = recognize_number(number, True)
-                    if len(value) > 1 and not units:
-                        units = value[1]
-                    if len(value) > 2 and not name:
-                        name = value[2]
-                    if len(value) > 3 and not desc:
-                        desc = value[3]
+                    if len(value) > 1:
+                        data['units'] = value[1]
+                    if len(value) > 2:
+                        data['name'] = value[2]
+                    if len(value) > 3:
+                        data['desc'] = value[3]
             else:
-                number = recognize_all(value)
+                number, mantissa, sf = recognize_all(value)
         else:
             number = value
 
-        # process model to get values for name, units, and desc if still empty
-        if is_str(model):
-            components = model.split(maxsplit=2)
-            if len(components) == 1:
-                units = components[0] if units is None else units
-            else:
-                name = components[0] if name is None else name
-                units = components[1] if units is None else units
-                if len(components) == 3:
-                    desc = components[2] if desc is None else desc
-        else:
-            name = getattr(model, 'name', None) if name is None else name
-            units = getattr(model, 'units', None) if units is None else units
-            desc = getattr(model, 'desc', None) if desc is None else desc
-
         # create the underlying data structure and add attributes as appropriate
         self = float.__new__(cls, number)
+        if not units:
+            units = data.get('units')
         if units:
             self.units = units
+        if not name:
+            name = data.get('name')
         if name:
             self.name = name
+        if not desc:
+            desc = data.get('desc')
         if desc:
             self.desc = desc
 
