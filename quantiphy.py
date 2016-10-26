@@ -69,17 +69,17 @@ CONSTANTS = {
     'hbar': (6.62606957e-34/(2*math.pi),
                                 'J-s',  'ħ',   "reduced Plank's constant"),
     'k':    ('1.3806488e-23',   'J/K',  'k',   "Boltzmann's constant"),
-    'q':    ('1.602176565e-19', 'C',    'q',   "Elementary charge"),
-    'c':    ('2.99792458e8',    'm/s',  'c',   "Speed of light"),
-    'C0':   ('273.15',          'K',    '0°C', "Zero degrees Celsius in Kelvin"),
-    'eps0': ('8.854187817e-12', 'F/m',  'ε₀',  "Permittivity of free space"),
-    'mu0':  (4e-7*math.pi,      'H/m',  'μ₀',  "Permeability of free space"),
-    'Z0':   ('376.730313461',   'Ohms', 'Z₀',  "Characteristic impedance of free space"),
+    'q':    ('1.602176565e-19', 'C',    'q',   "elementary charge"),
+    'c':    ('2.99792458e8',    'm/s',  'c',   "speed of light"),
+    '0C':   ('273.15',          'K',    '0°C', "zero degrees Celsius in Kelvin"),
+    'eps0': ('8.854187817e-12', 'F/m',  'ε₀',  "permittivity of free space"),
+    'mu0':  (4e-7*math.pi,      'H/m',  'μ₀',  "permeability of free space"),
+    'Z0':   ('376.730313461',   'Ohms', 'Z₀',  "characteristic impedance of free space"),
 }
 
 
 # Constants {{{1
-__version__ = '0.2.4'
+__version__ = '0.3.0'
 __released__ = '2016-10-25'
 
 # These mappings are only used when reading numbers

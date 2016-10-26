@@ -1,7 +1,7 @@
 QuantiPhy - Physical Quantities
 ===============================
 
-| Version: 0.2.4
+| Version: 0.3.0
 | Released: 2016-10-25
 
 .. image:: https://img.shields.io/travis/KenKundert/quantiphy/master.svg
@@ -198,8 +198,7 @@ You can also access the full precision of the quantity:
 Full precision implies whatever precision was used when specifying the quantity 
 if it was specified as a string. If it was specified as a real number, then 
 a fixed, user controllable number of digits are used (default=12). Generally one 
-uses 'full' when generating output that will be read by a machine. Conversely it 
-is best not to use 'full' when generating output meant for humans to read.
+uses 'full' when generating output that will be read by a machine.
 
 If you specify *fmt* to render, it will generally include the name and perhaps 
 the description if they are available. The formatting is controlled by 
@@ -236,7 +235,7 @@ that you can use it in expressions and it will evaluate to its real value::
     <class 'float'>
 
 Notice that when performing arithmetic operations on quantities the units are 
-completely ignored and do not propagate in any to the newly computed result.
+completely ignored and do not propagate in any way to the newly computed result.
 
 
 Preferences
@@ -337,6 +336,40 @@ assign_rec (str):
         "Temp = 300_K -- Temperature".
 
 
+Ambiguity of Scale Factors and Units
+------------------------------------
+
+By default, *QuantiPhy* treats both the scale factor and the units as being 
+optional.  With the scale factor being optional, the meaning of some 
+specifications can be ambiguous. For example, '1m' may represent 1 milli or it 
+may represent 1 meter.  Similarly, '1meter' my represent 1 meter or 
+1 milli-eter. To allow you to avoid this ambiguity, *QuantiPhy* accepts '_' as 
+the unity scale factor. In this way '1_m' is unambiguously 1 meter. You can 
+instruct *QuantiPhy* to output '_' as the unity scale factor by specifying the 
+*unity_sf* argument to *set_preferences*:
+
+.. code-block:: python
+
+   >>> Quantity.set_preferences(unity_sf='_')
+   >>> l = Quantity(1, 'm')
+   >>> print(l)
+   1_m
+
+If you need to interpret numbers that have units and are known not to have scale 
+factors, you can specify the *ignore_sf* preference:
+
+.. code-block:: python
+
+   >>> Quantity.set_preferences(ignore_sf=True, unity_sf='')
+   >>> l = Quantity('1000m')
+   >>> l.as_tuple()
+   (1000.0, 'm')
+
+   >>> print(l)
+   1km
+
+   >>> Quantity.set_preferences(ignore_sf=False)
+
 Exceptional Values
 ------------------
 
@@ -381,22 +414,25 @@ Plank's constant:
 
 .. code-block:: python
 
+   >>> Quantity.set_preferences(
+   ...     fmt=True, spacer=' ', assign_fmt=('{n} = {v} -- {d}', '{n} = {v}')
+   ... )
+
    >>> plank = Quantity('h')
    >>> print(plank)
-   662.61e-36J-s
+   h = 662.61e-36 J-s -- Plank's constant
 
    >>> rplank = Quantity('hbar')
    >>> print(rplank)
-   105.46e-36J-s
+   ħ = 105.46e-36 J-s -- reduced Plank's constant
 
-Boltzmann's constant:
 Boltzmann's constant:
 
 .. code-block:: python
 
    >>> boltz = Quantity('k')
    >>> print(boltz)
-   13.806e-24J/K
+   k = 13.806e-24 J/K -- Boltzmann's constant
 
 Elementary charge:
 
@@ -404,7 +440,7 @@ Elementary charge:
 
    >>> q = Quantity('q')
    >>> print(q)
-   160.22e-21C
+   q = 160.22e-21 C -- elementary charge
 
 Speed of light:
 
@@ -412,15 +448,15 @@ Speed of light:
 
    >>> c = Quantity('c')
    >>> print(c)
-   299.79Mm/s
+   c = 299.79 Mm/s -- speed of light
 
 Zero degrees Celsius in Kelvin:
 
 .. code-block:: python
 
-   >>> zeroC = Quantity('C0')
+   >>> zeroC = Quantity('0C')
    >>> print(zeroC)
-   273.15K
+   0°C = 273.15 K -- zero degrees Celsius in Kelvin
 
 *QuantiPhy* uses *k* rather than *K* to represent kilo so that you can 
 distinguish between kilo and Kelvin.
@@ -431,7 +467,7 @@ Permittivity of free space:
 
    >>> eps0 = Quantity('eps0')
    >>> print(eps0)
-   8.8542pF/m
+   ε₀ = 8.8542 pF/m -- permittivity of free space
 
 Permeability of free space:
 
@@ -439,7 +475,7 @@ Permeability of free space:
 
    >>> mu0 = Quantity('mu0')
    >>> print(mu0)
-   1.2566uH/m
+   μ₀ = 1.2566 uH/m -- permeability of free space
 
 Characteristic impedance of free space:
 
@@ -447,7 +483,7 @@ Characteristic impedance of free space:
 
    >>> Z0 = Quantity('Z0')
    >>> print(Z0)
-   376.73Ohms
+   Z₀ = 376.73 Ohms -- characteristic impedance of free space
 
 You can add additional constants by adding them to the CONSTANTS dictionary:
 
@@ -457,7 +493,7 @@ You can add additional constants by adding them to the CONSTANTS dictionary:
    >>> CONSTANTS['h_line'] = (1.420405751786e9, 'Hz')
    >>> h_line = Quantity('h_line')
    >>> print(h_line)
-   1.4204GHz
+   1.4204 GHz
 
 The value of the constant may be a tuple or a string. If it is a string, it will 
 be interpreted as if it were passed as the primary argument to Quantity. If it 
@@ -470,27 +506,25 @@ the quantity.
 .. code-block:: python
 
    >>> CONSTANTS['lambda'] = 'λ = 211.0611405389mm -- wavelength of hydrogen line'
-   >>> print('{:S}'.format(Quantity('lambda')))
-   λ = 211.06mm
+   >>> print(Quantity('lambda'))
+   λ = 211.06 mm -- wavelength of hydrogen line
 
    >>> CONSTANTS['lambda'] = (Quantity('c')/h_line,)
-   >>> print('{:S}'.format(Quantity('lambda')))
+   >>> print(Quantity('lambda'))
    211.06m
 
    >>> CONSTANTS['lambda'] = (Quantity('c')/h_line, 'm')
-   >>> print('{:S}'.format(Quantity('lambda')))
-   211.06mm
+   >>> print(Quantity('lambda'))
+   211.06 mm
 
    >>> CONSTANTS['lambda'] = (Quantity('c')/h_line, 'm', 'λ')
-   >>> print('{:S}'.format(Quantity('lambda')))
-   λ = 211.06mm
+   >>> print(Quantity('lambda'))
+   λ = 211.06 mm
 
    >>> CONSTANTS['lambda'] = (Quantity('c')/h_line, 'm', 'λ', 'wavelength of hydrogen line')
-   >>> print('{:S}'.format(Quantity('lambda')))
-   λ = 211.06mm
+   >>> print(Quantity('lambda'))
+   λ = 211.06 mm -- wavelength of hydrogen line
 
-In the last example the description is added to the quantity but it is not 
-displayed because by default the S format does not show the description.
 
 String Formatting
 -----------------
@@ -500,10 +534,10 @@ Quantities can be passed into the string *format* method:
 .. code-block:: python
 
    >>> print('{}'.format(h_line))
-   1.4204GHz
+   1.4204 GHz
 
    >>> print('{:s}'.format(h_line))
-   1.4204GHz
+   1.4204 GHz
 
 In these cases the preferences for SI scale factors, units, and precision are 
 honored.
@@ -513,20 +547,20 @@ You can override the precision as part of the format specification
 .. code-block:: python
 
    >>> print('{:.6}'.format(h_line))
-   1.420406GHz
+   1.420406 GHz
 
 You can also specify the width and alignment.
 
 .. code-block:: python
 
    >>> print('|{:15.6}|'.format(h_line))
-   |1.420406GHz    |
+   |1.420406 GHz   |
 
    >>> print('|{:<15.6}|'.format(h_line))
-   |1.420406GHz    |
+   |1.420406 GHz   |
 
    >>> print('|{:>15.6}|'.format(h_line))
-   |    1.420406GHz|
+   |   1.420406 GHz|
 
 The 'q' type specifier can be used to explicitly indicate that both the number 
 and the units are desired and that SI scale factors should be used, regardless 
@@ -535,7 +569,7 @@ of the current preferences.
 .. code-block:: python
 
    >>> print('{:.6q}'.format(h_line))
-   1.420406GHz
+   1.420406 GHz
 
 Alternately, 'r' can be used to indicate just the number represented using SI 
 scale factors is desired, and the units should not be included.
@@ -586,10 +620,10 @@ preference.
    >>> trise = Quantity('10ns', name='trise')
 
    >>> print('{:S}'.format(trise))
-   trise = 10ns
+   trise = 10 ns
 
    >>> print('{:Q}'.format(trise))
-   trise = 10ns
+   trise = 10 ns
 
    >>> print('{:R}'.format(trise))
    trise = 10n
@@ -603,26 +637,24 @@ preference.
    >>> print('{:G}'.format(trise))
    trise = 1e-08
 
-   >>> print('{0:Q} ({0:d})'.format(wavelength))
-   λ = 211.06mm (wavelength of hydrogen line)
-
-   >>> Quantity.set_preferences(assign_fmt='{n} = {v} -- {d}')
+   >>> print('{0:n} = {0:q} ({0:d})'.format(wavelength))
+   λ = 211.06 mm (wavelength of hydrogen line)
 
    >>> print('{:S}'.format(wavelength))
-   λ = 211.06mm -- wavelength of hydrogen line
+   λ = 211.06 mm -- wavelength of hydrogen line
 
 You can also specify two values to *assign_fmt*, in which case the first is used 
 if there is a description and the second used otherwise.
 
 .. code-block:: python
 
-   >>> Quantity.set_preferences(assign_fmt=('{n} = {v}  # {d}', '{n} = {v}'))
+   >>> Quantity.set_preferences(assign_fmt=('{n} = {v} -- {d}', '{n} = {v}'))
 
    >>> print('{:S}'.format(trise))
-   trise = 10ns
+   trise = 10 ns
 
    >>> print('{:S}'.format(wavelength))
-   λ = 211.06mm  # wavelength of hydrogen line
+   λ = 211.06 mm -- wavelength of hydrogen line
 
 
 Exceptions
@@ -657,47 +689,14 @@ Python namespace. For example:
    >>> Quantity.add_to_namespace(design_parameters)
 
    >>> print(Fref, Kdet, Kvco, sep='\n')
-   156MHz
-   88.3uA
-   9.07GHz/V
+   Fref = 156 MHz -- Reference frequency
+   Kdet = 88.3 uA -- Gain of phase detector (Imax)
+   Kvco = 9.07 GHz/V -- Gain of VCO
 
 Any number of quantities may be given, with each quantity given on its own line.  
 The identifier given to the left '=' is the name of the variable in the local 
 namespace that is used to hold the quantity. The text after the '--' is used as 
 a description of the quantity.
-
-
-Ambiguity of Scale Factors and Units
-------------------------------------
-
-By default, *QuantiPhy* treats both the scale factor and the units as being 
-optional.  With the scale factor being optional, the meaning of some 
-specifications can be ambiguous. For example, '1m' may represent 1 milli or it 
-may represent 1 meter.  Similarly, '1meter' my represent 1 meter or 
-1 milli-eter. To allow you to avoid this ambiguity, *QuantiPhy* accepts '_' as 
-the unity scale factor. In this way '1_m' is unambiguously 1 meter. You can 
-instruct *QuantiPhy* to output '_' as the unity scale factor by specifying the 
-*unity_sf* argument to *set_preferences*:
-
-.. code-block:: python
-
-   >>> Quantity.set_preferences(unity_sf='_')
-   >>> l = Quantity(1, 'm')
-   >>> print(l)
-   1_m
-
-If you need to interpret numbers that have units and are known not to have scale 
-factors, you can specify the *ignore_sf* preference:
-
-.. code-block:: python
-
-   >>> Quantity.set_preferences(ignore_sf=True, unity_sf='')
-   >>> l = Quantity('1000m')
-   >>> l.as_tuple()
-   (1000.0, 'm')
-
-   >>> print(l)
-   1km
 
 
 Subclassing Quantity
@@ -716,4 +715,4 @@ are active simultaneously. For example:
    >>> period1 = Quantity(1e-9, 's')
    >>> period2 = ConventionalQuantity(1e-9, 's')
    >>> print(period1, period2)
-   1ns 1e-9
+   1 ns 1e-9
