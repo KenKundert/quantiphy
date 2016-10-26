@@ -79,7 +79,7 @@ CONSTANTS = {
 
 
 # Constants {{{1
-__version__ = '0.3.3'
+__version__ = '0.3.4'
 __released__ = '2016-10-26'
 
 # These mappings are only used when reading numbers
@@ -333,19 +333,20 @@ class Quantity(float):
         data = {}
 
         # process model to get values for name, units, and desc if available
-        if is_str(model):
-            components = model.split(None, 2)
-            if len(components) == 1:
-                data['units'] = components[0]
+        if model:
+            if is_str(model):
+                components = model.split(None, 2)
+                if len(components) == 1:
+                    data['units'] = components[0]
+                else:
+                    data['name'] = components[0]
+                    data['units'] = components[1]
+                    if len(components) == 3:
+                        data['desc'] = components[2]
             else:
-                data['name'] = components[0]
-                data['units'] = components[1]
-                if len(components) == 3:
-                    data['desc'] = components[2]
-        else:
-            data['name'] = getattr(model, 'name', '')
-            data['units'] = getattr(model, 'units', '')
-            data['desc'] = getattr(model, 'desc', '')
+                data['name'] = getattr(model, 'name', '')
+                data['units'] = getattr(model, 'units', '')
+                data['desc'] = getattr(model, 'desc', '')
 
         def recognize_all(value):
             try:
@@ -356,11 +357,14 @@ class Quantity(float):
                 if match:
                     n, val, d = match.groups()
                     number, u, mantissa, sf = recognize_number(val, ignore_sf)
-                    data['name'] = n
-                    data['desc'] = d
+                    if n:
+                        data['name'] = n
+                    if d:
+                        data['desc'] = d
                 else:
                     raise
-            data['units'] = u
+            if u:
+                data['units'] = u
             return number, mantissa, sf
 
         # process the value
