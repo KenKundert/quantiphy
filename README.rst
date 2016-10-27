@@ -723,12 +723,14 @@ are active simultaneously. For example:
 Example
 -------
 
-Here is a very simple example that uses *QuantiPhy*. It runs the *du* command 
-and then prints the results. The results are sorted by size and the size is 
-printed using SI scale factors.  Quantity is used to interpret the 'human' size 
-output from *du* and convert it to a float, which is easily sorted, then is is 
-converted back to a string with SI scale factors and units when rendered in the 
-print statement.
+Here is a very simple example that uses *QuantiPhy*. It runs the *du* command, 
+which prints out the disk usage of files and directories.  The results *du* are 
+gathered and then sorted by size and then the size and name of each item is 
+printed.
+
+Quantity is used to interpret the 'human' size output from *du* and convert it 
+to a float, which is easily sorted, then is is converted back to a string with 
+SI scale factors and units when rendered in the print statement.
 
 .. code-block:: python
 
