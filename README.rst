@@ -731,6 +731,7 @@ converted back to a string with SI scale factors and units when rendered in the
 print statement.
 
 .. code-block:: python
+
    #!/bin/env python3
    # runs du and sorts the output, suppressing any error messages
 
