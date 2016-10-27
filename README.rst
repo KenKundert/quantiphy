@@ -1,7 +1,7 @@
 QuantiPhy - Physical Quantities
 ===============================
 
-| Version: 0.4.0
+| Version: 0.4.1
 | Released: 2016-10-26
 |
 
@@ -718,3 +718,43 @@ are active simultaneously. For example:
    >>> period2 = ConventionalQuantity(1e-9, 's')
    >>> print(period1, period2)
    1 ns 1e-9
+
+
+Example
+-------
+
+Here is a very simple example that uses *QuantiPhy*. It runs the *du* command 
+and then prints the results. The results are sorted by size and the size is 
+printed using SI scale factors.  Quantity is used to interpret the 'human' size 
+output from *du* and convert it to a float, which is easily sorted, then is is 
+converted back to a string with SI scale factors and units when rendered in the 
+print statement.
+
+.. code-block:: python
+   #!/bin/env python3
+   # runs du and sorts the output, suppressing any error messages
+
+   from quantiphy import Quantity
+   from inform import os_error
+   from shlib import Run
+   import sys
+
+   try:
+      du = Run(['du', '-h'] + sys.argv[1:], modes='WEO1')
+
+      files = []
+      for line in du.stdout.split('\n'):
+         if line:
+             size, filename = line.split('\t', 1)
+             files += [(Quantity(size, 'B'), filename)]
+
+      files.sort(key=lambda x: x[0])
+
+      for each in files:
+         print(*each, sep='\t')
+
+   except OSError as err:
+      sys.exit(os_error(err))
+   except KeyboardInterrupt:
+      sys.exit('dus: killed by user')
+
