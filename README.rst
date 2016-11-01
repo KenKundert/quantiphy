@@ -723,8 +723,8 @@ are active simultaneously. For example:
 Example
 -------
 
-Here is a very simple example that uses *QuantiPhy*. It runs the *du* command, 
-which prints out the disk usage of files and directories.  The results *du* are 
+Here is a simple example that uses *QuantiPhy*. It runs the *du* command, which 
+prints out the disk usage of files and directories.  The results from *du* are 
 gathered and then sorted by size and then the size and name of each item is 
 printed.
 
@@ -735,7 +735,7 @@ SI scale factors and units when rendered in the print statement.
 .. code-block:: python
 
    #!/bin/env python3
-   # runs du and sorts the output, suppressing any error messages
+   # runs du and sorts the output while suppressing any error messages from du
 
    from quantiphy import Quantity
    from inform import os_error
