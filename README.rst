@@ -340,7 +340,7 @@ output_sf (str):
 render_sf (dict, func):
     Use this to change the way individual scale factors are rendered. May be 
     a dictionary or a function. For example, to replace *u* with *μ*, use 
-    *render_sf={'u': 'μ'}*.
+    *render_sf*={'u': 'μ'}.
 
     .. code-block:: python
 
@@ -352,7 +352,7 @@ render_sf (dict, func):
         >>> print(period)
         1μs
 
-    To render exponential notation as traditional scientific notation, use::
+    To render exponential notation as traditional scientific notation, use:
 
     .. code-block:: python
 
@@ -379,6 +379,8 @@ render_sf (dict, func):
         '1.4204×10⁹Hz'
 
     Both of these are common enough so that provides rendering methods for you.
+
+    .. code-block:: python
 
         >>> Quantity.set_preferences(render_sf=Quantity.render_sf_in_greek)
         >>> print(period)
