@@ -378,7 +378,8 @@ render_sf (dict, func):
         >>> h_line.render(si=False)
         '1.4204×10⁹Hz'
 
-    Both of these are common enough so that provides rendering methods for you.
+    Both of these are common enough so that *QuantiPhy* provides rendering 
+    methods for you.
 
     .. code-block:: python
 
