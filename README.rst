@@ -1,8 +1,8 @@
 QuantiPhy - Physical Quantities
 ===============================
 
-| Version: 0.4.1
-| Released: 2016-10-26
+| Version: 0.5.0
+| Released: 2016-11-04
 |
 
 .. image:: https://img.shields.io/travis/KenKundert/quantiphy/master.svg
@@ -24,6 +24,17 @@ QuantiPhy - Physical Quantities
 Use 'pip install quantiphy' to install. Requires Python2.7 or Python3.3 or 
 better.
 
+Synopsis
+--------
+
+The *QuantiPhy* package provides the *Quantity* class that:
+
+1. accepts real values with units in a variety of common forms, including those 
+   that include SI scale factors,
+2. converts them into an object that is treated as a floating point number in 
+   expressions,
+3. generally includes the units when printed and by default employs the SI scale 
+   factors.
 
 Introduction
 ------------
@@ -87,6 +98,29 @@ specify 1ns:
     >>> period = Quantity('1ns')
     >>> print(period)
     1ns
+
+When given as a string, the number may use any of the following scale factors:
+
+    |   *Y* (10\ :sup:`24`)
+    |   *Z* (10\ :sup:`21`)
+    |   *E* (10\ :sup:`18`)
+    |   *P* (10\ :sup:`15`)
+    |   *T* (10\ :sup:`12`)
+    |   *G* (10\ :sup:`9`)
+    |   *M* (10\ :sup:`6`)
+    |   *k* (10\ :sup:`3`)
+    |   *_* (1)
+    |   *c* (10\ :sup:`-2`)
+    |   *%* (10\ :sup:`-2`)
+    |   *m* (10\ :sup:`-3`)
+    |   *u* (10\ :sup:`-6`)
+    |   *μ* (10\ :sup:`-6`)
+    |   *n* (10\ :sup:`-9`)
+    |   *p* (10\ :sup:`-12`)
+    |   *f* (10\ :sup:`-15`)
+    |   *a* (10\ :sup:`-18`)
+    |   *z* (10\ :sup:`-21`)
+    |   *y* (10\ :sup:`-24`)
 
 So far our 1ns is just a value. However, you may also give a name and 
 description.  For example:
@@ -300,7 +334,61 @@ unity_sf (str):
 
 output_sf (str):
     Which scale factors to output, generally one would only use familiar scale 
-    factors.  Default is 'TGMkmunpfa'.
+    factors.  Default is 'TGMkmunpfa'.  This setting does not affect the scale 
+    factors that are recognized when reading number.
+
+render_sf (dict, func):
+    Use this to change the way individual scale factors are rendered. May be 
+    a dictionary or a function. For example, to replace *u* with *μ*, use 
+    *render_sf={'u': 'μ'}*.
+
+    .. code-block:: python
+
+        >>> period = Quantity('1μs')
+        >>> print(period)
+        1us
+
+        >>> Quantity.set_preferences(render_sf={'u': 'μ'})
+        >>> print(period)
+        1μs
+
+    To render exponential notation as traditional scientific notation, use::
+
+    .. code-block:: python
+
+        >>> sf_mapper = str.maketrans({
+        ...     'e': '×10',
+        ...     '-': '⁻',
+        ...     '0': '⁰',
+        ...     '1': '¹',
+        ...     '2': '²',
+        ...     '3': '³',
+        ...     '4': '⁴',
+        ...     '5': '⁵',
+        ...     '6': '⁶',
+        ...     '7': '⁷',
+        ...     '8': '⁸',
+        ...     '9': '⁹',
+        ... })
+
+        >>> def map_sf(sf):
+        ...     return sf.translate(sf_mapper)
+
+        >>> Quantity.set_preferences(render_sf=map_sf)
+        >>> h_line.render(si=False)
+        '1.4204×10⁹Hz'
+
+    Both of these are common enough so that provides rendering methods for you.
+
+        >>> Quantity.set_preferences(render_sf=Quantity.render_sf_in_greek)
+        >>> print(period)
+        1μs
+
+        >>> Quantity.set_preferences(render_sf=Quantity.render_sf_in_sci_notation)
+        >>> h_line.render(si=False)
+        '1.4204×10⁹Hz'
+
+        >>> Quantity.set_preferences(render_sf=None)
 
 ignore_sf (bool):
     Whether scale factors should be ignored by default when converting strings 
@@ -486,6 +574,14 @@ Characteristic impedance of free space:
    >>> Z0 = Quantity('Z0')
    >>> print(Z0)
    Z₀ = 376.73 Ohms -- characteristic impedance of free space
+
+Ångström in meters:
+
+.. code-block:: python
+
+   >>> angstrom = Quantity('angstrom')
+   >>> print(angstrom)
+   Å = 100 pm -- Ångström in meters
 
 You can add additional constants by adding them to the CONSTANTS dictionary:
 

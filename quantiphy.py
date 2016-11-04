@@ -24,6 +24,7 @@ Utilities for converting to and from physical quantities (numbers with units).
 # Imports {{{1
 import re
 import math
+from six import string_types, u, python_2_unicode_compatible
 
 # Parameters {{{1
 DEFAULTS = {
@@ -41,6 +42,10 @@ DEFAULTS = {
         # what to use as unity scale factor, generally '' or '_'
     'output_sf': 'TGMkmunpfa',
         # the scale factors that should be used when formatting numbers
+    'render_sf': {},
+        # use this to change the way individual scale factors are rendered.
+        # ex: render_sf={'u': 'μ'} to render micro using mu. Can be a mapping or
+        # a function.
     'ignore_sf': False,
         # assume quantity does not employ scale factor when converting from string
     'fmt': False,
@@ -75,12 +80,13 @@ CONSTANTS = {
     'eps0': ('8.854187817e-12', 'F/m',  'ε₀',  "permittivity of free space"),
     'mu0':  (4e-7*math.pi,      'H/m',  'μ₀',  "permeability of free space"),
     'Z0':   ('376.730313461',   'Ohms', 'Z₀',  "characteristic impedance of free space"),
+    'angstrom': ('1e-10',       'm',    'Å',   "Ångström in meters"),
 }
 
 
 # Constants {{{1
-__version__ = '0.4.1'
-__released__ = '2016-10-26'
+__version__ = '0.5.0'
+__released__ = '2016-11-04'
 
 # These mappings are only used when reading numbers
 MAPPINGS = {
@@ -99,6 +105,7 @@ MAPPINGS = {
     '%': ('e-2',  1e-2 ),  # only available for input, not used in output
     'm': ('e-3',  1e-3 ),
     'u': ('e-6',  1e-6 ),
+    'μ': ('e-6',  1e-6 ),
     'n': ('e-9',  1e-9 ),
     'p': ('e-12', 1e-12),
     'f': ('e-15', 1e-15),
@@ -250,7 +257,6 @@ def recognize_number(value, ignore_sf):
 
 # Utilities {{{1
 # is_str {{{2
-from six import string_types
 def is_str(obj):
     """Identifies strings in all their various guises."""
     return isinstance(obj, string_types)
@@ -277,6 +283,7 @@ def _combine(mantissa, sf, units, spacer):
         return mantissa + sf
 
 # Quantity class {{{1
+@python_2_unicode_compatible
 class Quantity(float):
     # Defaults
     _si = DEFAULTS['si']
@@ -286,6 +293,7 @@ class Quantity(float):
     _spacer = DEFAULTS['spacer']
     _unity_sf = DEFAULTS['unity_sf']
     _output_sf = DEFAULTS['output_sf']
+    _render_sf = DEFAULTS['render_sf']
     _keep_components = DEFAULTS['keep_components']
     _ignore_sf = DEFAULTS['ignore_sf']
     _fmt = DEFAULTS['fmt']
@@ -416,6 +424,7 @@ class Quantity(float):
 
     # is_infinte() {{{2
     def is_infinite(self):
+        '''Test value to determine if it is infinite.'''
         try:
             value = self._mantissa
         except AttributeError:
@@ -424,6 +433,7 @@ class Quantity(float):
 
     # is_nan() {{{2
     def is_nan(self):
+        '''Test value to determine if it is not a number.'''
         try:
             value = self._mantissa
         except AttributeError:
@@ -432,7 +442,7 @@ class Quantity(float):
 
     # as_tuple() {{{2
     def as_tuple(self):
-        "Returns a tuple that contains the value as a float and the units."
+        "Returns a tuple that contains the value as a float along with its units."
         return self.real, self.units
 
     # render() {{{2
@@ -511,6 +521,13 @@ class Quantity(float):
                     if SMALL_SCALE_FACTORS[index-1] in self._output_sf:
                         sf = SMALL_SCALE_FACTORS[index-1]
 
+        # render the scale factor if approprite
+        if self._render_sf:
+            try:
+                sf = self._render_sf.get(sf, sf)
+            except AttributeError:
+                sf = self._render_sf.__func__(sf)
+
         # move decimal point as needed
         if shift:
             mantissa += '00'
@@ -531,6 +548,7 @@ class Quantity(float):
 
     # is_close() {{{2
     def is_close(self, other):
+        '''Use abstol and reltol to determine if a value is close.'''
         try:
             return math.isclose(
                 self.real, float(other),
@@ -541,10 +559,6 @@ class Quantity(float):
             delta = abs(self.real-float(other))
             reference = max(abs(self.real), abs(float(other)))
             return delta <= max(self._reltol * reference, self._abstol)
-
-    # __float__() {{{2
-    def __float__(self):
-        return self.real
 
     # __str__() {{{2
     def __str__(self):
@@ -631,7 +645,7 @@ class Quantity(float):
     # set_preferences() {{{2
     @classmethod
     def set_preferences(cls, **kwargs):
-        """Set Class Preferences
+        """Set class preferences.
 
         si (bool): Use SI scale factors by default.
         units (bool): Output units by default.
@@ -647,6 +661,10 @@ class Quantity(float):
         unity_sf (str): The output scale factor for unity, generally '' or '_'.
         output_sf (str): Which scale factors to output, generally one would only use
             familiar scale factors.
+        render_sf (dict or funct): use this to change the way individual scale
+            factors are rendered, ex: render_sf={'u': 'μ'} to render micro using
+            mu.
+        a function.
         ignore_sf (bool): Whether scale factors should be ignored by default.
         fmt (bool): Cause render() to add name and description by default they are given.
         reltol (real): relative tolerance, used by is_close() when determining
@@ -689,7 +707,7 @@ class Quantity(float):
                 # override with the desired value
                 setattr(cls, lkey, value)
 
-# add_to_namespace() {{{2
+    # add_to_namespace() {{{2
     @classmethod
     def add_to_namespace(cls, quantities):
         """ Add to Namespace
@@ -721,3 +739,44 @@ class Quantity(float):
                 namespace[name] = quantity
             else:  # pragma: no cover
                 raise ValueError('{}: not a valid number.'.format(line))
+
+    # render_sf_in_sci_notation() {{{2
+    _SCI_NOTATION_MAPPER = {
+        ord(u'e'): u'×10',
+        ord(u'+'): u'',
+        ord(u'-'): u'⁻',
+        ord(u'0'): u'⁰',
+        ord(u'1'): u'¹',
+        ord(u'2'): u'²',
+        ord(u'3'): u'³',
+        ord(u'4'): u'⁴',
+        ord(u'5'): u'⁵',
+        ord(u'6'): u'⁶',
+        ord(u'7'): u'⁷',
+        ord(u'8'): u'⁸',
+        ord(u'9'): u'⁹',
+        ord(u'u'): u'μ',
+    }
+
+    @staticmethod
+    def render_sf_in_sci_notation(sf):
+        """ Render scale factors in scientific notation
+
+        Pass this function to render_sf preference if you prefer your large and
+        small numbers is classic scientific notation.
+        """
+        # The explicit references to unicode here and in _SCI_NOTATION_MAPPER are
+        # for backward compatibility with python2. They can be removed when
+        # python2 support is dropped.
+        return u(sf).translate(Quantity._SCI_NOTATION_MAPPER)
+
+    # render_sf_in_greek() {{{2
+    @staticmethod
+    def render_sf_in_greek(sf):
+        '''Render scale factors in Greek alphabet if appropriate.
+
+        Pass this dictionary to render_sf preference if you prefer μ rather than u.
+        '''
+        # this could just as easily be a simple dictionary, but implement it as
+        # a function so that it supports a docstring.
+        return {u'u': u'μ'}.get(sf, sf)
