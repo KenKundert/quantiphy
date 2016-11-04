@@ -340,7 +340,7 @@ output_sf (str):
 render_sf (dict, func):
     Use this to change the way individual scale factors are rendered. May be 
     a dictionary or a function. For example, to replace *u* with *μ*, use 
-    *render_sf*={'u': 'μ'}.
+    *render_sf* = {'u': 'μ'}.
 
     .. code-block:: python
 
