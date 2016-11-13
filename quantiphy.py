@@ -22,9 +22,67 @@ Utilities for converting to and from physical quantities (numbers with units).
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 # Imports {{{1
+from __future__ import division
 import re
 import math
 from six import string_types, u, python_2_unicode_compatible
+
+# Utilities {{{1
+# is_str {{{2
+def is_str(obj):
+    """Identifies strings in all their various guises."""
+    return isinstance(obj, string_types)
+
+# Unit Conversions {{{1
+_unit_conversions = {}
+def _convert_units(to_units, from_units, value):
+    if to_units == from_units:
+        return value
+    return _unit_conversions[(to_units,from_units)](value)
+
+class UnitConversion(object):
+    def __init__(self, to_units, from_units, slope=1, intercept=0):
+        to_units = to_units.split() if is_str(to_units) else to_units
+        from_units = from_units.split() if is_str(from_units) else from_units
+        self.slope = slope
+        self.intercept = intercept
+        for to in to_units:
+            for frm in from_units:
+                _unit_conversions[(to, frm)] = self.forward
+                _unit_conversions[(frm, to)] = self.reverse
+
+    def forward(self, value):
+        return value*self.slope + self.intercept
+
+    def reverse(self, value):
+        return (value - self.intercept)/self.slope
+
+# Temperature conversions {{{2
+UnitConversion('C °C', 'C °C')
+UnitConversion('C °C', 'K', 1, -273.15)
+UnitConversion('C °C', 'F °F', 5/9, -32*5/9)
+UnitConversion('C °C', 'R °R', 5/9, -491.67*5/9)
+# UnitConversion('K', 'C °C', 1, 273.15) -- redundant
+UnitConversion('K', 'F °F', 5/9, 273.15 - 32*5/9)
+UnitConversion('K', 'R °R', 5/9, 0)
+
+# Distance conversions {{{2
+UnitConversion('m', 'km', 1000)
+UnitConversion('m', 'cm', 1/100)
+UnitConversion('m', 'mm', 1/1000)
+UnitConversion('m', 'um μm micron', 1/1000000)
+UnitConversion('m', 'nm', 1/1000000000)
+UnitConversion('m', 'Å angstrom', 1/10000000000)
+
+# Mass conversions {{{2
+UnitConversion('g', 'lb lbs', 453.59237)
+UnitConversion('g', 'oz', 28.34952)
+
+# Time conversions {{{2
+UnitConversion('s', 'sec')
+UnitConversion('s', 'min', 60)
+UnitConversion('s', 'hr hour', 3600)
+UnitConversion('s', 'day', 86400)
 
 # Parameters {{{1
 DEFAULTS = {
@@ -36,7 +94,7 @@ DEFAULTS = {
         # normal precision
     'full_prec': 12,
         # full precision
-    'spacer': '',
+    'spacer': ' ',
         # spacer between number and units
     'unity_sf': '',
         # what to use as unity scale factor, generally '' or '_'
@@ -57,7 +115,7 @@ DEFAULTS = {
         # second is used. For example, an alternate specification that prints
         # the description if it is available is:
         #     'assign_fmt': ('{n} = {v} -- {d}', '{n} = {v}'),
-    'assign_rec': r'\A\s*(?:(\w+)\s*=\s*)?(.*?)(?:\s*--\s*(.*?)\s*)?\Z',
+    'assign_rec': r'\A\s*(?:([^=]+)\s*=\s*)?(.*?)(?:\s*--\s*(.*?)\s*)?\Z',
         # assignment recognizer
     'keep_components': True,
         # keep string components
@@ -80,7 +138,6 @@ CONSTANTS = {
     'eps0': ('8.854187817e-12', 'F/m',  'ε₀',  "permittivity of free space"),
     'mu0':  (4e-7*math.pi,      'H/m',  'μ₀',  "permeability of free space"),
     'Z0':   ('376.730313461',   'Ohms', 'Z₀',  "characteristic impedance of free space"),
-    'angstrom': ('1e-10',       'm',    'Å',   "Ångström in meters"),
 }
 
 
@@ -123,7 +180,10 @@ SMALL_SCALE_FACTORS = 'munpfazy'
     # These must be given in order, one for every three decades.
 
 # Regular expression for recognizing and decomposing string .format method codes
-FORMAT_SPEC = re.compile(r'\A([<>]?)(\d*)(?:\.(\d+))?([qQrRusSeEfFgGdn]?)\Z')
+FORMAT_SPEC = re.compile(r'\A([<>]?)(\d*)(?:\.(\d+))?(?:([qQrRusSeEfFgGdn])([a-zA-Z°Å][-^/()\w]*)?)?\Z')
+#                             ^align ^width    ^prec     ^format            ^units
+
+IDENTIFIER = re.compile(r'\A[_a-zA-Z][\w]*\Z')
 
 # Pattern Definitions {{{1
 # Build regular expressions used to recognize quantities
@@ -135,11 +195,9 @@ sign = named_regex('sign', '[-+]?')
 mantissa = named_regex('mant', r'[0-9]*\.?[0-9]+')
 exponent = named_regex('exp', '[eE][-+]?[0-9]+')
 scale_factor = named_regex('sf', '[%s]' % ''.join(MAPPINGS))
-units = named_regex('units', r'(?:[a-zA-Z][-^/()\w]*)?')
+units = named_regex('units', r'(?:[a-zA-Z°Å][-^/()\w]*)?')
     # examples: Ohms, V/A, J-s, m/s^2, H/(m-s)
     # leading char must be letter to avoid 1.0E-9s -> ('1.0e18', '-9s')
-smpl_units = named_regex('units', r'(?:[a-zA-Z_]*)')
-    # may only contain alphabetic characters, ex: V, A, Ohms, etc.
 currency = named_regex('currency', '[%s]' % CURRENCY_SYMBOLS)
 nan = named_regex('nan', '(?i)inf|nan')
 left_delimit = r'(?:\A|(?<=[^a-zA-Z0-9_.]))'
@@ -255,12 +313,7 @@ def recognize_number(value, ignore_sf):
     else:
         raise ValueError('%s: not a valid number.' % value)
 
-# Utilities {{{1
-# is_str {{{2
-def is_str(obj):
-    """Identifies strings in all their various guises."""
-    return isinstance(obj, string_types)
-
+# Quantity class {{{1
 # _combine {{{2
 def _combine(mantissa, sf, units, spacer):
     mantissa = mantissa.lstrip('+')
@@ -282,7 +335,7 @@ def _combine(mantissa, sf, units, spacer):
     else:
         return mantissa + sf
 
-# Quantity class {{{1
+# class attributes {{{2
 @python_2_unicode_compatible
 class Quantity(float):
     # Defaults
@@ -311,7 +364,8 @@ class Quantity(float):
 
     # constructor {{{2
     def __new__(
-        cls, value, model=None, units=None, name=None, desc=None, ignore_sf=None
+        cls, value, model=None, units=None, scale=None,
+        name=None, desc=None, ignore_sf=None
     ):
         """Physical Quantity
         A real quantity with units.
@@ -366,9 +420,9 @@ class Quantity(float):
                     n, val, d = match.groups()
                     number, u, mantissa, sf = recognize_number(val, ignore_sf)
                     if n:
-                        data['name'] = n
+                        data['name'] = n.strip()
                     if d:
-                        data['desc'] = d
+                        data['desc'] = d.strip()
                 else:
                     raise
             if u:
@@ -396,18 +450,43 @@ class Quantity(float):
         else:
             number = value
 
-        # create the underlying data structure and add attributes as appropriate
-        self = float.__new__(cls, number)
+        # resolve units, name and description
         if not units:
             units = data.get('units')
-        if units:
-            self.units = units
         if not name:
             name = data.get('name')
-        if name:
-            self.name = name
         if not desc:
             desc = data.get('desc')
+
+        # perform specified conversion if requested
+        if scale:
+            original = number
+            if is_str(scale):
+                # if scale is string, it contains the units to convert from
+                number = _convert_units(scale, units, number)
+                units = scale
+            else:
+                try:
+                    # otherwise, it might be a function
+                    number, units = scale(number, units)
+                except TypeError:
+                    try:
+                        # otherwise, assume it is a scale factor and units
+                        multiplier, units = scale
+                    except TypeError:
+                        # otherwise, assume it is just a scale factor
+                        multiplier = scale
+                    number *= multiplier
+            if original != number:
+                # must erase mantissa which is not out of date
+                mantissa = None
+
+        # create the underlying data structure and add attributes as appropriate
+        self = float.__new__(cls, number)
+        if units:
+            self.units = units
+        if name:
+            self.name = name
         if desc:
             self.desc = desc
 
@@ -446,7 +525,7 @@ class Quantity(float):
         return self.real, self.units
 
     # render() {{{2
-    def render(self, units=None, si=None, prec=None, fmt=None):
+    def render(self, units=None, si=None, prec=None, fmt=None, scale=None):
         "Returns the quantity as a string."
 
         use_fmt = self._fmt if fmt is None else fmt
@@ -474,7 +553,7 @@ class Quantity(float):
         # convert into scientific notation with proper precision
         if prec is None:
             prec = self._prec
-        if prec == 'full' and hasattr(self, '_mantissa'):
+        if prec == 'full' and hasattr(self, '_mantissa') and not scale:
             mantissa = self._mantissa
             sf = self._scale_factor
             try:
@@ -496,8 +575,30 @@ class Quantity(float):
                 prec = self._full_prec
             assert (prec >= 0)
 
+            # scale if desired
+            number = self.real
+            if scale:
+                if is_str(scale):
+                    # if scale is string, it contains the units to convert to
+                    number = _convert_units(scale, self.units, number)
+                    units = scale
+                else:
+                    try:
+                        # otherwise, it might be a function
+                        number, units = scale(number, self.units)
+                    except TypeError:
+                        try:
+                            # otherwise, assume it is a scale factor and units
+                            multiplier, units = scale
+                        except TypeError:
+                            # otherwise, assume it is just a scale factor
+                            multiplier = scale
+                        number *= multiplier
+                if not use_units:
+                    units = ''
+
             # get components of number
-            number = "%.*e" % (prec, self.real)
+            number = "%.*e" % (prec, number)
             mantissa, exp = number.split("e")
             exp = int(exp)
 
@@ -506,7 +607,7 @@ class Quantity(float):
         shift = exp % 3
         sf = "e%d" % (exp - shift)
         if index == 0:
-            if units and units not in CURRENCY_SYMBOLS and not self._spacer:
+            if units and units not in CURRENCY_SYMBOLS:
                 sf = self._unity_sf
             else:
                 sf = ''
@@ -547,8 +648,14 @@ class Quantity(float):
         return format(_combine(mantissa, sf, units, self._spacer))
 
     # is_close() {{{2
-    def is_close(self, other):
+    def is_close(self, other, check_units=True):
         '''Use abstol and reltol to determine if a value is close.'''
+        if check_units:
+            other_units = getattr(other, 'units', None)
+            if other_units:
+                my_units = getattr(self, 'units', None)
+                if my_units != other_units:
+                    return False
         try:
             return math.isclose(
                 self.real, float(other),
@@ -601,8 +708,10 @@ class Quantity(float):
         """
         match = FORMAT_SPEC.match(fmt)
         if match:
-            align, width, prec, ftype = match.groups()
+            align, width, prec, ftype, units = match.groups()
+            scale = units if units else None
             prec = int(prec) if prec else None
+            ftype = ftype if ftype else ''
             if ftype and ftype in 'dnu':
                 if ftype == 'u':
                     value = self.units
@@ -616,17 +725,29 @@ class Quantity(float):
             fmt = ftype.isupper()
             if ftype in 'sS':  # note that ftype = '' matches this case
                 fmt = fmt if ftype else None
-                value = self.render(prec=prec, fmt=fmt)
+                value = self.render(prec=prec, fmt=fmt, scale=scale)
             elif ftype in 'qQ':
-                value = self.render(prec=prec, si=True, units=True, fmt=fmt)
+                value = self.render(
+                    prec=prec, si=True, units=True, fmt=fmt, scale=scale
+                )
             elif ftype in 'rR':
-                value = self.render(prec=prec, si=True, units=False, fmt=fmt)
+                value = self.render(
+                    prec=prec, si=True, units=False, fmt=fmt, scale=scale
+                )
             else:
+                if scale:
+                    # this is a hack that will include the scaling
+                    value = float(self.render(
+                        prec='full', si=False, units=False, fmt=False,
+                        scale=scale
+                    ))
+                else:
+                    value = float(self)
                 if prec is None:
                     prec = self._prec
                 if ftype in 'gG':
                     prec += 1
-                value = '{0:.{1}{2}}'.format(self.real, prec, ftype.lower())
+                value = '{0:.{1}{2}}'.format(value, prec, ftype.lower())
                 if ftype.isupper():
                     name = getattr(self, 'name', '')
                     desc = getattr(self, 'desc', '')
@@ -724,6 +845,7 @@ class Quantity(float):
         """
         # Access the namespace of the calling frame
         import inspect
+        import keyword
         frame = inspect.stack()[1][0]
         namespace = frame.f_globals
 
@@ -735,8 +857,12 @@ class Quantity(float):
                     continue
                 if not name:
                     raise ValueError('{}: no variable name given.'.format(line))
-                quantity = Quantity(value, name=name, desc=desc)
-                namespace[name] = quantity
+                name = name.strip()
+                quantity = cls(value, name=name, desc=desc)
+                if IDENTIFIER.match(name) and not keyword.iskeyword( name):
+                    namespace[name] = quantity
+                else:
+                    raise ValueError('{}: not a valid identifier.'.format(name))
             else:  # pragma: no cover
                 raise ValueError('{}: not a valid number.'.format(line))
 

@@ -43,29 +43,97 @@ Introduction
 units into physical quantities.  Physical quantities are very commonly 
 encountered when working with real-world systems when numbers are involved. And 
 when encountered, the numbers often use SI scale factors to make them easier to 
-read and write. For example, imagine trying to determine the rise time and 
-bandwidth of a simple RC circuit:
+read and write.  Surprisingly, most computer languages do not support numbers in 
+these forms, meaning that when working with physical quantities, one often has 
+to choose what form to use, one that is easy for computers to read or one that 
+is easy for humans to read. For example, consider this table of critical 
+frequencies needed in jitter tolerance measurements in optical communication:
+
+.. code-block:: python
+
+    >>> table1 = """
+    ...     SDH     | Rate          | f1      | f2       | f3      | f4
+    ...     --------+---------------|---------|----------|---------|--------
+    ...     STM-1   | 155.52 Mb/s   | 500 Hz  | 6.5 kHz  | 65 kHz  | 1.3 MHz
+    ...     STM-4   | 622.08 Mb/s   | 1 kHz   | 25 kHz   | 250 kHz | 5 MHz
+    ...     STM-16  | 2.48832 Gb/s  | 5 kHz   | 100 kHz  | 1 MHz   | 20 MHz
+    ...     STM-64  | 9.95328 Gb/s  | 20 kHz  | 400 kHz  | 4 MHz   | 80 MHz
+    ...     STM-256 | 39.81312 Gb/s | 80 kHz  | 1.92 MHz | 16 MHz  | 320 MHz
+    ... """
+
+This table was formatted to be easily read by humans. If it were formatted for 
+computers, the numbers would be given without units and in exponential notation 
+because they have dramatically different sizes. For example, it might look like 
+this:
+
+.. code-block:: python
+
+    >>> table2 = """
+    ...     SDH     | Rate (b/s)    | f1 (Hz) | f2 (Hz)  | f3 (Hz) | f4 (Hz)
+    ...     --------+---------------|---------|----------|---------|--------
+    ...     STM-1   | 1.5552e8      | 5e2     | 6.5e3    | 6.5e3   | 1.3e6
+    ...     STM-4   | 6.2208e8      | 1e3     | 2.5e3    | 2.5e5   | 5e6
+    ...     STM-16  | 2.48832e9     | 5e3     | 1e5      | 1e6     | 2e7
+    ...     STM-64  | 9.95328e9     | 2e4     | 4e5      | 4e6     | 8e7
+    ...     STM-256 | 3.981312e10   | 8e4     | 1.92e6   | 1.6e7   | 3.20e8
+    ... """
+
+This contains the same information, but it is much harder for humans to read and 
+interpret.  Often the compromise of partially scaling the numbers can be used to 
+make the table easier to interpret:
+
+.. code-block:: python
+
+    >>> table3 = """
+    ...     SDH     | Rate (Mb/s)   | f1 (kHz)| f2 (kHz) | f3 (kHz)| f4 (MHz)
+    ...     --------+---------------|---------|----------|---------|--------
+    ...     STM-1   | 155.52        | 0.5     | 6.5      | 65      | 1.3
+    ...     STM-4   | 622.08        | 1       | 2.5      | 250     | 5
+    ...     STM-16  | 2488.32       | 5       | 100      | 1000    | 20
+    ...     STM-64  | 9953.28       | 20      | 400      | 4000    | 80
+    ...     STM-256 | 39813.120     | 80      | 1920     | 16000   | 320
+    ... """
+
+This looks cleaner, but it is still involves some effort to interpret because 
+the values are distant from their corresponding scaling and units, because the 
+large and small values are oddly scaled (0.5 kHz is more naturally given as 
+500Hz and 39813 MHz is more naturally given as 39.8 GHz), and because each 
+column may have a different scaling factor.
+
+All these tables contain the same information, but in the second two tables the 
+readability has been traded off in order to make the data easier to read into 
+a computer.
+
+*QuanitiPhy* makes it easy to read and generate numbers with units and scale 
+factors so you do not have to choose between human and computer reabililty.  For 
+example, the above tables could be read with the following (the must be tweaked 
+somewhat to handle tables 2 and 3):
 
 .. code-block:: python
 
     >>> from quantiphy import Quantity
-    >>> from math import pi
 
-    >>> r = Quantity('1kOhm')
-    >>> c = Quantity('1nF')
-    >>> tau = Quantity(r*c, 's')
-    >>> bw = Quantity(1/(2*pi*tau), 'Hz')
-    >>> print('R = {}, C = {} → τ = {}, BW = {}.'.format(r, c, tau, bw))
-    R = 1kOhm, C = 1nF → τ = 1us, BW = 159.15kHz.
+    >>> sdh = []
+    >>> lines = table1.strip().split('\n')
+    >>> for line in lines[2:]:
+    ...     fields = line.split('|')
+    ...     name = fields[0].strip()
+    ...     critical_freqs = [Quantity(f) for f in fields[1:]]
+    ...     sdh.append((name, critical_freqs))
+    >>> for name, freqs in sdh:
+    ...     print('{:8s}: {:12s} {:9s} {:9s} {}'.format(name, *freqs))
+    STM-1   : 155.52 Mb/s  500 Hz    6.5 kHz   65 kHz
+    STM-4   : 622.08 Mb/s  1 kHz     25 kHz    250 kHz
+    STM-16  : 2.4883 Gb/s  5 kHz     100 kHz   1 MHz
+    STM-64  : 9.9533 Gb/s  20 kHz    400 kHz   4 MHz
+    STM-256 : 39.813 Gb/s  80 kHz    1.92 MHz  16 MHz
 
-A quantity is the pairing of a real number and units, though the units are 
-optional. The Quantity class is used to combine the pair into a single object, 
-and then provides methods to provide access to the pair in useful ways. In the 
-above example quantities were created from strings that contained the value and 
-unit (ex. '1nF') or from arguments where the value and units were specified 
-explicitly (ex. r*c, 's'). Once created, the quantity objects can be treated 
-like simple real values, but when printed, their values are presented using SI 
-scale factors along with their units.
+*Quantity* is used to convert a number string, such as '155.52 Mb/s' into an 
+internal representation that includes the value and the units: 155.52e6 and 
+'b/s'.  The scaling factor is properly included. Once a value is converted to 
+a Quantity, it can be treated just like a normal float. The main difference 
+occurs when it is time to convert it back to a string. When doing so, the scale 
+factor and units are included by default.
 
 
 Quantities
@@ -85,19 +153,19 @@ specify 1ns:
 
     >>> period = Quantity(1e-9, 's')
     >>> print(period)
-    1ns
+    1 ns
 
     >>> period = Quantity('0.000000001 s')
     >>> print(period)
-    1ns
+    1 ns
 
     >>> period = Quantity('1e-9s')
     >>> print(period)
-    1ns
+    1 ns
 
     >>> period = Quantity('1ns')
     >>> print(period)
-    1ns
+    1 ns
 
 When given as a string, the number may use any of the following scale factors:
 
@@ -128,8 +196,8 @@ description.  For example:
 .. code-block:: python
 
     >>> period = Quantity('Tclk = 10ns -- clock period')
-    >>> print(period.name, '=', period, '#', period.desc)
-    Tclk = 10ns # clock period
+    >>> print(period.name, '=', period, ' #', period.desc)
+    Tclk = 10 ns  # clock period
 
 If you only specify a real number for the value, then the units, name, and 
 description do not get values. This is where the second argument, the model, 
@@ -143,20 +211,20 @@ taken to be the description. For example:
 .. code-block:: python
 
     >>> out_period = Quantity(10*period, period)
-    >>> print(out_period.name, '=', out_period, '#', out_period.desc)
-    Tclk = 100ns # clock period
+    >>> print(out_period.name, '=', out_period, ' #', out_period.desc)
+    Tclk = 100 ns  # clock period
 
     >>> freq = Quantity(100e6, 'Hz')
     >>> print(freq)
-    100MHz
+    100 MHz
 
     >>> freq = Quantity(100e6, 'Fin Hz')
-    >>> print(freq.name, '=', freq, '#', freq.desc)
-    Fin = 100MHz # 
+    >>> print(freq.name, '=', freq, ' #', freq.desc)
+    Fin = 100 MHz  # 
 
     >>> freq = Quantity(100e6, 'Fin Hz Input frequency')
-    >>> print(freq.name, '=', freq, '#', freq.desc)
-    Fin = 100MHz # Input frequency
+    >>> print(freq.name, '=', freq, ' #', freq.desc)
+    Fin = 100 MHz  # Input frequency
 
 In addition, you can explicitly specify the units, the name, and the description 
 using named arguments. These values override anything specified in the value or 
@@ -168,8 +236,8 @@ the model.
     ...     10*period, period, name='output period',
     ...     desc='period at output of frequency divider'
     ... )
-    >>> print(out_period.name, '=', out_period, '#', out_period.desc)
-    output period = 100ns # period at output of frequency divider
+    >>> print(out_period.name, '=', out_period, ' #', out_period.desc)
+    output period = 100 ns  # period at output of frequency divider
 
 Finally, you can overwrite the quantities attributes to override the units, 
 name, or description.
@@ -180,8 +248,8 @@ name, or description.
     >>> out_period.units = 's'
     >>> out_period.name = 'output period'
     >>> out_period.desc = 'period at output of frequency divider'
-    >>> print(out_period.name, '=', out_period, '#', out_period.desc)
-    output period = 100ns # period at output of frequency divider
+    >>> print(out_period.name, '=', out_period, ' #', out_period.desc)
+    output period = 100 ns  # period at output of frequency divider
 
 From a quantity object, you access its value in various ways:
 
@@ -193,13 +261,13 @@ From a quantity object, you access its value in various ways:
     (1420405751.786, 'Hz')
 
     >>> str(h_line)
-    '1.4204GHz'
+    '1.4204 GHz'
 
     >>> h_line.render()
-    '1.4204GHz'
+    '1.4204 GHz'
 
     >>> h_line.render(si=False)
-    '1.4204e9Hz'
+    '1.4204e9 Hz'
 
 You can also access the value without the units:
 
@@ -226,10 +294,10 @@ You can also access the full precision of the quantity:
 .. code-block:: python
 
     >>> h_line.render(prec='full')
-    '1.420405751786GHz'
+    '1.420405751786 GHz'
 
     >>> h_line.render(si=False, prec='full')
-    '1.420405751786e9Hz'
+    '1.420405751786e9 Hz'
 
 Full precision implies whatever precision was used when specifying the quantity 
 if it was specified as a string. If it was specified as a real number, then 
@@ -244,11 +312,194 @@ description is not printed.
 .. code-block:: python
 
     >>> h_line.render(fmt=True)
-    '1.4204GHz'
+    '1.4204 GHz'
 
     >>> out_period.render(fmt=True)
-    'output period = 100ns'
+    'output period = 100 ns'
 
+
+Rescaling When Creating a Quantity
+----------------------------------
+
+It may be that a value as given uses inconvenient units. For example, you are 
+given temperature in Fahrenheit, but you would prefer it in Kelvin.  Or perhaps 
+you are given mass data in a string that contains kilograms as a simple number 
+(without units or scale factor).  In this case you need to convert to grams so 
+that if the SI scale factors you don't end up with milli-kilograms. To address 
+these issues, use the *scale* argument to the Quantify class.
+
+For example:
+
+.. code-block:: python
+
+    >>> m = Quantity('2.529', scale=1000, units='g')
+    >>> print(m)
+    2.529 kg
+
+In this case the value is given in kilograms, and is converted to grams by 
+multiplying the given value by 1000. Finally the units are specified as 'g'.
+
+When specifying the scale you can also specify the units. For example:
+
+.. code-block:: python
+
+    >>> m = Quantity('2.529', scale=(1000, 'g'))
+    >>> print(m)
+    2.529 kg
+
+This indicates that the units should be set to 'g' after the scale operation.
+
+So far the scale operation has been a simple multiplication, but it is possible 
+to pass a function in for scale to perform more complicated scale operations.  
+for example:
+
+.. code-block:: python
+
+    >>> def f2k(f, units):
+    ...     return (f - 32)/1.8 + 273.15, 'K'
+
+    >>> t = Quantity(212, scale=f2k)
+    >>> print(t)
+    373.15 K
+
+The function is expected to take two arguments: the value and the given units, 
+and it is expected to return two values: the scaled value and the new units. In 
+this example *f2k* ignores the given units and just assumes degrees Fahrenheit.  
+But you can write a more sophisticated function as follows:
+
+.. code-block:: python
+
+    >>> def to_kelvin(t, units):
+    ...     if units in ['F', '°F']:
+    ...         return (t - 32)/1.8 + 273.15, 'K'
+    ...     if units in ['C', '°C']:
+    ...         return t + 273.15, 'K'
+    ...     if units in ['K']:
+    ...         return t, 'K'
+    ...     raise NotImplementedError
+
+    >>> t = Quantity(212, units='°F', scale=to_kelvin)
+    >>> print(t)
+    373.15 K
+
+In this case, you initially specify the quantity to be 212 °F, but before the 
+value of the quantity is fixed it is rescaled to Kelvin. It was necessary to 
+specify the units to initially be '°F' so that the scaling function knows what 
+to convert from.
+
+*QuantiPhy* also has a built-in unit conversion feature that is accessed by 
+passing the units to convert to as the value of scale.  For example:
+
+.. code-block:: python
+
+    >>> t = Quantity('212 °F', scale='K')
+    >>> print(t)
+    373.15 K
+
+You can add your own unit conversions to *QuantiPhy* by using *UnitConversion*:
+
+.. code-block:: python
+
+    >>> from quantiphy import Quantity, UnitConversion
+
+    >>> UnitConversion('g', 'lb lbs', 453.59237)
+    <...>
+
+    >>> m = Quantity('10 lbs', scale='g')
+    >>> print(m)
+    4.5359 kg
+
+*UnitConversion* accepts a scale factor and an offset, so can support 
+temperature conversions.  Also, the conversion can occur in either direction:
+
+.. code-block:: python
+
+    >>> m = Quantity('1 kg', scale='lbs')
+    >>> print(m)
+    2.2046 lbs
+
+Unit conversions between the following units are built-in:
+
+===== ==============================================
+K     K, F, °F, R, °R
+C, °C K, C, °C, F, °F, R, °R
+m     km, m, cm, mm, um, μm, micron, nm, Å, angstrom
+g     oz, lb, lbs
+s     s, sec, min, hour, hr , day
+===== ==============================================
+
+When using unit conversions it is important to only convert to units without 
+scale factors (such as those in the first column above) when creating 
+a quantity.  If the units used in a quantity includes a scale factor, then it is 
+easy to end up with two scale factors when converting the number to a string 
+(ex: 1 mkm or one milli-kilo-meter).
+
+Here is an example that uses quantity rescaling. Imagine that a table is being 
+read that gives temperature versus time, but the temperature is given in °F and 
+the time is given in minutes, but for the purpose of later analysis it is 
+desired that the values be converted to the more natural units of Kelvin and 
+seconds:
+
+.. code-block:: python
+
+    >>> rawdata = '''
+    ...     0 450
+    ...     10 400
+    ...     20 360
+    ... '''
+    >>> data = []
+    >>> for line in rawdata.split('\n'):
+    ...     if line:
+    ...         time, temp = line.split()
+    ...         time = Quantity(time, 'min', scale='s')
+    ...         temp = Quantity(temp, '°F', scale='K')
+    ...         data += [(time, temp)]
+    >>> for time, temp in data:
+    ...     print('{:7s} {}'.format(time, temp))
+    0 s     505.37 K
+    600 s   477.59 K
+    1.2 ks  455.37 K
+
+
+Rescaling When Rendering a Quantity
+-----------------------------------
+
+It is also possible rescale the value of a quantity when rendering it. In this 
+case the value of the quantity is not affected by the scaling, only the rendered 
+value is affected.  As before, *scale* can be a float, a tuple, a function, or 
+a string:
+
+.. code-block:: python
+
+    >>> m = Quantity('2529 g')
+    >>> print('mass in kg: %s' % m.render(False, scale=0.001))
+    mass in kg: 2.529
+
+    >>> print(m.render(scale=(0.0022046, 'lb')))
+    5.5754 lb
+
+    >>> import math
+    >>> def to_dB(value, units):
+    ...     return 20*math.log10(value), 'dB'+units
+
+    >>> T = Quantity('100mV')
+    >>> print(T.render(scale=to_dB))
+    -20 dBV
+
+    >>> print(m.render(scale='lb'))
+    5.5755 lb
+
+In an earlier example the units of time/temperature data were converted to 
+normal SI units. Presumably this make processing easier. Now, when producing 
+output the units can be converted back if desired:
+
+.. code-block:: python
+
+    >>> for time, temp in data:
+    ...     print('%-7s %s' % (time.render(scale='min'), temp.render(scale='°F')))
+    0 min   450 °F
+    10 min  400 °F
+    20 min  360 °F
 
 Quantities As Reals
 -------------------
@@ -256,9 +507,11 @@ Quantities As Reals
 You can use a quantity in the same way that you can use a real number, meaning 
 that you can use it in expressions and it will evaluate to its real value::
 
+.. code-block:: python
+
     >>> period = Quantity('1us')
     >>> print(period)
-    1us
+    1 us
 
     >>> frequency = 1/period
     >>> print(frequency)
@@ -282,12 +535,12 @@ You can adjust some of the behavior of these functions on a global basis using
 
 .. code-block:: python
 
-   >>> Quantity.set_preferences(prec=2, spacer=' ')
+   >>> Quantity.set_preferences(prec=2, spacer='')
    >>> h_line.render()
-   '1.42 GHz'
+   '1.42GHz'
 
    >>> h_line.render(prec=4)
-   '1.4204 GHz'
+   '1.4204GHz'
 
 Specifying *prec* (precision) as 4 gives 5 digits of precision (you get one more 
 digit than the number you specify for precision). Thus, the common range for 
@@ -300,7 +553,7 @@ default value:
 
    >>> Quantity.set_preferences(prec=None, spacer=None)
    >>> h_line.render()
-   '1.4204GHz'
+   '1.4204 GHz'
 
 The available preferences are:
 
@@ -324,7 +577,7 @@ spacer (str):
     May be '' or ' ', use the latter if you prefer a space between
     the number and the units. Generally using ' ' makes numbers easier to
     read, particularly with complex units, and using '' is easier to parse.  
-    Default is ''.
+    Default is ' '.
 
 unity_sf (str):
     The output scale factor for unity, generally '' or '_'.  Default is ''.  
@@ -346,11 +599,11 @@ render_sf (dict, func):
 
         >>> period = Quantity('1μs')
         >>> print(period)
-        1us
+        1 us
 
         >>> Quantity.set_preferences(render_sf={'u': 'μ'})
         >>> print(period)
-        1μs
+        1 μs
 
     To render exponential notation as traditional scientific notation, use:
 
@@ -376,7 +629,7 @@ render_sf (dict, func):
 
         >>> Quantity.set_preferences(render_sf=map_sf)
         >>> h_line.render(si=False)
-        '1.4204×10⁹Hz'
+        '1.4204×10⁹ Hz'
 
     Both of these are common enough so that *QuantiPhy* provides these rendering 
     methods for you.
@@ -385,11 +638,11 @@ render_sf (dict, func):
 
         >>> Quantity.set_preferences(render_sf=Quantity.render_sf_in_greek)
         >>> print(period)
-        1μs
+        1 μs
 
         >>> Quantity.set_preferences(render_sf=Quantity.render_sf_in_sci_notation)
         >>> h_line.render(si=False)
-        '1.4204×10⁹Hz'
+        '1.4204×10⁹ Hz'
 
         >>> Quantity.set_preferences(render_sf=None)
 
@@ -436,14 +689,15 @@ By default, *QuantiPhy* treats both the scale factor and the units as being
 optional.  With the scale factor being optional, the meaning of some 
 specifications can be ambiguous. For example, '1m' may represent 1 milli or it 
 may represent 1 meter.  Similarly, '1meter' my represent 1 meter or 
-1 milli-eter. To allow you to avoid this ambiguity, *QuantiPhy* accepts '_' as 
-the unity scale factor. In this way '1_m' is unambiguously 1 meter. You can 
-instruct *QuantiPhy* to output '_' as the unity scale factor by specifying the 
-*unity_sf* argument to *set_preferences*:
+1 milli-eter.  In this case *QuantiPhy* gives preference to the scale factor, so 
+'1m' normally converts to 1e-3. To allow you to avoid this ambiguity, 
+*QuantiPhy* accepts '_' as the unity scale factor.  In this way '1_m' is 
+unambiguously 1 meter. You can instruct *QuantiPhy* to output '_' as the unity 
+scale factor by specifying the *unity_sf* argument to *set_preferences*:
 
 .. code-block:: python
 
-   >>> Quantity.set_preferences(unity_sf='_')
+   >>> Quantity.set_preferences(unity_sf='_', spacer='')
    >>> l = Quantity(1, 'm')
    >>> print(l)
    1_m
@@ -453,15 +707,16 @@ factors, you can specify the *ignore_sf* preference:
 
 .. code-block:: python
 
-   >>> Quantity.set_preferences(ignore_sf=True, unity_sf='')
+   >>> Quantity.set_preferences(ignore_sf=True, unity_sf='', spacer=' ')
    >>> l = Quantity('1000m')
    >>> l.as_tuple()
    (1000.0, 'm')
 
    >>> print(l)
-   1km
+   1 km
 
    >>> Quantity.set_preferences(ignore_sf=False)
+
 
 Exceptional Values
 ------------------
@@ -494,6 +749,13 @@ to determine if they are close.
    True
 
    >>> h_line.is_close(h_line + 1e4)
+   False
+
+By default, *is_close()* looks at the both the value and the units if the 
+argument has units. In this way if you compare two quantities with different 
+units, the *is_close* test will always fail if their units differ.
+
+   >>> Quantity('10ns').is_close(Quantity('10nm'))
    False
 
 
@@ -577,14 +839,6 @@ Characteristic impedance of free space:
    >>> Z0 = Quantity('Z0')
    >>> print(Z0)
    Z₀ = 376.73 Ohms -- characteristic impedance of free space
-
-Ångström in meters:
-
-.. code-block:: python
-
-   >>> angstrom = Quantity('angstrom')
-   >>> print(angstrom)
-   Å = 100 pm -- Ångström in meters
 
 You can add additional constants by adding them to the CONSTANTS dictionary:
 
@@ -756,6 +1010,20 @@ if there is a description and the second used otherwise.
 
    >>> print('{:S}'.format(wavelength))
    λ = 211.06 mm -- wavelength of hydrogen line
+
+Finally, you can add units after the format code, which will cause the number to 
+be scaled to those units if the transformation represents a known unit 
+conversion.
+
+.. code-block:: python
+
+   >>> Tboil = Quantity('Boiling point = 100 °C')
+   >>> print('{:S°F}'.format(Tboil))
+   Boiling point = 212 °F
+
+   >>> eff_channel_length = Quantity('leff = 14nm')
+   >>> print('{:SÅ}'.format(eff_channel_length))
+   leff = 140 Å
 
 
 Exceptions

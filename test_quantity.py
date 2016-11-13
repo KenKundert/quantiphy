@@ -225,7 +225,7 @@ def test_number_recognition():
         names.add(case.name)
 
         Quantity.set_preferences(
-            prec=None, full_prec=None, spacer=None, unity_sf=None, output_sf=None,
+            prec=None, full_prec=None, spacer='', unity_sf=None, output_sf=None,
             ignore_sf=None, assign_fmt=None, assign_rec=None
         )
         try:
