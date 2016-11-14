@@ -73,6 +73,7 @@ UnitConversion('m', 'mm', 1/1000)
 UnitConversion('m', 'um μm micron', 1/1000000)
 UnitConversion('m', 'nm', 1/1000000000)
 UnitConversion('m', 'Å angstrom', 1/10000000000)
+UnitConversion('m', 'mi mile miles', 1609.344)
 
 # Mass conversions {{{2
 UnitConversion('g', 'lb lbs', 453.59237)
@@ -183,6 +184,7 @@ SMALL_SCALE_FACTORS = 'munpfazy'
 FORMAT_SPEC = re.compile(r'\A([<>]?)(\d*)(?:\.(\d+))?(?:([qQrRusSeEfFgGdn])([a-zA-Z°Å][-^/()\w]*)?)?\Z')
 #                             ^align ^width    ^prec     ^format            ^units
 
+# Regular expression for recognizing identifiers
 IDENTIFIER = re.compile(r'\A[_a-zA-Z][\w]*\Z')
 
 # Pattern Definitions {{{1
@@ -200,8 +202,6 @@ units = named_regex('units', r'(?:[a-zA-Z°Å][-^/()\w]*)?')
     # leading char must be letter to avoid 1.0E-9s -> ('1.0e18', '-9s')
 currency = named_regex('currency', '[%s]' % CURRENCY_SYMBOLS)
 nan = named_regex('nan', '(?i)inf|nan')
-left_delimit = r'(?:\A|(?<=[^a-zA-Z0-9_.]))'
-right_delimit = r'(?=[^-+0-9_]|\Z)'
 
 # number_with_scale_factor {{{2
 number_with_scale_factor = (
@@ -714,7 +714,7 @@ class Quantity(float):
             ftype = ftype if ftype else ''
             if ftype and ftype in 'dnu':
                 if ftype == 'u':
-                    value = self.units
+                    value = scale if scale else self.units
                 elif ftype == 'n':
                     value = getattr(self, 'name', '')
                 elif ftype == 'd':
@@ -760,6 +760,7 @@ class Quantity(float):
                     value = assign_fmt.format(n=name, v=value, d=desc)
             return '{0:{1}{2}s}'.format(value, align, width)
         else:
+            # unrecognized format, just provide something reasonable
             return self.render()
 
 
@@ -861,7 +862,7 @@ class Quantity(float):
                 quantity = cls(value, name=name, desc=desc)
                 if IDENTIFIER.match(name) and not keyword.iskeyword( name):
                     namespace[name] = quantity
-                else:
+                else:  # pragma: no cover
                     raise ValueError('{}: not a valid identifier.'.format(name))
             else:  # pragma: no cover
                 raise ValueError('{}: not a valid number.'.format(line))

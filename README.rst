@@ -396,6 +396,10 @@ passing the units to convert to as the value of scale.  For example:
     >>> print(t)
     373.15 K
 
+    >>> d = Quantity('d = 93 Mmiles  -- average distance from Sun to Earth', scale='m')
+    >>> print(d)
+    149.67 Gm
+
 You can add your own unit conversions to *QuantiPhy* by using *UnitConversion*:
 
 .. code-block:: python
@@ -420,13 +424,13 @@ temperature conversions.  Also, the conversion can occur in either direction:
 
 Unit conversions between the following units are built-in:
 
-===== ==============================================
+===== ===============================================================
 K     K, F, °F, R, °R
 C, °C K, C, °C, F, °F, R, °R
-m     km, m, cm, mm, um, μm, micron, nm, Å, angstrom
+m     km, m, cm, mm, um, μm, micron, nm, Å, angstrom, mi, mile, miles
 g     oz, lb, lbs
 s     s, sec, min, hour, hr , day
-===== ==============================================
+===== ===============================================================
 
 When using unit conversions it is important to only convert to units without 
 scale factors (such as those in the first column above) when creating 
@@ -489,9 +493,20 @@ a string:
     >>> print(m.render(scale='lb'))
     5.5755 lb
 
-In an earlier example the units of time/temperature data were converted to 
+When converting to units that have scale factors, it is important to disable SI 
+scale factors to avoid producing units that have two scale factors (ex: 1 mkm or 
+one milli-kilo-meter). For example:
+
+    >>> d = Quantity('1 mm')
+    >>> print(d.render(scale='cm'))
+    100 mcm
+
+    >>> print(d.render(scale='cm', si=False))
+    100e-3 cm
+
+In an earlier example the units of time and temperature data were converted to 
 normal SI units. Presumably this make processing easier. Now, when producing 
-output the units can be converted back if desired:
+output, the units can be converted back if desired:
 
 .. code-block:: python
 
@@ -500,6 +515,7 @@ output the units can be converted back if desired:
     0 min   450 °F
     10 min  400 °F
     20 min  360 °F
+
 
 Quantities As Reals
 -------------------
@@ -1024,6 +1040,17 @@ conversion.
    >>> eff_channel_length = Quantity('leff = 14nm')
    >>> print('{:SÅ}'.format(eff_channel_length))
    leff = 140 Å
+
+This feature can be used to simplify the conversion of the time and temperature 
+information back into the original units:
+
+.. code-block:: python
+
+    >>> for time, temp in data:
+    ...     print('{:<7smin} {:s°F}'.format(time, temp))
+    0 min   450 °F
+    10 min  400 °F
+    20 min  360 °F
 
 
 Exceptions

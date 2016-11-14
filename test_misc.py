@@ -56,6 +56,12 @@ def test_misc():
     assert repr(q) == "Quantity('inf Hz')"
 
     with pytest.raises(ValueError):
+        class Foo(Quantity):
+            pass
+        Foo.set_preferences(assign_rec=r'(\w+)\s*=\s*(.*)')
+        q = Foo('%')
+
+    with pytest.raises(ValueError):
         q = Quantity('x*y = z')
 
     with pytest.raises(ValueError):
@@ -63,6 +69,9 @@ def test_misc():
 
     with pytest.raises(ValueError):
         Quantity.add_to_namespace('x*y = z')
+
+    with pytest.raises(ValueError):
+        Quantity.add_to_namespace('in = 1mA')
 
     with pytest.raises(ValueError):
         Quantity('x\ny = z')
@@ -110,3 +119,19 @@ def test_misc():
 
     size = Quantity('100k', 'B')
     assert size.render() == '100 kB'
+
+    f1 = Quantity('1GHz')
+    f2 = Quantity('1GOhms')
+    assert f1.is_close(f1) == True
+    assert f1.is_close(f2) == False
+    assert f1.is_close(f1+1) == True
+    assert f1.is_close(f1+1e6) == False
+
+    class Foo(Quantity):
+        pass
+    Foo.set_preferences(render_sf=Foo.render_sf_in_greek)
+    t = Foo('1us')
+    assert t.render() == '1 μs'
+
+    Foo.set_preferences(render_sf=Quantity.render_sf_in_sci_notation)
+    assert t.render(si=False) == '1×10⁻⁶ s'
