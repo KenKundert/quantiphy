@@ -1,3 +1,5 @@
+# encoding: utf8
+
 from quantiphy import Quantity
 import math
 
