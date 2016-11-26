@@ -1,8 +1,8 @@
 QuantiPhy - Physical Quantities
 ===============================
 
-| Version: 0.5.0
-| Released: 2016-11-04
+| Version: 0.5.1
+| Released: 2016-11-25
 |
 
 .. image:: https://img.shields.io/travis/KenKundert/quantiphy/master.svg
@@ -1225,6 +1225,7 @@ produces an SVG version of the results using MatPlotLib.
     ax.set_xlim((0, 1e6))
     pl.savefig('spectrum-zoomed.svg')
 
-Notice the axis labels in the generated graph.
+Notice the axis labels in the generated graph.  Use of *QuantiPhy* makes the 
+widely scaled units compact and easy to read.
 
 ..  image:: spectrum-zoomed.png
