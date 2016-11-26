@@ -36,6 +36,7 @@ The *QuantiPhy* package provides the *Quantity* class that:
    expressions,
 3. generally includes the units when printing and by default employs the SI 
    scale factors.
+4. Unit conversion is supported when converting to or from quantities.
 
 
 Introduction
@@ -107,9 +108,9 @@ readability has been traded off in order to make the data easier to read into
 a computer.
 
 *QuanitiPhy* makes it easy to read and generate numbers with units and scale 
-factors so you do not have to choose between human and computer reabililty.  For 
-example, the above tables could be read with the following (the must be tweaked 
-somewhat to handle tables 2 and 3):
+factors so you do not have to choose between human and computer readability.  
+For example, the above tables could be read with the following (the must be 
+tweaked somewhat to handle tables 2 and 3):
 
 .. code-block:: python
 
@@ -320,6 +321,32 @@ description is not printed.
     'output period = 100 ns'
 
 
+Quantities As Reals
+-------------------
+
+You can use a quantity in the same way that you can use a real number, meaning 
+that you can use it in expressions and it will evaluate to its real value:
+
+.. code-block:: python
+
+    >>> period = Quantity('1us')
+    >>> print(period)
+    1 us
+
+    >>> frequency = 1/period
+    >>> print(frequency)
+    1000000.0
+
+    >>> type(period)
+    <class 'quantiphy.Quantity'>
+
+    >>> type(frequency)
+    <class 'float'>
+
+Notice that when performing arithmetic operations on quantities the units are 
+completely ignored and do not propagate in any way to the newly computed result.
+
+
 Rescaling When Creating a Quantity
 ----------------------------------
 
@@ -499,6 +526,8 @@ When converting to units that have scale factors, it is important to disable SI
 scale factors to avoid producing units that have two scale factors (ex: 1 mkm or 
 one milli-kilo-meter). For example:
 
+.. code-block:: python
+
     >>> d = Quantity('1 mm')
     >>> print(d.render(scale='cm'))
     100 mcm
@@ -517,32 +546,6 @@ output, the units can be converted back if desired:
     0 min   450 °F
     10 min  400 °F
     20 min  360 °F
-
-
-Quantities As Reals
--------------------
-
-You can use a quantity in the same way that you can use a real number, meaning 
-that you can use it in expressions and it will evaluate to its real value::
-
-.. code-block:: python
-
-    >>> period = Quantity('1us')
-    >>> print(period)
-    1 us
-
-    >>> frequency = 1/period
-    >>> print(frequency)
-    1000000.0
-
-    >>> type(period)
-    <class 'quantiphy.Quantity'>
-
-    >>> type(frequency)
-    <class 'float'>
-
-Notice that when performing arithmetic operations on quantities the units are 
-completely ignored and do not propagate in any way to the newly computed result.
 
 
 Preferences
@@ -772,6 +775,8 @@ to determine if they are close.
 By default, *is_close()* looks at the both the value and the units if the 
 argument has units. In this way if you compare two quantities with different 
 units, the *is_close* test will always fail if their units differ.
+
+.. code-block:: python
 
    >>> Quantity('10ns').is_close(Quantity('10nm'))
    False

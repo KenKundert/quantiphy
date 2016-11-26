@@ -2,6 +2,7 @@
 
 from quantiphy import Quantity, CONSTANTS
 import pytest
+import sys
 
 def test_misc():
     Quantity.set_preferences(spacer=' ')
@@ -127,11 +128,12 @@ def test_misc():
     assert f1.is_close(f1+1) == True
     assert f1.is_close(f1+1e6) == False
 
-    class Foo(Quantity):
-        pass
-    Foo.set_preferences(render_sf=Foo.render_sf_in_greek)
-    t = Foo('1us')
-    assert t.render() == '1 μs'
+    if sys.version_info.major == 3:
+        class Foo(Quantity):
+            pass
+        Foo.set_preferences(render_sf=Foo.render_sf_in_greek)
+        t = Foo('1us')
+        assert t.render() == '1 μs'
 
-    Foo.set_preferences(render_sf=Quantity.render_sf_in_sci_notation)
-    assert t.render(si=False) == '1×10⁻⁶ s'
+        Foo.set_preferences(render_sf=Quantity.render_sf_in_sci_notation)
+        assert t.render(si=False) == '1×10⁻⁶ s'
