@@ -109,7 +109,7 @@ a computer.
 
 *QuanitiPhy* makes it easy to read and generate numbers with units and scale 
 factors so you do not have to choose between human and computer readability.  
-For example, the above tables could be read with the following (the must be 
+For example, the above tables could be read with the following (it must be 
 tweaked somewhat to handle tables 2 and 3):
 
 .. code-block:: python

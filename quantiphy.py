@@ -41,20 +41,48 @@ def _convert_units(to_units, from_units, value):
     return _unit_conversions[(to_units,from_units)](value)
 
 class UnitConversion(object):
+    """
+    Create a unit converter.
+    """
     def __init__(self, to_units, from_units, slope=1, intercept=0):
+        """
+        to_units (string or list of strings):
+            A collection of units. If given as a single string it is split.
+
+        from_units (string or list of strings):
+            A collection of units. If given as a single string it is split.
+
+        slope:
+            Scale factor for conversion.
+
+        intercept:
+            Conversion offset.
+
+        Forward Conversion:
+            The following conversion is applied if the given units are amongst 
+            the from_units and the desired units are amoungst the to_units:
+
+                new_value = given_value*slope + incercept
+
+        Reverse Conversion:
+            The following conversion is applied if the given units are amongst 
+            the to_units and the desired units are amoungst the from_units:
+
+                new_value = (given_value - intercept)/slope
+        """
         to_units = to_units.split() if is_str(to_units) else to_units
         from_units = from_units.split() if is_str(from_units) else from_units
         self.slope = slope
         self.intercept = intercept
         for to in to_units:
             for frm in from_units:
-                _unit_conversions[(to, frm)] = self.forward
-                _unit_conversions[(frm, to)] = self.reverse
+                _unit_conversions[(to, frm)] = self._forward
+                _unit_conversions[(frm, to)] = self._reverse
 
-    def forward(self, value):
+    def _forward(self, value):
         return value*self.slope + self.intercept
 
-    def reverse(self, value):
+    def _reverse(self, value):
         return (value - self.intercept)/self.slope
 
 # Temperature conversions {{{2
@@ -391,6 +419,7 @@ class Quantity(float):
             factors.  In this way, '1m' will be interpreted as 1 meter rather
             than 1 milli.
         """
+
         ignore_sf = cls._ignore_sf if ignore_sf is None else ignore_sf
         data = {}
 
@@ -526,7 +555,32 @@ class Quantity(float):
 
     # render() {{{2
     def render(self, units=None, si=None, prec=None, fmt=None, scale=None):
-        "Returns the quantity as a string."
+        """Convert quantity to a string
+
+        units (bool):
+            Whether the units should be included in the string.
+        si (bool):
+            Whether SI scale factors should be used.
+        prec (int or 'full'):
+            The desired precision (one plus this value is the desired number of
+            digits). If specified as full, the full original precision is used.
+        fmt (bool):
+            Whether assign_fmt should be used to include name and perhaps
+            description in string.
+        scale (float, tuple, func, or string):
+            If a float, it scales the displayed value (the quantity is multiplied
+                by scale before being converted to the sting).
+            If a tuple, the first value, a float, is treated as a scale factor
+                and the second value, a string, is take to be the units of the
+                displayed value.
+            If a function, it takes two arguments, the value and the units of
+                the quantity and it returns two values, the value and units of
+                the displayed value.
+            If a string, it is taken to the be desired units. This value along
+                with the units of the quantity are used to select a known unit
+                conversion, which is applied to create the displayed value.
+        """
+
 
         use_fmt = self._fmt if fmt is None else fmt
         if use_fmt and self._assign_fmt and self.name:
@@ -771,49 +825,62 @@ class Quantity(float):
     def set_preferences(cls, **kwargs):
         """Set class preferences.
 
-        si (bool): Use SI scale factors by default.
-        units (bool): Output units by default.
-        prec (int): Default precision in digits where 0 corresponds to 1 digit. Must
+        si (bool):
+            Use SI scale factors by default.
+        units (bool):
+            Output units by default.
+        prec (int):
+            Default precision in digits where 0 corresponds to 1 digit. Must
             be nonnegative. This precision is used when full precision is not
             required.
-        full_prec (int): Default full precision in digits where 0 corresponds to 1
-            digit, must be nonnegative. This precision is used when full precision
-            is requested if the precision is not otherwise known.
-        spacer (str): May be '' or ' ', use the latter if you prefer a space between
-            the number and the units. Generally using ' ' makes numbers easier to
-            read, particularly with complex units, and using '' is easier to parse.
-        unity_sf (str): The output scale factor for unity, generally '' or '_'.
-        output_sf (str): Which scale factors to output, generally one would only use
-            familiar scale factors.
-        render_sf (dict or funct): use this to change the way individual scale
-            factors are rendered, ex: render_sf={'u': 'μ'} to render micro using
-            mu.
-        a function.
-        ignore_sf (bool): Whether scale factors should be ignored by default.
-        fmt (bool): Cause render() to add name and description by default they are given.
-        reltol (real): relative tolerance, used by is_close() when determining
-            equivalence.
-        abstol (real): absolute tolerance, used by is_close() when determining
-            equivalence.
-        keep_components (bool): indicate whether components should be kept if
-            quantity value was given as string. Doing so takes a bit of space, but
-            allows the original precision of the number to be recreated when full
-            precision is requested.
-        assign_fmt (str): Format string for an assignment. Will be passed through
-            string .format method. Format string takes three possible arguments
-            named n, q, and d for the name, value and description.  The default is
+        full_prec (int):
+            Default full precision in digits where 0 corresponds to 1 digit,
+            must be nonnegative. This precision is used when full precision is
+            requested if the precision is not otherwise known.
+        spacer (str):
+            May be '' or ' ', use the latter if you prefer a space between the
+            number and the units. Generally using ' ' makes numbers easier to
+            read, particularly with complex units, and using '' is easier to
+            parse.
+        unity_sf (str):
+            The output scale factor for unity, generally '' or '_'.
+        output_sf (str):
+            Which scale factors to output, generally one would only use familiar
+            scale factors.
+        render_sf (dict or funct):
+            Use this to change the way individual scale factors are rendered,
+            ex: render_sf={'u': 'μ'} to render micro using mu. If a function is
+            given, it takes a single string argument, the nominal scale factor,
+            and returns a string, the desired scale factor.
+        ignore_sf (bool):
+            Whether scale factors should be ignored by default.
+        fmt (bool):
+            Cause render() to add name and description by default they are
+            given.
+        reltol (real):
+            Relative tolerance, used by is_close() when determining equivalence.
+        abstol (real):
+            Absolute tolerance, used by is_close() when determining equivalence.
+        keep_components (bool):
+            Indicate whether components should be kept if quantity value was
+            given as string. Doing so takes a bit of space, but allows the
+            original precision of the number to be recreated when full precision
+            is requested.
+        assign_fmt (str):
+            Format string for an assignment. Will be passed through string
+            .format() method. Format string takes three possible arguments named
+            n, q, and d for the name, value and description.  The default is
                 '{n} = {v}'
             You can also pass two format strings as a tuple, The first is used
             if desc is present, otherwise second is used. For example,
                 ('{n} = {v} -- {d}', '{n} = {v}'),
-        assign_rec (str): Regular expression used to recognize an assignment. Used
-            in add_to_namespace(). Default recognizes the form
+        assign_rec (str):
+            Regular expression used to recognize an assignment. Used in
+            add_to_namespace(). Default recognizes the form
                 "Temp = 300_K -- Ambient temperature".
-        reltol (real): relative tolerance.
-        abstol (real): absolute tolerance.
 
-        Any value not passed in are left alone. Pass in None to reset it to its
-        default value.
+        Any value not passed in are left alone. Pass in None to reset a value to
+        its default value.
         """
 
         for key, value in kwargs.items():
@@ -838,7 +905,9 @@ class Quantity(float):
 
         Takes a string that contains quantity definitions and places those
         quantities in the calling namespace. The string may contain one
-        definition per line, of the form:
+        definition per line, each of which is parsed by assign_rec. By default,
+        the lines are assumed to be of the form:
+
             <name> = <value> -- <description>
 
         <name> must be a valid identifier (ex: c_load).
@@ -908,4 +977,4 @@ class Quantity(float):
         '''
         # this could just as easily be a simple dictionary, but implement it as
         # a function so that it supports a docstring.
-        return {u'u': u'μ'}.get(sf, sf)
+        return {'u': 'μ'}.get(sf, sf)
