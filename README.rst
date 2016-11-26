@@ -21,8 +21,9 @@ QuantiPhy - Physical Quantities
     :target: https://pypi.python.org/pypi/quantiphy/
 
 
-Use 'pip install quantiphy' to install. Requires Python2.7 or Python3.3 or 
-better.
+Use 'pip3 install quantiphy' to install.  Requires Python3.3 or better.
+Python2.7 is also supported, however support for unicode units is weak.
+
 
 Synopsis
 --------
@@ -33,8 +34,9 @@ The *QuantiPhy* package provides the *Quantity* class that:
    that include SI scale factors,
 2. converts them into an object that is treated as a floating point number in 
    expressions,
-3. generally includes the units when printed and by default employs the SI scale 
-   factors.
+3. generally includes the units when printing and by default employs the SI 
+   scale factors.
+
 
 Introduction
 ------------
@@ -1154,4 +1156,81 @@ SI scale factors and units when rendered in the print statement.
       sys.exit(os_error(err))
    except KeyboardInterrupt:
       sys.exit('dus: killed by user')
+
+
+MatPlotLib Example
+-------------------
+
+In this example *QuantiPhy* is used to create easy to read axis labels in 
+MatPlotLib. It uses NumPy to do a spectral analysis of a signal and then 
+produces an SVG version of the results using MatPlotLib.
+
+.. code-block:: python
+
+    #!/usr/bin/env python3
+
+    import numpy as np
+    from numpy.fft import fft, fftfreq, fftshift
+    import matplotlib as mpl
+    mpl.use('SVG')
+    from matplotlib.ticker import FuncFormatter
+    import matplotlib.pyplot as pl
+    from quantiphy import Quantity
+
+    # define some utility functions
+    def mag(spectrum):
+        return np.absolute(spectrum)
+
+    def freq_fmt(val, pos):
+        return Quantity(val, 'Hz').render()
+    freq_formatter = FuncFormatter(freq_fmt)
+
+    def volt_fmt(val, pos):
+        return Quantity(val, 'V').render()
+    volt_formatter = FuncFormatter(volt_fmt)
+
+    # read the data from delta-sigma.smpl
+    data = np.fromfile('delta-sigma.smpl', sep=' ')
+    time, wave = data.reshape((2, len(data)//2), order='F')
+
+    # print out basic information about the data
+    timestep = Quantity(time[1] - time[0], 's')
+    nonperiodicity = Quantity(wave[-1] - wave[0], 'V')
+    period = Quantity(timestep * len(time), 's')
+    freq_res = Quantity(1/period, 'Hz')
+    print('timestep = {}'.format(timestep))
+    print('nonperiodicity = {}'.format(nonperiodicity))
+    print('timepoints = {}'.format(len(time)))
+    print('period = {}'.format(period))
+    print('freq resolution = {}'.format(freq_res))
+
+    # create the window
+    window = np.kaiser(len(time), 11)/0.37
+        # beta=11 corresponds to alpha=3.5 (beta = pi*alpha)
+        # the processing gain with alpha=3.5 is 0.37
+    windowed = window*wave
+
+    # transform the data into the frequency domain
+    spectrum = 2*fftshift(fft(windowed))/len(time)
+    freq = fftshift(fftfreq(len(wave), timestep))
+
+    # generate graphs of the resulting spectrum
+    fig = pl.figure()
+    ax = fig.add_subplot(111)
+    ax.plot(freq, mag(spectrum))
+    ax.set_yscale('log')
+    ax.xaxis.set_major_formatter(freq_formatter)
+    ax.yaxis.set_major_formatter(volt_formatter)
+    pl.savefig('spectrum.svg')
+    ax.set_xlim((0, 1e6))
+    pl.savefig('spectrum-zoomed.svg')
+
+Notice the axis labels in the generated graph.
+
+..  image:: spectrum-zoomed.svg.jpeg
+   :height: 300px
+   :width: 400 px
+   :scale: 50 %
+   :alt: alternate text
+   :align: right
 

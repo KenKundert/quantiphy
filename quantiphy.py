@@ -745,6 +745,8 @@ class Quantity(float):
                     value = float(self)
                 if prec is None:
                     prec = self._prec
+                if prec == 'full':
+                    prec = self._full_prec
                 if ftype in 'gG':
                     prec += 1
                 value = '{0:.{1}{2}}'.format(value, prec, ftype.lower())
