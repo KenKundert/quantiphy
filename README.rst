@@ -1227,4 +1227,4 @@ produces an SVG version of the results using MatPlotLib.
 
 Notice the axis labels in the generated graph.
 
-.. image:: https://github.com/KenKundert/quantiphy/blob/master/spectrum-zoomed.svg
+..  image:: spectrum-zoomed.png
