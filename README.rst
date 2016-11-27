@@ -1,8 +1,8 @@
 QuantiPhy - Physical Quantities
 ===============================
 
-| Version: 1.0.0
-| Released: 2016-11-26
+| Version: 1.1.0
+| Released: 2016-11-27
 |
 
 .. image:: https://img.shields.io/travis/KenKundert/quantiphy/master.svg
@@ -677,6 +677,9 @@ render_sf (dict, func):
 ignore_sf (bool):
     Whether scale factors should be ignored by default when converting strings 
     into numbers.  Default is False.
+
+known_units (list of strings or string):
+    Units with a leading character that could be confused as a scale factor.
 
 reltol (real):
     Relative tolerance, used by is_close() when determining equivalence. Default 
