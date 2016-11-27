@@ -435,12 +435,12 @@ You can add your own unit conversions to *QuantiPhy* by using *UnitConversion*:
 
     >>> from quantiphy import Quantity, UnitConversion
 
-    >>> UnitConversion('g', 'lb lbs', 453.59237)
+    >>> UnitConversion('m', 'pc parsec', 3.0857e16)
     <...>
 
-    >>> m = Quantity('10 lbs', scale='g')
-    >>> print(m)
-    4.5359 kg
+    >>> d = Quantity('5 upc', scale='m')
+    >>> print(d)
+    154.28 Gm
 
 *UnitConversion* accepts a scale factor and an offset, so can support 
 temperature conversions.  Also, the conversion can occur in either direction:
@@ -575,6 +575,13 @@ default value:
    >>> Quantity.set_preferences(prec=None, spacer=None)
    >>> h_line.render()
    '1.4204 GHz'
+
+You can also access the value of an existing preference:
+
+.. code-block:: python
+
+   >>> known_units = Quantity.get_preference('known_units')
+   >>> Quantity.set_preferences(known_units = known_units + ['m'])
 
 The available preferences are:
 
@@ -737,6 +744,27 @@ factors, you can specify the *ignore_sf* preference:
    1 km
 
    >>> Quantity.set_preferences(ignore_sf=False)
+
+Alternatively, you can specify the units you wish to use whose leading character 
+is a scale factor.  Once known, these units will no longer confuse *Quantiphy*.  
+These units can be specified as a list or as a string. If specified as a string 
+the string is split to form the list. Specifying the known units replaces any 
+existing known units.
+
+.. code-block:: python
+
+   >>> d1 = Quantity('1 au')
+   >>> d2 = Quantity('1000 pc')
+   >>> print(d1.render(si=False), d2, sep='\n')
+   1e-18 u
+   1 nc
+
+   >>> Quantity.set_preferences(known_units='au pc')
+   >>> d1 = Quantity('1 au')
+   >>> d2 = Quantity('1000 pc')
+   >>> print(d1.render(si=False), d2, sep='\n')
+   1 au
+   1 kpc
 
 
 Exceptional Values
@@ -1074,6 +1102,16 @@ a number:
    ...     print(err)
    xxx: not a valid number.
 
+A KeyError is raised if a unit conversion is requested but no suitable unit
+converter is available.
+
+.. code-block:: python
+
+   >>> q = Quantity('93 Mmi', scale='pc')
+   Traceback (most recent call last):
+   ...
+   KeyError: ('pc', 'mi')
+
 
 Add to Namespace
 ----------------
@@ -1234,3 +1272,14 @@ Notice the axis labels in the generated graph.  Use of *QuantiPhy* makes the
 widely scaled units compact and easy to read.
 
 ..  image:: spectrum-zoomed.png
+
+
+Releases
+--------
+
+1.0 (2016-11-26):
+    - Initial production release.
+
+1.1 (2016-11-27):
+    - Added *known_units* preference.
+    - Added *get_preference* class method.

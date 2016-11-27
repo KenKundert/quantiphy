@@ -113,7 +113,7 @@ UnitConversion('s', 'min', 60)
 UnitConversion('s', 'hr hour', 3600)
 UnitConversion('s', 'day', 86400)
 
-# Parameters {{{1
+# Settings {{{1
 DEFAULTS = {
     'si': True,
         # use si scale factors
@@ -129,12 +129,16 @@ DEFAULTS = {
         # what to use as unity scale factor, generally '' or '_'
     'output_sf': 'TGMkmunpfa',
         # the scale factors that should be used when formatting numbers
+        # this can be a subset of the available scale factors
     'render_sf': {},
         # use this to change the way individual scale factors are rendered.
         # ex: render_sf={'u': 'μ'} to render micro using mu. Can be a mapping or
         # a function.
     'ignore_sf': False,
         # assume quantity does not employ scale factor when converting from string
+    'known_units': [],
+        # units with a leading character that could be confused as a scale
+        # factor
     'fmt': False,
         # cause render to add name and description by default if given
     'assign_fmt': '{n} = {v}',
@@ -323,24 +327,6 @@ sf_free_number_converters = [
         nan_with_units, currency_nan, simple_nan,
     ]
 ]
-# recognize_number() {{{2
-def recognize_number(value, ignore_sf):
-    if ignore_sf:
-        number_converters = sf_free_number_converters
-    else:
-        number_converters = all_number_converters
-    for pattern, get_mant, get_sf, get_units in number_converters:
-        match = pattern.match(value)
-        if match:
-            mantissa = get_mant(match)
-            sf = get_sf(match)
-            sf = sf if sf != '_' else ''
-            units = get_units(match)
-            number = float(mantissa + MAPPINGS.get(sf, [sf])[0])
-            return number, units, mantissa, sf
-    else:
-        raise ValueError('%s: not a valid number.' % value)
-
 # Quantity class {{{1
 # _combine {{{2
 def _combine(mantissa, sf, units, spacer):
@@ -377,6 +363,7 @@ class Quantity(float):
     _render_sf = DEFAULTS['render_sf']
     _keep_components = DEFAULTS['keep_components']
     _ignore_sf = DEFAULTS['ignore_sf']
+    _known_units = DEFAULTS['known_units']
     _fmt = DEFAULTS['fmt']
     _assign_fmt = DEFAULTS['assign_fmt']
     _assign_rec = DEFAULTS['assign_rec']
@@ -398,26 +385,34 @@ class Quantity(float):
         """Physical Quantity
         A real quantity with units.
 
-        value (real or string): the value of the quantity.
-            If a string, it may be specified with SI scale factors and units.
-            For example, the following are all valid:
+        value (real or string):
+            The value of the quantity.  If a string, it may be specified with SI
+            scale factors and units.  For example, the following are all valid:
                 2.5ns, 1.7 MHz, 1e6ohms, 2.8_V, 1e12 F, 42, etc.
             String may also have name and description if they are provided in a
             way recognizable by assign_rec. For example,
                 trise = 10ns -- rise time
             would work with the default recognizer.
-        model (quantity or string): used to pick up any missing attibutes
-            (units, name, desc). May be a quantity or a string. If it is a string,
-            it will be split. Then if there is one item, it is take to be the
-            units. If there are two, they are taken to be the name and units.
-            And if there are three or more, the first two are taken to the be
-            name and units, and the remainder is take to be the description.
-        units (string): overrides the units taken from the value or model.
-        name (string): overrides the name taken from the value or model.
-        desc (string): overrides the desc taken from the value or model.
-        ignore_sf (bool): assume the values given in strings do not employ scale
-            factors.  In this way, '1m' will be interpreted as 1 meter rather
-            than 1 milli.
+        model (quantity or string):
+            Used to pick up any missing attibutes (units, name, desc). May be a
+            quantity or a string. If it is a string, it will be split. Then if
+            there is one item, it is take to be the units. If there are two,
+            they are taken to be the name and units.  And if there are three or
+            more, the first two are taken to the be name and units, and the
+            remainder is take to be the description.
+        units (string):
+            Overrides the units taken from the value or model.
+        name (string):
+            Overrides the name taken from the value or model.
+        desc (string):
+            Overrides the desc taken from the value or model.
+        ignore_sf (bool):
+            Assume the values given in strings do not employ scale factors.  In
+            this way, '1m' will be interpreted as 1 meter rather than 1 milli.
+
+        Will produce a ValueError exception if passed a string that cannot be
+        converted to a quantity. Will produced a KeyError if a unit conversion
+        is requested and there is no corresponding unit converter.
         """
 
         ignore_sf = cls._ignore_sf if ignore_sf is None else ignore_sf
@@ -438,6 +433,25 @@ class Quantity(float):
                 data['name'] = getattr(model, 'name', '')
                 data['units'] = getattr(model, 'units', '')
                 data['desc'] = getattr(model, 'desc', '')
+
+        def recognize_number(value, ignore_sf):
+            if ignore_sf:
+                number_converters = sf_free_number_converters
+            else:
+                number_converters = all_number_converters
+            for pattern, get_mant, get_sf, get_units in number_converters:
+                match = pattern.match(value)
+                if match:
+                    mantissa = get_mant(match)
+                    sf = get_sf(match)
+                    sf = sf if sf != '_' else ''
+                    units = get_units(match)
+                    if sf+units in cls._known_units:
+                        sf, units = '', sf+units
+                    number = float(mantissa + MAPPINGS.get(sf, [sf])[0])
+                    return number, units, mantissa, sf
+            else:
+                raise ValueError('%s: not a valid number.' % value)
 
         def recognize_all(value):
             try:
@@ -579,6 +593,9 @@ class Quantity(float):
             If a string, it is taken to the be desired units. This value along
                 with the units of the quantity are used to select a known unit
                 conversion, which is applied to create the displayed value.
+
+        Will produced a KeyError if a unit conversion is requested and there is
+        no corresponding unit converter.
         """
 
 
@@ -823,7 +840,7 @@ class Quantity(float):
     # set_preferences() {{{2
     @classmethod
     def set_preferences(cls, **kwargs):
-        """Set class preferences.
+        """Set class preferences
 
         si (bool):
             Use SI scale factors by default.
@@ -854,6 +871,10 @@ class Quantity(float):
             and returns a string, the desired scale factor.
         ignore_sf (bool):
             Whether scale factors should be ignored by default.
+        known_units (list or string):
+            List of units that are expected to be used for which the leading
+            character could be mistaken as a scale factor.  If a string is
+            given, it is split at white space to form the list.
         fmt (bool):
             Cause render() to add name and description by default they are
             given.
@@ -896,7 +917,23 @@ class Quantity(float):
                     delattr(cls, lkey)
             else:
                 # override with the desired value
+                if key in ['known_units'] and is_str(value):
+                    value = value.split()
                 setattr(cls, lkey, value)
+
+    # get_preference() {{{2
+    @classmethod
+    def get_preference(cls, key):
+        """Get class preference
+
+        name (str):
+            Name of the desired preference. Choose from: units, prec, full_prec,
+            spacer, unity_sf, output_sf, render_sf, ignore_sf, known_units, fmt,
+            reltol, abstol, keep_components, assign_fmt, assign_rec.
+        """
+
+        # override with the desired value
+        return getattr(cls, '_' + key)
 
     # add_to_namespace() {{{2
     @classmethod
