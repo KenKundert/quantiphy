@@ -8,7 +8,7 @@ with open('README.rst') as f:
 
 setup(
     name='quantiphy',
-    version='0.5.1',
+    version='1.0.0',
     description='physical quantities (numbers with units)',
     long_description=readme,
     author="Ken Kundert",
