@@ -138,6 +138,22 @@ a Quantity, it can be treated just like a normal float. The main difference
 occurs when it is time to convert it back to a string. When doing so, the scale 
 factor and units are included by default.
 
+Alternatives
+""""""""""""
+
+There are a considerable number of Python packages dedicated to units and 
+quantities (`Alternatives <https://kdavies4.github.io/natu/seealso.html>`_).  
+However, as a rule, they focus on the units rather than the scale factors. In 
+particular, they build a system of units that you are expected to use throughout 
+your calculations.  These packages demand a high level of commitment from their 
+users and in turn provide unit consistency and built-in unit conversions.  In 
+contrast, *QuantiPhy* treats units basically as documentation.  They are simply 
+strings that are attached to quantities largely so they can be presented to the 
+user when the values are printed. As such, *QuantiPhy* is a light-weight package 
+that demands little from the user. It is used when inputting and outputting 
+values, and then only when it provides value. As a result, it provides 
+a simplicity in use that cannot be matched by the other packages.
+
 
 Quantities
 ----------
