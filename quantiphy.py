@@ -175,8 +175,8 @@ CONSTANTS = {
 
 
 # Constants {{{1
-__version__ = '1.1.0'
-__released__ = '2016-11-27'
+__version__ = '1.1.1'
+__released__ = '2016-12-09'
 
 # These mappings are only used when reading numbers
 MAPPINGS = {

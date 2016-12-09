@@ -1,8 +1,8 @@
 QuantiPhy - Physical Quantities
 ===============================
 
-| Version: 1.1.0
-| Released: 2016-11-27
+| Version: 1.1.1
+| Released: 2016-12-09
 |
 
 .. image:: https://img.shields.io/travis/KenKundert/quantiphy/master.svg
@@ -101,7 +101,9 @@ This looks cleaner, but it is still involves some effort to interpret because
 the values are distant from their corresponding scaling and units, because the 
 large and small values are oddly scaled (0.5 kHz is more naturally given as 
 500Hz and 39813 MHz is more naturally given as 39.8 GHz), and because each 
-column may have a different scaling factor.
+column may have a different scaling factor. While these might seem like minor 
+inconveniences on this table, they can become quite annoying as the table 
+becomes larger.
 
 All these tables contain the same information, but in the second two tables the 
 readability has been traded off in order to make the data easier to read into 
