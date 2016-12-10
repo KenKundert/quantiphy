@@ -1,7 +1,7 @@
 QuantiPhy - Physical Quantities
 ===============================
 
-| Version: 1.1.5
+| Version: 1.1.6
 | Released: 2016-12-10
 |
 
@@ -110,7 +110,7 @@ for the numbers may be found in the column headings, the axes, the labels, the
 title, the caption, or in the body of the text.  The sheer number of places to 
 look can dramatically slow the interpretation of the data. This problem does not 
 exist in the first table where each number is complete as it includes both its 
-scaling and its units.
+scaling and its units. The eye gets the full picture on the first glance.
 
 All these tables contain the same information, but in the second two tables the 
 readability has been traded off in order to make the data easier to read into 
