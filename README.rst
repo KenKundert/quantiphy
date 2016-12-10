@@ -1,7 +1,7 @@
 QuantiPhy - Physical Quantities
 ===============================
 
-| Version: 1.1.4
+| Version: 1.1.5
 | Released: 2016-12-10
 |
 
@@ -103,7 +103,14 @@ large and small values are oddly scaled (0.5 kHz is more naturally given as
 500Hz and 39813 MHz is more naturally given as 39.8 GHz), and because each 
 column may have a different scaling factor. While these might seem like minor 
 inconveniences on this table, they can become quite annoying as the table 
-becomes larger.
+becomes larger. Fundamentally this issue is that the eyes are naturally drawn to 
+the number, but the numbers are not complete, and so the eyes need to hunt 
+further. This problem exists with both tables and graphs. The scaling and units 
+for the numbers may be found in the column headings, the axes, the labels, the 
+title, the caption, or in the body of the text.  The sheer number of places to 
+look can dramatically slow the interpretation of the data. This problem does not 
+exist in the first table where each number is complete as it includes both its 
+scaling and its units.
 
 All these tables contain the same information, but in the second two tables the 
 readability has been traded off in order to make the data easier to read into 
@@ -111,7 +118,7 @@ a computer.
 
 *QuanitiPhy* makes it easy to read and generate numbers with units and scale 
 factors so you do not have to choose between human and computer readability.  
-For example, the above tables could be read with the following (it must be 
+For example, the above tables could be read with the following code (it must be 
 tweaked somewhat to handle tables 2 and 3):
 
 .. code-block:: python
