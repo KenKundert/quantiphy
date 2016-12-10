@@ -1,8 +1,8 @@
 QuantiPhy - Physical Quantities
 ===============================
 
-| Version: 1.1.3
-| Released: 2016-12-09
+| Version: 1.1.4
+| Released: 2016-12-10
 |
 
 .. image:: https://img.shields.io/travis/KenKundert/quantiphy/master.svg
@@ -1209,11 +1209,11 @@ SI scale factors and units when rendered in the print statement.
 
 .. code-block:: python
 
-   #!/bin/env python3
+   #!/usr/bin/env python3
    # runs du and sorts the output while suppressing any error messages from du
 
    from quantiphy import Quantity
-   from inform import os_error
+   from inform import display, fatal, os_error
    from shlib import Run
    import sys
 
@@ -1229,12 +1229,12 @@ SI scale factors and units when rendered in the print statement.
       files.sort(key=lambda x: x[0])
 
       for each in files:
-         print(*each, sep='\t')
+         display(*each, sep='\t')
 
    except OSError as err:
-      sys.exit(os_error(err))
+      fatal(os_error(err))
    except KeyboardInterrupt:
-      sys.exit('dus: killed by user')
+      display('dus: killed by user')
 
 
 MatPlotLib Example
@@ -1255,11 +1255,13 @@ produces an SVG version of the results using MatPlotLib.
     from matplotlib.ticker import FuncFormatter
     import matplotlib.pyplot as pl
     from quantiphy import Quantity
+    Quantity.set_preferences(prec=2)
 
     # define some utility functions
     def mag(spectrum):
         return np.absolute(spectrum)
 
+    # define the axis formatting routines
     def freq_fmt(val, pos):
         return Quantity(val, 'Hz').render()
     freq_formatter = FuncFormatter(freq_fmt)
@@ -1302,12 +1304,24 @@ produces an SVG version of the results using MatPlotLib.
     ax.yaxis.set_major_formatter(volt_formatter)
     pl.savefig('spectrum.svg')
     ax.set_xlim((0, 1e6))
+    ax.set_ylim((1e-7, 1))
     pl.savefig('spectrum-zoomed.svg')
+
+This script produces the following textual output::
+
+    timestep: 20 ns
+    nonperiodicity: 2.3 pV
+    timepoints: 27994
+    period: 560 us
+    freq resolution: 1.79 kHz
+
+And the following is one of the two graphs produced:
+
+..  image:: spectrum-zoomed.png
 
 Notice the axis labels in the generated graph.  Use of *QuantiPhy* makes the 
 widely scaled units compact and easy to read.
 
-..  image:: spectrum-zoomed.png
 
 
 Releases
