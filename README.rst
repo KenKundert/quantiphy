@@ -1,7 +1,7 @@
 QuantiPhy - Physical Quantities
 ===============================
 
-| Version: 1.1.2
+| Version: 1.1.3
 | Released: 2016-12-09
 |
 
@@ -1277,11 +1277,11 @@ produces an SVG version of the results using MatPlotLib.
     nonperiodicity = Quantity(wave[-1] - wave[0], 'V')
     period = Quantity(timestep * len(time), 's')
     freq_res = Quantity(1/period, 'Hz')
-    print('timestep = {}'.format(timestep))
-    print('nonperiodicity = {}'.format(nonperiodicity))
-    print('timepoints = {}'.format(len(time)))
-    print('period = {}'.format(period))
-    print('freq resolution = {}'.format(freq_res))
+    print('timestep:', timestep)
+    print('nonperiodicity:', nonperiodicity)
+    print('timepoints:', len(time))
+    print('period:', period)
+    print('freq resolution:', freq_res)
 
     # create the window
     window = np.kaiser(len(time), 11)/0.37
