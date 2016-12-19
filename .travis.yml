@@ -9,11 +9,11 @@ install:
   - pip install .
   - pip install coveralls
 script:
-  - coverage run --source=quantiphy setup.py test
+  - coverage run --source=quantiphy setup.py pytest
 deploy:
     provider: pypi
     user: messenger
     on:
         tags: true
 after_success:
-    coveralls
+  - coveralls

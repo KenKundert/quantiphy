@@ -18,7 +18,8 @@ setup(
     license='GPLv3+',
     zip_safe=True,
     py_modules=['quantiphy'],
-    install_requires=['six', 'pytest-runner'],
+    install_requires=['six'],
+    setup_requires=['pytest-runner>=2.0'],
     tests_require=['pytest'],
     keywords=[
         'quantities', 'physical', 'quantity', 'units', 'SI', 'scale factors',
