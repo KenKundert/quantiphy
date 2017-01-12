@@ -157,7 +157,7 @@ DEFAULTS = {
     'abstol': 1e-12,
         # absolute tolerance
 }
-CURRENCY_SYMBOLS = '$'
+CURRENCY_SYMBOLS = '$£€'
 CONSTANTS = {
     # value may be given as real number or string. If given as a string then the
     # number of significant figures is used as the full precision.
@@ -192,7 +192,6 @@ MAPPINGS = {
     '_': ('',     1    ),
     '' : ('',     1    ),
     'c': ('e-2',  1e-2 ),  # only available for input, not used in output
-    '%': ('e-2',  1e-2 ),  # only available for input, not used in output
     'm': ('e-3',  1e-3 ),
     'u': ('e-6',  1e-6 ),
     'μ': ('e-6',  1e-6 ),
@@ -213,7 +212,7 @@ SMALL_SCALE_FACTORS = 'munpfazy'
     # These must be given in order, one for every three decades.
 
 # Regular expression for recognizing and decomposing string .format method codes
-FORMAT_SPEC = re.compile(r'\A([<>]?)(\d*)(?:\.(\d+))?(?:([qQrRusSeEfFgGdn])([a-zA-Z°Å][-^/()\w]*)?)?\Z')
+FORMAT_SPEC = re.compile(r'\A([<>]?)(\d*)(?:\.(\d+))?(?:([qQrRusSeEfFgGdn])([a-zA-Z°ÅΩ℧%][-^/()\w]*)?)?\Z')
 #                             ^align ^width    ^prec     ^format            ^units
 
 # Regular expression for recognizing identifiers
@@ -229,8 +228,8 @@ sign = named_regex('sign', '[-+]?')
 mantissa = named_regex('mant', r'[0-9]*\.?[0-9]+')
 exponent = named_regex('exp', '[eE][-+]?[0-9]+')
 scale_factor = named_regex('sf', '[%s]' % ''.join(MAPPINGS))
-units = named_regex('units', r'(?:[a-zA-Z°Å][-^/()\w]*)?')
-    # examples: Ohms, V/A, J-s, m/s^2, H/(m-s)
+units = named_regex('units', r'(?:[a-zA-Z°ÅΩ℧%][-^/()\w]*)?')
+    # examples: Ohms, V/A, J-s, m/s^2, H/(m-s), ℧, %
     # leading char must be letter to avoid 1.0E-9s -> ('1.0e18', '-9s')
 currency = named_regex('currency', '[%s]' % CURRENCY_SYMBOLS)
 nan = named_regex('nan', '(?i)inf|nan')

@@ -90,7 +90,8 @@ def test_misc():
     q3 = Quantity('10cm', name='foo')
     q4 = Quantity('10%', name='bar', desc='buzz')
     assert '{:G}'.format(q3) == 'foo = 0.1'
-    assert '{:G}'.format(q4) == 'bar = 0.1  # buzz'
+    assert '{:G}'.format(q4) == 'bar = 10  # buzz'
+    assert '{:S}'.format(q4) == 'bar = 10 %  # buzz'
 
     class Derived(Quantity):
         pass
