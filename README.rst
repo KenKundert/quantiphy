@@ -1182,6 +1182,25 @@ converter is available.
    KeyError: ('pc', 'mi')
 
 
+Subclassing Quantity
+--------------------
+
+By subclassing Quantity you can create different sets of default behaviors that 
+are active simultaneously. For example:
+
+.. code-block:: python
+
+   >>> class ConventionalQuantity(Quantity):
+   ...     pass
+
+   >>> ConventionalQuantity.set_preferences(show_si=False, show_units=False)
+
+   >>> period1 = Quantity(1e-9, 's')
+   >>> period2 = ConventionalQuantity(1e-9, 's')
+   >>> print(period1, period2)
+   1 ns 1e-9
+
+
 Add to Namespace
 ----------------
 
@@ -1231,25 +1250,6 @@ description by default:
         fatal(err, culprit=filename)
 
     display(Fref, Kdet, Kvco, sep='\n')
-
-
-Subclassing Quantity
---------------------
-
-By subclassing Quantity you can create different sets of default behaviors that 
-are active simultaneously. For example:
-
-.. code-block:: python
-
-   >>> class ConventionalQuantity(Quantity):
-   ...     pass
-
-   >>> ConventionalQuantity.set_preferences(show_si=False, show_units=False)
-
-   >>> period1 = Quantity(1e-9, 's')
-   >>> period2 = ConventionalQuantity(1e-9, 's')
-   >>> print(period1, period2)
-   1 ns 1e-9
 
 
 Example
