@@ -1392,9 +1392,9 @@ Releases
     - Added *get_preference* class method.
 
 1.2 (2017-02-24):
-    - allow digits after decimal point be optional
+    - allow digits after decimal point to be optional
     - support underscores in numbers
     - allow options to be monkey-patched on to Quantity objects
-    - fix some issues in full precision mode
     - add strip_dp option
+    - fix some issues in full precision mode
     - ranamed some options, arguments and methods
