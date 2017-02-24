@@ -33,6 +33,27 @@ def is_str(obj):
     """Identifies strings in all their various guises."""
     return isinstance(obj, string_types)
 
+# combine {{{2
+def combine(mantissa, sf, units, spacer):
+    mantissa = mantissa.lstrip('+')
+    if units:
+        if units in CURRENCY_SYMBOLS:
+            # prefix the value with the units
+            if mantissa[0] == '-':
+                # if negative, the sign goes before the currency symbol
+                return '-' + units + mantissa[1:] + sf
+            else:
+                return units + mantissa + sf
+        else:
+            if sf in MAPPINGS:
+                # has a scale factor
+                return mantissa + spacer + sf + units
+            else:
+                # has an exponent
+                return mantissa + sf + spacer + units
+    else:
+        return mantissa + sf
+
 # Unit Conversions {{{1
 _unit_conversions = {}
 def _convert_units(to_units, from_units, value):
@@ -115,9 +136,9 @@ UnitConversion('s', 'day', 86400)
 
 # Settings {{{1
 DEFAULTS = {
-    'si': True,
-        # use si scale factors
-    'units': True,
+    'show_si': True,
+        # use SI scale factors
+    'show_units': True,
         # output units
     'prec': 4,
         # normal precision
@@ -130,24 +151,27 @@ DEFAULTS = {
     'output_sf': 'TGMkmunpfa',
         # the scale factors that should be used when formatting numbers
         # this can be a subset of the available scale factors
-    'render_sf': {},
+    'map_sf': {},
         # use this to change the way individual scale factors are rendered.
-        # ex: render_sf={'u': 'μ'} to render micro using mu. Can be a mapping or
+        # ex: map_sf={'u': 'μ'} to render micro using mu. Can be a mapping or
         # a function.
     'ignore_sf': False,
         # assume quantity does not employ scale factor when converting from string
     'known_units': [],
         # units with a leading character that could be confused as a scale
         # factor
-    'fmt': False,
+    'show_label': False,
         # cause render to add name and description by default if given
-    'assign_fmt': '{n} = {v}',
+    'strip_dp': True,
+        # strip the decimal points from numbers when rendering even if they can
+        # then be mistaken for integers.
+    'label_fmt': '{n} = {v}',
         # assignment formatter
         # use {n}, {v}, and {d} to access name, value, and description
         # if two are given as tuple, first is used if desc is present, otherwise
         # second is used. For example, an alternate specification that prints
         # the description if it is available is:
-        #     'assign_fmt': ('{n} = {v} -- {d}', '{n} = {v}'),
+        #     'label_fmt': ('{n} = {v} -- {d}', '{n} = {v}'),
     'assign_rec': r'\A\s*(?:([^=]+)\s*=\s*)?(.*?)(?:\s*--\s*(.*?)\s*)?\Z',
         # assignment recognizer
     'keep_components': True,
@@ -175,8 +199,8 @@ CONSTANTS = {
 
 
 # Constants {{{1
-__version__ = '1.1.7'
-__released__ = '2017-01-11'
+__version__ = '1.2.0'
+__released__ = '2017-02-24'
 
 # These mappings are only used when reading numbers
 MAPPINGS = {
@@ -225,12 +249,19 @@ def named_regex(name, regex):
 
 # components {{{2
 sign = named_regex('sign', '[-+]?')
-mantissa = named_regex('mant', r'[0-9]*\.?[0-9]+')
+required_digits = r'(?:[0-9][0-9_]*[0-9]|[0-9]+)'  # allow interior underscores
+optional_digits = r'(?:[0-9][0-9_]*[0-9]|[0-9]*)'
+mantissa = named_regex(
+    'mant',
+    r'(?:{od}\.?{rd})|(?:{rd}\.?{od})'.format(
+        rd = required_digits, od = optional_digits
+    ),  # leading or trailing digits are optional, but not both
+)
 exponent = named_regex('exp', '[eE][-+]?[0-9]+')
 scale_factor = named_regex('sf', '[%s]' % ''.join(MAPPINGS))
 units = named_regex('units', r'(?:[a-zA-Z°ÅΩ℧%][-^/()\w]*)?')
-    # examples: Ohms, V/A, J-s, m/s^2, H/(m-s), ℧, %
-    # leading char must be letter to avoid 1.0E-9s -> ('1.0e18', '-9s')
+    # examples: Ohms, V/A, J-s, m/s^2, H/(m-s), Ω, %
+    # leading char must be letter to avoid 1.0E-9s -> (1e18, '-9s')
 currency = named_regex('currency', '[%s]' % CURRENCY_SYMBOLS)
 nan = named_regex('nan', '(?i)inf|nan')
 
@@ -326,55 +357,41 @@ sf_free_number_converters = [
         nan_with_units, currency_nan, simple_nan,
     ]
 ]
-# Quantity class {{{1
-# _combine {{{2
-def _combine(mantissa, sf, units, spacer):
-    mantissa = mantissa.lstrip('+')
-    if units:
-        if units in CURRENCY_SYMBOLS:
-            # prefix the value with the units
-            if mantissa[0] == '-':
-                # if negative, the sign goes before the currency symbol
-                return '-' + units + mantissa[1:] + sf
-            else:
-                return units + mantissa + sf
-        else:
-            if sf in MAPPINGS:
-                # has a scale factor
-                return mantissa + spacer + sf + units
-            else:
-                # has an exponent
-                return mantissa + sf + spacer + units
-    else:
-        return mantissa + sf
 
-# class attributes {{{2
+
+# Quantity class {{{1
 @python_2_unicode_compatible
 class Quantity(float):
-    # Defaults
-    _si = DEFAULTS['si']
-    _units = DEFAULTS['units']
-    _prec = DEFAULTS['prec']
-    _full_prec = DEFAULTS['full_prec']
-    _spacer = DEFAULTS['spacer']
-    _unity_sf = DEFAULTS['unity_sf']
-    _output_sf = DEFAULTS['output_sf']
-    _render_sf = DEFAULTS['render_sf']
-    _keep_components = DEFAULTS['keep_components']
-    _ignore_sf = DEFAULTS['ignore_sf']
-    _known_units = DEFAULTS['known_units']
-    _fmt = DEFAULTS['fmt']
-    _assign_fmt = DEFAULTS['assign_fmt']
-    _assign_rec = DEFAULTS['assign_rec']
-    _reltol = DEFAULTS['reltol']
-    _abstol = DEFAULTS['abstol']
+    # class attributes {{{2
+    # defaults
+    show_si = DEFAULTS['show_si']
+    show_units = DEFAULTS['show_units']
+    prec = DEFAULTS['prec']
+    full_prec = DEFAULTS['full_prec']
+    spacer = DEFAULTS['spacer']
+    unity_sf = DEFAULTS['unity_sf']
+    output_sf = DEFAULTS['output_sf']
+    map_sf = DEFAULTS['map_sf']
+    keep_components = DEFAULTS['keep_components']
+    ignore_sf = DEFAULTS['ignore_sf']
+    known_units = DEFAULTS['known_units']
+    show_label = DEFAULTS['show_label']
+    strip_dp = DEFAULTS['strip_dp']
+    label_fmt = DEFAULTS['label_fmt']
+    assign_rec = DEFAULTS['assign_rec']
+    reltol = DEFAULTS['reltol']
+    abstol = DEFAULTS['abstol']
+        # These class attributes act as defaults for the instances. However,
+        # when accessing these values the code always goes through self.
+        # This allows the user to monkey-patch the instances to provide local
+        # overrides to these values.
 
     units = ''  # do not change these
     name = ''
     desc = ''
-        # these used as the default values for these three attributes. Putting
-        # them here means that the instances do not need to contain these values
-        # if not specified, but yet they can always be accessed
+        # These are used as the default values for these three attributes.
+        # Putting them here means that the instances do not need to contain
+        # these values if not specified, but yet they can always be accessed.
 
     # constructor {{{2
     def __new__(
@@ -414,7 +431,7 @@ class Quantity(float):
         is requested and there is no corresponding unit converter.
         """
 
-        ignore_sf = cls._ignore_sf if ignore_sf is None else ignore_sf
+        ignore_sf = cls.ignore_sf if ignore_sf is None else ignore_sf
         data = {}
 
         # process model to get values for name, units, and desc if available
@@ -445,8 +462,9 @@ class Quantity(float):
                     sf = get_sf(match)
                     sf = sf if sf != '_' else ''
                     units = get_units(match)
-                    if sf+units in cls._known_units:
+                    if sf+units in cls.known_units:
                         sf, units = '', sf+units
+                    mantissa = mantissa.replace('_', '')
                     number = float(mantissa + MAPPINGS.get(sf, [sf])[0])
                     return number, units, mantissa, sf
             else:
@@ -457,7 +475,7 @@ class Quantity(float):
                 number, u, mantissa, sf = recognize_number(value, ignore_sf)
             except ValueError:
                 # not a simple number, try the assignment recognizer
-                match = re.match(cls._assign_rec, value)
+                match = re.match(cls.assign_rec, value)
                 if match:
                     n, val, d = match.groups()
                     number, u, mantissa, sf = recognize_number(val, ignore_sf)
@@ -532,10 +550,10 @@ class Quantity(float):
         if desc:
             self.desc = desc
 
-        if cls._keep_components:
+        if cls.keep_components:
             try:
-                # if we got a string, keep the pieces so we can reconstruct it
-                # exactly as it was given.
+                # If we got a string, keep the pieces so we can reconstruct it
+                # exactly as it was given. Needed for 'full' precision.
                 if mantissa:
                     self._mantissa = mantissa
                     self._scale_factor = sf
@@ -567,18 +585,21 @@ class Quantity(float):
         return self.real, self.units
 
     # render() {{{2
-    def render(self, units=None, si=None, prec=None, fmt=None, scale=None):
+    def render(
+        self, show_units=None, show_si=None, prec=None, show_label=None,
+        scale=None
+    ):
         """Convert quantity to a string
 
-        units (bool):
+        show_units (bool):
             Whether the units should be included in the string.
-        si (bool):
+        show_si (bool):
             Whether SI scale factors should be used.
         prec (int or 'full'):
             The desired precision (one plus this value is the desired number of
             digits). If specified as full, the full original precision is used.
-        fmt (bool):
-            Whether assign_fmt should be used to include name and perhaps
+        show_label (bool):
+            Whether label_fmt should be used to include name and perhaps
             description in string.
         scale (float, tuple, func, or string):
             If a float, it scales the displayed value (the quantity is multiplied
@@ -598,34 +619,36 @@ class Quantity(float):
         """
 
 
-        use_fmt = self._fmt if fmt is None else fmt
-        if use_fmt and self._assign_fmt and self.name:
+        use_fmt = self.show_label if show_label is None else show_label
+        if use_fmt and self.label_fmt and self.name:
             def format(value):
-                if is_str(self._assign_fmt):
-                    assign_fmt = self._assign_fmt
+                if is_str(self.label_fmt):
+                    label_fmt = self.label_fmt
                 elif self.desc:
-                    assign_fmt = self._assign_fmt[0]
+                    label_fmt = self.label_fmt[0]
                 else:
-                    assign_fmt = self._assign_fmt[1]
-                return assign_fmt.format(n=self.name, v=value, d=self.desc)
+                    label_fmt = self.label_fmt[1]
+                return label_fmt.format(n=self.name, v=value, d=self.desc)
         else:
             format = lambda x: x
 
         # initialize units and si
-        use_units = self._units if units is None else units
-        units = self.units if use_units else ''
-        si = self._si if si is None else si
+        show_units = self.show_units if show_units is None else show_units
+        units = self.units if show_units else ''
+        show_si = self.show_si if show_si is None else show_si
 
         # check for infinities or NaN
         if self.is_infinite() or self.is_nan():
-            return format(_combine(str(self.real), '', units, ' '))
+            return format(combine(str(self.real), '', units, ' '))
 
         # convert into scientific notation with proper precision
         if prec is None:
-            prec = self._prec
+            prec = self.prec
         if prec == 'full' and hasattr(self, '_mantissa') and not scale:
             mantissa = self._mantissa
             sf = self._scale_factor
+
+            # convert scale factor to integer exponent
             try:
                 exp = int(sf)
             except ValueError:
@@ -634,15 +657,30 @@ class Quantity(float):
                 else:
                     exp = 0
 
-            # normalize the mantissa
+            # add decimal point to mantissa if missing
             mantissa += '' if '.' in mantissa else '.'
-            whole, frac = mantissa.split('.')
+            # strip off leading zeros and break into components
+            whole, frac = mantissa.strip('0').split('.')
+            if whole == '':
+                # no whole part, remove leading zeros from fractional part
+                orig_len = len(frac)
+                frac = frac.lstrip('0')
+                if frac:
+                    whole = frac[:1]
+                    frac = frac[1:]
+                    exp -= orig_len - len(frac)
+                else:
+                    # stripping off zeros left us with nothing, this must be 0
+                    whole = '0'
+                    frac = ''
+                    exp = 0
+            # normalize the mantissa
             mantissa = whole[0] + '.' + whole[1:] + frac
             exp += len(whole) - 1
         else:
             # determine precision
             if prec == 'full':
-                prec = self._full_prec
+                prec = self.full_prec
             assert (prec >= 0)
 
             # scale if desired
@@ -664,7 +702,7 @@ class Quantity(float):
                             # otherwise, assume it is just a scale factor
                             multiplier = scale
                         number *= multiplier
-                if not use_units:
+                if not show_units:
                     units = ''
 
             # get components of number
@@ -678,26 +716,26 @@ class Quantity(float):
         sf = "e%d" % (exp - shift)
         if index == 0:
             if units and units not in CURRENCY_SYMBOLS:
-                sf = self._unity_sf
+                sf = self.unity_sf
             else:
                 sf = ''
-        elif si:
+        elif show_si:
             if (index > 0):
                 if index <= len(BIG_SCALE_FACTORS):
-                    if BIG_SCALE_FACTORS[index-1] in self._output_sf:
+                    if BIG_SCALE_FACTORS[index-1] in self.output_sf:
                         sf = BIG_SCALE_FACTORS[index-1]
             else:
                 index = -index
                 if index <= len(SMALL_SCALE_FACTORS):
-                    if SMALL_SCALE_FACTORS[index-1] in self._output_sf:
+                    if SMALL_SCALE_FACTORS[index-1] in self.output_sf:
                         sf = SMALL_SCALE_FACTORS[index-1]
 
         # render the scale factor if approprite
-        if self._render_sf:
+        if self.map_sf:
             try:
-                sf = self._render_sf.get(sf, sf)
+                sf = self.map_sf.get(sf, sf)
             except AttributeError:
-                sf = self._render_sf.__func__(sf)
+                sf = self.map_sf.__func__(sf)
 
         # move decimal point as needed
         if shift:
@@ -713,9 +751,13 @@ class Quantity(float):
             mantissa = mantissa.rstrip("0")
 
         # remove trailing decimal point
-        mantissa = mantissa.rstrip(".")
+        if sf or show_units or self.strip_dp:
+            mantissa = mantissa.rstrip(".")
+        else:
+            if mantissa[-1] == '.':
+                mantissa += '0'
 
-        return format(_combine(mantissa, sf, units, self._spacer))
+        return format(combine(mantissa, sf, units, self.spacer))
 
     # is_close() {{{2
     def is_close(self, other, check_units=True):
@@ -729,13 +771,13 @@ class Quantity(float):
         try:
             return math.isclose(
                 self.real, float(other),
-                rel_tol=self._reltol, abs_tol=self._abstol
+                rel_tol=self.reltol, abs_tol=self.abstol
             )
         except AttributeError:  # pragma: no cover
             # used by python3.4 and earlier
             delta = abs(self.real-float(other))
             reference = max(abs(self.real), abs(float(other)))
-            return delta <= max(self._reltol * reference, self._abstol)
+            return delta <= max(self.reltol * reference, self.abstol)
 
     # __str__() {{{2
     def __str__(self):
@@ -743,15 +785,17 @@ class Quantity(float):
 
     # __repr__() {{{2
     def __repr__(self):
-        si = False if self._ignore_sf else None
-        return 'Quantity({!r})'.format(self.render(units=True, si=si, prec='full'))
+        show_si = False if self.ignore_sf else None
+        return 'Quantity({!r})'.format(
+            self.render(show_units=True, show_si=show_si, prec='full')
+        )
 
     # __format__() {{{2
-    def __format__(self, fmt):
+    def __format__(self, template):
         """Convert quantity to string for Python string format function.
 
         Supports the normal floating point and string format types as well some
-        new ones. If the format code is given in upper case, assign_fmt is used
+        new ones. If the format code is given in upper case, label_fmt is used
         to add the name and perhaps description to the result.
 
         The format is specified using AW.PT where:
@@ -759,15 +803,15 @@ class Quantity(float):
         W is integer and gives the width
         P is integer and gives the precision
         T is char and gives the type: choose from q, r, s, e, f, g, u, n, d, ...
-           q = quantity [si=y, units=y, fmt=n] (ex: 1.4204GHz)
-           Q = quantity [si=y, units=y, fmt=y] (ex: f = 1.4204GHz)
-           r = real [si=y, units=n, fmt=n] (ex: 1.4204G)
-           R = real [si=y, units=n, fmt=y] (ex: f = 1.4204G)
+           q = quantity [si=y, units=y, label=n] (ex: 1.4204GHz)
+           Q = quantity [si=y, units=y, label=y] (ex: f = 1.4204GHz)
+           r = real [si=y, units=n, label=n] (ex: 1.4204G)
+           R = real [si=y, units=n, label=y] (ex: f = 1.4204G)
              = string [] (ex: 1.4204GHz)
-           s = string [fmt=n] (ex: 1.4204GHz)
-           S = string [fmt=y] (ex: f = 1.4204GHz)
-           e = exponential form [si=n, units=n, fmt=n] (ex: 1.4204e9)
-           E = exponential form [si=n, units=n, fmt=y] (ex: f = 1.4204e9)
+           s = string [label=n] (ex: 1.4204GHz)
+           S = string [label=y] (ex: f = 1.4204GHz)
+           e = exponential form [si=n, units=n, label=n] (ex: 1.4204e9)
+           E = exponential form [si=n, units=n, label=y] (ex: f = 1.4204e9)
            f = float [na] (ex: 1420400000.0000)
            F = float [na] (ex: f = 1420400000.0000)
            g = float [na] (ex: 1.4204e+09)
@@ -776,7 +820,7 @@ class Quantity(float):
            n = name [na] (ex: f)
            d = description [na] (ex: hydrogen line)
         """
-        match = FORMAT_SPEC.match(fmt)
+        match = FORMAT_SPEC.match(template)
         if match:
             align, width, prec, ftype, units = match.groups()
             scale = units if units else None
@@ -790,46 +834,48 @@ class Quantity(float):
                 elif ftype == 'd':
                     value = getattr(self, 'desc', '')
                 else:  # pragma: no cover
-                    raise AssertionError(ftype)
+                    raise NotImplementedError(ftype)
                 return '{0:{1}{2}s}'.format(value, align, width)
-            fmt = ftype.isupper()
+            label = ftype.isupper()
             if ftype in 'sS':  # note that ftype = '' matches this case
-                fmt = fmt if ftype else None
-                value = self.render(prec=prec, fmt=fmt, scale=scale)
+                label = label if ftype else None
+                value = self.render(prec=prec, show_label=label, scale=scale)
             elif ftype in 'qQ':
                 value = self.render(
-                    prec=prec, si=True, units=True, fmt=fmt, scale=scale
+                    prec=prec, show_si=True, show_units=True, show_label=label,
+                    scale=scale
                 )
             elif ftype in 'rR':
                 value = self.render(
-                    prec=prec, si=True, units=False, fmt=fmt, scale=scale
+                    prec=prec, show_si=True, show_units=False, show_label=label,
+                    scale=scale
                 )
             else:
                 if scale:
                     # this is a hack that will include the scaling
                     value = float(self.render(
-                        prec='full', si=False, units=False, fmt=False,
-                        scale=scale
+                        prec='full', show_si=False, show_units=False,
+                        show_label=False, scale=scale
                     ))
                 else:
                     value = float(self)
                 if prec is None:
-                    prec = self._prec
+                    prec = self.prec
                 if prec == 'full':
-                    prec = self._full_prec
+                    prec = self.full_prec
                 if ftype in 'gG':
                     prec += 1
                 value = '{0:.{1}{2}}'.format(value, prec, ftype.lower())
                 if ftype.isupper():
                     name = getattr(self, 'name', '')
                     desc = getattr(self, 'desc', '')
-                    if is_str(self._assign_fmt):
-                        assign_fmt = self._assign_fmt
+                    if is_str(self.label_fmt):
+                        label_fmt = self.label_fmt
                     elif desc:
-                        assign_fmt = self._assign_fmt[0]
+                        label_fmt = self.label_fmt[0]
                     else:
-                        assign_fmt = self._assign_fmt[1]
-                    value = assign_fmt.format(n=name, v=value, d=desc)
+                        label_fmt = self.label_fmt[1]
+                    value = label_fmt.format(n=name, v=value, d=desc)
             return '{0:{1}{2}s}'.format(value, align, width)
         else:
             # unrecognized format, just provide something reasonable
@@ -841,9 +887,9 @@ class Quantity(float):
     def set_preferences(cls, **kwargs):
         """Set class preferences
 
-        si (bool):
+        show_si (bool):
             Use SI scale factors by default.
-        units (bool):
+        show_units (bool):
             Output units by default.
         prec (int):
             Default precision in digits where 0 corresponds to 1 digit. Must
@@ -863,9 +909,9 @@ class Quantity(float):
         output_sf (str):
             Which scale factors to output, generally one would only use familiar
             scale factors.
-        render_sf (dict or funct):
+        map_sf (dict or funct):
             Use this to change the way individual scale factors are rendered,
-            ex: render_sf={'u': 'μ'} to render micro using mu. If a function is
+            ex: map_sf={'u': 'μ'} to render micro using mu. If a function is
             given, it takes a single string argument, the nominal scale factor,
             and returns a string, the desired scale factor.
         ignore_sf (bool):
@@ -874,9 +920,12 @@ class Quantity(float):
             List of units that are expected to be used for which the leading
             character could be mistaken as a scale factor.  If a string is
             given, it is split at white space to form the list.
-        fmt (bool):
-            Cause render() to add name and description by default they are
+        show_label (bool):
+            Cause render() to add name and description by default if they are
             given.
+        strip_dp (bool):
+            When rendering, strip the decimal points from numbers even if they
+            can then be mistaken for integers.
         reltol (real):
             Relative tolerance, used by is_close() when determining equivalence.
         abstol (real):
@@ -886,7 +935,7 @@ class Quantity(float):
             given as string. Doing so takes a bit of space, but allows the
             original precision of the number to be recreated when full precision
             is requested.
-        assign_fmt (str):
+        label_fmt (str):
             Format string for an assignment. Will be passed through string
             .format() method. Format string takes three possible arguments named
             n, q, and d for the name, value and description.  The default is
@@ -904,21 +953,21 @@ class Quantity(float):
         """
 
         for key, value in kwargs.items():
-            lkey = '_' + key
+            assert key in DEFAULTS, ('%s: unknown.' % key)
             if value is None:
                 # attributes that were passed as None are to be returned to
                 # their default value
                 if cls == Quantity:
                     # this is base class, override value with the default value
-                    setattr(cls, lkey, DEFAULTS[key])
+                    setattr(cls, key, DEFAULTS[key])
                 else:
                     # delete the attribute so value of parent class is used.
-                    delattr(cls, lkey)
+                    delattr(cls, key)
             else:
                 # override with the desired value
                 if key in ['known_units'] and is_str(value):
                     value = value.split()
-                setattr(cls, lkey, value)
+                setattr(cls, key, value)
 
     # get_preference() {{{2
     @classmethod
@@ -926,13 +975,13 @@ class Quantity(float):
         """Get class preference
 
         name (str):
-            Name of the desired preference. Choose from: units, prec, full_prec,
-            spacer, unity_sf, output_sf, render_sf, ignore_sf, known_units, fmt,
-            reltol, abstol, keep_components, assign_fmt, assign_rec.
+            Name of the desired preference. Choose from: show_si, show_units,
+            prec, full_prec, spacer, unity_sf, output_sf, map_sf, ignore_sf,
+            known_units, show_label, reltol, abstol, keep_components, label_fmt,
+            assign_rec.
         """
-
-        # override with the desired value
-        return getattr(cls, '_' + key)
+        assert key in DEFAULTS, ('%s: unknown.' % key)
+        return getattr(cls, key)
 
     # add_to_namespace() {{{2
     @classmethod
@@ -958,7 +1007,7 @@ class Quantity(float):
         namespace = frame.f_globals
 
         for line in quantities.splitlines():
-            match = re.match(cls._assign_rec, line)
+            match = re.match(cls.assign_rec, line)
             if match:
                 name, value, desc = match.groups()
                 if not value:
@@ -974,7 +1023,7 @@ class Quantity(float):
             else:  # pragma: no cover
                 raise ValueError('{}: not a valid number.'.format(line))
 
-    # render_sf_in_sci_notation() {{{2
+    # map_sf_to_sci_notation() {{{2
     _SCI_NOTATION_MAPPER = {
         ord(u'e'): u'×10',
         ord(u'+'): u'',
@@ -993,10 +1042,10 @@ class Quantity(float):
     }
 
     @staticmethod
-    def render_sf_in_sci_notation(sf):
+    def map_sf_to_sci_notation(sf):
         """ Render scale factors in scientific notation
 
-        Pass this function to render_sf preference if you prefer your large and
+        Pass this function to map_sf preference if you prefer your large and
         small numbers is classic scientific notation.
         """
         # The explicit references to unicode here and in _SCI_NOTATION_MAPPER are
@@ -1004,12 +1053,12 @@ class Quantity(float):
         # python2 support is dropped.
         return u(sf).translate(Quantity._SCI_NOTATION_MAPPER)
 
-    # render_sf_in_greek() {{{2
+    # map_sf_to_greek() {{{2
     @staticmethod
-    def render_sf_in_greek(sf):
+    def map_sf_to_greek(sf):
         '''Render scale factors in Greek alphabet if appropriate.
 
-        Pass this dictionary to render_sf preference if you prefer μ rather than u.
+        Pass this dictionary to map_sf preference if you prefer μ rather than u.
         '''
         # this could just as easily be a simple dictionary, but implement it as
         # a function so that it supports a docstring.

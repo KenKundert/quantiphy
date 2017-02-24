@@ -3,7 +3,7 @@
 from quantiphy import Quantity
 
 def test_constants():
-    Quantity.set_preferences(spacer=' ', assign_fmt='{n} = {v} -- {d}')
+    Quantity.set_preferences(spacer=' ', label_fmt='{n} = {v} -- {d}')
     assert '{:.12q}'.format(Quantity('h')) == '662.606957e-36 J-s'
     assert '{:.12q}'.format(Quantity('hbar')) == '105.4571725336e-36 J-s'
     assert '{:.12q}'.format(Quantity('k')) == '13.806488e-24 J/K'

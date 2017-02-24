@@ -5,10 +5,10 @@ import math
 import sys
 
 def test_simple_scaling():
-    Quantity.set_preferences(spacer=' ', assign_fmt=None)
+    Quantity.set_preferences(spacer=' ', label_fmt=None)
     q=Quantity('1kg')
     assert q.render() == '1 kg'
-    assert q.render(scale=0.001, units=False) == '1'
+    assert q.render(scale=0.001, show_units=False) == '1'
 
     q=Quantity('1', units='g', scale=1000)
     assert q.render() == '1 kg'
@@ -29,7 +29,7 @@ def test_simple_scaling():
     assert q.render(scale=dB) == '-40 dBV'
 
 def test_temperature():
-    Quantity.set_preferences(spacer=' ', assign_fmt=None, ignore_sf=True)
+    Quantity.set_preferences(spacer=' ', label_fmt=None, ignore_sf=True)
     if sys.version_info.major == 3:
         q=Quantity('100 °C')
         assert q.render() == '100 °C'
@@ -105,17 +105,17 @@ def test_temperature():
     assert q.render() == '273.15 K'
 
 def test_distance():
-    Quantity.set_preferences(spacer=' ', assign_fmt=None, ignore_sf=False)
+    Quantity.set_preferences(spacer=' ', label_fmt=None, ignore_sf=False)
     q=Quantity('1_m')
     assert q.render() == '1 m'
-    assert q.render(scale='cm', si=False) == '100 cm'
-    assert q.render(scale='mm', si=False) == '1e3 mm'
-    assert q.render(scale='um', si=False) == '1e6 um'
-    assert q.render(scale='μm', si=False) == '1e6 μm'
-    assert q.render(scale='nm', si=False) == '1e9 nm'
+    assert q.render(scale='cm', show_si=False) == '100 cm'
+    assert q.render(scale='mm', show_si=False) == '1e3 mm'
+    assert q.render(scale='um', show_si=False) == '1e6 um'
+    assert q.render(scale='μm', show_si=False) == '1e6 μm'
+    assert q.render(scale='nm', show_si=False) == '1e9 nm'
     if sys.version_info.major == 3:
-        assert q.render(scale='Å', si=False) == '10e9 Å'
-    assert q.render(scale='angstrom', si=False) == '10e9 angstrom'
+        assert q.render(scale='Å', show_si=False) == '10e9 Å'
+    assert q.render(scale='angstrom', show_si=False) == '10e9 angstrom'
     assert q.render(scale='mi') == '621.37 umi'
     assert q.render(scale='mile') == '621.37 umile'
     assert q.render(scale='miles') == '621.37 umiles'
@@ -174,7 +174,7 @@ def test_distance():
     assert q.render() == '149.67 Gm'
 
 def test_mass():
-    Quantity.set_preferences(spacer=' ', assign_fmt=None, ignore_sf=False)
+    Quantity.set_preferences(spacer=' ', label_fmt=None, ignore_sf=False)
     q=Quantity('1 g')
     assert q.render() == '1 g'
     assert q.render(scale='oz') == '35.274 moz'
@@ -191,7 +191,7 @@ def test_mass():
     assert q.render() == '453.59 g'
 
 def test_time():
-    Quantity.set_preferences(spacer=' ', assign_fmt=None, ignore_sf=True)
+    Quantity.set_preferences(spacer=' ', label_fmt=None, ignore_sf=True)
     q=Quantity('86400 s')
     assert q.render() == '86.4 ks'
     assert q.render(scale='sec') == '86.4 ksec'

@@ -7,30 +7,30 @@ import sys
 def test_misc():
     Quantity.set_preferences(spacer=' ')
     q = Quantity(1420405751.786, 'Hz')
-    assert q.render(si=False, units=False) == '1.4204e9'
+    assert q.render(show_si=False, show_units=False) == '1.4204e9'
 
     t = Quantity('1420405751.786 Hz').as_tuple()
     assert t == (1420405751.786, 'Hz')
 
-    t = Quantity('1420405751.786 Hz').render(si=True, units=True, prec='full')
+    t = Quantity('1420405751.786 Hz').render(show_si=True, show_units=True, prec='full')
     assert t == '1.420405751786 GHz'
 
-    s = Quantity('1420405751.786 Hz').render(si=False, units=True, prec='full')
+    s = Quantity('1420405751.786 Hz').render(show_si=False, show_units=True, prec='full')
     assert s == '1.420405751786e9 Hz'
 
     f=float(Quantity('1420405751.786 Hz'))
     assert f == 1420405751.786
 
-    t = Quantity('1420405751.786 Hz').render(si=True, units=False)
+    t = Quantity('1420405751.786 Hz').render(show_si=True, show_units=False)
     assert t == '1.4204G'
 
-    s = Quantity('1420405751.786 Hz').render(si=False, units=False)
+    s = Quantity('1420405751.786 Hz').render(show_si=False, show_units=False)
     assert s == '1.4204e9'
 
-    s = Quantity(1420405751.786, 'Hz').render(si=False, units=False, prec='full')
+    s = Quantity(1420405751.786, 'Hz').render(show_si=False, show_units=False, prec='full')
     assert s == '1.420405751786e9'
 
-    f = Quantity('14204.05751786MHz').render(si=True, units=False, prec='full')
+    f = Quantity('14204.05751786MHz').render(show_si=True, show_units=False, prec='full')
     assert f == '14.20405751786G'
 
     q = Quantity('1420405751.786 Hz', units='HZ').render()
@@ -77,11 +77,11 @@ def test_misc():
     with pytest.raises(ValueError):
         Quantity('x\ny = z')
 
-    Quantity.set_preferences(assign_fmt='{x}')
+    Quantity.set_preferences(label_fmt='{x}')
     with pytest.raises(KeyError):
         '{:S}'.format(Quantity('f = 1kHz'))
 
-    Quantity.set_preferences(assign_fmt=('{n} = {v}  # {d}', '{n} = {v}'))
+    Quantity.set_preferences(label_fmt=('{n} = {v}  # {d}', '{n} = {v}'))
     q1 = Quantity('10ns', name='trise')
     q2 = Quantity('10ns', name='trise', desc='rise time')
     assert '{:G}'.format(q1) == 'trise = 1e-08'
@@ -102,22 +102,22 @@ def test_misc():
     assert mu.render() == '1.2566 uH/m'
 
     q = Quantity('Tclk = 10ns -- clock period')
-    assert q.render(fmt=True) == 'Tclk = 10 ns  # clock period'
+    assert q.render(show_label=True) == 'Tclk = 10 ns  # clock period'
 
     q = Quantity('Tclk = 10ns')
-    assert q.render(fmt=True) == 'Tclk = 10 ns'
+    assert q.render(show_label=True) == 'Tclk = 10 ns'
     assert q.is_close(1e-8) is True
     assert q.is_close(1.001e-8) is False
 
     CONSTANTS['h_line'] = 'F_hy = 1420405751.786 Hz -- frequency of hydrogen line'
     h_line = Quantity('h_line')
-    assert h_line.render(fmt=True) == 'F_hy = 1.4204 GHz  # frequency of hydrogen line'
+    assert h_line.render(show_label=True) == 'F_hy = 1.4204 GHz  # frequency of hydrogen line'
 
     h_line2 = Quantity(h_line, h_line)
-    assert h_line2.render(fmt=True) == 'F_hy = 1.4204 GHz  # frequency of hydrogen line'
+    assert h_line2.render(show_label=True) == 'F_hy = 1.4204 GHz  # frequency of hydrogen line'
 
     h_line3 = Quantity(1420405751.786, 'F_hy Hz frequency of hydrogen line')
-    assert h_line3.render(fmt=True) == 'F_hy = 1.4204 GHz  # frequency of hydrogen line'
+    assert h_line3.render(show_label=True) == 'F_hy = 1.4204 GHz  # frequency of hydrogen line'
 
     size = Quantity('100k', 'B')
     assert size.render() == '100 kB'
@@ -129,12 +129,24 @@ def test_misc():
     assert f1.is_close(f1+1) == True
     assert f1.is_close(f1+1e6) == False
 
+    p = Quantity('3_1_4_1.592_65_36mRads')
+    assert p.render() == '3.1416 Rads'
+
+    Quantity.set_preferences(known_units='au pc')
+    d1 = Quantity('1 au')
+    d2 = Quantity('1000 pc')
+    assert d1.render(show_si=False) == '1 au'
+    assert d2.render() == '1 kpc'
+
+    p = Quantity.get_preference(key='known_units')
+    assert ' '.join(p) == 'au pc'
+
     if sys.version_info.major == 3:
         class Foo(Quantity):
             pass
-        Foo.set_preferences(render_sf=Foo.render_sf_in_greek)
+        Foo.set_preferences(map_sf=Foo.map_sf_to_greek)
         t = Foo('1us')
         assert t.render() == '1 μs'
 
-        Foo.set_preferences(render_sf=Quantity.render_sf_in_sci_notation)
-        assert t.render(si=False) == '1×10⁻⁶ s'
+        Foo.set_preferences(map_sf=Quantity.map_sf_to_sci_notation)
+        assert t.render(show_si=False) == '1×10⁻⁶ s'

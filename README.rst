@@ -1,8 +1,8 @@
 QuantiPhy - Physical Quantities
 ===============================
 
-| Version: 1.1.7
-| Released: 2017-01-11
+| Version: 1.2.0
+| Released: 2017-02-24
 |
 
 .. image:: https://img.shields.io/travis/KenKundert/quantiphy/master.svg
@@ -309,7 +309,7 @@ From a quantity object, you access its value in various ways:
     >>> h_line.render()
     '1.4204 GHz'
 
-    >>> h_line.render(si=False)
+    >>> h_line.render(show_si=False)
     '1.4204e9 Hz'
 
 You can also access the value without the units:
@@ -322,7 +322,7 @@ You can also access the value without the units:
     >>> h_line.render(False)
     '1.4204G'
 
-    >>> h_line.render(False, si=False)
+    >>> h_line.render(False, show_si=False)
     '1.4204e9'
 
 Or you can access just the units:
@@ -339,7 +339,7 @@ You can also access the full precision of the quantity:
     >>> h_line.render(prec='full')
     '1.420405751786 GHz'
 
-    >>> h_line.render(si=False, prec='full')
+    >>> h_line.render(show_si=False, prec='full')
     '1.420405751786e9 Hz'
 
 Full precision implies whatever precision was used when specifying the quantity 
@@ -347,17 +347,17 @@ if it was specified as a string. If it was specified as a real number, then
 a fixed, user controllable number of digits are used (default=12). Generally one 
 uses 'full' when generating output that will be read by a machine.
 
-If you specify *fmt* to render, it will generally include the name and perhaps 
-the description if they are available. The formatting is controlled by 
-'assign_fmt', which is described later. With the default formatting, the 
+If you specify *show_label* to render, it will generally include the name and 
+perhaps the description if they are available. The formatting is controlled by 
+'label_fmt', which is described later. With the default formatting, the 
 description is not printed.
 
 .. code-block:: python
 
-    >>> h_line.render(fmt=True)
+    >>> h_line.render(show_label=True)
     '1.4204 GHz'
 
-    >>> out_period.render(fmt=True)
+    >>> out_period.render(show_label=True)
     'output period = 100 ns'
 
 
@@ -572,7 +572,7 @@ one milli-kilo-meter). For example:
     >>> print(d.render(scale='cm'))
     100 mcm
 
-    >>> print(d.render(scale='cm', si=False))
+    >>> print(d.render(scale='cm', show_si=False))
     100e-3 cm
 
 In an earlier example the units of time and temperature data were converted to 
@@ -623,12 +623,24 @@ You can also access the value of an existing preference:
    >>> known_units = Quantity.get_preference('known_units')
    >>> Quantity.set_preferences(known_units = known_units + ['m'])
 
+Finally, you can override the preferences on an individual quantity by 
+monkey-patching the quantity itself. Doing so will override the global 
+preferences on that quantity:
+
+.. code-block:: python
+
+   >>> boltzmann = Quantity('h')
+   >>> boltzmann.show_units = False
+   >>> boltzmann.show_si = False
+   >>> boltzmann.render()
+   '662.61e-36'
+
 The available preferences are:
 
-si (bool):
+show_si (bool):
     Use SI scale factors by default. Default is True.
 
-units (bool):
+show_units (bool):
     Output units by default. Default is True.
 
 prec (int):
@@ -658,10 +670,11 @@ output_sf (str):
     factors.  Default is 'TGMkmunpfa'.  This setting does not affect the scale 
     factors that are recognized when reading number.
 
-render_sf (dict, func):
+map_sf (dict, func):
     Use this to change the way individual scale factors are rendered. May be 
-    a dictionary or a function. For example, to replace *u* with *μ*, use 
-    *render_sf* = {'u': 'μ'}.
+    a dictionary or a function. Default is empty.
+
+    For example, to replace *u* with *μ*, use *map_sf* = {'u': 'μ'}.
 
     .. code-block:: python
 
@@ -669,7 +682,7 @@ render_sf (dict, func):
         >>> print(period)
         1 us
 
-        >>> Quantity.set_preferences(render_sf={'u': 'μ'})
+        >>> Quantity.set_preferences(map_sf={'u': 'μ'})
         >>> print(period)
         1 μs
 
@@ -695,8 +708,8 @@ render_sf (dict, func):
         >>> def map_sf(sf):
         ...     return sf.translate(sf_mapper)
 
-        >>> Quantity.set_preferences(render_sf=map_sf)
-        >>> h_line.render(si=False)
+        >>> Quantity.set_preferences(map_sf=map_sf)
+        >>> h_line.render(show_si=False)
         '1.4204×10⁹ Hz'
 
     Both of these are common enough so that *QuantiPhy* provides these rendering 
@@ -704,15 +717,15 @@ render_sf (dict, func):
 
     .. code-block:: python
 
-        >>> Quantity.set_preferences(render_sf=Quantity.render_sf_in_greek)
+        >>> Quantity.set_preferences(map_sf=Quantity.map_sf_to_greek)
         >>> print(period)
         1 μs
 
-        >>> Quantity.set_preferences(render_sf=Quantity.render_sf_in_sci_notation)
-        >>> h_line.render(si=False)
+        >>> Quantity.set_preferences(map_sf=Quantity.map_sf_to_sci_notation)
+        >>> h_line.render(show_si=False)
         '1.4204×10⁹ Hz'
 
-        >>> Quantity.set_preferences(render_sf=None)
+        >>> Quantity.set_preferences(map_sf=None)
 
 ignore_sf (bool):
     Whether scale factors should be ignored by default when converting strings 
@@ -720,6 +733,15 @@ ignore_sf (bool):
 
 known_units (list of strings or string):
     Units with a leading character that could be confused as a scale factor.
+    Default is empty.
+
+show_label (bool):
+    Cause render() to add name and description by default if they are
+    given.  Default is False.
+
+strip_dp (bool):
+    When rendering, strip the decimal points from numbers even if they
+    can then be mistaken for integers.  Default is True.
 
 reltol (real):
     Relative tolerance, used by is_close() when determining equivalence. Default 
@@ -733,8 +755,9 @@ keep_components (bool):
     Whether components of number should be kept if the quantities' value was 
     given as string.  Doing so takes a bit of space, but allows the original 
     precision of the number to be recreated when full precision is requested.
+    Default is True.
 
-assign_fmt (str or tuple):
+label_fmt (str or tuple):
     Format string for an assignment. Will be passed through string format method 
     to generate a string that includes the quantity name.  Format string takes 
     three possible arguments named n, q, and d for the name, value and 
@@ -798,14 +821,14 @@ existing known units.
 
    >>> d1 = Quantity('1 au')
    >>> d2 = Quantity('1000 pc')
-   >>> print(d1.render(si=False), d2, sep='\n')
+   >>> print(d1.render(show_si=False), d2, sep='\n')
    1e-18 u
    1 nc
 
    >>> Quantity.set_preferences(known_units='au pc')
    >>> d1 = Quantity('1 au')
    >>> d2 = Quantity('1000 pc')
-   >>> print(d1.render(si=False), d2, sep='\n')
+   >>> print(d1.render(show_si=False), d2, sep='\n')
    1 au
    1 kpc
 
@@ -864,7 +887,8 @@ Plank's constant:
 .. code-block:: python
 
    >>> Quantity.set_preferences(
-   ...     fmt=True, spacer=' ', assign_fmt=('{n} = {v} -- {d}', '{n} = {v}')
+   ...     show_label=True, spacer=' ',
+   ...     label_fmt=('{n} = {v} -- {d}', '{n} = {v}')
    ... )
 
    >>> plank = Quantity('h')
@@ -1061,7 +1085,7 @@ Access the name or description of the quantity using 'n' and 'd'.
 
 Using the upper case versions of the format codes that print the numerical value 
 of the quantity (SQRFEG) to indicate that the name and perhaps description 
-should be included as well. They are under the control of the *assign_fmt* 
+should be included as well. They are under the control of the *label_fmt* 
 preference.
 
 .. code-block:: python
@@ -1092,12 +1116,12 @@ preference.
    >>> print('{:S}'.format(wavelength))
    λ = 211.06 mm -- wavelength of hydrogen line
 
-You can also specify two values to *assign_fmt*, in which case the first is used 
+You can also specify two values to *label_fmt*, in which case the first is used 
 if there is a description and the second used otherwise.
 
 .. code-block:: python
 
-   >>> Quantity.set_preferences(assign_fmt=('{n} = {v} -- {d}', '{n} = {v}'))
+   >>> Quantity.set_preferences(label_fmt=('{n} = {v} -- {d}', '{n} = {v}'))
 
    >>> print('{:S}'.format(trise))
    trise = 10 ns
@@ -1194,7 +1218,7 @@ are active simultaneously. For example:
    >>> class ConventionalQuantity(Quantity):
    ...     pass
 
-   >>> ConventionalQuantity.set_preferences(si=False, units=False)
+   >>> ConventionalQuantity.set_preferences(show_si=False, show_units=False)
 
    >>> period1 = Quantity(1e-9, 's')
    >>> period2 = ConventionalQuantity(1e-9, 's')

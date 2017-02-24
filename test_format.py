@@ -4,7 +4,7 @@ from quantiphy import Quantity
 import sys
 
 def test_format():
-    Quantity.set_preferences(spacer=' ', assign_fmt=None)
+    Quantity.set_preferences(spacer=' ', label_fmt=None)
     q=Quantity('f = 1420.405751786 MHz -- frequency of hydrogen line')
     assert '{}'.format(q) == '1.4204 GHz'
     assert '{:.8}'.format(q) == '1.42040575 GHz'
@@ -28,8 +28,33 @@ def test_format():
     q=Quantity('2ns')
     assert float(q) == 2e-9
 
+def test_full_format():
+    Quantity.set_preferences(spacer=' ', label_fmt=None, prec='full')
+    q=Quantity('f = 1420.405751786 MHz -- frequency of hydrogen line')
+    assert '{}'.format(q) == '1.420405751786 GHz'
+    assert '{:.8}'.format(q) == '1.42040575 GHz'
+    assert '{:.8s}'.format(q) == '1.42040575 GHz'
+    assert '{:.8S}'.format(q) == 'f = 1.42040575 GHz'
+    assert '{:.8q}'.format(q) == '1.42040575 GHz'
+    assert '{:.8Q}'.format(q) == 'f = 1.42040575 GHz'
+    assert '{:r}'.format(q) == '1.420405751786G'
+    assert '{:R}'.format(q) == 'f = 1.420405751786G'
+    assert '{:u}'.format(q) == 'Hz'
+    assert '{:.4f}'.format(q) == '1420405751.7860'
+    assert '{:.4F}'.format(q) == 'f = 1420405751.7860'
+    assert '{:e}'.format(q) == '1.420405751786e+09'
+    assert '{:E}'.format(q) == 'f = 1.420405751786e+09'
+    assert '{:g}'.format(q) == '1420405751.786'
+    assert '{:G}'.format(q) == 'f = 1420405751.786'
+    assert '{:n}'.format(q) == 'f'
+    assert '{:d}'.format(q) == 'frequency of hydrogen line'
+    assert '{:X}'.format(q) == '1.420405751786 GHz'
+
+    q=Quantity('2ns')
+    assert float(q) == 2e-9
+
 def test_scaled_format():
-    Quantity.set_preferences(spacer=' ', assign_fmt=None)
+    Quantity.set_preferences(spacer=' ', label_fmt=None, prec=None)
     if sys.version_info.major == 3:
         q=Quantity('Tboil = 100 °C -- boiling point of water')
         assert '{}'.format(q) == '100 °C'
