@@ -1237,7 +1237,7 @@ description by default:
     from inform import os_error, fatal, display
 
     class VerboseQuantity(Quantity):
-        show_label = True,
+        show_label = True
         label_fmt = ('{n} = {v} -- {d}', '{n} = {v}')
 
     filename = 'parameters'
