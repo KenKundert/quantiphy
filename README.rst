@@ -623,6 +623,8 @@ You can also access the value of an existing preference:
    >>> known_units = Quantity.get_preference('known_units')
    >>> Quantity.set_preferences(known_units = known_units + ['m'])
 
+Alternately, the options are class attributes that can be read or set directly.
+
 Finally, you can override the preferences on an individual quantity by 
 monkey-patching the quantity itself. Doing so will override the global 
 preferences on that quantity:
@@ -1205,6 +1207,30 @@ Any number of quantities may be given, with each quantity given on its own line.
 The identifier given to the left '=' is the name of the variable in the local 
 namespace that is used to hold the quantity. The text after the '--' is used as 
 a description of the quantity.
+
+Here is an example that uses this feature to read parameters from a file. It 
+also subclasses Quantity to create a version that displays the name and 
+description by default:
+
+.. code-block:: python
+
+    from quantiphy import Quantity
+    from inform import os_error, fatal, display
+
+    class VerboseQuantity(Quantity):
+        show_label = True,
+        label_fmt = ('{n} = {v} -- {d}', '{n} = {v}')
+
+    filename = 'parameters'
+    try:
+        with open(filename) as f:
+            VerboseQuantity.add_to_namespace(f.read())
+    except OSError as err:
+        fatal(os_error(err))
+    except ValueError as err:
+        fatal(err, culprit=filename)
+
+    display(Fref, Kdet, Kvco, sep='\n')
 
 
 Subclassing Quantity
