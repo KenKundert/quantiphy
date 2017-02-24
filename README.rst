@@ -1390,3 +1390,11 @@ Releases
 1.1 (2016-11-27):
     - Added *known_units* preference.
     - Added *get_preference* class method.
+
+1.2 (2017-02-24):
+    - allow digits after decimal point be optional
+    - support underscores in numbers
+    - allow options to be monkey-patched on to Quantity objects
+    - fix some issues in full precision mode
+    - add strip_dp option
+    - ranamed some options, arguments and methods
