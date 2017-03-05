@@ -80,14 +80,14 @@ class UnitConversion(object):
             Conversion offset.
 
         Forward Conversion:
-            The following conversion is applied if the given units are amongst 
-            the from_units and the desired units are amoungst the to_units:
+            The following conversion is applied if the given units are among 
+            the from_units and the desired units are among the to_units:
 
                 new_value = given_value*slope + incercept
 
         Reverse Conversion:
-            The following conversion is applied if the given units are amongst 
-            the to_units and the desired units are amoungst the from_units:
+            The following conversion is applied if the given units are among 
+            the to_units and the desired units are among the from_units:
 
                 new_value = (given_value - intercept)/slope
         """
@@ -110,7 +110,7 @@ class UnitConversion(object):
 UnitConversion('C °C', 'C °C')
 UnitConversion('C °C', 'K', 1, -273.15)
 UnitConversion('C °C', 'F °F', 5/9, -32*5/9)
-UnitConversion('C °C', 'R °R', 5/9, -491.67*5/9)
+UnitConversion('C °C', 'R °R', 5/9, -273.15)
 # UnitConversion('K', 'C °C', 1, 273.15) -- redundant
 UnitConversion('K', 'F °F', 5/9, 273.15 - 32*5/9)
 UnitConversion('K', 'R °R', 5/9, 0)
@@ -760,7 +760,7 @@ class Quantity(float):
         return format(combine(mantissa, sf, units, self.spacer))
 
     # is_close() {{{2
-    def is_close(self, other, check_units=True):
+    def is_close(self, other, reltol=None, abstol=None, check_units=True):
         '''Use abstol and reltol to determine if a value is close.'''
         if check_units:
             other_units = getattr(other, 'units', None)
@@ -768,16 +768,17 @@ class Quantity(float):
                 my_units = getattr(self, 'units', None)
                 if my_units != other_units:
                     return False
+        reltol = self.reltol if reltol is None else reltol
+        abstol = self.abstol if abstol is None else abstol
         try:
             return math.isclose(
-                self.real, float(other),
-                rel_tol=self.reltol, abs_tol=self.abstol
+                self.real, float(other), rel_tol=reltol, abs_tol=abstol
             )
         except AttributeError:  # pragma: no cover
             # used by python3.4 and earlier
             delta = abs(self.real-float(other))
             reference = max(abs(self.real), abs(float(other)))
-            return delta <= max(self.reltol * reference, self.abstol)
+            return delta <= max(reltol * reference, abstol)
 
     # __str__() {{{2
     def __str__(self):

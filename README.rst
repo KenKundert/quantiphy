@@ -493,13 +493,13 @@ temperature conversions.  Also, the conversion can occur in either direction:
 
 Unit conversions between the following units are built-in:
 
-===== ===============================================================
-K     K, F, °F, R, °R
-C, °C K, C, °C, F, °F, R, °R
-m     km, m, cm, mm, um, μm, micron, nm, Å, angstrom, mi, mile, miles
-g     oz, lb, lbs
-s     s, sec, min, hour, hr , day
-===== ===============================================================
+====== ===============================================================
+K:     K, F, °F, R, °R
+C, °C: K, C, °C, F, °F, R, °R
+m:     km, m, cm, mm, um, μm, micron, nm, Å, angstrom, mi, mile, miles
+g:     oz, lb, lbs
+s:     s, sec, min, hour, hr , day
+====== ===============================================================
 
 When using unit conversions it is important to only convert to units without 
 scale factors (such as those in the first column above) when creating 
