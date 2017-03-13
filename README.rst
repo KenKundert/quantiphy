@@ -1315,10 +1315,6 @@ produces an SVG version of the results using MatPlotLib.
     from quantiphy import Quantity
     Quantity.set_preferences(prec=2)
 
-    # define some utility functions
-    def mag(spectrum):
-        return np.absolute(spectrum)
-
     # define the axis formatting routines
     def freq_fmt(val, pos):
         return Quantity(val, 'Hz').render()
@@ -1356,7 +1352,7 @@ produces an SVG version of the results using MatPlotLib.
     # generate graphs of the resulting spectrum
     fig = pl.figure()
     ax = fig.add_subplot(111)
-    ax.plot(freq, mag(spectrum))
+    ax.plot(freq, np.absolute(spectrum))
     ax.set_yscale('log')
     ax.xaxis.set_major_formatter(freq_formatter)
     ax.yaxis.set_major_formatter(volt_formatter)
