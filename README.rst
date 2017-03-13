@@ -133,21 +133,22 @@ tweaked somewhat to handle tables 2 and 3):
     ...     critical_freqs = [Quantity(f) for f in fields[1:]]
     ...     sdh.append((name, critical_freqs))
     >>> for name, freqs in sdh:
-    ...     print('{:8s}: {:12s} {:9s} {:9s} {}'.format(name, *freqs))
-    STM-1   : 155.52 Mb/s  500 Hz    6.5 kHz   65 kHz
-    STM-4   : 622.08 Mb/s  1 kHz     25 kHz    250 kHz
-    STM-16  : 2.4883 Gb/s  5 kHz     100 kHz   1 MHz
-    STM-64  : 9.9533 Gb/s  20 kHz    400 kHz   4 MHz
-    STM-256 : 39.813 Gb/s  80 kHz    1.92 MHz  16 MHz
+    ...     print('{:8s}: {:12s} {:9s} {:9s} {:9s} {}'.format(name, *freqs))
+    STM-1   : 155.52 Mb/s  500 Hz    6.5 kHz   65 kHz    1.3 MHz
+    STM-4   : 622.08 Mb/s  1 kHz     25 kHz    250 kHz   5 MHz
+    STM-16  : 2.4883 Gb/s  5 kHz     100 kHz   1 MHz     20 MHz
+    STM-64  : 9.9533 Gb/s  20 kHz    400 kHz   4 MHz     80 MHz
+    STM-256 : 39.813 Gb/s  80 kHz    1.92 MHz  16 MHz    320 MHz
+
 
     >>> for name, freqs in sdh:
-    ...     print('{:8s}: {:.4e} {:.4e} {:.4e} {:.4e}'.format(
+    ...     print('{:8s}: {:.4e} {:.4e} {:.4e} {:.4e} {:.4e}'.format(
     ...         name, *(1*f for f in freqs)))
-    STM-1   : 1.5552e+08 5.0000e+02 6.5000e+03 6.5000e+04
-    STM-4   : 6.2208e+08 1.0000e+03 2.5000e+04 2.5000e+05
-    STM-16  : 2.4883e+09 5.0000e+03 1.0000e+05 1.0000e+06
-    STM-64  : 9.9533e+09 2.0000e+04 4.0000e+05 4.0000e+06
-    STM-256 : 3.9813e+10 8.0000e+04 1.9200e+06 1.6000e+07
+    STM-1   : 1.5552e+08 5.0000e+02 6.5000e+03 6.5000e+04 1.3000e+06
+    STM-4   : 6.2208e+08 1.0000e+03 2.5000e+04 2.5000e+05 5.0000e+06
+    STM-16  : 2.4883e+09 5.0000e+03 1.0000e+05 1.0000e+06 2.0000e+07
+    STM-64  : 9.9533e+09 2.0000e+04 4.0000e+05 4.0000e+06 8.0000e+07
+    STM-256 : 3.9813e+10 8.0000e+04 1.9200e+06 1.6000e+07 3.2000e+08
 
 The first output shows that quantities can be displayed in easily readable forms 
 with their units and the second output shows that the values are easily 
