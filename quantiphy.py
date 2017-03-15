@@ -25,6 +25,10 @@ Utilities for converting to and from physical quantities (numbers with units).
 from __future__ import division
 import re
 import math
+try:
+    from collections import ChainMap
+except ImportError:
+    from chainmap import ChainMap
 from six import string_types, u, python_2_unicode_compatible
 
 # Utilities {{{1
@@ -134,6 +138,41 @@ UnitConversion('s', 'min', 60)
 UnitConversion('s', 'hr hour', 3600)
 UnitConversion('s', 'day', 86400)
 
+
+# Constants {{{1
+_user_defined_constants = {}
+_predefined_constants = {'mks':{}}
+_default_unit_system = 'mks'
+
+def set_unit_system(category):
+    global _constants
+    _constants = ChainMap(
+        _user_defined_constants,
+        _predefined_constants[category]
+    )
+
+set_unit_system(_default_unit_system)
+
+class Constant(object):
+    def __init__(self, value, name=None, unit_systems=None):
+        self.name = name
+        self.value = value
+        if unit_systems:
+            for system in unit_systems.split():
+                constants = _predefined_constants.get(system, {})
+                if name:
+                    constants[name] = self.value
+                if value.name:
+                    constants[value.name] = self.value
+                _predefined_constants[system] = constants
+        else:
+            if name:
+                _user_defined_constants[name] = self.value
+            if value.name:
+                _user_defined_constants[value.name] = self.value
+        if not name and not value.name:
+            raise NameError('name was not specified')
+
 # Settings {{{1
 DEFAULTS = {
     'show_si': True,
@@ -182,25 +221,11 @@ DEFAULTS = {
         # absolute tolerance
 }
 CURRENCY_SYMBOLS = '$£€'
-CONSTANTS = {
-    # value may be given as real number or string. If given as a string then the
-    # number of significant figures is used as the full precision.
-    'h':    ('6.62606957e-34',  'J-s',  'h',   "Plank's constant"),
-    'hbar': (6.62606957e-34/(2*math.pi),
-                                'J-s',  'ħ',   "reduced Plank's constant"),
-    'k':    ('1.3806488e-23',   'J/K',  'k',   "Boltzmann's constant"),
-    'q':    ('1.602176565e-19', 'C',    'q',   "elementary charge"),
-    'c':    ('2.99792458e8',    'm/s',  'c',   "speed of light"),
-    '0C':   ('273.15',          'K',    '0°C', "zero degrees Celsius in Kelvin"),
-    'eps0': ('8.854187817e-12', 'F/m',  'ε₀',  "permittivity of free space"),
-    'mu0':  (4e-7*math.pi,      'H/m',  'μ₀',  "permeability of free space"),
-    'Z0':   ('376.730313461',   'Ohms', 'Z₀',  "characteristic impedance of free space"),
-}
 
 
 # Constants {{{1
-__version__ = '1.2.1'
-__released__ = '2017-03-04'
+__version__ = '1.2.2'
+__released__ = '2017-03-15'
 
 # These mappings are only used when reading numbers
 MAPPINGS = {
@@ -491,20 +516,17 @@ class Quantity(float):
 
         # process the value
         if is_str(value):
-            if value in CONSTANTS:
-                value = CONSTANTS[value]
-                if is_str(value):
-                    number, mantissa, sf = recognize_all(value)
-                else:
-                    number = value[0]
-                    if is_str(number):
-                        number, _, mantissa, sf = recognize_number(number, True)
-                    if len(value) > 1:
-                        data['units'] = value[1]
-                    if len(value) > 2:
-                        data['name'] = value[2]
-                    if len(value) > 3:
-                        data['desc'] = value[3]
+            constant = _constants.get(value)
+            if constant:
+                number = float(constant)
+                mantissa = getattr(constant, '_mantissa', None)
+                sf = getattr(constant, '_scale_factor', None)
+                if constant.units:
+                    data['units'] = constant.units
+                if constant.name:
+                    data['name'] = constant.name
+                if constant.desc:
+                    data['desc'] = constant.desc
             else:
                 number, mantissa, sf = recognize_all(value)
         else:
@@ -1064,3 +1086,105 @@ class Quantity(float):
         # this could just as easily be a simple dictionary, but implement it as
         # a function so that it supports a docstring.
         return {'u': 'μ'}.get(sf, sf)
+
+
+# Predefined Constants {{{1
+# Plank's constant {{{2
+Constant(Quantity(
+    '6.62606957e-34',
+    units='J-s',
+    name='h',
+    desc="Plank's constant"
+), unit_systems='mks')
+
+Constant(Quantity(
+    '6.62606885e-27',
+    units='erg-s',
+    name='h',
+    desc="Plank's constant"
+), unit_systems='cgs')
+
+# Reduced Plank's constant {{{2
+Constant(Quantity(
+    6.62606957e-34/(2*math.pi),
+    units='J-s',
+    name='ħ',
+    desc="reduced Plank's constant"
+), name='hbar', unit_systems='mks')
+
+Constant(Quantity(
+    '1.0545716e-27',
+    units='erg-s',
+    name='ħ',
+    desc="reduced Plank's constant"
+), name='hbar', unit_systems='cgs')
+
+# Boltzmann's constant {{{2
+Constant(Quantity(
+    '1.3806488e-23',
+    units='J/K',
+    name='k',
+    desc="Boltzmann's constant"
+), unit_systems='mks')
+
+Constant(Quantity(
+    '1.38064852e-16',
+    units='erg/K',
+    name='k',
+    desc="Boltzmann's constant"
+), unit_systems='cgs')
+
+# Elementary charge {{{2
+Constant(Quantity(
+    '1.602176565e-19',
+    units='C',
+    name='q',
+    desc="elementary charge"
+), unit_systems='mks')
+
+Constant(Quantity(
+    '4.80320427e-10',
+    units='Fr',
+    name='q',
+    desc="elementary charge"
+), unit_systems='cgs')
+
+# Speed of light {{{2
+Constant(Quantity(
+    '2.99792458e8',
+    units='m/s',
+    name='c',
+    desc="speed of light"
+), unit_systems='mks cgs')
+
+# Zero degrees Celsius in Kelvin {{{2
+Constant(Quantity(
+    '273.15',
+    units='K',
+    name='0°C',
+    desc="zero degrees Celsius in Kelvin"
+), name='0C', unit_systems='mks cgs')
+
+# Permittivity of free space {{{2
+Constant(Quantity(
+    '8.854187817e-12',
+    units='F/m',
+    name='ε₀',
+    desc="permittivity of free space"
+), name='eps0', unit_systems='mks')
+
+# Permeability of free space {{{2
+Constant(Quantity(
+    4e-7*math.pi,
+    units='H/m',
+    name='μ₀',
+    desc="permeability of free space"
+), name='mu0', unit_systems='mks')
+
+# Characteristic impedance of free space {{{2
+Constant(Quantity(
+    '376.730313461',
+    units='Ohms',
+    name='Z₀',
+    desc="characteristic impedance of free space"
+), name='Z0', unit_systems='mks')

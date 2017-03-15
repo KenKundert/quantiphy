@@ -1,8 +1,8 @@
 QuantiPhy - Physical Quantities
 ===============================
 
-| Version: 1.2.1
-| Released: 2017-03-04
+| Version: 1.2.2
+| Released: 2017-03-15
 |
 
 .. image:: https://img.shields.io/travis/KenKundert/quantiphy/master.svg
@@ -164,7 +164,7 @@ occurs when it is time to convert it back to a string. When doing so, the scale
 factor and units are included by default.
 
 Alternatives
-""""""""""""
+''''''''''''
 
 There are a considerable number of Python packages dedicated to units and 
 quantities (`Alternatives <https://kdavies4.github.io/natu/seealso.html>`_).  
@@ -902,6 +902,10 @@ Plank's constant:
    >>> print(rplank)
    ħ = 105.46e-36 J-s -- reduced Plank's constant
 
+   >>> rplank = Quantity('ħ')
+   >>> print(rplank)
+   ħ = 105.46e-36 J-s -- reduced Plank's constant
+
 Boltzmann's constant:
 
 .. code-block:: python
@@ -937,7 +941,7 @@ Zero degrees Celsius in Kelvin:
 *QuantiPhy* uses *k* rather than *K* to represent kilo so that you can 
 distinguish between kilo and Kelvin.
 
-Permittivity of free space:
+Electromagnetic Constants:
 
 .. code-block:: python
 
@@ -945,61 +949,109 @@ Permittivity of free space:
    >>> print(eps0)
    ε₀ = 8.8542 pF/m -- permittivity of free space
 
-Permeability of free space:
-
-.. code-block:: python
-
    >>> mu0 = Quantity('mu0')
    >>> print(mu0)
    μ₀ = 1.2566 uH/m -- permeability of free space
-
-Characteristic impedance of free space:
-
-.. code-block:: python
 
    >>> Z0 = Quantity('Z0')
    >>> print(Z0)
    Z₀ = 376.73 Ohms -- characteristic impedance of free space
 
-You can add additional constants by adding them to the CONSTANTS dictionary:
+
+Unit Systems
+''''''''''''
+
+There are multiple versions of the built-in constants, each associated with 
+a different unit system. For example, there are 'mks' (SI) and 'cgs' (EMU-CGS) 
+versions of Plank's constant, Boltzmann's constant, etc. To specify which one 
+you want, you would set the desired unit system:
 
 .. code-block:: python
 
-   >>> from quantiphy import Quantity, CONSTANTS
-   >>> CONSTANTS['h_line'] = (1.420405751786e9, 'Hz')
-   >>> h_line = Quantity('h_line')
-   >>> print(h_line)
-   1.4204 GHz
+   >>> from quantiphy import Quantity, set_unit_system
 
-The value of the constant may be a tuple or a string. If it is a string, it will 
-be interpreted as if it were passed as the primary argument to Quantity. If it 
-is a tuple, it may contain up to 4 values, the value, the units, the name, and 
-the description. This value may also be a string, and if so it must contain 
-a simple number. The benefit of using a string in this case is that *QuantiPhy* 
-will recognize the significant figures and use them as the full precision for 
-the quantity.
+   >>> plank = Quantity('h')
+   >>> print(plank)
+   h = 662.61e-36 J-s -- Plank's constant
+
+   >>> set_unit_system('cgs')
+   >>> plank = Quantity('h')
+   >>> print(plank)
+   h = 6.6261e-27 erg-s -- Plank's constant
+
+   >>> set_unit_system('mks')
+   >>> plank = Quantity('h')
+   >>> print(plank)
+   h = 662.61e-36 J-s -- Plank's constant
+
+Not all constants exist in both unit systems. For example, the electromagnetic 
+constants are not available in cgs units.
+
+
+User Defined Constants
+''''''''''''''''''''''
+
+You can add additional constants using the Constant class. Instantiating this 
+class creates the constant and adds it to QuantiPhy's store of constants (the 
+return value is generally ignored):
 
 .. code-block:: python
 
-   >>> CONSTANTS['lambda'] = 'λ = 211.0611405389mm -- wavelength of hydrogen line'
-   >>> print(Quantity('lambda'))
-   λ = 211.06 mm -- wavelength of hydrogen line
+   >>> from quantiphy import Quantity, Constant
+   >>> Constant(Quantity("λh = 211.061140539mm -- wavelength of hydrogen line"))
+   <...>
+   >>> hy_wavelength = Quantity('λh')
+   >>> print(hy_wavelength)
+   λh = 211.06 mm -- wavelength of hydrogen line
 
-   >>> CONSTANTS['lambda'] = (Quantity('c')/h_line,)
-   >>> print(Quantity('lambda'))
-   211.06m
+The constant is accessed by name, which in this case is the name given in the 
+quantity used when creating the constant. You can also specify the name as an 
+argument to Constant:
 
-   >>> CONSTANTS['lambda'] = (Quantity('c')/h_line, 'm')
-   >>> print(Quantity('lambda'))
-   211.06 mm
+.. code-block:: python
 
-   >>> CONSTANTS['lambda'] = (Quantity('c')/h_line, 'm', 'λ')
-   >>> print(Quantity('lambda'))
-   λ = 211.06 mm
+   >>> from quantiphy import Quantity, Constant
+   >>> Constant(
+   ...     Quantity("λh = 211.061140539mm -- wavelength of hydrogen line"),
+   ...     name='lambda h'
+   ... )
+   <...>
+   >>> hy_wavelength = Quantity('lambda h')
+   >>> print(hy_wavelength)
+   λh = 211.06 mm -- wavelength of hydrogen line
 
-   >>> CONSTANTS['lambda'] = (Quantity('c')/h_line, 'm', 'λ', 'wavelength of hydrogen line')
-   >>> print(Quantity('lambda'))
-   λ = 211.06 mm -- wavelength of hydrogen line
+It is not necessary to specify both names, one is sufficient.  Notice that the 
+name specified as an argument to Constant does not actually become part of the 
+constant, it is only used for looking up the constant.
+
+By default, user defined units are not associated with a unit system, meaning 
+that they are always available regardless of which unit system is being used.  
+However, when creating a constant you can specify one or more unit systems for 
+the constant. You need not limit yourself to the predefined 'mks' and 'cgs' unit 
+systems.
+
+.. code-block:: python
+
+   >>> Constant(Quantity(4.80320427e-10, 'Fr'), 'q', 'esu gaussian')
+   <...>
+   >>> Constant(Quantity(1.602176487e-20, 'abC'), name='q', unit_systems='emu')
+   <...>
+   >>> q_mks = Quantity('q')
+   >>> set_unit_system('cgs')
+   >>> q_cgs = Quantity('q')
+   >>> set_unit_system('esu')
+   >>> q_esu = Quantity('q')
+   >>> set_unit_system('gaussian')
+   >>> q_gaussian = Quantity('q')
+   >>> set_unit_system('emu')
+   >>> q_emu = Quantity('q')
+   >>> set_unit_system('mks')
+   >>> print(q_mks, q_cgs, q_esu, q_gaussian, q_emu, sep='\n')
+   q = 160.22e-21 C -- elementary charge
+   q = 480.32 pFr -- elementary charge
+   480.32 pFr
+   480.32 pFr
+   16.022e-21 abC
 
 
 String Formatting
@@ -1079,9 +1131,9 @@ Access the name or description of the quantity using 'n' and 'd'.
 
 .. code-block:: python
 
-   >>> wavelength = Quantity('lambda')
+   >>> wavelength = Quantity('λh')
    >>> print('{:n}'.format(wavelength))
-   λ
+   λh
 
    >>> print('{:d}'.format(wavelength))
    wavelength of hydrogen line
@@ -1114,10 +1166,10 @@ preference.
    trise = 1e-08
 
    >>> print('{0:n} = {0:q} ({0:d})'.format(wavelength))
-   λ = 211.06 mm (wavelength of hydrogen line)
+   λh = 211.06 mm (wavelength of hydrogen line)
 
    >>> print('{:S}'.format(wavelength))
-   λ = 211.06 mm -- wavelength of hydrogen line
+   λh = 211.06 mm -- wavelength of hydrogen line
 
 You can also specify two values to *label_fmt*, in which case the first is used 
 if there is a description and the second used otherwise.
@@ -1130,7 +1182,7 @@ if there is a description and the second used otherwise.
    trise = 10 ns
 
    >>> print('{:S}'.format(wavelength))
-   λ = 211.06 mm -- wavelength of hydrogen line
+   λh = 211.06 mm -- wavelength of hydrogen line
 
 Finally, you can add units after the format code, which will cause the number to 
 be scaled to those units if the transformation represents a known unit 

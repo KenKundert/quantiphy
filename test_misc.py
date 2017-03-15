@@ -1,6 +1,6 @@
 # encoding: utf8
 
-from quantiphy import Quantity, CONSTANTS
+from quantiphy import Quantity, Constant
 import pytest
 import sys
 
@@ -109,8 +109,8 @@ def test_misc():
     assert q.is_close(1e-8) is True
     assert q.is_close(1.001e-8) is False
 
-    CONSTANTS['h_line'] = 'F_hy = 1420405751.786 Hz -- frequency of hydrogen line'
-    h_line = Quantity('h_line')
+    Constant(Quantity('F_hy = 1420405751.786 Hz -- frequency of hydrogen line'))
+    h_line = Quantity('F_hy')
     assert h_line.render(show_label=True) == 'F_hy = 1.4204 GHz  # frequency of hydrogen line'
 
     h_line2 = Quantity(h_line, h_line)
