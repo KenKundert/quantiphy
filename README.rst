@@ -56,7 +56,7 @@ frequencies needed in jitter tolerance measurements in optical communication:
 
     >>> table1 = """
     ...     SDH     | Rate          | f1      | f2       | f3      | f4
-    ...     --------+---------------|---------|----------|---------|--------
+    ...     --------+---------------+---------+----------+---------+--------
     ...     STM-1   | 155.52 Mb/s   | 500 Hz  | 6.5 kHz  | 65 kHz  | 1.3 MHz
     ...     STM-4   | 622.08 Mb/s   | 1 kHz   | 25 kHz   | 250 kHz | 5 MHz
     ...     STM-16  | 2.48832 Gb/s  | 5 kHz   | 100 kHz  | 1 MHz   | 20 MHz
@@ -73,7 +73,7 @@ this:
 
     >>> table2 = """
     ...     SDH     | Rate (b/s)    | f1 (Hz) | f2 (Hz)  | f3 (Hz) | f4 (Hz)
-    ...     --------+---------------|---------|----------|---------|--------
+    ...     --------+---------------+---------+----------+---------+--------
     ...     STM-1   | 1.5552e8      | 5e2     | 6.5e3    | 6.5e3   | 1.3e6
     ...     STM-4   | 6.2208e8      | 1e3     | 2.5e3    | 2.5e5   | 5e6
     ...     STM-16  | 2.48832e9     | 5e3     | 1e5      | 1e6     | 2e7
@@ -89,7 +89,7 @@ make the table easier to interpret:
 
     >>> table3 = """
     ...     SDH     | Rate (Mb/s)   | f1 (kHz)| f2 (kHz) | f3 (kHz)| f4 (MHz)
-    ...     --------+---------------|---------|----------|---------|--------
+    ...     --------+---------------+---------+----------+---------+--------
     ...     STM-1   | 155.52        | 0.5     | 6.5      | 65      | 1.3
     ...     STM-4   | 622.08        | 1       | 2.5      | 250     | 5
     ...     STM-16  | 2488.32       | 5       | 100      | 1000    | 20
@@ -1501,3 +1501,7 @@ Releases
     - add strip_dp option
     - fix some issues in full precision mode
     - ranamed some options, arguments and methods
+
+1.3 (2017-03-??):
+    - reworked constants
+    - added unit systems for physical constants
