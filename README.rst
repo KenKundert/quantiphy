@@ -1437,11 +1437,12 @@ produces an SVG version of the results using MatPlotLib.
     # print out basic information about the data
     timestep = Quantity(time[1] - time[0], 's')
     nonperiodicity = Quantity(wave[-1] - wave[0], 'V')
+    points = Quantity(len(time))
     period = Quantity(timestep * len(time), 's')
     freq_res = Quantity(1/period, 'Hz')
     print('timestep:', timestep)
     print('nonperiodicity:', nonperiodicity)
-    print('timepoints:', len(time))
+    print('timepoints:', points)
     print('period:', period)
     print('freq resolution:', freq_res)
 
@@ -1471,7 +1472,7 @@ This script produces the following textual output::
 
     timestep: 20 ns
     nonperiodicity: 2.3 pV
-    timepoints: 27994
+    timepoints: 28k
     period: 560 us
     freq resolution: 1.79 kHz
 
