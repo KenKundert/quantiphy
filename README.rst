@@ -1243,6 +1243,17 @@ information back into the original units:
     10 min  400 °F
     20 min  360 °F
 
+All of these features can be used with formatted strings, which are new to 
+Python in version 3.6:
+
+.. code-block:: python
+
+    >>> for time, temp in data:
+    ...     print(f'{time:<7smin} {temp:s°F}')
+    0 min   450 °F
+    10 min  400 °F
+    20 min  360 °F
+
 
 Exceptions
 ----------
