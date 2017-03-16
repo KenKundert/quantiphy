@@ -1398,7 +1398,7 @@ SI scale factors and units when rendered in the print statement.
    except OSError as err:
       fatal(os_error(err))
    except KeyboardInterrupt:
-      display('dus: killed by user')
+      display('dus: killed by user.')
 
 
 MatPlotLib Example
