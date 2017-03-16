@@ -1,7 +1,7 @@
 QuantiPhy - Physical Quantities
 ===============================
 
-| Version: 1.2.2
+| Version: 1.2.3
 | Released: 2017-03-15
 |
 
@@ -986,6 +986,38 @@ you want, you would set the desired unit system:
 
 Not all constants exist in both unit systems. For example, the electromagnetic 
 constants are not available in cgs units.
+
+The currently supported predefined physical constants are:
+
+
+========  =====================  =====================
+name      mks value              cgs value
+========  =====================  =====================
+h         6.626070040e-34 J-s    6.626070040e-27 erg-s
+hbar, h   1.054571800e-34 J-s    1.054571800e-27 erg-s
+k         1.38064852e-23 J/K     1.38064852e-16 erg/K
+q         1.6021766208e-19 C     4.80320425e-10 Fr
+c         2.99792458e8 m/s       2.99792458e8 m/s
+0C, 0°C   273.15 K               273.15 K
+eps0, ε₀  8.854187817e-12 F/m    ---
+mu0, μ₀   4e-7π                  ---
+Z0, Z₀    376.730 313 461        ---
+========  =====================  =====================
+
+Notice that c, the speed of light, is the same in both unit systems because 
+QuantiPhy wants numbers given in terms of their base units rather than in scaled 
+units. So mass is given in grams even though in mks the fundamental unit of mass 
+is kilograms and length is given in meters even though in cgs the fundamental 
+unit of length is centimeters. If you would like the speed of light given in 
+centimeters, use the following:
+
+    >>> c = Quantity('c', scale=100, units='cm')
+    >>> c.show_si = False
+    >>> print(c)
+    c = 29.979e9 cm -- speed of light
+
+    >>> print(f'{c:e} {c:u}')
+    2.9979e+10 cm
 
 
 User Defined Constants

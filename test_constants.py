@@ -4,11 +4,11 @@ from quantiphy import Quantity, Constant, set_unit_system
 
 def test_constants():
     Quantity.set_preferences(spacer=' ', label_fmt='{n} = {v} -- {d}')
-    assert '{:.12q}'.format(Quantity('h')) == '662.606957e-36 J-s'
-    assert '{:.12q}'.format(Quantity('hbar')) == '105.4571725336e-36 J-s'
-    assert '{:.12q}'.format(Quantity('ħ')) == '105.4571725336e-36 J-s'
-    assert '{:.12q}'.format(Quantity('k')) == '13.806488e-24 J/K'
-    assert '{:.12q}'.format(Quantity('q')) == '160.2176565e-21 C'
+    assert '{:.12q}'.format(Quantity('h')) == '662.607004e-36 J-s'
+    assert '{:.12q}'.format(Quantity('hbar')) == '105.45718e-36 J-s'
+    assert '{:.12q}'.format(Quantity('ħ')) == '105.45718e-36 J-s'
+    assert '{:.12q}'.format(Quantity('k')) == '13.8064852e-24 J/K'
+    assert '{:.12q}'.format(Quantity('q')) == '160.21766208e-21 C'
     assert '{:.12q}'.format(Quantity('c')) == '299.792458 Mm/s'
     assert '{:.12q}'.format(Quantity('0C')) == '273.15 K'
     assert '{:.12q}'.format(Quantity('eps0')) == '8.854187817 pF/m'
@@ -38,11 +38,11 @@ def test_constants():
     assert '{:S}'.format(Quantity('Z0')) == 'Z₀ = 376.73 Ohms -- characteristic impedance of free space'
 
     set_unit_system('cgs')
-    assert '{:.12q}'.format(Quantity('h')) == '6.62606885e-27 erg-s'
-    assert '{:.12q}'.format(Quantity('hbar')) == '1.0545716e-27 erg-s'
-    assert '{:.12q}'.format(Quantity('ħ')) == '1.0545716e-27 erg-s'
+    assert '{:.12q}'.format(Quantity('h')) == '6.62607004e-27 erg-s'
+    assert '{:.12q}'.format(Quantity('hbar')) == '1.0545718e-27 erg-s'
+    assert '{:.12q}'.format(Quantity('ħ')) == '1.0545718e-27 erg-s'
     assert '{:.12q}'.format(Quantity('k')) == '138.064852 aerg/K'
-    assert '{:.12q}'.format(Quantity('q')) == '480.320427 pFr'
+    assert '{:.12q}'.format(Quantity('q')) == '480.320425 pFr'
     assert '{:.12q}'.format(Quantity('c')) == '299.792458 Mm/s'
     assert '{:.12q}'.format(Quantity('0C')) == '273.15 K'
 
@@ -63,11 +63,11 @@ def test_constants():
     assert '{:S}'.format(Quantity('0C')) == '0°C = 273.15 K -- zero degrees Celsius in Kelvin'
 
     set_unit_system('mks')
-    assert '{:.12q}'.format(Quantity('h')) == '662.606957e-36 J-s'
-    assert '{:.12q}'.format(Quantity('hbar')) == '105.4571725336e-36 J-s'
-    assert '{:.12q}'.format(Quantity('ħ')) == '105.4571725336e-36 J-s'
-    assert '{:.12q}'.format(Quantity('k')) == '13.806488e-24 J/K'
-    assert '{:.12q}'.format(Quantity('q')) == '160.2176565e-21 C'
+    assert '{:.12q}'.format(Quantity('h')) == '662.607004e-36 J-s'
+    assert '{:.12q}'.format(Quantity('hbar')) == '105.45718e-36 J-s'
+    assert '{:.12q}'.format(Quantity('ħ')) == '105.45718e-36 J-s'
+    assert '{:.12q}'.format(Quantity('k')) == '13.8064852e-24 J/K'
+    assert '{:.12q}'.format(Quantity('q')) == '160.21766208e-21 C'
     assert '{:.12q}'.format(Quantity('c')) == '299.792458 Mm/s'
     assert '{:.12q}'.format(Quantity('0C')) == '273.15 K'
     assert '{:.12q}'.format(Quantity('eps0')) == '8.854187817 pF/m'

@@ -224,7 +224,7 @@ CURRENCY_SYMBOLS = '$£€'
 
 
 # Constants {{{1
-__version__ = '1.2.2'
+__version__ = '1.2.3'
 __released__ = '2017-03-15'
 
 # These mappings are only used when reading numbers
@@ -1091,14 +1091,14 @@ class Quantity(float):
 # Predefined Constants {{{1
 # Plank's constant {{{2
 Constant(Quantity(
-    '6.62606957e-34',
+    '6.626070040e-34',
     units='J-s',
     name='h',
     desc="Plank's constant"
 ), unit_systems='mks')
 
 Constant(Quantity(
-    '6.62606885e-27',
+    '6.626070040e-27',
     units='erg-s',
     name='h',
     desc="Plank's constant"
@@ -1106,14 +1106,14 @@ Constant(Quantity(
 
 # Reduced Plank's constant {{{2
 Constant(Quantity(
-    6.62606957e-34/(2*math.pi),
+    '1.054571800e-34',
     units='J-s',
     name='ħ',
     desc="reduced Plank's constant"
 ), name='hbar', unit_systems='mks')
 
 Constant(Quantity(
-    '1.0545716e-27',
+    '1.054571800e-27',
     units='erg-s',
     name='ħ',
     desc="reduced Plank's constant"
@@ -1121,7 +1121,7 @@ Constant(Quantity(
 
 # Boltzmann's constant {{{2
 Constant(Quantity(
-    '1.3806488e-23',
+    '1.38064852e-23',
     units='J/K',
     name='k',
     desc="Boltzmann's constant"
@@ -1136,14 +1136,14 @@ Constant(Quantity(
 
 # Elementary charge {{{2
 Constant(Quantity(
-    '1.602176565e-19',
+    '1.6021766208e-19',
     units='C',
     name='q',
     desc="elementary charge"
 ), unit_systems='mks')
 
 Constant(Quantity(
-    '4.80320427e-10',
+    '4.80320425e-10',
     units='Fr',
     name='q',
     desc="elementary charge"
