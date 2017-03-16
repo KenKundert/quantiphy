@@ -994,7 +994,7 @@ The currently supported predefined physical constants are:
 name      mks value              cgs value
 ========  =====================  =====================
 h         6.626070040e-34 J-s    6.626070040e-27 erg-s
-hbar, h   1.054571800e-34 J-s    1.054571800e-27 erg-s
+hbar, ħ   1.054571800e-34 J-s    1.054571800e-27 erg-s
 k         1.38064852e-23 J/K     1.38064852e-16 erg/K
 q         1.6021766208e-19 C     4.80320425e-10 Fr
 c         2.99792458e8 m/s       2.99792458e8 m/s
@@ -1010,6 +1010,8 @@ units. So mass is given in grams even though in mks the fundamental unit of mass
 is kilograms and length is given in meters even though in cgs the fundamental 
 unit of length is centimeters. If you would like the speed of light given in 
 centimeters, use the following:
+
+.. code-block:: python
 
     >>> c = Quantity('c', scale=100, units='cm')
     >>> c.show_si = False
