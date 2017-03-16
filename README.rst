@@ -1279,6 +1279,15 @@ converter is available.
    ...
    KeyError: ('pc', 'mi')
 
+A NameError is raised if a constant is created without a name.
+
+.. code-block:: python
+
+   >>> q = Constant(Quantity('1ns'))
+   Traceback (most recent call last):
+   ...
+   NameError: no name specified
+
 
 Subclassing Quantity
 --------------------

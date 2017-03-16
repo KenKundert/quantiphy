@@ -171,7 +171,7 @@ class Constant(object):
             if value.name:
                 _user_defined_constants[value.name] = self.value
         if not name and not value.name:
-            raise NameError('name was not specified')
+            raise NameError('no name specified')
 
 # Settings {{{1
 DEFAULTS = {
