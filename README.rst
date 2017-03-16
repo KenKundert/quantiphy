@@ -962,9 +962,9 @@ Unit Systems
 ''''''''''''
 
 There are multiple versions of the built-in constants, each associated with 
-a different unit system. For example, there are 'mks' (SI) and 'cgs' (EMU-CGS) 
-versions of Plank's constant, Boltzmann's constant, etc. To specify which one 
-you want, you would set the desired unit system:
+a different unit system. For example, there are 'mks' (SI) and 'cgs' 
+(Gaussian-CGS) versions of Plank's constant, Boltzmann's constant, etc. To 
+specify which one you want, you would set the desired unit system:
 
 .. code-block:: python
 
