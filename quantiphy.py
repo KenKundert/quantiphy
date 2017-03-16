@@ -493,7 +493,7 @@ class Quantity(float):
                     number = float(mantissa + MAPPINGS.get(sf, [sf])[0])
                     return number, units, mantissa, sf
             else:
-                raise ValueError('%s: not a valid number.' % value)
+                raise ValueError('%s: not a valid number' % value)
 
         def recognize_all(value):
             try:
@@ -1044,7 +1044,7 @@ class Quantity(float):
                 else:  # pragma: no cover
                     raise ValueError('{}: not a valid identifier.'.format(name))
             else:  # pragma: no cover
-                raise ValueError('{}: not a valid number.'.format(line))
+                raise ValueError('{}: not a valid number'.format(line))
 
     # map_sf_to_sci_notation() {{{2
     _SCI_NOTATION_MAPPER = {

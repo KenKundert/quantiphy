@@ -1267,7 +1267,7 @@ a number:
    ...     q = Quantity('xxx')
    ... except ValueError as err:
    ...     print(err)
-   xxx: not a valid number.
+   xxx: not a valid number
 
 A KeyError is raised if a unit conversion is requested but no suitable unit
 converter is available.
