@@ -1,0 +1,3 @@
+Fref = 156 MHz  -- Reference frequency
+Kdet = 88.3 uA  -- Gain of phase detector (Imax)
+Kvco = 9.07 GHz/V  -- Gain of VCO

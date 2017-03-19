@@ -1340,23 +1340,26 @@ description by default:
 
 .. code-block:: python
 
-    from quantiphy import Quantity
-    from inform import os_error, fatal, display
+   >>> from quantiphy import Quantity
+   >>> from inform import os_error, fatal, display
 
-    class VerboseQuantity(Quantity):
-        show_label = True
-        label_fmt = ('{n} = {v} -- {d}', '{n} = {v}')
+   >>> class VerboseQuantity(Quantity):
+   ...    show_label = True
+   ...    label_fmt = ('{n} = {v} -- {d}', '{n} = {v}')
 
-    filename = 'parameters'
-    try:
-        with open(filename) as f:
-            VerboseQuantity.add_to_namespace(f.read())
-    except OSError as err:
-        fatal(os_error(err))
-    except ValueError as err:
-        fatal(err, culprit=filename)
+   >>> filename = 'parameters'
+   >>> try:
+   ...     with open(filename) as f:
+   ...         VerboseQuantity.add_to_namespace(f.read())
+   ... except OSError as err:
+   ...     fatal(os_error(err))
+   ... except ValueError as err:
+   ...     fatal(err, culprit=filename)
 
-    display(Fref, Kdet, Kvco, sep='\n')
+   >>> display(Fref, Kdet, Kvco, sep='\n')
+   Fref = 156 MHz -- Reference frequency
+   Kdet = 88.3 uA -- Gain of phase detector (Imax)
+   Kvco = 9.07 GHz/V -- Gain of VCO
 
 
 Example
@@ -1482,7 +1485,6 @@ And the following is one of the two graphs produced:
 
 Notice the axis labels in the generated graph.  Use of *QuantiPhy* makes the 
 widely scaled units compact and easy to read.
-
 
 
 Releases
