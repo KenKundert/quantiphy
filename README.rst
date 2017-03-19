@@ -1505,6 +1505,6 @@ Releases
     - fix some issues in full precision mode
     - ranamed some options, arguments and methods
 
-1.3 (2017-03-??):
+1.3 (2017-03-19):
     - reworked constants
     - added unit systems for physical constants
