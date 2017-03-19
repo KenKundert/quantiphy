@@ -11,10 +11,5 @@ install:
   - pip install coveralls
 script:
   - coverage run setup.py pytest
-deploy:
-    provider: pypi
-    user: messenger
-    on:
-        tags: true
 after_success:
   - coveralls
