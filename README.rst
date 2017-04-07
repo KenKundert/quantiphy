@@ -17,8 +17,9 @@ QuantiPhy - Physical Quantities
 .. image:: https://img.shields.io/pypi/pyversions/quantiphy.svg
     :target: https://pypi.python.org/pypi/quantiphy/
 
-.. image:: https://img.shields.io/pypi/dd/quantiphy.svg
-    :target: https://pypi.python.org/pypi/quantiphy/
+.. IGNORE: pypi statics are broken and unlikely to be fixed
+    .. image:: https://img.shields.io/pypi/dd/quantiphy.svg
+        :target: https://pypi.python.org/pypi/quantiphy/
 
 
 Use 'pip3 install quantiphy' to install.  Requires Python3.3 or better.
