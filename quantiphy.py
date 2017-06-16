@@ -232,8 +232,8 @@ CURRENCY_SYMBOLS = '$£€'
 
 
 # Constants {{{1
-__version__ = '1.3.0'
-__released__ = '2017-03-19'
+__version__ = '1.3.1'
+__released__ = '2017-06-15'
 
 # These mappings are only used when reading numbers
 MAPPINGS = {
