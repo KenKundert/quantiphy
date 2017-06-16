@@ -37,8 +37,8 @@ def is_str(obj):
     """Identifies strings in all their various guises."""
     return isinstance(obj, string_types)
 
-# combine {{{2
-def combine(mantissa, sf, units, spacer):
+# _combine {{{2
+def _combine(mantissa, sf, units, spacer):
     mantissa = mantissa.lstrip('+')
     if units:
         if units in CURRENCY_SYMBOLS:
@@ -57,6 +57,10 @@ def combine(mantissa, sf, units, spacer):
                 return mantissa + sf + spacer + units
     else:
         return mantissa + sf
+
+# _named_regex {{{2
+def named_regex(name, regex):
+    return '(?P<%s>%s)' % (name, regex)
 
 # Unit Conversions {{{1
 _unit_conversions = {}
@@ -139,7 +143,7 @@ UnitConversion('s', 'hr hour', 3600)
 UnitConversion('s', 'day', 86400)
 
 
-# Constants {{{1
+# User Defined Constants {{{1
 _user_defined_constants = {}
 _predefined_constants = {'mks':{}}
 _default_unit_system = 'mks'
@@ -190,6 +194,10 @@ DEFAULTS = {
     'output_sf': 'TGMkmunpfa',
         # the scale factors that should be used when formatting numbers
         # this can be a subset of the available scale factors
+    'input_sf': None,
+        # the scale factors that should be recognized when reading numbers
+        # this can be a subset of the available scale factors
+        # None implies that all known scale factors should be accepted
     'map_sf': {},
         # use this to change the way individual scale factors are rendered.
         # ex: map_sf={'u': 'μ'} to render micro using mu. Can be a mapping or
@@ -267,128 +275,10 @@ FORMAT_SPEC = re.compile(r'\A([<>]?)(\d*)(?:\.(\d+))?(?:([qQrRusSeEfFgGdn])([a-z
 # Regular expression for recognizing identifiers
 IDENTIFIER = re.compile(r'\A[_a-zA-Z][\w]*\Z')
 
-# Pattern Definitions {{{1
-# Build regular expressions used to recognize quantities
-def named_regex(name, regex):
-    return '(?P<%s>%s)' % (name, regex)
-
-# components {{{2
-sign = named_regex('sign', '[-+]?')
-required_digits = r'(?:[0-9][0-9_]*[0-9]|[0-9]+)'  # allow interior underscores
-optional_digits = r'(?:[0-9][0-9_]*[0-9]|[0-9]*)'
-mantissa = named_regex(
-    'mant',
-    r'(?:{od}\.?{rd})|(?:{rd}\.?{od})'.format(
-        rd = required_digits, od = optional_digits
-    ),  # leading or trailing digits are optional, but not both
-)
-exponent = named_regex('exp', '[eE][-+]?[0-9]+')
-scale_factor = named_regex('sf', '[%s]' % ''.join(MAPPINGS))
-units = named_regex('units', r'(?:[a-zA-Z°ÅΩ℧%][-^/()\w]*)?')
-    # examples: Ohms, V/A, J-s, m/s^2, H/(m-s), Ω, %
-    # leading char must be letter to avoid 1.0E-9s -> (1e18, '-9s')
-currency = named_regex('currency', '[%s]' % CURRENCY_SYMBOLS)
-nan = named_regex('nan', '(?i)inf|nan')
-
-# number_with_scale_factor {{{2
-number_with_scale_factor = (
-    r'{sign}{mantissa}\s*{scale_factor}{units}'.format(**locals()),
-    lambda match: match.group('sign') + match.group('mant'),
-    lambda match: match.group('sf'),
-    lambda match: match.group('units')
-)
-
-# number_with_exponent {{{2
-number_with_exponent = (
-    r'{sign}{mantissa}{exponent}\s*{units}'.format(**locals()),
-    lambda match: match.group('sign') + match.group('mant'),
-    lambda match: match.group('exp').lower(),
-    lambda match: match.group('units')
-)
-
-# simple_number {{{2
-# this one must be processed after number_with_scale_factor
-simple_number = (
-    r'{sign}{mantissa}\s*{units}'.format(**locals()),
-    lambda match: match.group('sign') + match.group('mant'),
-    lambda match: '',
-    lambda match: match.group('units')
-)
-
-# currency_with_scale_factor {{{2
-currency_with_scale_factor = (
-    r'{sign}{currency}{mantissa}\s*{scale_factor}'.format(**locals()),
-    lambda match: match.group('sign') + match.group('mant'),
-    lambda match: match.group('sf'),
-    lambda match: match.group('currency')
-)
-
-# currency_with_exponent {{{2
-currency_with_exponent = (
-    r'{sign}{currency}{mantissa}{exponent}'.format(**locals()),
-    lambda match: match.group('sign') + match.group('mant'),
-    lambda match: match.group('exp').lower(),
-    lambda match: match.group('currency')
-)
-
-# simple_currency {{{2
-simple_currency = (
-    r'{sign}{currency}{mantissa}'.format(**locals()),
-    lambda match: match.group('sign') + match.group('mant'),
-    lambda match: '',
-    lambda match: match.group('currency')
-)
-
-# nan_with_units {{{2
-nan_with_units = (
-    r'{sign}{nan}\s+{units}'.format(**locals()),
-    lambda match: match.group('sign') + match.group('nan').lower(),
-    lambda match: '',
-    lambda match: match.group('units')
-)
-
-# currency_nan {{{2
-currency_nan = (
-    r'{sign}{currency}{nan}'.format(**locals()),
-    lambda match: match.group('sign') + match.group('nan').lower(),
-    lambda match: '',
-    lambda match: match.group('currency')
-)
-
-# simple_nan {{{2
-simple_nan = (
-    r'{sign}{nan}'.format(**locals()),
-    lambda match: match.group('sign') + match.group('nan').lower(),
-    lambda match: '',
-    lambda match: ''
-)
-
-# all_number_converters {{{2
-all_number_converters = [
-    (re.compile('\A\s*{}\s*\Z'.format(pattern)), get_mant, get_sf, get_units)
-    for pattern, get_mant, get_sf, get_units in [
-        number_with_exponent, number_with_scale_factor, simple_number,
-        currency_with_exponent, currency_with_scale_factor, simple_currency,
-        nan_with_units, currency_nan, simple_nan,
-    ]
-]
-
-# sf_free_number_converters {{{2
-sf_free_number_converters = [
-    (re.compile('\A\s*{}\s*\Z'.format(pattern)), get_mant, get_sf, get_units)
-    for pattern, get_mant, get_sf, get_units in [
-        number_with_exponent, simple_number,
-        currency_with_exponent, simple_currency,
-        nan_with_units, currency_nan, simple_nan,
-    ]
-]
-
-
 # Quantity class {{{1
 @python_2_unicode_compatible
 class Quantity(float):
-    # class attributes {{{2
-    # defaults
+    # defaults {{{2
     show_si = DEFAULTS['show_si']
     show_units = DEFAULTS['show_units']
     prec = DEFAULTS['prec']
@@ -396,6 +286,7 @@ class Quantity(float):
     spacer = DEFAULTS['spacer']
     unity_sf = DEFAULTS['unity_sf']
     output_sf = DEFAULTS['output_sf']
+    input_sf = DEFAULTS['input_sf']
     map_sf = DEFAULTS['map_sf']
     keep_components = DEFAULTS['keep_components']
     ignore_sf = DEFAULTS['ignore_sf']
@@ -411,12 +302,142 @@ class Quantity(float):
         # This allows the user to monkey-patch the instances to provide local
         # overrides to these values.
 
-    units = ''  # do not change these
+    # constants (do not change these) {{{2
+    units = ''
     name = ''
     desc = ''
         # These are used as the default values for these three attributes.
         # Putting them here means that the instances do not need to contain
         # these values if not specified, but yet they can always be accessed.
+    all_number_converters = None
+    sf_free_number_converters = None
+        # These must be initialized to None, but will be set the first time
+        # Quantity is instantiated.
+
+    # _initialize_recognizers {{{2
+    @classmethod
+    def _initialize_recognizers(cls):
+        known_sf = ''.join(MAPPINGS)
+        if cls.input_sf is None:
+            input_sf = known_sf
+        else:
+            input_sf = cls.input_sf
+            unknown_sf = set(input_sf) - set(known_sf)
+            if unknown_sf:
+                unknown_sf = ', '.join(sorted(unknown_sf))
+                raise ValueError('Unknown scale factors: %s.' % unknown_sf)
+
+        # Build regular expressions used to recognize quantities
+        # components {{{2
+        sign = named_regex('sign', '[-+]?')
+        required_digits = r'(?:[0-9][0-9_]*[0-9]|[0-9]+)'  # allow interior underscores
+        optional_digits = r'(?:[0-9][0-9_]*[0-9]|[0-9]*)'
+        mantissa = named_regex(
+            'mant',
+            r'(?:{od}\.?{rd})|(?:{rd}\.?{od})'.format(
+                rd = required_digits, od = optional_digits
+            ),  # leading or trailing digits are optional, but not both
+        )
+        exponent = named_regex('exp', '[eE][-+]?[0-9]+')
+        scale_factor = named_regex('sf', '[%s]' % input_sf)
+        units = named_regex('units', r'(?:[a-zA-Z°ÅΩ℧%][-^/()\w]*)?')
+            # examples: Ohms, V/A, J-s, m/s^2, H/(m-s), Ω, %
+            # leading char must be letter to avoid 1.0E-9s -> (1e18, '-9s')
+        currency = named_regex('currency', '[%s]' % CURRENCY_SYMBOLS)
+        nan = named_regex('nan', '(?i)inf|nan')
+
+        # number_with_scale_factor {{{2
+        number_with_scale_factor = (
+            r'{sign}{mantissa}\s*{scale_factor}{units}'.format(**locals()),
+            lambda match: match.group('sign') + match.group('mant'),
+            lambda match: match.group('sf'),
+            lambda match: match.group('units')
+        )
+
+        # number_with_exponent {{{2
+        number_with_exponent = (
+            r'{sign}{mantissa}{exponent}\s*{units}'.format(**locals()),
+            lambda match: match.group('sign') + match.group('mant'),
+            lambda match: match.group('exp').lower(),
+            lambda match: match.group('units')
+        )
+
+        # simple_number {{{2
+        # this one must be processed after number_with_scale_factor
+        simple_number = (
+            r'{sign}{mantissa}\s*{units}'.format(**locals()),
+            lambda match: match.group('sign') + match.group('mant'),
+            lambda match: '',
+            lambda match: match.group('units')
+        )
+
+        # currency_with_scale_factor {{{2
+        currency_with_scale_factor = (
+            r'{sign}{currency}{mantissa}\s*{scale_factor}'.format(**locals()),
+            lambda match: match.group('sign') + match.group('mant'),
+            lambda match: match.group('sf'),
+            lambda match: match.group('currency')
+        )
+
+        # currency_with_exponent {{{2
+        currency_with_exponent = (
+            r'{sign}{currency}{mantissa}{exponent}'.format(**locals()),
+            lambda match: match.group('sign') + match.group('mant'),
+            lambda match: match.group('exp').lower(),
+            lambda match: match.group('currency')
+        )
+
+        # simple_currency {{{2
+        simple_currency = (
+            r'{sign}{currency}{mantissa}'.format(**locals()),
+            lambda match: match.group('sign') + match.group('mant'),
+            lambda match: '',
+            lambda match: match.group('currency')
+        )
+
+        # nan_with_units {{{2
+        nan_with_units = (
+            r'{sign}{nan}\s+{units}'.format(**locals()),
+            lambda match: match.group('sign') + match.group('nan').lower(),
+            lambda match: '',
+            lambda match: match.group('units')
+        )
+
+        # currency_nan {{{2
+        currency_nan = (
+            r'{sign}{currency}{nan}'.format(**locals()),
+            lambda match: match.group('sign') + match.group('nan').lower(),
+            lambda match: '',
+            lambda match: match.group('currency')
+        )
+
+        # simple_nan {{{2
+        simple_nan = (
+            r'{sign}{nan}'.format(**locals()),
+            lambda match: match.group('sign') + match.group('nan').lower(),
+            lambda match: '',
+            lambda match: ''
+        )
+
+        # all_number_converters {{{2
+        cls.all_number_converters = [
+            (re.compile('\A\s*{}\s*\Z'.format(pattern)), get_mant, get_sf, get_units)
+            for pattern, get_mant, get_sf, get_units in [
+                number_with_exponent, number_with_scale_factor, simple_number,
+                currency_with_exponent, currency_with_scale_factor, simple_currency,
+                nan_with_units, currency_nan, simple_nan,
+            ]
+        ]
+
+        # sf_free_number_converters {{{2
+        cls.sf_free_number_converters = [
+            (re.compile('\A\s*{}\s*\Z'.format(pattern)), get_mant, get_sf, get_units)
+            for pattern, get_mant, get_sf, get_units in [
+                number_with_exponent, simple_number,
+                currency_with_exponent, simple_currency,
+                nan_with_units, currency_nan, simple_nan,
+            ]
+        ]
 
     # constructor {{{2
     def __new__(
@@ -459,6 +480,10 @@ class Quantity(float):
         ignore_sf = cls.ignore_sf if ignore_sf is None else ignore_sf
         data = {}
 
+        # intialize Quantity if required
+        if not cls.all_number_converters or not cls.sf_free_number_converters:
+            cls._initialize_recognizers()
+
         # process model to get values for name, units, and desc if available
         if model:
             if is_str(model):
@@ -477,9 +502,9 @@ class Quantity(float):
 
         def recognize_number(value, ignore_sf):
             if ignore_sf:
-                number_converters = sf_free_number_converters
+                number_converters = cls.sf_free_number_converters
             else:
-                number_converters = all_number_converters
+                number_converters = cls.all_number_converters
             for pattern, get_mant, get_sf, get_units in number_converters:
                 match = pattern.match(value)
                 if match:
@@ -661,7 +686,7 @@ class Quantity(float):
 
         # check for infinities or NaN
         if self.is_infinite() or self.is_nan():
-            return format(combine(str(self.real), '', units, ' '))
+            return format(_combine(str(self.real), '', units, ' '))
 
         # convert into scientific notation with proper precision
         if prec is None:
@@ -779,7 +804,7 @@ class Quantity(float):
             if mantissa[-1] == '.':
                 mantissa += '0'
 
-        return format(combine(mantissa, sf, units, self.spacer))
+        return format(_combine(mantissa, sf, units, self.spacer))
 
     # is_close() {{{2
     def is_close(self, other, reltol=None, abstol=None, check_units=True):
@@ -932,6 +957,8 @@ class Quantity(float):
         output_sf (str):
             Which scale factors to output, generally one would only use familiar
             scale factors.
+        input_sf (str):
+            Which scale factors to recognize when reading numbers.
         map_sf (dict or funct):
             Use this to change the way individual scale factors are rendered,
             ex: map_sf={'u': 'μ'} to render micro using mu. If a function is
@@ -991,6 +1018,8 @@ class Quantity(float):
                 if key in ['known_units'] and is_str(value):
                     value = value.split()
                 setattr(cls, key, value)
+            if key == 'input_sf':
+                cls._initialize_recognizers()
 
     # get_preference() {{{2
     @classmethod
@@ -999,9 +1028,9 @@ class Quantity(float):
 
         name (str):
             Name of the desired preference. Choose from: show_si, show_units,
-            prec, full_prec, spacer, unity_sf, output_sf, map_sf, ignore_sf,
-            known_units, show_label, reltol, abstol, keep_components, label_fmt,
-            assign_rec.
+            prec, full_prec, spacer, unity_sf, output_sf, input_sf, map_sf,
+            ignore_sf, known_units, show_label, reltol, abstol, keep_components,
+            label_fmt, assign_rec.
         """
         assert key in DEFAULTS, ('%s: unknown.' % key)
         return getattr(cls, key)

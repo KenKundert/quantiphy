@@ -18,7 +18,7 @@ QuantiPhy - Physical Quantities
     :target: https://pypi.python.org/pypi/quantiphy/
 
 .. IGNORE: pypi statics are broken and unlikely to be fixed
-    .. image:: https://img.shields.io/pypi/dd/quantiphy.svg
+    .. image:: https://img.shields.io/pypi/dm/quantiphy.svg
         :target: https://pypi.python.org/pypi/quantiphy/
 
 
@@ -623,7 +623,7 @@ You can also access the value of an existing preference:
 .. code-block:: python
 
    >>> known_units = Quantity.get_preference('known_units')
-   >>> Quantity.set_preferences(known_units = known_units + ['m'])
+   >>> Quantity.set_preferences(known_units = known_units + ['kat'])
 
 Alternately, the options are class attributes that can be read or set directly.
 
@@ -673,6 +673,15 @@ output_sf (str):
     Which scale factors to output, generally one would only use familiar scale 
     factors.  Default is 'TGMkmunpfa'.  This setting does not affect the scale 
     factors that are recognized when reading number.
+
+input_sf (str):
+    Which scale factors to recognize when reading a number.
+    Default is 'YZEPTGMk_cmunpfazy'.  This setting does not affect the scale 
+    factors that are used when converting a number to a string. By specifying 
+    a reduced set of scale factors you can sometimes eliminate the chance that 
+    units you need to use will be confused for a scale factor. For example, 
+    specifying input_sf='GMKk' prevents *1 meter* from being interpreted as 1e-3 
+    eter.
 
 map_sf (dict, func):
     Use this to change the way individual scale factors are rendered. May be 
@@ -814,6 +823,33 @@ factors, you can specify the *ignore_sf* preference:
    1 km
 
    >>> Quantity.set_preferences(ignore_sf=False)
+   >>> l = Quantity('1000m')
+   >>> l.as_tuple()
+   (1.0, '')
+
+If there are scale factors that you know you will never use, you can instruct 
+Quantiphy to interpret a specific set and ignore the rest using the *input_sf* 
+preference.
+
+.. code-block:: python
+
+   >>> Quantity.set_preferences(input_sf='GMKk')
+   >>> l = Quantity('1000m')
+   >>> l.as_tuple()
+   (1000.0, 'm')
+
+   >>> print(l)
+   1 km
+
+Specifying *input_sf=None* causes Quantiphy to again accept all known scale 
+factors.
+
+.. code-block:: python
+
+   >>> Quantity.set_preferences(input_sf=None)
+   >>> l = Quantity('1000m')
+   >>> l.as_tuple()
+   (1.0, '')
 
 Alternatively, you can specify the units you wish to use whose leading character 
 is a scale factor.  Once known, these units will no longer confuse *Quantiphy*.  
