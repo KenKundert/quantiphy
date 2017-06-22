@@ -315,7 +315,7 @@ of grams by multiplying the given value by 1000.
 
 *QuantiPhy* provides other mechanisms for scaling numbers as they are converted 
 to quantities.  You can also specify a function to do the conversion, which is 
-helpful when the conversion is not linear:
+helpful when the conversion is :index:`not linear <dB>`:
 
 .. code-block:: python
 
@@ -395,7 +395,8 @@ in grams and wanting to present it in either kilograms or in pounds:
     5.5754 lb
 
 As before, functions can also be used to do the conversion. Here is an example 
-where that comes in handy: a logarithmic conversion to dBV is performed.
+where that comes in handy: a logarithmic conversion to :index:`dBV <dB>` is 
+performed.
 
 .. code-block:: python
 
@@ -407,8 +408,8 @@ where that comes in handy: a logarithmic conversion to dBV is performed.
     >>> print(T.render(scale=to_dB))
     -20 dBV
 
-Finally, :class:`you can also use <UnitConversion>` either the built in 
-conversion or the converters your added to do the conversion simply based on the 
+Finally, :class:`you can also use <UnitConversion>` either the built-in 
+converters or the converters you added to do the conversion simply based on the 
 units:
 
 .. code-block:: python
@@ -543,6 +544,18 @@ quantity.
     >>> print(period1)
     1e-9
 
+This is often the way to go with quantities that have :index:`logarithmic units`
+such as decibels (:index:`dB`) or shannons (Sh) (or the related bit, digits, 
+nats, hartleys, etc.). In these cases use of SI scale factors is often 
+undesired.
+
+    >>> gain = Quantity(0.25, 'dB')
+    >>> print(gain)
+    250 mdB
+
+    >>> gain.show_si = False
+    >>> print(gain)
+    250e-3 dB
 
 .. _ambiguity:
 

@@ -60,7 +60,7 @@ make the table easier to interpret:
     ...     STM-4   | 622.08        | 1       | 2.5      | 250     | 5
     ...     STM-16  | 2488.32       | 5       | 100      | 1000    | 20
     ...     STM-64  | 9953.28       | 20      | 400      | 4000    | 80
-    ...     STM-256 | 39813.120     | 80      | 1920     | 16000   | 320
+    ...     STM-256 | 39813.12      | 80      | 1920     | 16000   | 320
     ... """
 
 This looks cleaner, but it is still involves some effort to interpret because 
@@ -77,6 +77,20 @@ the title, the caption, or in the body of the text.  The sheer number of places
 to look can dramatically slow the interpretation of the data. This problem does 
 not exist in the first table where each number is complete as it includes both 
 its scaling and its units. The eye gets the full picture on the first glance.
+
+This last version of the table represents a very common mistake people make when 
+presenting data. They feel that adding units and scale factors to each number 
+adds clutter and wastes space and so removes them from the data and places them 
+somewhere else. Doing so results in a data that perhaps is visually cleaner but 
+is harder for the reader to interpret. This point was made very clear to me 
+recently when trying to read a graph in a news magazine. The subject was of 
+strong interest, so I was willing to spend the time to understand the meaning of 
+the data, but the units of measure for the data were not obvious.  I went 
+looking for them in every place I could think that they might be.  I searched 
+the axes, the labels, the title, the caption, and the text of the article.  
+I eventually found them in body of the article, but it took over 8 minutes to do 
+so. Annoyingly, there was plenty of space on the graph to properly label the 
+data.
 
 All these tables contain the same information, but in the second two tables the 
 readability has been traded off in order to make the data easier to read into 
@@ -96,10 +110,12 @@ tweaked somewhat to handle tables 2 and 3):
     >>> for line in lines[2:]:
     ...     fields = line.split('|')
     ...     name = fields[0].strip()
-    ...     critical_freqs = [Quantity(f) for f in fields[1:]]
-    ...     sdh.append((name, critical_freqs))
-    >>> for name, freqs in sdh:
-    ...     print('{:8s}: {:12s} {:9s} {:9s} {:9s} {}'.format(name, *freqs))
+    ...     rate = Quantity(fields[1])
+    ...     critical_freqs = [Quantity(f) for f in fields[2:]]
+    ...     sdh.append((name, rate, critical_freqs))
+
+    >>> for name, rate, freqs in sdh:
+    ...     print('{:8s}: {:12s} {:9s} {:9s} {:9s} {}'.format(name, rate, *freqs))
     STM-1   : 155.52 Mb/s  500 Hz    6.5 kHz   65 kHz    1.3 MHz
     STM-4   : 622.08 Mb/s  1 kHz     25 kHz    250 kHz   5 MHz
     STM-16  : 2.4883 Gb/s  5 kHz     100 kHz   1 MHz     20 MHz
@@ -107,9 +123,8 @@ tweaked somewhat to handle tables 2 and 3):
     STM-256 : 39.813 Gb/s  80 kHz    1.92 MHz  16 MHz    320 MHz
 
 
-    >>> for name, freqs in sdh:
-    ...     print('{:8s}: {:.4e} {:.4e} {:.4e} {:.4e} {:.4e}'.format(
-    ...         name, *(1*f for f in freqs)))
+    >>> for name, rate, freqs in sdh:
+    ...     print('{:8s}: {:.4e} {:.4e} {:.4e} {:.4e} {:.4e}'.format(name, rate, *(1*f for f in freqs)))
     STM-1   : 1.5552e+08 5.0000e+02 6.5000e+03 6.5000e+04 1.3000e+06
     STM-4   : 6.2208e+08 1.0000e+03 2.5000e+04 2.5000e+05 5.0000e+06
     STM-16  : 2.4883e+09 5.0000e+03 1.0000e+05 1.0000e+06 2.0000e+07

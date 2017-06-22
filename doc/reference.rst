@@ -1003,7 +1003,8 @@ Quantities
             lines are assumed to be of the form:
 
                 ``<name> = <value> -- <description>``
-            orL
+
+            or:
 
                 ``<name> = <value> # <description>``
 
