@@ -236,11 +236,14 @@ DEFAULTS = {
         # assignment formatter
         # use {n}, {v}, and {d} to access name, value, and description
         # if two are given as tuple, first is used if desc is present, otherwise
-        # second is used. For example, an alternate specification that prints
-        # the description if it is available is:
-        #     'label_fmt': ('{n} = {v} -- {d}', '{n} = {v}'),
-    'assign_rec': r'\A\s*(?:([^=]+)\s*=\s*)?(.*?)(?:\s*--\s*(.*?)\s*)?\Z',
+        # second is used. If two are given, {V} in the first is replaced by
+        # quantity formatted with the second. An alternate specification that
+        # prints the description if it is available is:
+        #     'label_fmt': ('{V} -- {d}', '{n} = {v}'),
+    'assign_rec': r'\A\s*(?:([^=]+)\s*=\s*)?(.*?)(?:\s*(?:#|--)\s*(.*?)\s*)?\Z',
         # assignment recognizer
+        # default recognizes: vel = 60 m/s -- velocity
+        #                   : vel = 60 m/s # velocity
     'keep_components': True,
         # keep string components
     'reltol': 1e-6,

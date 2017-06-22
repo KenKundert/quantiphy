@@ -839,22 +839,22 @@ Quantities
         :param label_fmt:
             :index:`Format string for an assignment <label_fmt (preference)>`.
             Will be passed through string .format() method. Format string takes 
-            three possible arguments named n, q, and d for the name, value and 
-            description.  A typical value is:
+            three possible arguments named *n*, *q*, and *d* for the name, value 
+            and description.  A typical value is:
 
                 ``'{n} = {v}'``
 
             You can also pass two format strings as a tuple, The first is used
-            if desc is present, otherwise second is used (the second should not 
-            contain {d}).  For example:
+            if the description is present, otherwise second is used (the second 
+            should not contain the *d* argument).  For example:
 
                 ``('{n} = {v} -- {d}', '{n} = {v}')``
 
-            When given as a tuple, there is an additional argument available: V.
-            It should only be used in the first format string, and it is the
+            When given as a tuple, there is an additional argument available: 
+            *V*.  It should only be used in the first format string and is the 
             quantity formatted with the second string. It is helpful because any 
-            argument formatting is applied to the combination, which can use used to 
-            line up the descriptions (see :ref:`thermal voltage example`):
+            argument formatting is applied to the combination, which gives you 
+            a way line up the descriptions (see :ref:`thermal voltage example`):
 
                 ('{V:<16}  # {d}', '{n}: {v}')
 
@@ -863,9 +863,21 @@ Quantities
         :param assign_rec:
             :index:`Regular expression used to recognize an assignment 
             <assign_rec (preference)>`.
-            Used in constructor and extract(). By default recognizes the form:
+            Used in constructor and extract(). By default recognizes the forms:
 
-                ``"Temp = 300_K -- Ambient temperature"``
+            .. code-block:: python
+
+                >>> vel = Quantity('vel = 60 m/s')
+                >>> print(vel.render(show_label=True))
+                vel: 60 m/s
+
+                >>> vel = Quantity('vel = 60 m/s -- velocity')
+                >>> print(vel.render(show_label=True))
+                vel: 60 m/s         # velocity
+
+                >>> vel = Quantity('vel = 60 m/s # velocity')
+                >>> print(vel.render(show_label=True))
+                vel: 60 m/s         # velocity
 
         :type assign_rec: string
 
@@ -991,6 +1003,9 @@ Quantities
             lines are assumed to be of the form:
 
                 ``<name> = <value> -- <description>``
+            orL
+
+                ``<name> = <value> # <description>``
 
             *<name>*:
                 Must be a valid identifier (ex: c_load).
@@ -1000,6 +1015,13 @@ Quantities
             *<description>*:
                 is an optional textual description (ex: Gain of PD (Imax)).
 
+            Any line that does not contain a value is ignores. So with the 
+            default *assign_rec* lines with the following form are ignored:
+
+                -- comment
+
+                # comment
+
         :type quantities: string
 
         For example:
@@ -1007,6 +1029,8 @@ Quantities
         .. code-block:: python
 
             >>> design_parameters = '''
+            ...     -- PLL Design Parameters
+            ...
             ...     Fref = 156 MHz  -- Reference frequency
             ...     Kdet = 88.3 uA  -- Gain of phase detector (Imax)
             ...     Kvco = 9.07 GHz/V  -- Gain of VCO
