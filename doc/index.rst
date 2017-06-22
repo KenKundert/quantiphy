@@ -3,8 +3,8 @@
 QuantiPhy: Physical Quantities
 ==============================
 
-| Version: 1.3.1
-| Released: 2017-06-15
+| Version: 1.3.3
+| Released: 2017-06-22
 | Please report all bugs and suggestions to `quantiphy@nurdletech.com <mailto://quantiphy@nurdletech.com>`_.
 
 Synopsis
