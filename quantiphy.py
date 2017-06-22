@@ -252,7 +252,7 @@ CURRENCY_SYMBOLS = '$£€'
 
 
 # Parameters {{{1
-__version__ = '1.3.3'
+__version__ = '1.3.4'
 __released__ = '2017-06-22'
 
 # These mappings are only used when reading numbers
