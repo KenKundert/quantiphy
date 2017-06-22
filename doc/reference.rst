@@ -494,6 +494,8 @@ Quantities
     The *u* format code signifies that only the units should be included, and 
     *d* does the same for the description.
 
+    .. code-block:: python
+
         >>> mu0 = Quantity('mu0')
 
         >>> f'{mu0}'
@@ -508,6 +510,8 @@ Quantities
     Quantities also support capitalized versions of most of the format codes, 
     specifically *S*, *E*, *F*, *G*, *Q*, AND *R*. These codes behave as if 
     *show_label* is True.
+
+    .. code-block:: python
 
         >>> f'{mu0:S}'
         'μ₀ = 1.2566 uH/m -- permeability of free space'
@@ -526,6 +530,16 @@ Quantities
 
         >>> f'{mu0:R}'
         'μ₀ = 1.2566u -- permeability of free space'
+
+    Finally, you can add units after the format code, which causes the units to 
+    be scaled to those units if the transformation represents a known unit 
+    conversion.
+
+    .. code-block:: python
+
+        >>> eff_channel_length = Quantity('leff = 14nm')
+        >>> f'{eff_channel_length:SÅ}'
+        'leff = 140 Å'
 
 
     **Methods**:

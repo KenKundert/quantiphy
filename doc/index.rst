@@ -776,9 +776,8 @@ first is used if there is a description and the second used otherwise.
     >>> print('{:S}'.format(vacuum_permittivity))
     ε₀ = 8.8542 pF/m -- permittivity of free space
 
-Finally, you can add units after the format code, which will cause the number to 
-be scaled to those units if the transformation represents a known unit 
-conversion.
+Finally, you can add units after the format code, which causes the number to be 
+scaled to those units if the transformation represents a known unit conversion.
 
 .. code-block:: python
 
