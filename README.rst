@@ -29,9 +29,10 @@ What?
 -----
 
 *QuantiPhy* is a Python library that offers support for physical quantities.  
-A quantity is a number and a unit of measure. A quantity keeps the units with 
-the number, making it easy to share them a single unit, but subclasses float, so 
-can be used where ever a number can be used.
+A quantity is the pairing of a number and a unit of measure that indicates the 
+amount of some measurable thing.  *QuantiPhy* provides quantity objects that 
+keep the units with the number, making it easy to share them a single unit.  
+They subclasses float, so can be used anywhere a number can be used.
 
 Why?
 ----
@@ -48,7 +49,7 @@ input and output physical quantities.
 Features
 --------
 
-- Flexibly reads amounts with units and SI scale factors
+- Flexibly reads amounts with units and SI scale factors.
 - Quantities subclass the float class, and so can be used as conventional 
   numbers.
 - Generally includes the units when printing or converting to strings and by 
@@ -59,12 +60,12 @@ Features
 Quick Start
 -----------
 
-Use:
+Install with::
 
    pip3 install quantiphy
 
-to install.  Requires Python3.4 or better.  Python2.7 is also supported, however 
-support for unicode is weak.
+Requires Python3.4 or better.  Python2.7 is also supported, however support for 
+unicode is weak.
 
 You use *Quantity* to convert numbers and units in various forms to quantities:
 
@@ -92,8 +93,8 @@ You use *Quantity* to convert numbers and units in various forms to quantities:
    >>> print(Tboil)
    100 °C
 
-Once you have a quantity, there are a variety of ways of accessing the aspects 
-of the quantity:
+Once you have a quantity, there are a variety of ways of accessing aspects of 
+the quantity:
 
 .. code-block:: python
 
