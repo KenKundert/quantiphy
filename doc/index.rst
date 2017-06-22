@@ -5,7 +5,9 @@ QuantiPhy: Physical Quantities
 
 | Version: 1.3.3
 | Released: 2017-06-22
-| Please report all bugs and suggestions to `quantiphy@nurdletech.com <mailto://quantiphy@nurdletech.com>`_.
+| Please report all bugs and suggestions to
+  `quantiphy@nurdletech.com <mailto://quantiphy@nurdletech.com>`_ or
+  `Github <https://github.com/KenKundert/quantiphy>`_.
 
 Synopsis
 --------
@@ -30,6 +32,17 @@ class that is built into Python. This new *Quantity* class ...
 Contents:
 
 * :ref:`overview`
+
+  - :ref:`the alternatives`
+  - :ref:`quantities`
+  - :ref:`constants`
+  - :ref:`preferences`
+  - :ref:`ambiguity`
+  - :ref:`formatting`
+  - :ref:`extract`
+  - :ref:`equivalence`
+  - :ref:`exceptional values`
+  - :ref:`exceptions`
 
 .. toctree::
    :maxdepth: 2
@@ -94,6 +107,8 @@ supports SI scale factors.  As such, *QuantiPhy* allows computers to communicate
 more naturally with humans, particularly scientists and engineers.
 
 
+.. _the alternatives:
+
 Alternatives
 ''''''''''''
 
@@ -110,6 +125,8 @@ that demands little from the user. It is used when inputting and outputting
 values, and then only when it provides value. As a result, it provides 
 a simplicity in use that cannot be matched by the other packages.
 
+
+.. _quantities:
 
 Quantities
 ''''''''''
@@ -412,6 +429,8 @@ output, the units can be converted back to the original units if desired:
     20 min  360 °F
 
 
+.. _constants:
+
 Physical Constants
 ''''''''''''''''''
 
@@ -469,6 +488,8 @@ Now it is available by name:
     1.4204 GHz
 
 
+.. _preferences:
+
 Preferences
 '''''''''''
 
@@ -522,6 +543,8 @@ quantity.
     >>> print(period1)
     1e-9
 
+
+.. _ambiguity:
 
 Ambiguity of Scale Factors and Units
 ''''''''''''''''''''''''''''''''''''
@@ -620,6 +643,8 @@ know exactly when you will be converting a temperature to a quantity, you can
 specify *ignore_sf* for that specific conversion. The effect is the same either 
 way, 'K' is interpreted as a unit rather than a scale factor.
 
+
+.. _formatting:
 
 String Formatting
 '''''''''''''''''
@@ -788,6 +813,8 @@ Python in version 3.6:
     20 min  360 °F
 
 
+.. _extract:
+
 Extract Quantities
 ''''''''''''''''''
 
@@ -854,6 +881,8 @@ the name and description by default.
     Kvco = 9.07 GHz/V  -- Gain of VCO
 
 
+.. _equivalence:
+
 Equivalence
 '''''''''''
 
@@ -883,6 +912,8 @@ units, the *is_close* test will always fail if their units differ.
    False
 
 
+.. _exceptional values:
+
 Exceptional Values
 ''''''''''''''''''
 
@@ -896,6 +927,8 @@ You can test whether the value of the quantity is infinite or is not-a-number.
    >>> h_line.is_nan()
    False
 
+
+.. _exceptions:
 
 Exceptions
 ''''''''''

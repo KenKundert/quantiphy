@@ -103,6 +103,9 @@ of the quantity:
    >>> float(Fhy)
    1420405751.786
 
+   >>> 2*cost
+   22400000.0
+
    >>> Rout.units
    'Ohms'
 

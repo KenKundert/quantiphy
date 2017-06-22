@@ -141,14 +141,17 @@ compute the thermal voltage: *Vt = kT/q*.
 .. code-block:: python
 
     >>> from quantiphy import Quantity
-    >>> Quantity.set_preferences(label_fmt=('{V:<18}  # {d}', '{n} = {v}'))
+    >>> Quantity.set_preferences(
+    ...     show_label=True,
+    ...     label_fmt=('{V:<18}  # {d}', '{n} = {v}')
+    ... )
 
     >>> T = Quantity(300, 'T K ambient temperature')
     >>> k = Quantity('k')
     >>> q = Quantity('q')
     >>> Vt = Quantity(k*T/q, 'Vt V thermal voltage')
 
-    >>> print(f'{T:S}\n{k:S}\n{q:S}\n{Vt:S}')
+    >>> print(T, k, q, Vt, sep='\n')
     T = 300 K           # ambient temperature
     k = 13.806e-24 J/K  # Boltzmann's constant
     q = 160.22e-21 C    # elementary charge

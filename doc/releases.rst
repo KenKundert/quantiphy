@@ -19,3 +19,9 @@ Releases
 1.3 (2017-03-19):
     - reworked constants
     - added unit systems for physical constants
+
+1.4 (2017-07-??):
+    - created formal documentation
+    - enhanced label_fmt to accept {V}
+    - replaced add_to_namespace with extract
+    - raise NameError rather than Assertion for unknown preferences

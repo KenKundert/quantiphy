@@ -211,6 +211,15 @@ Quantities
         >>> print(period)
         1 ns
 
+    Currency units ($£€) are a bit different than other units, they are placed 
+    at the front of the quantity. And like in Python in general, number may 
+    contain underscores, which are generally used to make large numbers more 
+    readable.
+
+        >>> period = Quantity('$11_200_000')
+        >>> print(period)
+        $11.2M
+
     When given as a string, the number may use any of the following scale factors:
 
         |   Y (10\ :sup:`24`)
@@ -423,6 +432,103 @@ Quantities
     a fixed, user controllable number of digits are used (default=12). Generally one 
     uses 'full' when generating output that will be read by a machine.
 
+
+    **Format Strings**:
+
+    Quantities can be flexibly interpolated into strings using the string format 
+    method or the new format strings. Quantities work with the string and 
+    floating point format codes, as well as supporting the normal field width, 
+    precision, and alignment modifiers:
+
+    .. code-block:: python
+
+        >>> f'{h_line}'
+        '1.4204 GHz'
+
+        >>> f'{h_line:s}'
+        '1.4204 GHz'
+
+        >>> f'{h_line:.6}'
+        '1.420406 GHz'
+
+        >>> f'|{h_line:15.6}|'
+        '|1.420406 GHz   |'
+
+        >>> f'|{h_line:<15.6}|'
+        '|1.420406 GHz   |'
+
+        >>> f'|{h_line:>15.6}|'
+        '|   1.420406 GHz|'
+
+        >>> f'{h_line:e}'
+        '1.4204e+09'
+
+        >>> f'{h_line:f}'
+        '1420405751.7860'
+
+        >>> f'{h_line:g}'
+        '1.4204e+09'
+
+    When using no format code or the *s* format code, the Quantity preferences 
+    such as *show_units* and *show_si* are honored. Quantities also support the 
+    *q* (quantity) and *r* (real) format codes that override the preferences.  
+    With *q* the units and scale factors are used regardless of the current 
+    preferences.  With *r*, the scale factors are used but the units are not 
+    included.
+
+    .. code-block:: python
+
+        >>> Quantity.set_preferences(show_units=False)
+
+        >>> f'{h_line}'
+        '1.4204G'
+
+        >>> f'{h_line:q}'
+        '1.4204 GHz'
+
+        >>> f'{h_line:r}'
+        '1.4204G'
+
+        >>> Quantity.set_preferences(show_units=None)
+
+    The *u* format code signifies that only the units should be included, and 
+    *d* does the same for the description.
+
+        >>> mu0 = Quantity('mu0')
+
+        >>> f'{mu0}'
+        '1.2566 uH/m'
+
+        >>> f'{mu0:u}'
+        'H/m'
+
+        >>> f'{mu0:d}'
+        'permeability of free space'
+
+    Quantities also support capitalized versions of most of the format codes, 
+    specifically *S*, *E*, *F*, *G*, *Q*, AND *R*. These codes behave as if 
+    *show_label* is True.
+
+        >>> f'{mu0:S}'
+        'μ₀ = 1.2566 uH/m -- permeability of free space'
+
+        >>> f'{mu0:E}'
+        'μ₀ = 1.2566e-06 -- permeability of free space'
+
+        >>> f'{mu0:F}'
+        'μ₀ = 0.0000 -- permeability of free space'
+
+        >>> f'{mu0:G}'
+        'μ₀ = 1.2566e-06 -- permeability of free space'
+
+        >>> f'{mu0:Q}'
+        'μ₀ = 1.2566 uH/m -- permeability of free space'
+
+        >>> f'{mu0:R}'
+        'μ₀ = 1.2566u -- permeability of free space'
+
+
+    **Methods**:
 
     .. method:: as_tuple()
 
