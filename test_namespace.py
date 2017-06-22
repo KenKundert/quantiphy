@@ -4,7 +4,7 @@ from quantiphy import Quantity
 
 def test_namespace():
     Quantity.set_preferences(spacer=' ')
-    Quantity.add_to_namespace('''
+    globals().update(Quantity.extract('''
         h_line = 1420.405751786 MHz -- Frequency of the hydrogen line
         k = 13.806488e-24 J/K -- Boltzmann's constant
         Temp = 300_K -- Temperature
@@ -46,7 +46,7 @@ def test_namespace():
         mu0 = mu0 -- Permeability of free space
         Z0 = Z0 -- Characteristic impedance of free space
         c = c  -- speed of light
-    ''')
+    '''))
 
     assert str(h_line) == '1.4204 GHz'
     assert str(k) == '13.806e-24 J/K'

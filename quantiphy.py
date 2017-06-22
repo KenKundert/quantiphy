@@ -143,39 +143,59 @@ UnitConversion('s', 'hr hour', 3600)
 UnitConversion('s', 'day', 86400)
 
 
-# User Defined Constants {{{1
-_user_defined_constants = {}
-_predefined_constants = {'mks':{}}
-_default_unit_system = 'mks'
-
-def set_unit_system(category):
-    global _constants
-    _constants = ChainMap(
-        _user_defined_constants,
-        _predefined_constants[category]
+# Constants {{{1
+def set_unit_system(unit_system):
+    global _active_constants
+    _active_constants = ChainMap(
+        _constants[None],
+        _constants[unit_system]
     )
-
+_default_unit_system = 'mks'
+_constants = {None: {}, _default_unit_system: {}}
 set_unit_system(_default_unit_system)
 
+# Constant class{{{2
 class Constant(object):
     def __init__(self, value, name=None, unit_systems=None):
+        """Constant
+        A saved named quantity.
+
+        value (quantity):
+            The value of the constant. Must be a quantity.
+        name (string):
+            The name of the constant.
+        unit_systems (list or string):
+            Name or names of the unit systems to which the constant should be
+            added.  If given as a string, string will be split at white space to
+            create the list.
+
+        The name of the constant is given by the name argument if given. It if
+        is not given the name would be taken from the value. If it does not have
+        a name, a NameError exception is raised.
+        """
+
         self.name = name
         self.value = value
+        if not name and not value.name:
+            raise NameError('no name specified.')
+
+        if is_str(unit_systems):
+            unit_systems = unit_systems.split()
+
+        # add value to the collection of constants under both names
         if unit_systems:
-            for system in unit_systems.split():
-                constants = _predefined_constants.get(system, {})
+            for system in unit_systems:
+                constants = _constants.get(system, {})
                 if name:
                     constants[name] = self.value
                 if value.name:
                     constants[value.name] = self.value
-                _predefined_constants[system] = constants
+                _constants[system] = constants
         else:
             if name:
-                _user_defined_constants[name] = self.value
+                _constants[None][name] = self.value
             if value.name:
-                _user_defined_constants[value.name] = self.value
-        if not name and not value.name:
-            raise NameError('no name specified')
+                _constants[None][value.name] = self.value
 
 # Settings {{{1
 DEFAULTS = {
@@ -231,7 +251,7 @@ DEFAULTS = {
 CURRENCY_SYMBOLS = '$£€'
 
 
-# Constants {{{1
+# Parameters {{{1
 __version__ = '1.3.1'
 __released__ = '2017-06-15'
 
@@ -448,22 +468,38 @@ class Quantity(float):
         A real quantity with units.
 
         value (real or string):
-            The value of the quantity.  If a string, it may be specified with SI
-            scale factors and units.  For example, the following are all valid:
+            The value of the quantity.  If a string, it may be the name of a
+            pre-defined constant or it may be a number that may be specified
+            with SI scale factors and/or units.  For example, the following are
+            all valid:
                 2.5ns, 1.7 MHz, 1e6ohms, 2.8_V, 1e12 F, 42, etc.
             String may also have name and description if they are provided in a
             way recognizable by assign_rec. For example,
                 trise = 10ns -- rise time
             would work with the default recognizer.
+            The available predefined constants generally include h, hbar, k, q,
+            c, 0K, eps0, u0, Z0 and what ever you define using Constant().
         model (quantity or string):
             Used to pick up any missing attibutes (units, name, desc). May be a
-            quantity or a string. If it is a string, it will be split. Then if
-            there is one item, it is take to be the units. If there are two,
-            they are taken to be the name and units.  And if there are three or
-            more, the first two are taken to the be name and units, and the
-            remainder is take to be the description.
+            quantity or a string. If model is a quantity, only its units will be
+            taken. If model is a string, it will be split. Then if there is one
+            item, it is taken to be the units. If there are two, they are taken
+            to be the name and units.  And if there are three or more, the first
+            two are taken to the be name and units, and the remainder is taken
+            to be the description.
         units (string):
             Overrides the units taken from the value or model.
+        scale (float, tuple, func, or string):
+            If a float, it multiplies by the given value to compute the value of
+                the quantity.
+            If a tuple, the first value, a float, is treated as a scale factor
+                and the second value, a string, is take to be the units of the
+                quantity.
+            If a function, it takes two arguments, the given value and the units 
+                and it returns two values, the value and units of the quantity.
+            If a string, it is taken to the be desired units. This value along
+                with the units of the given value are used to select a known unit
+                conversion, which is applied to create the quantity.
         name (string):
             Overrides the name taken from the value or model.
         desc (string):
@@ -496,9 +532,9 @@ class Quantity(float):
                     if len(components) == 3:
                         data['desc'] = components[2]
             else:
-                data['name'] = getattr(model, 'name', '')
+                #data['name'] = getattr(model, 'name', '')
                 data['units'] = getattr(model, 'units', '')
-                data['desc'] = getattr(model, 'desc', '')
+                #data['desc'] = getattr(model, 'desc', '')
 
         def recognize_number(value, ignore_sf):
             if ignore_sf:
@@ -518,7 +554,7 @@ class Quantity(float):
                     number = float(mantissa + MAPPINGS.get(sf, [sf])[0])
                     return number, units, mantissa, sf
             else:
-                raise ValueError('%s: not a valid number' % value)
+                raise ValueError('%s: not a valid number.' % value)
 
         def recognize_all(value):
             try:
@@ -541,7 +577,7 @@ class Quantity(float):
 
         # process the value
         if is_str(value):
-            constant = _constants.get(value)
+            constant = _active_constants.get(value)
             if constant:
                 number = float(constant)
                 mantissa = getattr(constant, '_mantissa', None)
@@ -669,13 +705,16 @@ class Quantity(float):
         use_fmt = self.show_label if show_label is None else show_label
         if use_fmt and self.label_fmt and self.name:
             def format(value):
+                Value = value
                 if is_str(self.label_fmt):
                     label_fmt = self.label_fmt
                 elif self.desc:
                     label_fmt = self.label_fmt[0]
+                    if '{V' in label_fmt:
+                        Value = self.label_fmt[1].format(n=self.name, v=value)
                 else:
                     label_fmt = self.label_fmt[1]
-                return label_fmt.format(n=self.name, v=value, d=self.desc)
+                return label_fmt.format(n=self.name, v=value, d=self.desc, V=Value)
         else:
             format = lambda x: x
 
@@ -915,15 +954,18 @@ class Quantity(float):
                     prec += 1
                 value = '{0:.{1}{2}}'.format(value, prec, ftype.lower())
                 if ftype.isupper():
+                    Value = value
                     name = getattr(self, 'name', '')
                     desc = getattr(self, 'desc', '')
                     if is_str(self.label_fmt):
                         label_fmt = self.label_fmt
                     elif desc:
                         label_fmt = self.label_fmt[0]
+                        if name and '{V' in label_fmt:
+                            Value = self.label_fmt[1].format(n=name, v=value)
                     else:
                         label_fmt = self.label_fmt[1]
-                    value = label_fmt.format(n=name, v=value, d=desc)
+                    value = label_fmt.format(n=name, v=value, d=desc, V=Value)
             return '{0:{1}{2}s}'.format(value, align, width)
         else:
             # unrecognized format, just provide something reasonable
@@ -990,12 +1032,18 @@ class Quantity(float):
             .format() method. Format string takes three possible arguments named
             n, q, and d for the name, value and description.  The default is
                 '{n} = {v}'
+
             You can also pass two format strings as a tuple, The first is used
-            if desc is present, otherwise second is used. For example,
-                ('{n} = {v} -- {d}', '{n} = {v}'),
+            if description is present, otherwise second is used. For example,
+                ('{n} = {v} -- {d}', '{n} = {v}')
+
+            When given as a tuple, there is an additional argument available: V.
+            It should only be used in the first format string, and it is the
+            quantity formatted with the second string. So for example,
+                ('{V:<16}  # {d}', '{n}: {v}')
         assign_rec (str):
             Regular expression used to recognize an assignment. Used in
-            add_to_namespace(). Default recognizes the form
+            extract(). Default recognizes the form
                 "Temp = 300_K -- Ambient temperature".
 
         Any value not passed in are left alone. Pass in None to reset a value to
@@ -1003,7 +1051,8 @@ class Quantity(float):
         """
 
         for key, value in kwargs.items():
-            assert key in DEFAULTS, ('%s: unknown.' % key)
+            if key not in DEFAULTS:
+                raise NameError('%s: unknown.' % key)
             if value is None:
                 # attributes that were passed as None are to be returned to
                 # their default value
@@ -1032,33 +1081,30 @@ class Quantity(float):
             ignore_sf, known_units, show_label, reltol, abstol, keep_components,
             label_fmt, assign_rec.
         """
-        assert key in DEFAULTS, ('%s: unknown.' % key)
+        if key not in DEFAULTS:
+            raise NameError('%s: unknown.' % key)
         return getattr(cls, key)
 
-    # add_to_namespace() {{{2
+    # extract() {{{2
     @classmethod
-    def add_to_namespace(cls, quantities):
-        """ Add to Namespace
+    def extract(cls, text):
+        """ Extract quantities
 
-        Takes a string that contains quantity definitions and places those
-        quantities in the calling namespace. The string may contain one
-        definition per line, each of which is parsed by assign_rec. By default,
-        the lines are assumed to be of the form:
+        Takes a string that contains quantity definitions and returns those
+        quantities in a dictionary. The string may contain one definition per
+        line, each of which is parsed by assign_rec. By default, the lines are
+        assumed to be of the form:
 
-            <name> = <value> -- <description>
+            <name> = <value> [-- <description>]
 
         <name> must be a valid identifier (ex: c_load).
         <value> is a number with optional units (ex: 3 or 1pF or 1 kOhm).
             The units need not be a simple identifier (ex: 9.07 GHz/V).
         <description> is an optional textual description (ex: Gain of PD (Imax)).
         """
-        # Access the namespace of the calling frame
-        import inspect
         import keyword
-        frame = inspect.stack()[1][0]
-        namespace = frame.f_globals
-
-        for line in quantities.splitlines():
+        quantities = {}
+        for line in text.splitlines():
             match = re.match(cls.assign_rec, line)
             if match:
                 name, value, desc = match.groups()
@@ -1069,11 +1115,12 @@ class Quantity(float):
                 name = name.strip()
                 quantity = cls(value, name=name, desc=desc)
                 if IDENTIFIER.match(name) and not keyword.iskeyword( name):
-                    namespace[name] = quantity
+                    quantities[name] = quantity
                 else:  # pragma: no cover
                     raise ValueError('{}: not a valid identifier.'.format(name))
             else:  # pragma: no cover
-                raise ValueError('{}: not a valid number'.format(line))
+                raise ValueError('{}: not a valid number.'.format(line))
+        return quantities
 
     # map_sf_to_sci_notation() {{{2
     _SCI_NOTATION_MAPPER = {
@@ -1098,7 +1145,7 @@ class Quantity(float):
         """ Render scale factors in scientific notation
 
         Pass this function to map_sf preference if you prefer your large and
-        small numbers is classic scientific notation.
+        small numbers in classic scientific notation.
         """
         # The explicit references to unicode here and in _SCI_NOTATION_MAPPER are
         # for backward compatibility with python2. They can be removed when

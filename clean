@@ -3,6 +3,7 @@
 set nonomatch
 rm -f fvi.1 fvi.1.rst fvi.1.pdf MANIFEST
 rm -rf generated_settings
+rm -rf doc/.build
 
 # the rest is common to all python directories
 rm -f *.pyc *.pyo .test*.sum expected result install.out

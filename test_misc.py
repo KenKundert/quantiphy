@@ -3,6 +3,7 @@
 from quantiphy import Quantity, Constant
 import pytest
 import sys
+from textwrap import dedent
 
 def test_misc():
     Quantity.set_preferences(spacer=' ')
@@ -66,13 +67,13 @@ def test_misc():
         q = Quantity('x*y = z')
 
     with pytest.raises(ValueError):
-        Quantity.add_to_namespace('1ns')
+        Quantity.extract('1ns')
 
     with pytest.raises(ValueError):
-        Quantity.add_to_namespace('x*y = z')
+        Quantity.extract('x*y = z')
 
     with pytest.raises(ValueError):
-        Quantity.add_to_namespace('in = 1mA')
+        Quantity.extract('in = 1mA')
 
     with pytest.raises(ValueError):
         Quantity('x\ny = z')
@@ -114,7 +115,7 @@ def test_misc():
     assert h_line.render(show_label=True) == 'F_hy = 1.4204 GHz  # frequency of hydrogen line'
 
     h_line2 = Quantity(h_line, h_line)
-    assert h_line2.render(show_label=True) == 'F_hy = 1.4204 GHz  # frequency of hydrogen line'
+    assert h_line2.render(show_label=True) == '1.4204 GHz'
 
     h_line3 = Quantity(1420405751.786, 'F_hy Hz frequency of hydrogen line')
     assert h_line3.render(show_label=True) == 'F_hy = 1.4204 GHz  # frequency of hydrogen line'
@@ -150,3 +151,39 @@ def test_misc():
 
         Foo.set_preferences(map_sf=Quantity.map_sf_to_sci_notation)
         assert t.render(show_si=False) == '1×10⁻⁶ s'
+
+    Quantity.set_preferences(label_fmt=('{V:<18}  # {d}', '{n} = {v}'))
+    T = Quantity('T = 300K -- ambient temperature', ignore_sf=True)
+    k = Quantity('k')
+    q = Quantity('q')
+    Vt = Quantity(k*T/q, 'Vt V thermal voltage')
+    result = '{:S}\n{:S}\n{:S}\n{:S}'.format(T, k, q, Vt)
+    expected = dedent("""
+        T = 300 K           # ambient temperature
+        k = 13.806e-24 J/K  # Boltzmann's constant
+        q = 160.22e-21 C    # elementary charge
+        Vt = 25.852 mV      # thermal voltage
+    """).strip()
+    assert result == expected
+
+    result = '{:Q}\n{:R}\n{:E}\n{:G}'.format(T, k, q, Vt)
+    expected = dedent("""
+        T = 300 K           # ambient temperature
+        k = 13.806e-24      # Boltzmann's constant
+        q = 1.6022e-19      # elementary charge
+        Vt = 0.025852       # thermal voltage
+    """).strip()
+    print(result)
+    print(expected)
+    assert result == expected
+
+    Quantity.set_preferences(label_fmt=('{V:<18}  # {d}', '{n}: {v}'))
+    result = '{:S}\n{:S}\n{:S}\n{:S}'.format(T, k, q, Vt)
+    expected = dedent("""
+        T: 300 K            # ambient temperature
+        k: 13.806e-24 J/K   # Boltzmann's constant
+        q: 160.22e-21 C     # elementary charge
+        Vt: 25.852 mV       # thermal voltage
+    """).strip()
+    assert result == expected
+
