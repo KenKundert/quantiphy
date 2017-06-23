@@ -1,10 +1,4 @@
 # encoding: utf8
-'''
-QuantiPhy: Support for Physical Quantities
-
-Utilities for converting to and from physical quantities (numbers with units).
-'''
-
 # License {{{1
 # Copyright (C) 2016 Kenneth S. Kundert
 #
@@ -34,7 +28,7 @@ from six import string_types, u, python_2_unicode_compatible
 # Utilities {{{1
 # is_str {{{2
 def is_str(obj):
-    """Identifies strings in all their various guises."""
+    # Identifies strings in all their various guises.
     return isinstance(obj, string_types)
 
 # _combine {{{2
@@ -67,38 +61,52 @@ _unit_conversions = {}
 def _convert_units(to_units, from_units, value):
     if to_units == from_units:
         return value
-    return _unit_conversions[(to_units,from_units)](value)
+    try:
+        return _unit_conversions[(to_units,from_units)](value)
+    except KeyError:
+        raise KeyError(
+            "Unable to convert between '%s' and '%s'." % (to_units, from_units)
+        )
 
 class UnitConversion(object):
     """
-    Create a unit converter.
+    Creates a unit converter. Just the creation of the converter is sufficient
+    to make it available to :class:`Quantity` (the :class:`UnitConversion`
+    object itself is normally discarded). Once created, it is automatically
+    employed by :class:`Quantity` when a conversion is requested with the given
+    units. A forward conversion is performed if the from and to units match, and
+    a reversion conversion is performed if they are swapped.
+
+    :param to_units:
+        A collection of units. If given as a single string it is split.
+    :type to_units: string or list of strings
+
+    :param from_units:
+        A collection of units. If given as a single string it is split.
+    :type from_units: string or list of strings
+
+    :param slope:
+        Scale factor for conversion.
+    :type slope: real
+
+    :param intercept:
+        Conversion offset.
+    :type intercept: real
+
+    **Forward Conversion**:
+    The following conversion is applied if the given units are among the
+    *from_units* and the desired units are among the *to_units*:
+
+        *new_value* = *given_value* * *slope* + *intercept*
+
+    **Reverse Conversion**:
+    The following conversion is applied if the given units are among 
+    the *to_units* and the desired units are among the *from_units*:
+
+        *new_value* = (*given_value* - *intercept*)/*slope*
+
     """
     def __init__(self, to_units, from_units, slope=1, intercept=0):
-        """
-        to_units (string or list of strings):
-            A collection of units. If given as a single string it is split.
-
-        from_units (string or list of strings):
-            A collection of units. If given as a single string it is split.
-
-        slope:
-            Scale factor for conversion.
-
-        intercept:
-            Conversion offset.
-
-        Forward Conversion:
-            The following conversion is applied if the given units are among 
-            the from_units and the desired units are among the to_units:
-
-                new_value = given_value*slope + incercept
-
-        Reverse Conversion:
-            The following conversion is applied if the given units are among 
-            the to_units and the desired units are among the from_units:
-
-                new_value = (given_value - intercept)/slope
-        """
         to_units = to_units.split() if is_str(to_units) else to_units
         from_units = from_units.split() if is_str(from_units) else from_units
         self.slope = slope
@@ -145,6 +153,20 @@ UnitConversion('s', 'day', 86400)
 
 # Constants {{{1
 def set_unit_system(unit_system):
+    """Activates a unit system.
+
+    The default unit system is 'mks'. Calling this function changes the active
+    unit system to the one with the specified name.  Only constants associated
+    with the active unit system or not associated with a unit system are
+    available for use.
+
+    :param unit_system:
+        Name of the desired unit system.
+    :type unit_system: string
+
+    A *KeyError* is raised if *unit_system* does not correspond to a known unit
+    system.
+    """
     global _active_constants
     _active_constants = ChainMap(
         _constants[None],
@@ -156,24 +178,43 @@ set_unit_system(_default_unit_system)
 
 # Constant class{{{2
 class Constant(object):
+    """Constant
+    Saves a quantity in such a way that it can later be recalled by name when
+    creating new quantities.
+
+    Just the creation of the constant is sufficient to make it available to
+    :class:`Quantity` (the :class:`Constant` object itself is normally discarded).
+
+    If *unit_systems* is specified, the constant is added to the specified unit
+    systems. In that case, the constant is only available if one of the
+    specified unit systems is active.  If *unit_systems* is not given, the
+    constant is not associated with a unit system, meaning that it is always
+    available regardless of which unit system is active.
+
+    :param value:
+        The value of the constant. Must be a quantity.
+    :type value: quantity
+
+    :param name:
+        The name of the constant.
+    :type name: string
+
+    :param unit_systems:
+        Name or names of the unit systems to which the constant should be added.
+        If given as a string, string will be split at white space to create the
+        list.  If a constant is associated with a unit system, it is only
+        available when that unit system is active. You need not limit yourself
+        to the predefined 'mks' and 'cgs' unit systems. Giving a name creates
+        the corresponding unit system if it does not already exist.
+    :type unit_systems: list or string
+
+    The constant is saved under *name* if given, and under the name contained
+    within *value* if available.  It is not necessary to supply both names, one
+    is sufficient.  A NameError exception is raised if neither name is
+    specified.
+    """
+
     def __init__(self, value, name=None, unit_systems=None):
-        """Constant
-        A saved named quantity.
-
-        value (quantity):
-            The value of the constant. Must be a quantity.
-        name (string):
-            The name of the constant.
-        unit_systems (list or string):
-            Name or names of the unit systems to which the constant should be
-            added.  If given as a string, string will be split at white space to
-            create the list.
-
-        The name of the constant is given by the name argument if given. It if
-        is not given the name would be taken from the value. If it does not have
-        a name, a NameError exception is raised.
-        """
-
         self.name = name
         self.value = value
         if not name and not value.name:
@@ -301,6 +342,66 @@ IDENTIFIER = re.compile(r'\A[_a-zA-Z][\w]*\Z')
 # Quantity class {{{1
 @python_2_unicode_compatible
 class Quantity(float):
+    """Create a Physical Quantity
+
+    A quantity is a number paired with a unit of measure.
+
+    :param value:
+        The value of the quantity.  If a string, it may be the name of a
+        pre-defined constant or it may be a number that may be specified with SI
+        scale factors and/or units.  For example, the following are all valid:
+        '2.5ns', '1.7 MHz', '1e6ohms', '2.8_V', '1e12 F', '$10_000', '42', 'ħ',
+        etc.  The string may also have name and description if they are provided
+        in a way recognizable by *assign_rec*. For example, 'trise = 10ns --
+        rise time' or 'trise = 10ns # rise time' would work with the default
+        recognizer.
+    :type value: real, string or quantity
+
+    :param model:
+        Used to pick up any missing attibutes (*units*, *name*, *desc*). May be a
+        quantity or a string. If model is a quantity, only its units would be
+        taken. If model is a string, it is split. Then, if there is one
+        item, it is taken to be *units*. If there are two, they are taken
+        to be *name* and *units*.  And if there are three or more, the first
+        two are taken to the be *name* and *units*, and the remainder is taken
+        to be *description*.
+    :type model: quantity or string
+
+    :param units:
+        Overrides the units taken from *value* or *model*.
+    :type units: string
+
+    :param scale:
+        - If a float, it multiplies by the given value to compute the value of
+          the quantity.
+        - If a tuple, the first value, a float, is treated as a scale factor
+          and the second value, a string, is take to be the units of the
+          quantity.
+        - If a function, it takes two arguments, the given value and the units 
+          and it returns two values, the value and units of the quantity.
+        - If a string, it is taken to the be desired units. This value along
+          with the units of the given value are used to select a known unit
+          conversion, which is applied to create the quantity.
+    :type scale: float, tuple, func, or string):
+
+    :param name:
+        Overrides the name taken from *value* or *model*.
+    :type name: string
+
+    :param desc:
+        Overrides the desc taken from *value* or *model*.
+    :type desc: string
+
+    :param ignore_sf:
+        Assume the value given within a string does not employ a scale factors.
+        In this way, '1m' is interpreted as 1 meter rather than 1 milli.
+    :type ignore_sf: boolean
+
+    Produces a *ValueError* if passed a string that cannot be converted to a
+    quantity. Produces a *KeyError* if a unit conversion is requested and there
+    is no corresponding unit converter.
+    """
+
     # defaults {{{2
     show_si = DEFAULTS['show_si']
     show_units = DEFAULTS['show_units']
@@ -467,55 +568,6 @@ class Quantity(float):
         cls, value, model=None, units=None, scale=None,
         name=None, desc=None, ignore_sf=None
     ):
-        """Physical Quantity
-        A real quantity with units.
-
-        value (real or string):
-            The value of the quantity.  If a string, it may be the name of a
-            pre-defined constant or it may be a number that may be specified
-            with SI scale factors and/or units.  For example, the following are
-            all valid:
-                2.5ns, 1.7 MHz, 1e6ohms, 2.8_V, 1e12 F, 42, etc.
-            String may also have name and description if they are provided in a
-            way recognizable by assign_rec. For example,
-                trise = 10ns -- rise time
-            would work with the default recognizer.
-            The available predefined constants generally include h, hbar, k, q,
-            c, 0K, eps0, u0, Z0 and what ever you define using Constant().
-        model (quantity or string):
-            Used to pick up any missing attibutes (units, name, desc). May be a
-            quantity or a string. If model is a quantity, only its units will be
-            taken. If model is a string, it will be split. Then if there is one
-            item, it is taken to be the units. If there are two, they are taken
-            to be the name and units.  And if there are three or more, the first
-            two are taken to the be name and units, and the remainder is taken
-            to be the description.
-        units (string):
-            Overrides the units taken from the value or model.
-        scale (float, tuple, func, or string):
-            If a float, it multiplies by the given value to compute the value of
-                the quantity.
-            If a tuple, the first value, a float, is treated as a scale factor
-                and the second value, a string, is take to be the units of the
-                quantity.
-            If a function, it takes two arguments, the given value and the units 
-                and it returns two values, the value and units of the quantity.
-            If a string, it is taken to the be desired units. This value along
-                with the units of the given value are used to select a known unit
-                conversion, which is applied to create the quantity.
-        name (string):
-            Overrides the name taken from the value or model.
-        desc (string):
-            Overrides the desc taken from the value or model.
-        ignore_sf (bool):
-            Assume the values given in strings do not employ scale factors.  In
-            this way, '1m' will be interpreted as 1 meter rather than 1 milli.
-
-        Will produce a ValueError exception if passed a string that cannot be
-        converted to a quantity. Will produced a KeyError if a unit conversion
-        is requested and there is no corresponding unit converter.
-        """
-
         ignore_sf = cls.ignore_sf if ignore_sf is None else ignore_sf
         data = {}
 
@@ -579,20 +631,20 @@ class Quantity(float):
             return number, mantissa, sf
 
         # process the value
-        if is_str(value):
-            constant = _active_constants.get(value)
-            if constant:
-                number = float(constant)
-                mantissa = getattr(constant, '_mantissa', None)
-                sf = getattr(constant, '_scale_factor', None)
-                if constant.units:
-                    data['units'] = constant.units
-                if constant.name:
-                    data['name'] = constant.name
-                if constant.desc:
-                    data['desc'] = constant.desc
-            else:
-                number, mantissa, sf = recognize_all(value)
+        if is_str(value) and value in _active_constants:
+            value = _active_constants[value]
+        if isinstance(value, Quantity):
+            number = float(value)
+            mantissa = getattr(value, '_mantissa', None)
+            sf = getattr(value, '_scale_factor', None)
+            if value.units:
+                data['units'] = value.units
+            if value.name:
+                data['name'] = value.name
+            if value.desc:
+                data['desc'] = value.desc
+        elif is_str(value):
+            number, mantissa, sf = recognize_all(value)
         else:
             number = value
 
@@ -649,7 +701,7 @@ class Quantity(float):
 
     # is_infinte() {{{2
     def is_infinite(self):
-        '''Test value to determine if it is infinite.'''
+        '''Test value to determine if quantity is infinite.'''
         try:
             value = self._mantissa
         except AttributeError:
@@ -658,7 +710,7 @@ class Quantity(float):
 
     # is_nan() {{{2
     def is_nan(self):
-        '''Test value to determine if it is not a number.'''
+        '''Test value to determine if quantity is not a number.'''
         try:
             value = self._mantissa
         except AttributeError:
@@ -675,32 +727,41 @@ class Quantity(float):
         self, show_units=None, show_si=None, prec=None, show_label=None,
         scale=None
     ):
-        """Convert quantity to a string
+        """Convert quantity to a string.
 
-        show_units (bool):
+        :param show_units:
             Whether the units should be included in the string.
-        show_si (bool):
-            Whether SI scale factors should be used.
-        prec (int or 'full'):
-            The desired precision (one plus this value is the desired number of
-            digits). If specified as full, the full original precision is used.
-        show_label (bool):
-            Whether label_fmt should be used to include name and perhaps
-            description in string.
-        scale (float, tuple, func, or string):
-            If a float, it scales the displayed value (the quantity is multiplied
-                by scale before being converted to the sting).
-            If a tuple, the first value, a float, is treated as a scale factor
-                and the second value, a string, is take to be the units of the
-                displayed value.
-            If a function, it takes two arguments, the value and the units of
-                the quantity and it returns two values, the value and units of
-                the displayed value.
-            If a string, it is taken to the be desired units. This value along
-                with the units of the quantity are used to select a known unit
-                conversion, which is applied to create the displayed value.
+        :type show_units: boolean
 
-        Will produced a KeyError if a unit conversion is requested and there is
+        :param show_si:
+            Whether SI scale factors should be used.
+        :type show_si: boolean
+
+        :param prec:
+            The desired precision (one plus this value is the desired number of
+            digits). If specified as 'full', the full original precision is used.
+        :type prec: integer or 'full'
+
+        :param show_label:
+            Whether *label_fmt* should be used to include name and perhaps
+            description in string.
+        :type show_label: boolean
+
+        :param scale:
+            - If a float, it scales the displayed value (the quantity is
+              multiplied by scale before being converted to the string).
+            - If a tuple, the first value, a float, is treated as a scale factor
+              and the second value, a string, is take to be the units of the
+              displayed value.
+            - If a function, it takes two arguments, the value and the units of
+              the quantity and it returns two values, the value and units of
+              the displayed value.
+            - If a string, it is taken to the be desired units. This value along
+              with the units of the quantity are used to select a known unit
+              conversion, which is applied to create the displayed value.
+        :type scale: real, pair, function, or string:
+
+        Produces a *KeyError* if a unit conversion is requested and there is
         no corresponding unit converter.
         """
 
@@ -850,7 +911,37 @@ class Quantity(float):
 
     # is_close() {{{2
     def is_close(self, other, reltol=None, abstol=None, check_units=True):
-        '''Use abstol and reltol to determine if a value is close.'''
+        '''
+        Are values equivalent?
+
+        Indicates  whether the value of a quantity or real number is equivalent
+        to that of a quantity. The two values need not be identical, they just
+        need to be close to be deemed equivalent.
+
+        :param other:
+            The value to compare against.
+        :type other: quantity or real
+
+        :param reltol:
+            The relative tolerance. If not specified. the *reltol* preference is 
+            used, which defaults to 1u.
+        :type reltol: real
+
+        :param abstol:
+            The absolute tolerance.  If not specified. the *abstol* preference is 
+            used, which defaults to 1p.
+        :type abstol: real
+
+        :param check_units:
+            If True (the default) compare the units of the two values, if they 
+            differ return False. Otherwise only compare the numeric values, 
+            ignoring the units.
+        :type check_units: boolean
+
+        Returns true if ``abs(a - b) <= max(reltol * max(abs(a), abs(b)), abstol)``
+        where ``a`` and ``b`` represent *other* and the numeric value of the
+        underlying quantity.
+        '''
         if check_units:
             other_units = getattr(other, 'units', None)
             if other_units:
@@ -978,79 +1069,136 @@ class Quantity(float):
     # set_preferences() {{{2
     @classmethod
     def set_preferences(cls, **kwargs):
-        """Set class preferences
+        """Set class preferences.
 
-        show_si (bool):
+        :param show_si:
             Use SI scale factors by default.
-        show_units (bool):
-            Output units by default.
-        prec (int):
-            Default precision in digits where 0 corresponds to 1 digit. Must
-            be nonnegative. This precision is used when full precision is not
-            required.
-        full_prec (int):
-            Default full precision in digits where 0 corresponds to 1 digit,
-            must be nonnegative. This precision is used when full precision is
-            requested if the precision is not otherwise known.
-        spacer (str):
-            May be '' or ' ', use the latter if you prefer a space between the
+        :type show_si: boolean
+
+        :param prec:
+            Default precision  in digits where 0 corresponds to 1 digit.  Must
+            be nonnegative.  This precision is used when the full precision is
+            not required. Default is 4.
+        :type prec: integer
+
+        :param full_prec:
+            Default full precision in digits where 0 corresponds to 1 digit.
+            Must be nonnegative.  This precision is used when the full precision
+            is requested and the precision is not otherwise known. Default is 12.
+        :type full_prec: integer
+
+        :param spacer:
+            The spacer text to be inserted in a string between the numeric value
+            and the scale factor when units are present.  Is generally specified
+            to be '' or ' '; use the latter if you prefer a space between the
             number and the units. Generally using ' ' makes numbers easier to
             read, particularly with complex units, and using '' is easier to
-            parse.
-        unity_sf (str):
-            The output scale factor for unity, generally '' or '_'.
-        output_sf (str):
+            parse.  You could also use a Unicode thin space.
+        :type spacer: string
+
+        :param unity_sf:
+            The output scale factor for unity, generally '' or '_'. The default
+            is '', but use '_' if you want there to be no ambiguity between
+            units and scale factors. For example, 0.3 would be rendered as
+            '300m', and 300 m would be rendered as '300_m'.
+        :type unity_sf: string
+
+        :param output_sf:
             Which scale factors to output, generally one would only use familiar
-            scale factors.
-        input_sf (str):
-            Which scale factors to recognize when reading numbers.
-        map_sf (dict or funct):
+            scale factors. The default is 'TGMkmunpfa', which gets rid or the
+            very large ('YZEP') and very small ('zy') scale factors that many
+            people do not recognize. 
+        :type output_sf: string
+
+        :param input_sf:
+            Which scale factors to recognize when reading numbers.  The default
+            is 'YZEPTGMKk_cmuμnpfazy'.  You can use this to ignore the scale
+            factors you never expect to reduce the chance of a scale factor/unit
+            ambiguity.  For example, if you expect to encounter temperatures in
+            Kelvin and can do without 'K' as a scale factor, you might use
+            'TGMK_munpfa'. This also gets rid of the unusual scale factors.
+        :type input_sf: string
+
+        :param ignore_sf:
+            Whether all scale factors should be ignored by default.
+        :type ignore_sf: boolean
+
+        :param map_sf:
             Use this to change the way individual scale factors are rendered,
             ex: map_sf={'u': 'μ'} to render micro using mu. If a function is
             given, it takes a single string argument, the nominal scale factor,
             and returns a string, the desired scale factor.
-        ignore_sf (bool):
-            Whether scale factors should be ignored by default.
-        known_units (list or string):
-            List of units that are expected to be used for which the leading
-            character could be mistaken as a scale factor.  If a string is
-            given, it is split at white space to form the list.
-        show_label (bool):
+        :type map_sf: dictionary or function
+
+        :param known_units:
+            List of units that are expected to be used in preference to a scale
+            factor when the leading character could be mistaken as a scale
+            factor.  If a string is given, it is split at white space to form
+            the list. When set, any previous known units are overridden.
+        :type known_units: list or string
+
+        :param show_label:
             Cause render() to add name and description by default if they are
-            given.
-        strip_dp (bool):
+            available.  By default this is False.
+        :type show_label: boolean
+
+        :param strip_dp:
             When rendering, strip the decimal points from numbers even if they
-            can then be mistaken for integers.
-        reltol (real):
-            Relative tolerance, used by is_close() when determining equivalence.
-        abstol (real):
-            Absolute tolerance, used by is_close() when determining equivalence.
-        keep_components (bool):
+            can then be mistaken for integers. By default this is True.
+        :type strip_dp: boolean
+
+        :param reltol:
+            Relative tolerance, used by :meth:`Quantity.is_close()` when
+            determining equivalence.  Default is 1μ.
+        :type reltol: float
+
+        :param abstol:
+            Absolute tolerance, used by :meth:`Quantity.is_close()` when
+            determining equivalence.  Default is 1p.
+        :type abstol: float
+
+        :param keep_components:
             Indicate whether components should be kept if quantity value was
             given as string. Doing so takes a bit of space, but allows the
             original precision of the number to be recreated when full precision
             is requested.
-        label_fmt (str):
-            Format string for an assignment. Will be passed through string
+        :type keep_components: boolean
+
+        :param label_fmt:
+            Format string when label is requested.  Is passed through string
             .format() method. Format string takes three possible arguments named
-            n, q, and d for the name, value and description.  The default is
-                '{n} = {v}'
+            *n*, *q*, and *d* for the name, value and description.  A typical
+            value is:
+
+                ``'{n} = {v}'``
 
             You can also pass two format strings as a tuple, The first is used
-            if description is present, otherwise second is used. For example,
-                ('{n} = {v} -- {d}', '{n} = {v}')
+            if the description is present, otherwise second is used (the second 
+            should not contain the *d* argument).  For example:
 
-            When given as a tuple, there is an additional argument available: V.
-            It should only be used in the first format string, and it is the
-            quantity formatted with the second string. So for example,
-                ('{V:<16}  # {d}', '{n}: {v}')
-        assign_rec (str):
-            Regular expression used to recognize an assignment. Used in
-            extract(). Default recognizes the form
-                "Temp = 300_K -- Ambient temperature".
+                ``('{n} = {v} -- {d}', '{n} = {v}')``
 
-        Any value not passed in are left alone. Pass in None to reset a value to
-        its default value.
+            When given as a tuple, there is an additional argument available: 
+            *V*.  It should only be used in the first format string and is the 
+            quantity formatted with the second string. It is helpful because any 
+            argument formatting is applied to the combination, which gives you 
+            a way line up the descriptions:
+
+                ``('{V:<16}  # {d}', '{n}: {v}')``
+        :type label_fmt: string or tuple
+
+        :param assign_rec:
+            Regular expression used to recognize an assignment.
+            Used in constructor and extract(). By default recognizes the forms:
+
+                - ``'vel = 60 m/s'``
+                - ``'vel = 60 m/s -- velocity'``
+                - ``'vel = 60 m/s # velocity'``
+
+        :type assign_rec: string
+
+        Any values not passed in are left alone. Pass in *None* to reset a
+        preference to its default value.
         """
 
         for key, value in kwargs.items():
@@ -1078,11 +1226,12 @@ class Quantity(float):
     def get_preference(cls, key):
         """Get class preference
 
-        name (str):
-            Name of the desired preference. Choose from: show_si, show_units,
-            prec, full_prec, spacer, unity_sf, output_sf, input_sf, map_sf,
-            ignore_sf, known_units, show_label, reltol, abstol, keep_components,
-            label_fmt, assign_rec.
+        Returns the value of given preference.
+
+        :param name:
+            Name of the desired preference. See
+            :meth:`Quantity.set_preferences()` for list of preferences.
+        :type name: string
         """
         if key not in DEFAULTS:
             raise NameError('%s: unknown.' % key)
@@ -1091,19 +1240,36 @@ class Quantity(float):
     # extract() {{{2
     @classmethod
     def extract(cls, text):
-        """ Extract quantities
+        """Extract quantities
 
-        Takes a string that contains quantity definitions and returns those
-        quantities in a dictionary. The string may contain one definition per
-        line, each of which is parsed by assign_rec. By default, the lines are
-        assumed to be of the form:
+        Takes a string that contains quantity definitions, one per line, and 
+        returns those quantities in a dictionary.
 
-            <name> = <value> [-- <description>]
+        :param quantities:
+            The string that contains the quantities, one definition per
+            line.  Each is parsed by *assign_rec*. By default, the lines are
+            assumed to be of the form:
 
-        <name> must be a valid identifier (ex: c_load).
-        <value> is a number with optional units (ex: 3 or 1pF or 1 kOhm).
-            The units need not be a simple identifier (ex: 9.07 GHz/V).
-        <description> is an optional textual description (ex: Gain of PD (Imax)).
+                ``<name> = <value> [-- <description>]``
+
+                ``<name> = <value> [# <description>]``
+
+            <name>: Must be a valid identifier (ex: c_load).
+
+            <value>: A number with optional units (ex: 3 or 1pF or 1 kOhm),
+            the units need not be a simple identifier (ex: 9.07 GHz/V).
+
+            <description>: Optional textual description (ex: Gain of PD (Imax)).
+
+            Blank lines an any line that does not contain a value is ignored. So
+            with the default *assign_rec*, lines with the following form are
+            ignored:
+
+                ``-- comment``
+
+                ``# comment``
+        :type quantities: string
+        :rtype: dictionary
         """
         import keyword
         quantities = {}
@@ -1147,8 +1313,9 @@ class Quantity(float):
     def map_sf_to_sci_notation(sf):
         """ Render scale factors in scientific notation
 
-        Pass this function to map_sf preference if you prefer your large and
-        small numbers in classic scientific notation.
+        Pass this function to *map_sf* preference if you prefer your large and
+        small numbers in classic scientific notation. Set *show_si* False to
+        format all numbers in scientific notation.
         """
         # The explicit references to unicode here and in _SCI_NOTATION_MAPPER are
         # for backward compatibility with python2. They can be removed when
@@ -1160,7 +1327,7 @@ class Quantity(float):
     def map_sf_to_greek(sf):
         '''Render scale factors in Greek alphabet if appropriate.
 
-        Pass this dictionary to map_sf preference if you prefer μ rather than u.
+        Pass this dictionary to *map_sf* preference if you prefer μ rather than u.
         '''
         # this could just as easily be a simple dictionary, but implement it as
         # a function so that it supports a docstring.

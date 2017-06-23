@@ -14,8 +14,8 @@ encountered when working with real-world systems when numbers are involved. And
 when encountered, the numbers often use SI scale factors to make them easier to 
 read and write.  Surprisingly, most computer languages do not support numbers in 
 these forms, meaning that when working with physical quantities, one often has 
-to choose what form to use, one that is easy for computers to read or one that 
-is easy for humans to read. For example, consider this table of critical 
+to choose between using a form that is easy for computers to read or one that is 
+easy for humans to read. For example, consider this table of critical 
 frequencies needed in jitter tolerance measurements in optical communication:
 
 .. code-block:: python
@@ -69,7 +69,7 @@ large and small values are oddly scaled (0.5 kHz is more naturally given as
 500Hz and 39813 MHz is more naturally given as 39.8 GHz), and because each 
 column may have a different scaling factor. While these might seem like minor 
 inconveniences on this table, they can become quite annoying as tables become 
-larger or more numerous. Fundamentally this issue is that the eyes are naturally 
+larger or more numerous. Fundamentally the issue is that the eyes are naturally 
 drawn to the number, but the numbers are not complete, and so the eyes need to 
 hunt further.  This problem exists with both tables and graphs. The scaling and 
 units for the numbers may be found in the column headings, the axes, the labels, 
@@ -82,19 +82,10 @@ This last version of the table represents a very common mistake people make when
 presenting data. They feel that adding units and scale factors to each number 
 adds clutter and wastes space and so removes them from the data and places them 
 somewhere else. Doing so results in a data that perhaps is visually cleaner but 
-is harder for the reader to interpret. This point was made very clear to me 
-recently when trying to read a graph in a news magazine. The subject was of 
-strong interest, so I was willing to spend the time to understand the meaning of 
-the data, but the units of measure for the data were not obvious.  I went 
-looking for them in every place I could think that they might be.  I searched 
-the axes, the labels, the title, the caption, and the text of the article.  
-I eventually found them in body of the article, but it took over 8 minutes to do 
-so. Annoyingly, there was plenty of space on the graph to properly label the 
-data.
-
-All these tables contain the same information, but in the second two tables the 
-readability has been traded off in order to make the data easier to read into 
-a computer.
+is harder for the reader to interpret.  All these tables contain the same 
+information, but in the second two tables the readability has been traded off in 
+order to make the data easier to read into a computer because in most languages 
+there is no easy way to read numbers that have either units or scale factors.
 
 *QuanitiPhy* makes it easy to read and generate numbers with units and scale 
 factors so you do not have to choose between human and computer readability.  
@@ -131,18 +122,19 @@ tweaked somewhat to handle tables 2 and 3):
     STM-64  : 9.9533e+09 2.0000e+04 4.0000e+05 4.0000e+06 8.0000e+07
     STM-256 : 3.9813e+10 8.0000e+04 1.9200e+06 1.6000e+07 3.2000e+08
 
-The first output shows that quantities can be displayed in easily readable forms 
-with their units and the second output shows that the values are easily 
-accessible for computation (the use of ``1*f`` is not necessary to be able to 
-see the results in exponential notation, rather it is there to demonstrate that 
-it is easy to do calculations on Quantities).
+The code first reads the data and then produces two outputs.  The first output 
+shows that quantities can be displayed in easily readable forms with their units 
+and the second output shows that the values are easily accessible for 
+computation (the use of ``1*f`` is not necessary to be able to see the results 
+in exponential notation, rather it is there to demonstrate that it is easy to do 
+calculations on Quantities).
 
-*Quantity* is used to convert a number string, such as '155.52 Mb/s' into an 
-internal representation that includes the value and the units: 155.52e6 and 
-'b/s'.  The scaling factor is properly included. Once a value is converted to 
-a Quantity, it can be treated just like a normal float. The main difference 
-occurs when it is time to convert it back to a string. When doing so, the scale 
-factor and units are included by default.
+:class:`quantiphy.Quantity` is used to convert a number string, such as '155.52 
+Mb/s' into an internal representation that includes the value and the units: 
+155.52e6 and 'b/s'.  The scaling factor is properly interpreted. Once a value is 
+converted to a Quantity, it can be treated just like a normal float. The main 
+difference occurs when it is time to convert it back to a string. When doing so, 
+the scale factor and units are included by default.
 
 
 .. _thermal voltage example:
@@ -172,24 +164,23 @@ compute the thermal voltage: *Vt = kT/q*.
     q = 160.22e-21 C    # elementary charge
     Vt = 25.852 mV      # thermal voltage
 
-The first part of this example imports Quantity and sets the *label_fmt* 
-preference to display both the value and the description when upper case format 
-codes are used. *label_fmt* is given as a tuple of two strings, the first will 
-be used when the description is present, the second is used when it is not. In 
-the first string, the ``{V:<16}`` is replaced by the expansion of the second 
-string, left justified with a field width of 16, and the ``{d}`` is replaced by 
-the description. On the second string the ``{n}`` is replaced by the *name* and 
-``{v}`` is replaced by the value (numeric value and units).
+The first part of this example imports :class:`quantiphy.Quantity` and sets the 
+*label_fmt* preference to display both the value and the description when upper 
+case format codes are used. *label_fmt* is given as a tuple of two strings, the 
+first will be used when the description is present, the second is used when it 
+is not. In the first string, the ``{V:<16}`` is replaced by the expansion of the 
+second string, left justified with a field width of 16, and the ``{d}`` is 
+replaced by the description. On the second string the ``{n}`` is replaced by the 
+*name* and ``{v}`` is replaced by the value (numeric value and units).
 
 The second part defines four quantities. The first is given in a very specific 
 way to avoid the ambiguity between units and scale factors. In this case, the 
 temperature is given in Kelvin (K), and normally if the temperature were given 
 as the string '300 K', the units would be confused for the scale factor. As 
-mentioned :class:`previously <Quantity>` the 'K' would be treated as a scale 
-factor unless you took explicit steps. In this case, this issue is circumvented 
-by specifying the units in the model along with the name and description. The 
-model is also used when creating *Vt* to specify the name, units, and 
-description.
+mentioned in :ref:`ambiguity` the 'K' would be treated as a scale factor unless 
+you took explicit steps. In this case, this issue is circumvented by specifying 
+the units in the model along with the name and description. The model is also 
+used when creating *Vt* to specify the name, units, and description.
 
 The last part simply prints the four values. It uses the :S format specification 
 to indicated that the full quantity description should be printed. In this case, 
@@ -207,44 +198,46 @@ prints out the disk usage of files and directories.  The results from *du* are
 gathered and then sorted by size and then the size and name of each item is 
 printed.
 
-Quantity is used to interpret the 'human' size output from *du* and convert it 
-to a float, which is easily sorted, then is is converted back to a string with 
-SI scale factors and units when rendered in the print statement.
+Quantity is used to scale the filesize reported by *du* from KB to B. Then the 
+list of files is sorted by size. Here we are exploiting the fact that quantities 
+act like floats, and so the sorting can be done with no extra effort.  Finally, 
+the ability to render to a number with a scale factor and units is used when 
+presenting the results.
 
 .. code-block:: python
 
-   #!/usr/bin/env python3
-   # runs du and sorts the output while suppressing any error messages from du
+    #!/usr/bin/env python3
+    # runs du and sorts the output while suppressing any error messages from du
 
-   from quantiphy import Quantity
-   from inform import display, fatal, os_error
-   from shlib import Run
-   import sys
+    from quantiphy import Quantity
+    from inform import display, fatal, os_error
+    from shlib import Run
+    import sys
 
-   try:
-      du = Run(['du', '-h'] + sys.argv[1:], modes='WEO1')
+    try:
+        du = Run(['du'] + sys.argv[1:], modes='WEO1')
 
-      files = []
-      for line in du.stdout.split('\n'):
-         if line:
-             size, filename = line.split('\t', 1)
-             files += [(Quantity(size, 'B'), filename)]
+        files = []
+        for line in du.stdout.split('\n'):
+            if line:
+                size, filename = line.split('\t', 1)
+                files += [(Quantity(size, scale=(1000, 'B')), filename)]
 
-      files.sort(key=lambda x: x[0])
+        files.sort(key=lambda x: x[0])
 
-      for each in files:
-         display(*each, sep='\t')
+        for each in files:
+            display(*each, sep='\t')
 
-   except OSError as err:
-      fatal(os_error(err))
-   except KeyboardInterrupt:
-      display('dus: killed by user.')
+    except OSError as err:
+        fatal(os_error(err))
+    except KeyboardInterrupt:
+        display('dus: killed by user.')
 
 
 .. _matplotlib example:
 
 MatPlotLib Example
--------------------
+------------------
 
 In this example *QuantiPhy* is used to create easy to read axis labels in 
 MatPlotLib. It uses NumPy to do a spectral analysis of a signal and then 
@@ -324,10 +317,3 @@ And the following is one of the two graphs produced:
 
 Notice the axis labels in the generated graph.  Use of *QuantiPhy* makes the 
 widely scaled units compact and easy to read.
-
-
-**Navigation**:
-
-    * :ref:`Overview <overview>`
-    * :ref:`Reference Manual <reference manual>`
-    * :ref:`Back to start of Examples <examples>`
