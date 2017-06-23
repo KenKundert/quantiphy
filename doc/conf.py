@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Avendesora documentation build configuration file, created by
+# QuantiPhy documentation build configuration file, created by
 # sphinx-quickstart on Mon Jun 12 12:01:56 2017.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -186,7 +186,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'quantiphy.tex', u'Avendesora Documentation',
+  ('index', 'quantiphy.tex', u'QuantiPhy Documentation',
    u'Ken Kundert', 'manual'),
 ]
 
@@ -216,7 +216,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'quantiphy', u'Avendesora Documentation',
+    ('index', 'quantiphy', u'QuantiPhy Documentation',
      [u'Ken Kundert'], 1)
 ]
 
@@ -230,8 +230,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'Avendesora', u'Avendesora Documentation',
-   u'Ken Kundert', 'Avendesora', 'One line description of project.',
+  ('index', 'QuantiPhy', u'QuantiPhy Documentation',
+   u'Ken Kundert', 'QuantiPhy', 'One line description of project.',
    'Miscellaneous'),
 ]
 

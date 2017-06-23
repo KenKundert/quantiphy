@@ -32,7 +32,8 @@ What?
 A quantity is the pairing of a number and a unit of measure that indicates the 
 amount of some measurable thing.  *QuantiPhy* provides quantity objects that 
 keep the units with the number, making it easy to share them a single unit.  
-They subclasses float, so can be used anywhere a number can be used.
+They subclass float and so can be used anywhere a number is suitable.
+
 
 Why?
 ----
@@ -41,21 +42,41 @@ Quantities naturally supports SI scale factors, which are widely used in science
 and engineering. SI scale factors make it possible to cleanly represent both 
 very large and very small quantities in a form that is both easy to read and 
 write.  While generally better for humans, no general programming language 
-provides support for reading or writing quantities with SI scale factors, making 
-it difficult to write software that communicates effectively with humans.  
+provides direct support for reading or writing quantities with SI scale factors, 
+making it difficult to write software that communicates effectively with humans.  
 *QuantiPhy* addresses this deficiency, making is both natural and simple to both 
 input and output physical quantities.
+
 
 Features
 --------
 
 - Flexibly reads amounts with units and SI scale factors.
-- Quantities subclass the float class, and so can be used as conventional 
+- Quantities subclass the *float* class and so can be used as conventional 
   numbers.
 - Generally includes the units when printing or converting to strings and by 
   default employs SI scale factors.
 - Flexible unit conversion and scaling is supported to make it easy to convert 
   to or from any required form.
+- Provides a small but extensible collection of physical constants.
+
+
+Alternatives
+------------
+
+There are a considerable number of Python packages dedicated to units and 
+quantities (`alternatives <https://kdavies4.github.io/natu/seealso.html>`_).  
+However, as a rule, they focus on the units rather than the scale factors. In 
+particular, they build a system of units that you are expected to use throughout 
+your calculations.  These packages demand a high level of commitment from their 
+users and in turn provide unit consistency and built-in unit conversions.  In 
+contrast, *QuantiPhy* treats units basically as documentation.  They are simply 
+strings that are attached to quantities largely so they can be presented to the 
+user when the values are printed. As such, *QuantiPhy* is a light-weight package 
+that demands little from the user. It is used when inputting and outputting 
+values, and then only when it provides value. As a result, it provides 
+a simplicity in use that cannot be matched by the other packages.
+
 
 Quick Start
 -----------
@@ -155,5 +176,4 @@ incorporate quantity values into strings:
    >>> f'Boiling point of water: {Tboil:s°F}'
    'Boiling point of water: 212 °F'
 
-Further information can be found `here 
-<http://nurdletech.com/linux-utilities/quantiphy/doc/>`_.
+Further information can be found `here <https://quantiphy.readthedocs.io>`_.
