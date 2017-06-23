@@ -1,7 +1,7 @@
 QuantiPhy - Physical Quantities
 ===============================
 
-| Version: 1.3.7
+| Version: 1.3.8
 | Released: 2017-06-23
 |
 
