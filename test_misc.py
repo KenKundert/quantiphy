@@ -115,10 +115,13 @@ def test_misc():
     assert h_line.render(show_label=True) == 'F_hy = 1.4204 GHz  # frequency of hydrogen line'
 
     h_line2 = Quantity(h_line, h_line)
-    assert h_line2.render(show_label=True) == '1.4204 GHz'
+    assert h_line2.render(show_label=True) == 'F_hy = 1.4204 GHz  # frequency of hydrogen line'
 
-    h_line3 = Quantity(1420405751.786, 'F_hy Hz frequency of hydrogen line')
-    assert h_line3.render(show_label=True) == 'F_hy = 1.4204 GHz  # frequency of hydrogen line'
+    h_line3 = Quantity(1*h_line, h_line)
+    assert h_line3.render(show_label=True) == '1.4204 GHz'
+
+    h_line4 = Quantity(1420405751.786, 'F_hy Hz frequency of hydrogen line')
+    assert h_line4.render(show_label=True) == 'F_hy = 1.4204 GHz  # frequency of hydrogen line'
 
     size = Quantity('100k', 'B')
     assert size.render() == '100 kB'
