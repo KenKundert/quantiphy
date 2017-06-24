@@ -23,5 +23,6 @@ Releases
 1.4 (2017-07-??):
     - created formal documentation
     - enhanced label_fmt to accept {V}
+    - allow quantity to be passed as value to Quantity
     - replaced add_to_namespace with extract
     - raise NameError rather than Assertion for unknown preferences

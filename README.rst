@@ -44,7 +44,7 @@ very large and very small quantities in a form that is both easy to read and
 write.  While generally better for humans, no general programming language 
 provides direct support for reading or writing quantities with SI scale factors, 
 making it difficult to write software that communicates effectively with humans.  
-*QuantiPhy* addresses this deficiency, making is both natural and simple to both 
+*QuantiPhy* addresses this deficiency, making it natural and simple to both 
 input and output physical quantities.
 
 
@@ -102,9 +102,9 @@ You use *Quantity* to convert numbers and units in various forms to quantities:
    >>> print(Fhy)
    1.4204 GHz
 
-   >>> Rout = Quantity('50', 'Ohms')
-   >>> print(Rout)
-   50 Ohms
+   >>> Rsense = Quantity('1e-4 Ohms')
+   >>> print(Rsense)
+   100 uOhms
 
    >>> cost = Quantity('$11_200_000')
    >>> print(cost)
@@ -128,7 +128,7 @@ the quantity:
    >>> 2*cost
    22400000.0
 
-   >>> Rout.units
+   >>> Rsense.units
    'Ohms'
 
    >>> str(Tboil)

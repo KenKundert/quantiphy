@@ -118,8 +118,8 @@ provides many of the most common conversions for you:
     >>> print(distance_in_miles)
     93.206 Mmiles
 
-Specifying a :class:`quantiphy.Quantity` Value
-..............................................
+Specifying a Quantity Value
+...........................
 
 Normally, creating a quantity takes one or two arguments.  The first is taken to 
 be the value, and the second, if given, is taken to be the model, which is 
@@ -264,8 +264,8 @@ name, or description.
     output period = 100 ns -- period at output of frequency divider
 
 
-Scaling When Creating a :class:`quantiphy.Quantity`
-...................................................
+Scaling When Creating a Quantity
+................................
 
 Quantities tend to be used primarily when reading and writing numbers, and less 
 often when processing numbers.  Often data comes in an undesirable form. For 
@@ -376,8 +376,8 @@ seconds:
     1.2 ks  455.37 K
 
 
-Accessing :class:`quantiphy.Quantity` Values
-............................................
+Accessing Quantity Values
+.........................
 
 There are a variety of ways of accessing the value of a quantity. If you are 
 just interested in its numeric value, you access it with:
@@ -486,8 +486,8 @@ used (default=12).  Generally one uses 'full' when generating output that is
 intended to be read by a machine.
 
 
-Scaling When Rendering a :class:`quantiphy.Quantity`
-....................................................
+Scaling When Rendering a Quantity
+.................................
 
 Once it comes time to output quantities from your program, you may again may be 
 constrained in the way the numbers must be presented. *QuantiPhy* also allows 
