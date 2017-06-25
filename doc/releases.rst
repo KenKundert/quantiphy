@@ -24,5 +24,7 @@ Releases
     - created formal documentation
     - enhanced label_fmt to accept {V}
     - allow quantity to be passed as value to Quantity
-    - replaced add_to_namespace with extract
+    - replaced Quantity.add_to_namespace with Quantity.extract
     - raise NameError rather than Assertion for unknown preferences
+    - added Quantity.all_from_conv_fmt() and Quantity.all_from_si_fmt()
+    - change assign_rec to support more formats

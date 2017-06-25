@@ -16,7 +16,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 # Imports {{{1
-from __future__ import division
+from __future__ import division, unicode_literals
 import re
 import math
 try:
@@ -281,7 +281,7 @@ DEFAULTS = {
         # quantity formatted with the second. An alternate specification that
         # prints the description if it is available is:
         #     'label_fmt': ('{V} -- {d}', '{n} = {v}'),
-    'assign_rec': r'\A\s*(?:([^=]+)\s*=\s*)?(.*?)(?:\s*(?:#|--)\s*(.*?)\s*)?\Z',
+    'assign_rec': r'\A\s*(?:([^=:]+)\s*[=:]\s*)?(.*?)(?:\s*(?:#|--|//)\s*(.*?)\s*)?\Z',
         # assignment recognizer
         # default recognizes: vel = 60 m/s -- velocity
         #                   : vel = 60 m/s # velocity
@@ -342,6 +342,7 @@ IDENTIFIER = re.compile(r'\A[_a-zA-Z][\w]*\Z')
 # Quantity class {{{1
 @python_2_unicode_compatible
 class Quantity(float):
+    # docstring {{{2
     """Create a Physical Quantity
 
     A quantity is a number paired with a unit of measure.
@@ -438,9 +439,11 @@ class Quantity(float):
         # These must be initialized to None, but will be set the first time
         # Quantity is instantiated.
 
-    # _initialize_recognizers {{{2
+    # recognizers {{{2
     @classmethod
     def _initialize_recognizers(cls):
+        # Build regular expressions used to recognize quantities
+        # identify desired scale factors {{{3
         known_sf = ''.join(MAPPINGS)
         if cls.input_sf is None:
             input_sf = known_sf
@@ -451,8 +454,7 @@ class Quantity(float):
                 unknown_sf = ', '.join(sorted(unknown_sf))
                 raise ValueError('Unknown scale factors: %s.' % unknown_sf)
 
-        # Build regular expressions used to recognize quantities
-        # components {{{2
+        # components {{{3
         sign = named_regex('sign', '[-+]?')
         required_digits = r'(?:[0-9][0-9_]*[0-9]|[0-9]+)'  # allow interior underscores
         optional_digits = r'(?:[0-9][0-9_]*[0-9]|[0-9]*)'
@@ -470,7 +472,7 @@ class Quantity(float):
         currency = named_regex('currency', '[%s]' % CURRENCY_SYMBOLS)
         nan = named_regex('nan', '(?i)inf|nan')
 
-        # number_with_scale_factor {{{2
+        # number_with_scale_factor {{{3
         number_with_scale_factor = (
             r'{sign}{mantissa}\s*{scale_factor}{units}'.format(**locals()),
             lambda match: match.group('sign') + match.group('mant'),
@@ -478,7 +480,7 @@ class Quantity(float):
             lambda match: match.group('units')
         )
 
-        # number_with_exponent {{{2
+        # number_with_exponent {{{3
         number_with_exponent = (
             r'{sign}{mantissa}{exponent}\s*{units}'.format(**locals()),
             lambda match: match.group('sign') + match.group('mant'),
@@ -486,7 +488,7 @@ class Quantity(float):
             lambda match: match.group('units')
         )
 
-        # simple_number {{{2
+        # simple_number {{{3
         # this one must be processed after number_with_scale_factor
         simple_number = (
             r'{sign}{mantissa}\s*{units}'.format(**locals()),
@@ -495,7 +497,7 @@ class Quantity(float):
             lambda match: match.group('units')
         )
 
-        # currency_with_scale_factor {{{2
+        # currency_with_scale_factor {{{3
         currency_with_scale_factor = (
             r'{sign}{currency}{mantissa}\s*{scale_factor}'.format(**locals()),
             lambda match: match.group('sign') + match.group('mant'),
@@ -503,7 +505,7 @@ class Quantity(float):
             lambda match: match.group('currency')
         )
 
-        # currency_with_exponent {{{2
+        # currency_with_exponent {{{3
         currency_with_exponent = (
             r'{sign}{currency}{mantissa}{exponent}'.format(**locals()),
             lambda match: match.group('sign') + match.group('mant'),
@@ -511,7 +513,7 @@ class Quantity(float):
             lambda match: match.group('currency')
         )
 
-        # simple_currency {{{2
+        # simple_currency {{{3
         simple_currency = (
             r'{sign}{currency}{mantissa}'.format(**locals()),
             lambda match: match.group('sign') + match.group('mant'),
@@ -519,7 +521,7 @@ class Quantity(float):
             lambda match: match.group('currency')
         )
 
-        # nan_with_units {{{2
+        # nan_with_units {{{3
         nan_with_units = (
             r'{sign}{nan}\s+{units}'.format(**locals()),
             lambda match: match.group('sign') + match.group('nan').lower(),
@@ -527,7 +529,7 @@ class Quantity(float):
             lambda match: match.group('units')
         )
 
-        # currency_nan {{{2
+        # currency_nan {{{3
         currency_nan = (
             r'{sign}{currency}{nan}'.format(**locals()),
             lambda match: match.group('sign') + match.group('nan').lower(),
@@ -535,7 +537,7 @@ class Quantity(float):
             lambda match: match.group('currency')
         )
 
-        # simple_nan {{{2
+        # simple_nan {{{3
         simple_nan = (
             r'{sign}{nan}'.format(**locals()),
             lambda match: match.group('sign') + match.group('nan').lower(),
@@ -543,7 +545,7 @@ class Quantity(float):
             lambda match: ''
         )
 
-        # all_number_converters {{{2
+        # all_number_converters {{{3
         cls.all_number_converters = [
             (re.compile('\A\s*{}\s*\Z'.format(pattern)), get_mant, get_sf, get_units)
             for pattern, get_mant, get_sf, get_units in [
@@ -553,7 +555,7 @@ class Quantity(float):
             ]
         ]
 
-        # sf_free_number_converters {{{2
+        # sf_free_number_converters {{{3
         cls.sf_free_number_converters = [
             (re.compile('\A\s*{}\s*\Z'.format(pattern)), get_mant, get_sf, get_units)
             for pattern, get_mant, get_sf, get_units in [
@@ -562,6 +564,25 @@ class Quantity(float):
                 nan_with_units, currency_nan, simple_nan,
             ]
         ]
+
+        # numbers embedded in text {{{3
+        smpl_units = r'(?:[a-zA-Z_°ÅΩ℧]*)'
+            # may only contain alphabetic characters, ex: V, A, _Ohms, etc.
+            # or obvious unicode units, ex: °ÅΩ℧
+        sf_or_units = r'(?:[a-zA-Z_μ°ÅΩ℧]+)'
+            # must match units or scale factors: add μ, make non-optional
+        left_delimit = r'(?:\A|(?<=[^a-zA-Z0-9_.]))'
+        right_delimit = r'(?=[^-+0-9_]|\Z)'
+        cls.embedded_si_notation = re.compile(
+            '{left_delimit}{mantissa}{sf_or_units}{right_delimit}'.format(
+                **locals()
+            )
+        )
+        cls.embedded_e_notation = re.compile(
+            '{left_delimit}{mantissa}{exponent}?{smpl_units}{right_delimit}'.format(
+                **locals()
+            )
+        )
 
     # constructor {{{2
     def __new__(
@@ -1168,32 +1189,40 @@ class Quantity(float):
             Format string when label is requested.  Is passed through string
             .format() method. Format string takes three possible arguments named
             *n*, *q*, and *d* for the name, value and description.  A typical
-            value is:
+            value is::
 
-                ``'{n} = {v}'``
+                '{n} = {v}'
 
             You can also pass two format strings as a tuple, The first is used
             if the description is present, otherwise second is used (the second 
-            should not contain the *d* argument).  For example:
+            should not contain the *d* argument).  For example::
 
-                ``('{n} = {v} -- {d}', '{n} = {v}')``
+                ('{n} = {v} -- {d}', '{n} = {v}')
 
             When given as a tuple, there is an additional argument available: 
             *V*.  It should only be used in the first format string and is the 
             quantity formatted with the second string. It is helpful because any 
             argument formatting is applied to the combination, which gives you 
-            a way line up the descriptions:
+            a way line up the descriptions::
 
-                ``('{V:<16}  # {d}', '{n}: {v}')``
+                ('{V:<16}  # {d}', '{n}: {v}')
         :type label_fmt: string or tuple
 
         :param assign_rec:
-            Regular expression used to recognize an assignment.
-            Used in constructor and extract(). By default recognizes the forms:
+            Regular expression used to recognize an assignment.  Used in
+            constructor and extract(). By default an '=' or ':' separates the
+            name from the value and a '--', '#' or '//' separates the value from
+            the description, if a description is given. So recognizes the
+            following forms::
 
-                - ``'vel = 60 m/s'``
-                - ``'vel = 60 m/s -- velocity'``
-                - ``'vel = 60 m/s # velocity'``
+                'vel = 60 m/s'
+                'vel = 60 m/s -- velocity'
+                'vel = 60 m/s # velocity'
+                'vel = 60 m/s // velocity'
+                'vel: 60 m/s'
+                'vel: 60 m/s -- velocity'
+                'vel: 60 m/s # velocity'
+                'vel: 60 m/s // velocity'
 
         :type assign_rec: string
 
@@ -1332,6 +1361,74 @@ class Quantity(float):
         # this could just as easily be a simple dictionary, but implement it as
         # a function so that it supports a docstring.
         return {'u': 'μ'}.get(sf, sf)
+
+    # all_from_conv_fmt {{{2
+    @classmethod
+    def all_from_conv_fmt(cls, text, **kwargs):
+        """Convert all numbers and quantities from conventional notation.
+
+        :param text:
+            A search and replace is performed on this text. The search looks for
+            numbers and quantities in floating point or e-notation. They are
+            replaced with the same number rendered as a quantity. To be
+            recognized any units must be simple (only letters or underscores, no
+            digits or symbols) and the units must be immediately adjacent to the
+            number.
+        :type text: string
+        :param \**kwargs:
+            By default the numbers are rendered using the currently active
+            preferences, but any valid argument to :meth:`Quantity.render()` can
+            be passed in to control the rendering.
+        :rtype: string
+        """
+        out = []
+        start = 0
+        for match in cls.embedded_e_notation.finditer(text):
+            end = match.start(0)
+            number = match.group(0)
+            try:
+                number = Quantity(number).render(**kwargs)
+            except ValueError:  # pragma: no cover
+                # something unexpected happened
+                # but this is not essential, so ignore it
+                pass
+            out.append(text[start:end] + number)
+            start = match.end(0)
+        return ''.join(out) + text[start:]
+
+    # all_from_si_fmt {{{2
+    @classmethod
+    def all_from_si_fmt(cls, text, **kwargs):
+        """Convert all numbers and quantities from SI notation.
+
+        :param text:
+            A search and replace is performed on this text. The search looks for
+            numbers and quantities in SI notation (must have either a scale
+            factor or units or both).  They are replaced with the same number
+            rendered as a quantity. To be recognized any units must be simple
+            (only letters or underscores, no digits or symbols) and the units
+            must be immediately adjacent to the number.
+        :type text: string
+        :param \**kwargs:
+            By default the numbers are rendered using the currently active
+            preferences, but any valid argument to :meth:`Quantity.render()` can
+            be passed in to control the rendering.
+        :rtype: string
+        """
+        out = []
+        start = 0
+        for match in cls.embedded_si_notation.finditer(text):
+            end = match.start(0)
+            number = match.group(0)
+            try:
+                number = Quantity(number).render(**kwargs)
+            except ValueError:  # pragma: no cover
+                # something unexpected happened
+                # but this is not essential, so ignore it
+                pass
+            out.append(text[start:end] + number)
+            start = match.end(0)
+        return ''.join(out) + text[start:]
 
 
 # Predefined Constants {{{1

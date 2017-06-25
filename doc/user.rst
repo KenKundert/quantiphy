@@ -86,13 +86,13 @@ example, to create a quantity from a string you can use:
     >>> print(distance_to_sun)
     150 Gm
 
-Now ``distance_to_sun`` contains two items, the number 150000000000.0 and the 
+Now *distance_to_sun* contains two items, the number 150000000000.0 and the 
 units 'm'.  The 'G' was interpreted as the *giga* scale factor, which scales by 
 10\ :sup:`9`.
 
-:class:`quantiphy.Quantity` is a subclass of float, and so ``distance_to_sun`` 
-can be used just like any real number. For example, you can convert the distance 
-to miles using:
+:class:`quantiphy.Quantity` is a subclass of float, and so *distance_to_sun* can 
+be used just like any real number. For example, you can convert the distance to 
+miles using:
 
 .. code-block:: python
 
@@ -183,13 +183,19 @@ When given as a string, the number may use any of the following scale factors
 When specifying the value as a string you may also give a name and description, 
 and if you do they become available as the attributes *name* and *desc*.  This 
 conversion is under the control of the *assign_rec* preference.  The default 
-version of *assign_rec* recognizes specifications of the following forms:
+version of *assign_rec* accepts either '=' or ':' to separate the name from the 
+value, and either '--', '#', or '//' to separate the value from the description 
+if a description is given. Thus, by default *QuantiPhy* recognizes 
+specifications of the following forms:
 
-   ``<name> = <value>``
-
-   ``<name> = <value> -- <description>``
-
-   ``<name> = <value> # <description>``
+    | <name> = <value>
+    | <name> = <value> -- <description>
+    | <name> = <value> # <description>
+    | <name> = <value> // <description>
+    | <name>: <value>
+    | <name>: <value> -- <description>
+    | <name>: <value> # <description>
+    | <name>: <value> // <description>
 
 For example:
 
@@ -738,7 +744,7 @@ constant and adds it to *QuantiPhy*'s store of constants.
 .. code-block:: python
 
     >>> from quantiphy import Quantity, Constant
-    >>> Constant(Quantity("λh = 211.061140539mm -- wavelength of hydrogen line"))
+    >>> Constant(Quantity("λh: 211.061140539mm // wavelength of hydrogen line"))
     <...>
 
 The value returned when creating a constant is discarded.  Rather, creating the 
@@ -757,7 +763,7 @@ constant.  You can also specify the name as an argument to *Constant*.
     >>> from quantiphy import Quantity, Constant
 
     >>> Constant(
-    ...     Quantity("λh = 211.061140539mm -- wavelength of hydrogen line"),
+    ...     Quantity("λh = 211.061140539mm # wavelength of hydrogen line"),
     ...     name='lambda h'
     ... )
     <...>
@@ -1091,11 +1097,11 @@ are close.
    >>> h_line.is_close(h_line + 1e4)
    False
 
-:meth:`quantiphy.Quantity.is_close()` returns true if the units match and if::
+:meth:`quantiphy.Quantity.is_close()` returns true if the units match and if:
 
-    abs(a - b) <= max(reltol * max(abs(a), abs(b)), abstol)
+   | abs(*a* - *b*) <= max(reltol * max(abs(*a*), abs(*b*)), abstol)
 
-where ``a`` and ``b`` represent *other* and the numeric value of the underlying 
+where *a* and *b* represent *other* and the numeric value of the underlying 
 quantity.
 
 By default, *is_close()* looks at the both the value and the units if the 

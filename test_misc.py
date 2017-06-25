@@ -176,8 +176,6 @@ def test_misc():
         q = 1.6022e-19      # elementary charge
         Vt = 0.025852       # thermal voltage
     """).strip()
-    print(result)
-    print(expected)
     assert result == expected
 
     Quantity.set_preferences(label_fmt=('{V:<18}  # {d}', '{n}: {v}'))
@@ -190,3 +188,158 @@ def test_misc():
     """).strip()
     assert result == expected
 
+    processed = Quantity.all_from_conv_fmt('1420405751.786Hz', show_si=True)
+    assert processed == '1.4204 GHz'
+    processed = Quantity.all_from_conv_fmt('1.420405751786e9Hz', show_si=True)
+    assert processed == '1.4204 GHz'
+    processed = Quantity.all_from_si_fmt('1420.405751786MHz', show_si=False)
+    assert processed == '1.4204e9 Hz'
+    processed = Quantity.all_from_si_fmt('1420405751.786_Hz', show_si=False)
+    assert processed == '1.4204e9 Hz'
+
+    processed = Quantity.all_from_si_fmt('0s', show_si=True)
+    assert processed == '0 s'
+
+    mvi_raw_conv = '''
+Status @ 0.00000000e+00s: Tests started for mylib.sh:MiM.
+    Assertion successfully detects expected fault @ 1.00013334e-04s in sh_tb.REF (sh): 'V(cm)' out of range.
+    Assertion successfully detects expected fault @ 1.00123334e-04s in sh_tb.REF (sh): 'V(cm)' out of range.
+Status @ 2.00500000e-04s: in_val = 5.000000e-01.
+    Pass @ 3.00500000e-04s: V(out) voltage: expected=2.00000000e+00V, measured=1.99999965e+00V, diff=3.46117130e-07V.
+Status @ 3.00500000e-04s: in_val = 7.500000e-01.
+    Pass @ 4.00500000e-04s: V(out) voltage: expected=1.75000000e+00V, measured=1.74999966e+00V, diff=3.41027651e-07V.
+Status @ 4.00500000e-04s: in_val = 1.000000e+00.
+    Pass @ 5.00500000e-04s: V(out) voltage: expected=1.50000000e+00V, measured=1.49999944e+00V, diff=5.55270307e-07V.
+Status @ 5.00500000e-04s: in_val = 1.250000e+00.
+    Pass @ 6.00500000e-04s: V(out) voltage: expected=1.25000000e+00V, measured=1.25000000e+00V, diff=1.26565425e-14V.
+Status @ 6.00500000e-04s: in_val = 1.500000e+00.
+    Pass @ 7.00500000e-04s: V(out) voltage: expected=1.00000000e+00V, measured=9.99999924e-01V, diff=7.59200380e-08V.
+Status @ 7.00500000e-04s: in_val = 1.750000e+00.
+    Pass @ 8.00500000e-04s: V(out) voltage: expected=7.50000000e-01V, measured=7.50017054e-01V, diff=1.70539238e-05V.
+Status @ 8.00500000e-04s: in_val = 2.000000e+00.
+    FAIL @ 9.00500000e-04s: V(out) voltage: expected=5.00000000e-01V, measured=5.48562457e-01V, diff=4.85624570e-02V.
+Summary @ 9.00510000e-04s: 7 tests run, 1 failures detected, 0 faults detected, 0 test sequences skipped.
+    '''
+
+    mvi_raw_si = '''
+Status @ 0s: Tests started for mylib.sh:MiM.
+    Assertion successfully detects expected fault @ 100.013334us in sh_tb.REF (sh): 'V(cm)' out of range.
+    Assertion successfully detects expected fault @ 100.123334us in sh_tb.REF (sh): 'V(cm)' out of range.
+Status @ 200.5us: in_val = 500m.
+    Pass @ 300.5us: V(out) voltage: expected=2V, measured=1.99999965V, diff=346.11713nV.
+Status @ 300.5us: in_val = 750m.
+    Pass @ 400.5us: V(out) voltage: expected=1.75V, measured=1.74999966V, diff=341.027651nV.
+Status @ 400.5us: in_val = 1.
+    Pass @ 500.5us: V(out) voltage: expected=1.5V, measured=1.49999944V, diff=555.270307nV.
+Status @ 500.5us: in_val = 1.25.
+    Pass @ 600.5us: V(out) voltage: expected=1.25V, measured=1.25V, diff=12.6565425fV.
+Status @ 600.5us: in_val = 1.5.
+    Pass @ 700.5us: V(out) voltage: expected=1V, measured=999.999924mV, diff=75.920038nV.
+Status @ 700.5us: in_val = 1.75.
+    Pass @ 800.5us: V(out) voltage: expected=750mV, measured=750.017054mV, diff=17.0539238uV.
+Status @ 800.5us: in_val = 2.
+    FAIL @ 900.5us: V(out) voltage: expected=500mV, measured=548.562457mV, diff=48.562457mV.
+Summary @ 900.51us: 7 tests run, 1 failures detected, 0 faults detected, 0 test sequences skipped.
+    '''
+
+    mvi_conv = '''
+Status @ 0 s: Tests started for mylib.sh:MiM.
+    Assertion successfully detects expected fault @ 100.01e-6 s in sh_tb.REF (sh): 'V(cm)' out of range.
+    Assertion successfully detects expected fault @ 100.12e-6 s in sh_tb.REF (sh): 'V(cm)' out of range.
+Status @ 200.5e-6 s: in_val = 500e-3.
+    Pass @ 300.5e-6 s: V(out) voltage: expected=2 V, measured=2 V, diff=346.12e-9 V.
+Status @ 300.5e-6 s: in_val = 750e-3.
+    Pass @ 400.5e-6 s: V(out) voltage: expected=1.75 V, measured=1.75 V, diff=341.03e-9 V.
+Status @ 400.5e-6 s: in_val = 1.
+    Pass @ 500.5e-6 s: V(out) voltage: expected=1.5 V, measured=1.5 V, diff=555.27e-9 V.
+Status @ 500.5e-6 s: in_val = 1.25.
+    Pass @ 600.5e-6 s: V(out) voltage: expected=1.25 V, measured=1.25 V, diff=12.657e-15 V.
+Status @ 600.5e-6 s: in_val = 1.5.
+    Pass @ 700.5e-6 s: V(out) voltage: expected=1 V, measured=1 V, diff=75.92e-9 V.
+Status @ 700.5e-6 s: in_val = 1.75.
+    Pass @ 800.5e-6 s: V(out) voltage: expected=750e-3 V, measured=750.02e-3 V, diff=17.054e-6 V.
+Status @ 800.5e-6 s: in_val = 2.
+    FAIL @ 900.5e-6 s: V(out) voltage: expected=500e-3 V, measured=548.56e-3 V, diff=48.562e-3 V.
+Summary @ 900.51e-6 s: 7 tests run, 1 failures detected, 0 faults detected, 0 test sequences skipped.
+    '''
+
+    mvi_conv_full = '''
+Status @ 0 s: Tests started for mylib.sh:MiM.
+    Assertion successfully detects expected fault @ 100.013334e-6 s in sh_tb.REF (sh): 'V(cm)' out of range.
+    Assertion successfully detects expected fault @ 100.123334e-6 s in sh_tb.REF (sh): 'V(cm)' out of range.
+Status @ 200.5e-6 s: in_val = 500e-3.
+    Pass @ 300.5e-6 s: V(out) voltage: expected=2 V, measured=1.99999965 V, diff=346.11713e-9 V.
+Status @ 300.5e-6 s: in_val = 750e-3.
+    Pass @ 400.5e-6 s: V(out) voltage: expected=1.75 V, measured=1.74999966 V, diff=341.027651e-9 V.
+Status @ 400.5e-6 s: in_val = 1.
+    Pass @ 500.5e-6 s: V(out) voltage: expected=1.5 V, measured=1.49999944 V, diff=555.270307e-9 V.
+Status @ 500.5e-6 s: in_val = 1.25.
+    Pass @ 600.5e-6 s: V(out) voltage: expected=1.25 V, measured=1.25 V, diff=12.6565425e-15 V.
+Status @ 600.5e-6 s: in_val = 1.5.
+    Pass @ 700.5e-6 s: V(out) voltage: expected=1 V, measured=999.999924e-3 V, diff=75.920038e-9 V.
+Status @ 700.5e-6 s: in_val = 1.75.
+    Pass @ 800.5e-6 s: V(out) voltage: expected=750e-3 V, measured=750.017054e-3 V, diff=17.0539238e-6 V.
+Status @ 800.5e-6 s: in_val = 2.
+    FAIL @ 900.5e-6 s: V(out) voltage: expected=500e-3 V, measured=548.562457e-3 V, diff=48.562457e-3 V.
+Summary @ 900.51e-6 s: 7 tests run, 1 failures detected, 0 faults detected, 0 test sequences skipped.
+    '''
+
+    mvi_si = '''
+Status @ 0 s: Tests started for mylib.sh:MiM.
+    Assertion successfully detects expected fault @ 100.01 us in sh_tb.REF (sh): 'V(cm)' out of range.
+    Assertion successfully detects expected fault @ 100.12 us in sh_tb.REF (sh): 'V(cm)' out of range.
+Status @ 200.5 us: in_val = 500m.
+    Pass @ 300.5 us: V(out) voltage: expected=2 V, measured=2 V, diff=346.12 nV.
+Status @ 300.5 us: in_val = 750m.
+    Pass @ 400.5 us: V(out) voltage: expected=1.75 V, measured=1.75 V, diff=341.03 nV.
+Status @ 400.5 us: in_val = 1.
+    Pass @ 500.5 us: V(out) voltage: expected=1.5 V, measured=1.5 V, diff=555.27 nV.
+Status @ 500.5 us: in_val = 1.25.
+    Pass @ 600.5 us: V(out) voltage: expected=1.25 V, measured=1.25 V, diff=12.657 fV.
+Status @ 600.5 us: in_val = 1.5.
+    Pass @ 700.5 us: V(out) voltage: expected=1 V, measured=1 V, diff=75.92 nV.
+Status @ 700.5 us: in_val = 1.75.
+    Pass @ 800.5 us: V(out) voltage: expected=750 mV, measured=750.02 mV, diff=17.054 uV.
+Status @ 800.5 us: in_val = 2.
+    FAIL @ 900.5 us: V(out) voltage: expected=500 mV, measured=548.56 mV, diff=48.562 mV.
+Summary @ 900.51 us: 7 tests run, 1 failures detected, 0 faults detected, 0 test sequences skipped.
+    '''
+
+    mvi_si_full = '''
+Status @ 0 s: Tests started for mylib.sh:MiM.
+    Assertion successfully detects expected fault @ 100.013334 us in sh_tb.REF (sh): 'V(cm)' out of range.
+    Assertion successfully detects expected fault @ 100.123334 us in sh_tb.REF (sh): 'V(cm)' out of range.
+Status @ 200.5 us: in_val = 500m.
+    Pass @ 300.5 us: V(out) voltage: expected=2 V, measured=1.99999965 V, diff=346.11713 nV.
+Status @ 300.5 us: in_val = 750m.
+    Pass @ 400.5 us: V(out) voltage: expected=1.75 V, measured=1.74999966 V, diff=341.027651 nV.
+Status @ 400.5 us: in_val = 1.
+    Pass @ 500.5 us: V(out) voltage: expected=1.5 V, measured=1.49999944 V, diff=555.270307 nV.
+Status @ 500.5 us: in_val = 1.25.
+    Pass @ 600.5 us: V(out) voltage: expected=1.25 V, measured=1.25 V, diff=12.6565425 fV.
+Status @ 600.5 us: in_val = 1.5.
+    Pass @ 700.5 us: V(out) voltage: expected=1 V, measured=999.999924 mV, diff=75.920038 nV.
+Status @ 700.5 us: in_val = 1.75.
+    Pass @ 800.5 us: V(out) voltage: expected=750 mV, measured=750.017054 mV, diff=17.0539238 uV.
+Status @ 800.5 us: in_val = 2.
+    FAIL @ 900.5 us: V(out) voltage: expected=500 mV, measured=548.562457 mV, diff=48.562457 mV.
+Summary @ 900.51 us: 7 tests run, 1 failures detected, 0 faults detected, 0 test sequences skipped.
+    '''
+
+    processed = Quantity.all_from_conv_fmt(mvi_raw_conv, show_si=True)
+    assert processed == mvi_si
+    processed = Quantity.all_from_conv_fmt(mvi_raw_conv, show_si=False)
+    assert processed == mvi_conv
+    processed = Quantity.all_from_conv_fmt(mvi_raw_conv, show_si=True, prec='full')
+    assert processed == mvi_si_full
+    processed = Quantity.all_from_conv_fmt(mvi_raw_conv, show_si=False, prec='full')
+    assert processed == mvi_conv_full
+
+    processed = Quantity.all_from_si_fmt(mvi_raw_si, show_si=True)
+    assert processed == mvi_si
+    processed = Quantity.all_from_si_fmt(mvi_raw_si, show_si=False)
+    assert processed == mvi_conv
+    processed = Quantity.all_from_si_fmt(mvi_raw_si, show_si=True, prec='full')
+    assert processed == mvi_si_full
+    processed = Quantity.all_from_si_fmt(mvi_raw_si, show_si=False, prec='full')
+    assert processed == mvi_conv_full
