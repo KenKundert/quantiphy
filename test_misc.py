@@ -1,5 +1,6 @@
 # encoding: utf8
 
+from __future__ import unicode_literals
 from quantiphy import Quantity, add_constant
 import pytest
 import sys
@@ -200,6 +201,27 @@ def test_misc():
 
     processed = Quantity.all_from_si_fmt('0s', show_si=True)
     assert processed == '0 s'
+
+    # test input_sf
+    Quantity.set_preferences(input_sf='GMk', unity_sf='_', spacer='')
+    assert Quantity('10m').render(show_si=False) == '10_m'
+    Quantity.set_preferences(input_sf=None, unity_sf='_')
+    assert Quantity('10m').render(show_si=False) == '10e-3'
+    Quantity.set_preferences(unity_sf=None, spacer=None)
+
+    # test map_sf
+    Quantity.set_preferences(map_sf=Quantity.map_sf_to_greek)
+    assert Quantity('10e-6 m').render() == '10 μm'
+    Quantity.set_preferences(map_sf=Quantity.map_sf_to_sci_notation)
+    assert Quantity('10e-6 m').render() == '10 μm'
+    assert Quantity('10e-6 m').render(show_si=False) == '10×10⁻⁶ m'
+    Quantity.set_preferences(map_sf=None)
+
+    # test set_preferences error handling
+    with pytest.raises(NameError, message='fuzz: unknown.'):
+        Quantity.set_preferences(fuzz=True)
+    with pytest.raises(NameError, message='fuzz: unknown.'):
+        fuzz = Quantity.get_preference('fuzz')
 
     mvi_raw_conv = '''
 Status @ 0.00000000e+00s: Tests started for mylib.sh:MiM.

@@ -4,12 +4,15 @@ from __future__ import unicode_literals
 from quantiphy import Quantity
 import math
 import sys
+import pytest
 
 def test_simple_scaling():
     Quantity.set_preferences(spacer=' ', label_fmt=None)
     q=Quantity('1kg')
     assert q.render() == '1 kg'
     assert q.render(scale=0.001, show_units=False) == '1'
+    with pytest.raises(KeyError, message="Unable to convert between 'fuzz' and 'g'."):
+        q.render(scale='fuzz')
 
     q=Quantity('1', units='g', scale=1000)
     assert q.render() == '1 kg'

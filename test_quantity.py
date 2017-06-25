@@ -1,5 +1,6 @@
 # encoding: utf8
 
+from __future__ import unicode_literals
 from quantiphy import Quantity
 import sys
 
@@ -34,8 +35,7 @@ test_cases = [
     Case('banker', '1ps', ('1e-12', 's'), '1ps'),
     Case('conquer', '1ns', ('1e-9', 's'), '1ns'),
     Case('share', '1us', ('1e-6', 's'), '1us'),
-    Case('resurface', '1μs', ('1e-6', 's'), '1us') if py3 else None,
-        # fails on python2, so skip it.
+    Case('resurface', '1μs', ('1e-6', 's'), '1us'),
     Case('witch', '1ms', ('1e-3', 's'), '1ms'),
     Case('engrave', '1cs', ('10e-3', 's'), '10ms'),
     Case('finance', '1_s', ('1', 's'), '1s'),
@@ -313,7 +313,7 @@ def test_number_recognition():
             Quantity(str(q))
         except AssertionError:
             raise
-        except ValueError:
+        except (ValueError, KeyError):
             assert None is case.raw, case.name
         except Exception:
             print('%s: unexpected exception occurred.' % case.name)

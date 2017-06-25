@@ -2,6 +2,7 @@
 
 from __future__ import unicode_literals
 from quantiphy import Quantity, add_constant, set_unit_system
+import pytest
 
 def test_constants():
     Quantity.set_preferences(spacer=' ', label_fmt='{n} = {v} -- {d}')
@@ -55,6 +56,9 @@ def test_constants():
     assert str(Quantity('c')) == '299.79 Mm/s'
     assert str(Quantity('0C')) == '273.15 K'
 
+    with pytest.raises(ValueError, message='fuzz: not a valid number.'):
+        str(Quantity('fuzz'))
+
     assert '{:S}'.format(Quantity('h')) == "h = 6.6261e-27 erg-s -- Plank's constant"
     assert '{:S}'.format(Quantity('hbar')) == "ħ = 1.0546e-27 erg-s -- reduced Plank's constant"
     assert '{:S}'.format(Quantity('ħ')) == "ħ = 1.0546e-27 erg-s -- reduced Plank's constant"
@@ -97,6 +101,8 @@ def test_constants():
     assert '{:S}'.format(Quantity('mu0')) == 'μ₀ = 1.2566 uH/m -- permeability of free space'
     assert '{:S}'.format(Quantity('Z0')) == 'Z₀ = 376.73 Ohms -- characteristic impedance of free space'
 
+    add_constant(Quantity('1420.405751786 MHz'), 'hline')
+    assert str(Quantity('hline')) == '1.4204 GHz'
     add_constant(Quantity(4.80320427e-10, 'Fr'), 'q', 'esu gaussian')
     add_constant(Quantity(1.602176487e-20, 'abC'), alias='q', unit_systems='emu')
     assert str(Quantity('q')) == '160.22e-21 C'
@@ -109,3 +115,6 @@ def test_constants():
     set_unit_system('emu')
     assert str(Quantity('q')) == '16.022e-21 abC'
     set_unit_system('mks')
+
+    with pytest.raises(NameError, message='No name specified.'):
+        add_constant(Quantity(4.80320427e-10, 'Fr'), unit_systems='esu gaussian')

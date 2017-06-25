@@ -21,9 +21,9 @@ import re
 import math
 try:
     from collections import ChainMap
-except ImportError:
+except ImportError:  # pragma: no cover
     from chainmap import ChainMap
-from six import string_types, u, python_2_unicode_compatible
+from six import string_types, python_2_unicode_compatible
 
 # Utilities {{{1
 # is_str {{{2
@@ -211,7 +211,7 @@ def add_constant(value, alias=None, unit_systems=None):
     specified.
     """
     if not alias and not value.name:
-        raise NameError('no name specified.')
+        raise NameError('No name specified.')
     if is_str(unit_systems):
         unit_systems = unit_systems.split()
 
@@ -1341,7 +1341,7 @@ class Quantity(float):
         # The explicit references to unicode here and in _SCI_NOTATION_MAPPER are
         # for backward compatibility with python2. They can be removed when
         # python2 support is dropped.
-        return u(sf).translate(Quantity._SCI_NOTATION_MAPPER)
+        return sf.translate(Quantity._SCI_NOTATION_MAPPER)
 
     # map_sf_to_greek() {{{2
     @staticmethod

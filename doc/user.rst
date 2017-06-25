@@ -1214,4 +1214,4 @@ set or get a preference that is not supported.
    >>> q = add_constant(Quantity('1ns'))
    Traceback (most recent call last):
    ...
-   NameError: no name specified.
+   NameError: No name specified.
