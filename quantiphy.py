@@ -288,8 +288,8 @@ CURRENCY_SYMBOLS = '$£€'
 
 
 # Parameters {{{1
-__version__ = '1.3.8'
-__released__ = '2017-06-23'
+__version__ = '1.3.9'
+__released__ = '2017-06-25'
 
 # These mappings are only used when reading numbers
 MAPPINGS = {
