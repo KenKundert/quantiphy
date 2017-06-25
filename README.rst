@@ -85,7 +85,7 @@ Install with::
 Requires Python3.3 or better.  Python2.7 is also supported, however support for 
 unicode is weak.
 
-The full documentation can be `here <https://quantiphy.readthedocs.io>`_.
+You can find the full documentation `here <https://quantiphy.readthedocs.io>`_.
 
 You use *Quantity* to convert numbers and units in various forms to quantities:
 
