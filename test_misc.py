@@ -1,6 +1,6 @@
 # encoding: utf8
 
-from quantiphy import Quantity, Constant
+from quantiphy import Quantity, add_constant
 import pytest
 import sys
 from textwrap import dedent
@@ -55,7 +55,8 @@ def test_misc():
     q = Quantity('inf Hz')
     assert q.is_infinite() == True
 
-    assert repr(q) == "Quantity('inf Hz')"
+    assert repr(q).replace("u'", "'") == "Quantity('inf Hz')"
+        # the replace is used to get rid of unicode marker in python2
 
     with pytest.raises(ValueError):
         class Foo(Quantity):
@@ -110,7 +111,7 @@ def test_misc():
     assert q.is_close(1e-8) is True
     assert q.is_close(1.001e-8) is False
 
-    Constant(Quantity('F_hy = 1420405751.786 Hz -- frequency of hydrogen line'))
+    add_constant(Quantity('F_hy = 1420405751.786 Hz -- frequency of hydrogen line'))
     h_line = Quantity('F_hy')
     assert h_line.render(show_label=True) == 'F_hy = 1.4204 GHz  # frequency of hydrogen line'
 

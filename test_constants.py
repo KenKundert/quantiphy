@@ -1,6 +1,7 @@
 # encoding: utf8
 
-from quantiphy import Quantity, Constant, set_unit_system
+from __future__ import unicode_literals
+from quantiphy import Quantity, add_constant, set_unit_system
 
 def test_constants():
     Quantity.set_preferences(spacer=' ', label_fmt='{n} = {v} -- {d}')
@@ -96,8 +97,8 @@ def test_constants():
     assert '{:S}'.format(Quantity('mu0')) == 'μ₀ = 1.2566 uH/m -- permeability of free space'
     assert '{:S}'.format(Quantity('Z0')) == 'Z₀ = 376.73 Ohms -- characteristic impedance of free space'
 
-    Constant(Quantity(4.80320427e-10, 'Fr'), 'q', 'esu gaussian')
-    Constant(Quantity(1.602176487e-20, 'abC'), name='q', unit_systems='emu')
+    add_constant(Quantity(4.80320427e-10, 'Fr'), 'q', 'esu gaussian')
+    add_constant(Quantity(1.602176487e-20, 'abC'), alias='q', unit_systems='emu')
     assert str(Quantity('q')) == '160.22e-21 C'
     set_unit_system('cgs')
     assert str(Quantity('q')) == '480.32 pFr'

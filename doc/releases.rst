@@ -28,3 +28,4 @@ Releases
     - raise NameError rather than Assertion for unknown preferences
     - added Quantity.all_from_conv_fmt() and Quantity.all_from_si_fmt()
     - change assign_rec to support more formats
+    - changed Contant() to add_constant()

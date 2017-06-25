@@ -737,44 +737,36 @@ a new quantity. You can activate a unit system using
 :func:`quantiphy.set_unit_system`.  Doing so deactivates the previous system. By 
 default, the *mks* system is active.
 
-You can create your own constants and unit systems using the 
-:class:`quantiphy.Constant` class.  Instantiating this class creates the 
-constant and adds it to *QuantiPhy*'s store of constants.
+You can create your own constants and unit systems using
+:func:`quantiphy.add_constant`:
 
 .. code-block:: python
 
-    >>> from quantiphy import Quantity, Constant
-    >>> Constant(Quantity("λh: 211.061140539mm // wavelength of hydrogen line"))
-    <...>
-
-The value returned when creating a constant is discarded.  Rather, creating the 
-constant registers it with :class:`quantiphy.Quantity`.  Then it is available by 
-name:
+    >>> from quantiphy import Quantity, add_constant
+    >>> add_constant(Quantity("λh: 211.061140539mm // wavelength of hydrogen line"))
 
     >>> hy_wavelength = Quantity('λh')
     >>> print(hy_wavelength.render(show_label=True))
     λh = 211.06 mm -- wavelength of hydrogen line
 
 In this case is the name given in the quantity is used when creating the 
-constant.  You can also specify the name as an argument to *Constant*.
+constant.  You can also specify an alias as an argument to *add_constant*.
 
 .. code-block:: python
 
-    >>> from quantiphy import Quantity, Constant
-
-    >>> Constant(
+    >>> add_constant(
     ...     Quantity("λh = 211.061140539mm # wavelength of hydrogen line"),
-    ...     name='lambda h'
+    ...     alias='lambda h'
     ... )
-    <...>
+
     >>> hy_wavelength = Quantity('lambda h')
     >>> print(hy_wavelength.render(show_label=True))
     λh = 211.06 mm -- wavelength of hydrogen line
 
-It is not necessary to specify both names, one is sufficient, but the constant 
-is accessible using whatever name was available when it was created.  Notice 
-that the name specified as an argument to *Constant* does not actually become 
-part of the constant, it is only used for looking up the constant.
+It is not necessary to specify both the name and the alias, one is sufficient, 
+but the constant is accessible using either.  Notice that the alias does not 
+actually become part of the constant, it is only used for looking up the 
+constant.
 
 By default, user defined constants are not associated with a unit system, 
 meaning that they are always available regardless of which unit system is 
@@ -786,12 +778,10 @@ that would contain more than one name once split.
 
 .. code-block:: python
 
-    >>> from quantiphy import Quantity, Constant, set_unit_system
+    >>> from quantiphy import Quantity, add_constant, set_unit_system
 
-    >>> Constant(Quantity(4.80320427e-10, 'Fr'), 'q', 'esu gaussian')
-    <...>
-    >>> Constant(Quantity(1.602176487e-20, 'abC'), name='q', unit_systems='emu')
-    <...>
+    >>> add_constant(Quantity(4.80320427e-10, 'Fr'), 'q', 'esu gaussian')
+    >>> add_constant(Quantity(1.602176487e-20, 'abC'), alias='q', unit_systems='emu')
     >>> q_mks = Quantity('q')
     >>> set_unit_system('cgs')
     >>> q_cgs = Quantity('q')
@@ -1075,6 +1065,60 @@ a version that displays the name and description by default.
     Kvco = 9.07 GHz/V  -- Gain of VCO
 
 
+.. _translate:
+
+Translating Quantities
+----------------------
+
+:meth:`quantiphy.Quantity.all_from_conv_fmt()` recognizes conventionally 
+formatted numbers and quantities embedded in text and reformats them using 
+:meth:`quantiphy.Quantity.render()`. This is an difficult task in general, and 
+so some constraints are placed on the values to make them easier to distinguish.  
+Specifically, the units, if given, must be simple and immediately adjacent to 
+the number. Units are simple if they only consist of letters and underscores.  
+The characters °, Å, Ω and ℧ are also allowed.  So '47e3Ohms', '50_Ohms' and 
+'1.0e+12Ω' are recognized as quantities, but '50 Ohms' and '12m/s' are not.
+
+Besides the text to be translated, :meth:`all_from_conv_fmt` takes the same 
+arguments as :meth:`render`, though they must be given as named arguments.
+
+.. code-block:: python
+
+    >>> test_results = '''
+    ... Applying stimulus @ 2.00500000e-04s: V(in) = 5.000000e-01V.
+    ... Pass @ 3.00500000e-04s: V(out): expected=2.00000000e+00V, measured=1.99999965e+00V, diff=3.46117130e-07V.
+    ... '''.strip()
+
+    >>> Quantity.set_preferences(spacer='')
+    >>> translated = Quantity.all_from_conv_fmt(test_results)
+    >>> print(translated)
+    Applying stimulus @ 200.5us: V(in) = 500mV.
+    Pass @ 300.5us: V(out): expected=2V, measured=2V, diff=346.12nV.
+
+:meth:`quantiphy.Quantity.all_from_si_fmt()` is similar, except that it 
+recognizes quantities formatted with either a scale factor or units and ignores 
+plain numbers. Again, units are expected to be simple and adjacent to their 
+number.
+
+.. code-block:: python
+
+    >>> Quantity.set_preferences(spacer='')
+    >>> translated_back = Quantity.all_from_si_fmt(translated, show_si=False)
+    >>> print(translated_back)
+    Applying stimulus @ 200.5e-6s: V(in) = 500e-3V.
+    Pass @ 300.5e-6s: V(out): expected=2V, measured=2V, diff=346.12e-9V.
+
+Notice in the translations the quantities lost resolution. This is avoided if 
+you use 'full' precision:
+
+.. code-block:: python
+
+    >>> translated = Quantity.all_from_conv_fmt(test_results, prec='full')
+    >>> print(translated)
+    Applying stimulus @ 200.5us: V(in) = 500mV.
+    Pass @ 300.5us: V(out): expected=2V, measured=1.99999965V, diff=346.11713nV.
+
+
 .. _equivalence:
 
 Equivalence
@@ -1167,7 +1211,7 @@ set or get a preference that is not supported.
 
 .. code-block:: python
 
-   >>> q = Constant(Quantity('1ns'))
+   >>> q = add_constant(Quantity('1ns'))
    Traceback (most recent call last):
    ...
    NameError: no name specified.

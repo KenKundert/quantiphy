@@ -152,6 +152,7 @@ UnitConversion('s', 'day', 86400)
 
 
 # Constants {{{1
+#  set_unit_system {{{2
 def set_unit_system(unit_system):
     """Activates a unit system.
 
@@ -176,27 +177,20 @@ _default_unit_system = 'mks'
 _constants = {None: {}, _default_unit_system: {}}
 set_unit_system(_default_unit_system)
 
-# Constant class{{{2
-class Constant(object):
-    """Constant
+def add_constant(value, alias=None, unit_systems=None):
+    """
     Saves a quantity in such a way that it can later be recalled by name when
     creating new quantities.
-
-    Just the creation of the constant is sufficient to make it available to
-    :class:`Quantity` (the :class:`Constant` object itself is normally discarded).
-
-    If *unit_systems* is specified, the constant is added to the specified unit
-    systems. In that case, the constant is only available if one of the
-    specified unit systems is active.  If *unit_systems* is not given, the
-    constant is not associated with a unit system, meaning that it is always
-    available regardless of which unit system is active.
 
     :param value:
         The value of the constant. Must be a quantity.
     :type value: quantity
 
-    :param name:
-        The name of the constant.
+    :param alias:
+        An alias for the constant. Can be used to access the constant from as an
+        alternative to the name given in the value, which itself is optional.
+        If the value has a name, specifying this name is optional. If both are
+        given, the constant is accessible using either name.
     :type name: string
 
     :param unit_systems:
@@ -205,7 +199,10 @@ class Constant(object):
         list.  If a constant is associated with a unit system, it is only
         available when that unit system is active. You need not limit yourself
         to the predefined 'mks' and 'cgs' unit systems. Giving a name creates
-        the corresponding unit system if it does not already exist.
+        the corresponding unit system if it does not already exist.  If
+        *unit_systems* is not given, the constant is not associated with a unit
+        system, meaning that it is always available regardless of which unit
+        system is active.
     :type unit_systems: list or string
 
     The constant is saved under *name* if given, and under the name contained
@@ -213,30 +210,25 @@ class Constant(object):
     is sufficient.  A NameError exception is raised if neither name is
     specified.
     """
+    if not alias and not value.name:
+        raise NameError('no name specified.')
+    if is_str(unit_systems):
+        unit_systems = unit_systems.split()
 
-    def __init__(self, value, name=None, unit_systems=None):
-        self.name = name
-        self.value = value
-        if not name and not value.name:
-            raise NameError('no name specified.')
-
-        if is_str(unit_systems):
-            unit_systems = unit_systems.split()
-
-        # add value to the collection of constants under both names
-        if unit_systems:
-            for system in unit_systems:
-                constants = _constants.get(system, {})
-                if name:
-                    constants[name] = self.value
-                if value.name:
-                    constants[value.name] = self.value
-                _constants[system] = constants
-        else:
-            if name:
-                _constants[None][name] = self.value
+    # add value to the collection of constants under both names
+    if unit_systems:
+        for system in unit_systems:
+            constants = _constants.get(system, {})
+            if alias:
+                constants[alias] = value
             if value.name:
-                _constants[None][value.name] = self.value
+                constants[value.name] = value
+            _constants[system] = constants
+    else:
+        if alias:
+            _constants[None][alias] = value
+        if value.name:
+            _constants[None][value.name] = value
 
 # Settings {{{1
 DEFAULTS = {
@@ -566,10 +558,10 @@ class Quantity(float):
         ]
 
         # numbers embedded in text {{{3
-        smpl_units = r'(?:[a-zA-Z_°ÅΩ℧]*)'
+        smpl_units = '[a-zA-Z_°ÅΩ℧]*'
             # may only contain alphabetic characters, ex: V, A, _Ohms, etc.
             # or obvious unicode units, ex: °ÅΩ℧
-        sf_or_units = r'(?:[a-zA-Z_μ°ÅΩ℧]+)'
+        sf_or_units = '[a-zA-Z_μ°ÅΩ℧]+'
             # must match units or scale factors: add μ, make non-optional
         left_delimit = r'(?:\A|(?<=[^a-zA-Z0-9_.]))'
         right_delimit = r'(?=[^-+0-9_]|\Z)'
@@ -1433,101 +1425,142 @@ class Quantity(float):
 
 # Predefined Constants {{{1
 # Plank's constant {{{2
-Constant(Quantity(
-    '6.626070040e-34',
-    units='J-s',
-    name='h',
-    desc="Plank's constant"
-), unit_systems='mks')
-
-Constant(Quantity(
-    '6.626070040e-27',
-    units='erg-s',
-    name='h',
-    desc="Plank's constant"
-), unit_systems='cgs')
+add_constant(
+    Quantity(
+        '6.626070040e-34',
+        units='J-s',
+        name='h',
+        desc="Plank's constant"
+    ),
+    unit_systems='mks'
+)
+add_constant(
+    Quantity(
+        '6.626070040e-27',
+        units='erg-s',
+        name='h',
+        desc="Plank's constant"
+    ),
+    unit_systems='cgs'
+)
 
 # Reduced Plank's constant {{{2
-Constant(Quantity(
-    '1.054571800e-34',
-    units='J-s',
-    name='ħ',
-    desc="reduced Plank's constant"
-), name='hbar', unit_systems='mks')
-
-Constant(Quantity(
-    '1.054571800e-27',
-    units='erg-s',
-    name='ħ',
-    desc="reduced Plank's constant"
-), name='hbar', unit_systems='cgs')
+add_constant(
+    Quantity(
+        '1.054571800e-34',
+        units='J-s',
+        name='ħ',
+        desc="reduced Plank's constant"
+    ),
+    alias='hbar',
+    unit_systems='mks'
+)
+add_constant(
+    Quantity(
+        '1.054571800e-27',
+        units='erg-s',
+        name='ħ',
+        desc="reduced Plank's constant"
+    ),
+    alias='hbar',
+    unit_systems='cgs'
+)
 
 # Boltzmann's constant {{{2
-Constant(Quantity(
-    '1.38064852e-23',
-    units='J/K',
-    name='k',
-    desc="Boltzmann's constant"
-), unit_systems='mks')
-
-Constant(Quantity(
-    '1.38064852e-16',
-    units='erg/K',
-    name='k',
-    desc="Boltzmann's constant"
-), unit_systems='cgs')
+add_constant(
+    Quantity(
+        '1.38064852e-23',
+        units='J/K',
+        name='k',
+        desc="Boltzmann's constant"
+    ),
+    unit_systems='mks'
+)
+add_constant(
+    Quantity(
+        '1.38064852e-16',
+        units='erg/K',
+        name='k',
+        desc="Boltzmann's constant"
+    ),
+    unit_systems='cgs'
+)
 
 # Elementary charge {{{2
-Constant(Quantity(
-    '1.6021766208e-19',
-    units='C',
-    name='q',
-    desc="elementary charge"
-), unit_systems='mks')
-
-Constant(Quantity(
-    '4.80320425e-10',
-    units='Fr',
-    name='q',
-    desc="elementary charge"
-), unit_systems='cgs')
+add_constant(
+    Quantity(
+        '1.6021766208e-19',
+        units='C',
+        name='q',
+        desc="elementary charge"
+    ),
+    unit_systems='mks'
+)
+add_constant(
+    Quantity(
+        '4.80320425e-10',
+        units='Fr',
+        name='q',
+        desc="elementary charge"
+    ),
+    unit_systems='cgs'
+)
 
 # Speed of light {{{2
-Constant(Quantity(
-    '2.99792458e8',
-    units='m/s',
-    name='c',
-    desc="speed of light"
-), unit_systems='mks cgs')
+add_constant(
+    Quantity(
+        '2.99792458e8',
+        units='m/s',
+        name='c',
+        desc="speed of light"
+    ),
+    unit_systems='mks cgs'
+)
 
 # Zero degrees Celsius in Kelvin {{{2
-Constant(Quantity(
-    '273.15',
-    units='K',
-    name='0°C',
-    desc="zero degrees Celsius in Kelvin"
-), name='0C', unit_systems='mks cgs')
+add_constant(
+    Quantity(
+        '273.15',
+        units='K',
+        name='0°C',
+        desc="zero degrees Celsius in Kelvin"
+    ),
+    alias='0C',
+    unit_systems='mks cgs'
+)
 
 # Permittivity of free space {{{2
-Constant(Quantity(
-    '8.854187817e-12',
-    units='F/m',
-    name='ε₀',
-    desc="permittivity of free space"
-), name='eps0', unit_systems='mks')
+add_constant(
+    Quantity(
+        '8.854187817e-12',
+        units='F/m',
+        name='ε₀',
+        desc="permittivity of free space"
+    ),
+    alias='eps0',
+    unit_systems='mks'
+)
 
 # Permeability of free space {{{2
-Constant(Quantity(
-    4e-7*math.pi,
-    units='H/m',
-    name='μ₀',
-    desc="permeability of free space"
-), name='mu0', unit_systems='mks')
+add_constant(
+    Quantity(
+        4e-7*math.pi,
+        units='H/m',
+        name='μ₀',
+        desc="permeability of free space"
+    ),
+    alias='mu0',
+    unit_systems='mks'
+)
 
 # Characteristic impedance of free space {{{2
-Constant(Quantity(
-    '376.730313461',
-    units='Ohms',
-    name='Z₀',
-    desc="characteristic impedance of free space"
-), name='Z0', unit_systems='mks')
+add_constant(
+    Quantity(
+        '376.730313461',
+        units='Ohms',
+        name='Z₀',
+        desc="characteristic impedance of free space"
+    ),
+    alias='Z0',
+    unit_systems='mks'
+)

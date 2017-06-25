@@ -1,5 +1,6 @@
 # encoding: utf8
 
+from __future__ import unicode_literals
 from quantiphy import Quantity
 import math
 import sys
