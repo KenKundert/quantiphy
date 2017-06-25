@@ -444,7 +444,7 @@ class Quantity(float):
             unknown_sf = set(input_sf) - set(known_sf)
             if unknown_sf:
                 unknown_sf = ', '.join(sorted(unknown_sf))
-                raise ValueError('Unknown scale factors: %s.' % unknown_sf)
+                raise ValueError('%s: unknown scale factors.' % unknown_sf)
 
         # components {{{3
         sign = named_regex('sign', '[-+]?')

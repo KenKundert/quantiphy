@@ -207,7 +207,9 @@ def test_misc():
     assert Quantity('10m').render(show_si=False) == '10_m'
     Quantity.set_preferences(input_sf=None, unity_sf='_')
     assert Quantity('10m').render(show_si=False) == '10e-3'
-    Quantity.set_preferences(unity_sf=None, spacer=None)
+    with pytest.raises(ValueError, message='q, w: unknown scale factors'):
+        Quantity.set_preferences(input_sf='GMkwq', unity_sf='_', spacer='')
+    Quantity.set_preferences(input_sf=None, unity_sf=None, spacer=None)
 
     # test map_sf
     Quantity.set_preferences(map_sf=Quantity.map_sf_to_greek)

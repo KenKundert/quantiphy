@@ -85,7 +85,7 @@ Install with::
 
    pip3 install quantiphy
 
-Requires Python3.4 or better.  Python2.7 is also supported, however support for 
+Requires Python3.3 or better.  Python2.7 is also supported, however support for 
 unicode is weak.
 
 You use *Quantity* to convert numbers and units in various forms to quantities:
