@@ -22,9 +22,6 @@ QuantiPhy - Physical Quantities
         :target: https://pypi.python.org/pypi/quantiphy/
 
 
-`Documentation <http://nurdletech.com/linux-utilities/quantiphy/doc/>`_
------------------------------------------------------------------------
-
 What?
 -----
 
@@ -87,6 +84,8 @@ Install with::
 
 Requires Python3.3 or better.  Python2.7 is also supported, however support for 
 unicode is weak.
+
+The full documentation can be `here <https://quantiphy.readthedocs.io>`_.
 
 You use *Quantity* to convert numbers and units in various forms to quantities:
 
@@ -176,4 +175,5 @@ incorporate quantity values into strings:
    >>> f'Boiling point of water: {Tboil:s°F}'
    'Boiling point of water: 212 °F'
 
-Further information can be found `here <https://quantiphy.readthedocs.io>`_.
+*QuantiPhy* has many more features and capabilities. For more information, view 
+the `documentation <https://quantiphy.readthedocs.io>`_.
