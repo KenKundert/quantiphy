@@ -31,17 +31,17 @@ What?
 *QuantiPhy* is a Python library that offers support for physical quantities.  
 A quantity is the pairing of a number and a unit of measure that indicates the 
 amount of some measurable thing.  *QuantiPhy* provides quantity objects that 
-keep the units with the number, making it easy to share them a single unit.  
-They subclass float and so can be used anywhere a number is suitable.
+keep the units with the number, making it easy to share them as single object.  
+They subclass float and so can be used anywhere a number is appropriate.
 
 
 Why?
 ----
 
-Quantities naturally supports SI scale factors, which are widely used in science 
-and engineering. SI scale factors make it possible to cleanly represent both 
-very large and very small quantities in a form that is both easy to read and 
-write.  While generally better for humans, no general programming language 
+*QuantiPhy* naturally supports SI scale factors, which are widely used in 
+science and engineering. SI scale factors make it possible to cleanly represent 
+both very large and very small quantities in a form that is both easy to read 
+and write.  While generally better for humans, no general programming language 
 provides direct support for reading or writing quantities with SI scale factors, 
 making it difficult to write software that communicates effectively with humans.  
 *QuantiPhy* addresses this deficiency, making it natural and simple to both 
