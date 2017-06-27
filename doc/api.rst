@@ -1,5 +1,5 @@
 ---------------------
-Programming Interface
+Classes and Functions
 ---------------------
 
 .. automodule:: quantiphy

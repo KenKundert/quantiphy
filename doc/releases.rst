@@ -29,3 +29,7 @@ Releases
     - added Quantity.all_from_conv_fmt() and Quantity.all_from_si_fmt()
     - change assign_rec to support more formats
     - changed Contant() to add_constant()
+    - changed the way preferences are implemented
+    - changed name of preference methods:
+      set_preferences -> set_prefs, get_preference -> get_pref
+    - added Quantity.prefs() (preferences context manager)

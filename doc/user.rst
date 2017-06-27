@@ -670,7 +670,7 @@ is used if there is a description and the second used otherwise.
 
 .. code-block:: python
 
-    >>> Quantity.set_preferences(label_fmt=('{n} = {v} -- {d}', '{n} = {v}'))
+    >>> Quantity.set_prefs(label_fmt=('{n} = {v} -- {d}', '{n} = {v}'))
 
     >>> print('{:S}'.format(trise))
     trise = 10 ns
@@ -813,14 +813,14 @@ included (*show_units*), etc.  Similar preferences also control the conversion
 of strings into quantities, which can help disambiguate whether a suffix 
 represents a scale factor or a unit. The list of available preferences and their 
 descriptions are given in the description of the 
-:meth:`quantiphy.Quantity.set_preferences` method.
+:meth:`quantiphy.Quantity.set_prefs` method.
 
-To set a preference, use the :meth:`quantiphy.Quantity.set_preferences` class 
-method. You can set more than one preference at once:
+To set a preference, use the :meth:`quantiphy.Quantity.set_prefs` class method.  
+You can set more than one preference at once:
 
 .. code-block:: python
 
-    >>> Quantity.set_preferences(prec=6, map_sf={'u': 'μ'})
+    >>> Quantity.set_prefs(prec=6, map_sf={'u': 'μ'})
 
 This statements tells *QuantiPhy* to use 7 digits (the *prec* plus 1) and to 
 output μ rather u for the 10\ :sup:`-6` scale factor.
@@ -829,33 +829,49 @@ Setting preferences to *None* returns them to their default values:
 
 .. code-block:: python
 
-    >>> Quantity.set_preferences(prec=None, map_sf=None)
+    >>> Quantity.set_prefs(prec=None, map_sf=None)
 
 The preferences are changed on the class itself, meaning that they affect any 
 instance of that class regardless of whether they were instantiated before or 
 after the preferences were set. If you would like to have more than one set of 
-preferences, then you should subclass :class:`quantiphy.Quantity`. For example:
+preferences, then you should subclass :class:`quantiphy.Quantity`. For example, 
+imagine a situation where you have different types of quantities that would 
+naturally want different precisions:
 
 .. code-block:: python
 
-    >>> class ConventionalQuantity(Quantity):
+    >>> class Temperature(Quantity):
     ...     pass
+    >>> Temperature.set_prefs(prec=1, known_units='K', spacer='')
 
-    >>> ConventionalQuantity.set_preferences(show_si=False, show_units=False)
+    >>> class Frequency(Quantity):
+    ...     pass
+    >>> Frequency.set_prefs(prec=5, spacer='')
 
-    >>> period1 = Quantity(1e-9, 's')
-    >>> period2 = ConventionalQuantity(1e-9, 's')
-    >>> print(period1, period2, sep='\n')
-    1 ns
-    1e-9
+    >>> frequencies = []
+    >>> for each in '-25.3 999987.7, 25.1  1000207.1, 74.9  1001782.3'.split(','):
+    ...     temp, freq = each.split()
+    ...     frequencies.append((Temperature(temp, 'C'),  Frequency(freq, 'Hz')))
+
+    >>> for temp, freq in frequencies:
+    ...     print(temp, freq)
+    -25C 999.988kHz
+    25C 1.00021MHz
+    75C 1.00178MHz
+
+When a subclass is created, the preferences active in the main class are copied 
+into the subclass. Subsequent changes to the preferences in the main class do 
+not affect the subclass.
 
 You can also go the other way and override the preferences on a specific 
 quantity.
 
-    >>> period1.show_si = False
-    >>> period1.show_units = False
-    >>> print(period1)
-    1e-9
+    >>> print(hy_wavelength)
+    211.06 mm
+
+    >>> hy_wavelength.show_label = True
+    >>> print(hy_wavelength)
+    λh = 211.06 mm -- wavelength of hydrogen line
 
 This is often the way to go with quantities that have :index:`logarithmic units`
 such as decibels (:index:`dB`) or shannons (Sh) (or the related bit, digits, 
@@ -869,6 +885,30 @@ undesired.
     >>> gain.show_si = False
     >>> print(gain)
     250e-3 dB
+
+To retrieve a preference, use the :meth:`quantiphy.Quantity.get_pref` class 
+method. This is useful with *known_units*. Normally setting *known_units* 
+overrides the existing units. You can simply add more with::
+
+    >>> Quantity.set_prefs(known_units=Quantity.get_pref('known_units') + ['K'])
+
+A variation on :meth:`quantiphy.Quantity.set_prefs` is 
+:meth:`quantiphy.Quantity.prefs`. It is basically the same, except that it is 
+meant to work with Python's *with* statement to temporarily override 
+preferences:
+
+    >>> with Quantity.prefs(show_si=False, show_units=False):
+    ...     for time, temp in data:
+    ...         print('%-7s %s' % (time, temp))
+    0       505.37
+    600     477.59
+    1.2e3   455.37
+
+    >>> print('Final temperature = %s @ %s.' % data[-1][::-1])
+    Final temperature = 455.37 K @ 1.2 ks.
+
+Notice that the specified preferences only affected the table, not the final 
+printed values, which were rendered outside the *with* statement.
 
 
 .. _ambiguity:
@@ -888,11 +928,11 @@ may represent 1 meter.  Similarly, '1meter' my represent 1 meter or
 *QuantiPhy* accepts '_' as the unity scale factor.  In this way '1_m' is 
 unambiguously 1 meter. You can instruct *QuantiPhy* to output '_' as the unity 
 scale factor by specifying the *unity_sf* argument to 
-:meth:`quantiphy.Quantity.set_preferences()`:
+:meth:`quantiphy.Quantity.set_prefs()`:
 
 .. code-block:: python
 
-    >>> Quantity.set_preferences(unity_sf='_', spacer='')
+    >>> Quantity.set_prefs(unity_sf='_', spacer='')
     >>> l = Quantity(1, 'm')
     >>> print(l)
     1_m
@@ -902,7 +942,7 @@ factors, you can specify the *ignore_sf* preference:
 
 .. code-block:: python
 
-    >>> Quantity.set_preferences(ignore_sf=True, unity_sf='', spacer=' ')
+    >>> Quantity.set_prefs(ignore_sf=True, unity_sf='', spacer=' ')
     >>> l = Quantity('1000m')
     >>> l.as_tuple()
     (1000.0, 'm')
@@ -910,7 +950,7 @@ factors, you can specify the *ignore_sf* preference:
     >>> print(l)
     1 km
 
-    >>> Quantity.set_preferences(ignore_sf=False)
+    >>> Quantity.set_prefs(ignore_sf=False)
     >>> l = Quantity('1000m')
     >>> l.as_tuple()
     (1.0, '')
@@ -921,7 +961,7 @@ preference.
 
 .. code-block:: python
 
-    >>> Quantity.set_preferences(input_sf='GMk')
+    >>> Quantity.set_prefs(input_sf='GMk')
     >>> l = Quantity('1000m')
     >>> l.as_tuple()
     (1000.0, 'm')
@@ -934,7 +974,7 @@ factors again.
 
 .. code-block:: python
 
-    >>> Quantity.set_preferences(input_sf=None)
+    >>> Quantity.set_prefs(input_sf=None)
     >>> l = Quantity('1000m')
     >>> l.as_tuple()
     (1.0, '')
@@ -953,7 +993,7 @@ existing known units.
     1e-18 u
     1 nc
 
-    >>> Quantity.set_preferences(known_units='au pc')
+    >>> Quantity.set_prefs(known_units='au pc')
     >>> d1 = Quantity('1 au')
     >>> d2 = Quantity('1000 pc')
     >>> print(d1.render(show_si=False), d2, sep='\n')
@@ -990,7 +1030,7 @@ return them in a dictionary.  For example:
     ... '''
     >>> quantities = Quantity.extract(design_parameters)
 
-    >>> Quantity.set_preferences(
+    >>> Quantity.set_prefs(
     ...     label_fmt=('{V:<18}  # {d}', '{n} = {v}'),
     ...     show_label=True
     ... )
@@ -1090,7 +1130,7 @@ arguments as :meth:`render`, though they must be given as named arguments.
     ... Pass @ 3.00500000e-04s: V(out): expected=2.00000000e+00V, measured=1.99999965e+00V, diff=3.46117130e-07V.
     ... '''.strip()
 
-    >>> Quantity.set_preferences(spacer='')
+    >>> Quantity.set_prefs(spacer='')
     >>> translated = Quantity.all_from_conv_fmt(test_results)
     >>> print(translated)
     Applying stimulus @ 200.5us: V(in) = 500mV.
@@ -1103,7 +1143,7 @@ number.
 
 .. code-block:: python
 
-    >>> Quantity.set_preferences(spacer='')
+    >>> Quantity.set_prefs(spacer='')
     >>> translated_back = Quantity.all_from_si_fmt(translated, show_si=False)
     >>> print(translated_back)
     Applying stimulus @ 200.5e-6s: V(in) = 500e-3V.

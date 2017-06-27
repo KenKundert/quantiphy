@@ -23,6 +23,7 @@ try:
     from collections import ChainMap
 except ImportError:  # pragma: no cover
     from chainmap import ChainMap
+from contextlib import contextmanager
 from six import string_types, python_2_unicode_compatible
 
 # Utilities {{{1
@@ -230,64 +231,7 @@ def add_constant(value, alias=None, unit_systems=None):
         if value.name:
             _constants[None][value.name] = value
 
-# Settings {{{1
-DEFAULTS = {
-    'show_si': True,
-        # use SI scale factors
-    'show_units': True,
-        # output units
-    'prec': 4,
-        # normal precision
-    'full_prec': 12,
-        # full precision
-    'spacer': ' ',
-        # spacer between number and units
-    'unity_sf': '',
-        # what to use as unity scale factor, generally '' or '_'
-    'output_sf': 'TGMkmunpfa',
-        # the scale factors that should be used when formatting numbers
-        # this can be a subset of the available scale factors
-    'input_sf': None,
-        # the scale factors that should be recognized when reading numbers
-        # this can be a subset of the available scale factors
-        # None implies that all known scale factors should be accepted
-    'map_sf': {},
-        # use this to change the way individual scale factors are rendered.
-        # ex: map_sf={'u': 'μ'} to render micro using mu. Can be a mapping or
-        # a function.
-    'ignore_sf': False,
-        # assume quantity does not employ scale factor when converting from string
-    'known_units': [],
-        # units with a leading character that could be confused as a scale
-        # factor
-    'show_label': False,
-        # cause render to add name and description by default if given
-    'strip_dp': True,
-        # strip the decimal points from numbers when rendering even if they can
-        # then be mistaken for integers.
-    'label_fmt': '{n} = {v}',
-        # assignment formatter
-        # use {n}, {v}, and {d} to access name, value, and description
-        # if two are given as tuple, first is used if desc is present, otherwise
-        # second is used. If two are given, {V} in the first is replaced by
-        # quantity formatted with the second. An alternate specification that
-        # prints the description if it is available is:
-        #     'label_fmt': ('{V} -- {d}', '{n} = {v}'),
-    'assign_rec': r'\A\s*(?:([^=:]+)\s*[=:]\s*)?(.*?)(?:\s*(?:#|--|//)\s*(.*?)\s*)?\Z',
-        # assignment recognizer
-        # default recognizes: vel = 60 m/s -- velocity
-        #                   : vel = 60 m/s # velocity
-    'keep_components': True,
-        # keep string components
-    'reltol': 1e-6,
-        # relative tolerance
-    'abstol': 1e-12,
-        # absolute tolerance
-}
-CURRENCY_SYMBOLS = '$£€'
-
-
-# Parameters {{{1
+# Globals {{{1
 __version__ = '1.3.9'
 __released__ = '2017-06-25'
 
@@ -330,6 +274,30 @@ FORMAT_SPEC = re.compile(r'\A([<>]?)(\d*)(?:\.(\d+))?(?:([qQrRusSeEfFgGdn])([a-z
 
 # Regular expression for recognizing identifiers
 IDENTIFIER = re.compile(r'\A[_a-zA-Z][\w]*\Z')
+
+# Defaults {{{1
+DEFAULTS = {
+    'abstol': 1e-12,
+    'assign_rec': r'\A\s*((?P<name>[^=:]+)\s*[=:]\s*)?(?P<val>.*?)(\s*(#|--|//)\s*(?P<desc>.*?)\s*)?\Z',
+    'full_prec': 12,
+    'ignore_sf': False,
+    'input_sf': ''.join(MAPPINGS.keys()),
+    'keep_components': True,
+    'known_units': [],
+    'label_fmt': '{n} = {v}',
+    'map_sf': {},
+    'output_sf': 'TGMkmunpfa',
+    'prec': 4,
+    'reltol': 1e-6,
+    'show_label': False,
+    'show_si': True,
+    'show_units': True,
+    'spacer': ' ',
+    'strip_dp': True,
+    'unity_sf': '',
+}
+CURRENCY_SYMBOLS = '$£€'
+
 
 # Quantity class {{{1
 @python_2_unicode_compatible
@@ -392,32 +360,9 @@ class Quantity(float):
 
     Produces a *ValueError* if passed a string that cannot be converted to a
     quantity. Produces a *KeyError* if a unit conversion is requested and there
-    is no corresponding unit converter.
+    is no corresponding unit converter or if assignment recognizer (*assign_rec*
+    does not match at least the value (*val*)).
     """
-
-    # defaults {{{2
-    show_si = DEFAULTS['show_si']
-    show_units = DEFAULTS['show_units']
-    prec = DEFAULTS['prec']
-    full_prec = DEFAULTS['full_prec']
-    spacer = DEFAULTS['spacer']
-    unity_sf = DEFAULTS['unity_sf']
-    output_sf = DEFAULTS['output_sf']
-    input_sf = DEFAULTS['input_sf']
-    map_sf = DEFAULTS['map_sf']
-    keep_components = DEFAULTS['keep_components']
-    ignore_sf = DEFAULTS['ignore_sf']
-    known_units = DEFAULTS['known_units']
-    show_label = DEFAULTS['show_label']
-    strip_dp = DEFAULTS['strip_dp']
-    label_fmt = DEFAULTS['label_fmt']
-    assign_rec = DEFAULTS['assign_rec']
-    reltol = DEFAULTS['reltol']
-    abstol = DEFAULTS['abstol']
-        # These class attributes act as defaults for the instances. However,
-        # when accessing these values the code always goes through self.
-        # This allows the user to monkey-patch the instances to provide local
-        # overrides to these values.
 
     # constants (do not change these) {{{2
     units = ''
@@ -431,16 +376,252 @@ class Quantity(float):
         # These must be initialized to None, but will be set the first time
         # Quantity is instantiated.
 
+    # preferences {{{2
+    _initialized = set()
+
+    # _initialize_preferences {{{3
+    @classmethod
+    def _initialize_preferences(cls):
+        if id(cls) in cls._initialized:
+            return
+        cls._initialized.add(id(cls))
+        if cls == Quantity:
+            prefs = DEFAULTS
+        else:
+            parent = cls.__mro__[1]
+                # for some reason I cannot get super to work right
+            prefs = parent._preferences
+        # copy dict so any changes made to parent's preferences do not affect us
+        prefs = dict(prefs)
+        cls._preferences = ChainMap({}, prefs)
+            # use chain to support use of contexts
+            # put empty map in as first so user never accidentally deletes or
+            # changes one of the initial preferences
+
+    # set preferences {{{3
+    @classmethod
+    def set_prefs(cls, **kwargs):
+        """Set class preferences.
+
+        :param abstol:
+            Absolute tolerance, used by :meth:`Quantity.is_close()` when
+            determining equivalence.  Default is 1p.
+        :type abstol: float
+
+        :param assign_rec:
+            Regular expression used to recognize an assignment.  Used in
+            constructor and extract(). By default an '=' or ':' separates the
+            name from the value and a '--', '#' or '//' separates the value from
+            the description, if a description is given. So recognizes the
+            following forms::
+
+                'vel = 60 m/s'
+                'vel = 60 m/s -- velocity'
+                'vel = 60 m/s # velocity'
+                'vel = 60 m/s // velocity'
+                'vel: 60 m/s'
+                'vel: 60 m/s -- velocity'
+                'vel: 60 m/s # velocity'
+                'vel: 60 m/s // velocity'
+
+            The name, value, and description are identified in the regular
+            expression using named groups the names *name*, *val* and *desc*.
+            For example::
+
+                assign_req = r'(?P<name>.*+) = (?P<val>.*?) -- (?P<desc>.*?)',
+
+        :type assign_rec: string
+
+        :param full_prec:
+            Default full precision in digits where 0 corresponds to 1 digit.
+            Must be nonnegative.  This precision is used when the full precision
+            is requested and the precision is not otherwise known. Default is 12.
+        :type full_prec: integer
+
+        :param ignore_sf:
+            Whether all scale factors should be ignored by default.
+        :type ignore_sf: boolean
+
+        :param input_sf:
+            Which scale factors to recognize when reading numbers.  The default
+            is 'YZEPTGMKk_cmuμnpfazy'.  You can use this to ignore the scale
+            factors you never expect to reduce the chance of a scale factor/unit
+            ambiguity.  For example, if you expect to encounter temperatures in
+            Kelvin and can do without 'K' as a scale factor, you might use
+            'TGMK_munpfa'. This also gets rid of the unusual scale factors.
+        :type input_sf: string
+
+        :param keep_components:
+            Indicate whether components should be kept if quantity value was
+            given as string. Doing so takes a bit of space, but allows the
+            original precision of the number to be recreated when full precision
+            is requested.
+        :type keep_components: boolean
+
+        :param known_units:
+            List of units that are expected to be used in preference to a scale
+            factor when the leading character could be mistaken as a scale
+            factor.  If a string is given, it is split at white space to form
+            the list. When set, any previous known units are overridden.
+        :type known_units: list or string
+
+        :param label_fmt:
+            Format string when label is requested.  Is passed through string
+            .format() method. Format string takes three possible arguments named
+            *n*, *q*, and *d* for the name, value and description.  A typical
+            value is::
+
+                '{n} = {v}'
+
+            You can also pass two format strings as a tuple, The first is used
+            if the description is present, otherwise second is used (the second 
+            should not contain the *d* argument).  For example::
+
+                ('{n} = {v} -- {d}', '{n} = {v}')
+
+            When given as a tuple, there is an additional argument available: 
+            *V*.  It should only be used in the first format string and is the 
+            quantity formatted with the second string. It is helpful because any 
+            argument formatting is applied to the combination, which gives you 
+            a way line up the descriptions::
+
+                ('{V:<16}  # {d}', '{n}: {v}')
+        :type label_fmt: string or tuple
+
+        :param map_sf:
+            Use this to change the way individual scale factors are rendered,
+            ex: map_sf={'u': 'μ'} to render micro using mu. If a function is
+            given, it takes a single string argument, the nominal scale factor,
+            and returns a string, the desired scale factor.
+        :type map_sf: dictionary or function
+
+        :param output_sf:
+            Which scale factors to output, generally one would only use familiar
+            scale factors. The default is 'TGMkmunpfa', which gets rid or the
+            very large ('YZEP') and very small ('zy') scale factors that many
+            people do not recognize. 
+        :type output_sf: string
+
+        :param prec:
+            Default precision  in digits where 0 corresponds to 1 digit.  Must
+            be nonnegative.  This precision is used when the full precision is
+            not required. Default is 4.
+        :type prec: integer
+
+        :param reltol:
+            Relative tolerance, used by :meth:`Quantity.is_close()` when
+            determining equivalence.  Default is 1μ.
+        :type reltol: float
+
+        :param show_label:
+            Cause render() to add name and description by default if they are
+            available.  By default this is False.
+        :type show_label: boolean
+
+        :param show_si:
+            Use SI scale factors by default.
+        :type show_si: boolean
+
+        :param spacer:
+            The spacer text to be inserted in a string between the numeric value
+            and the scale factor when units are present.  Is generally specified
+            to be '' or ' '; use the latter if you prefer a space between the
+            number and the units. Generally using ' ' makes numbers easier to
+            read, particularly with complex units, and using '' is easier to
+            parse.  You could also use a Unicode thin space.
+        :type spacer: string
+
+        :param strip_dp:
+            When rendering, strip the decimal points from numbers even if they
+            can then be mistaken for integers. By default this is True.
+        :type strip_dp: boolean
+
+        :param unity_sf:
+            The output scale factor for unity, generally '' or '_'. The default
+            is '', but use '_' if you want there to be no ambiguity between
+            units and scale factors. For example, 0.3 would be rendered as
+            '300m', and 300 m would be rendered as '300_m'.
+        :type unity_sf: string
+
+        Any values not passed in are left alone. Pass in *None* to reset a
+        preference to its default value.
+
+        Trying to set an unknown preference results in a KeyError.
+        """
+        cls._initialize_preferences()
+        if is_str(kwargs.get('known_units')):
+            kwargs['known_units'] = kwargs['known_units'].split()
+        for k, v in kwargs.items():
+            if k not in DEFAULTS.keys():
+                 raise KeyError(k)
+            if v is None:
+                try:
+                    del cls._preferences[k]
+                except KeyError:
+                    # This occurs if pref is not set in first member of chain
+                    # could pass, explicitly set to default, or raise
+                    pass
+            else:
+                cls._preferences[k] = v
+        if 'input_sf' in kwargs:
+            cls._initialize_recognizers()
+
+    # get preference {{{3
+    @classmethod
+    def get_pref(cls, name):
+        """Get class preference
+
+        Returns the value of given preference.
+
+        :param name:
+            Name of the desired preference. See
+            :meth:`Quantity.set_prefs()` for list of preferences.
+        :type name: string
+
+        Trying to access an unknown preference results in a KeyError.
+        """
+        cls._initialize_preferences()
+        return cls._preferences[name]
+
+    # preferences {{{3
+    @classmethod
+    @contextmanager
+    def prefs(cls, **kwargs):
+        """Set class preferences.
+
+        This is just like :meth:`Quantity.set_prefs()`, except it is designed to
+        work as a context manager. For example::
+
+            with Quantity.preferences(ignore_sf=True):
+                ...
+
+        In this case the specified values are used within the *with* statement,
+        and then return to their original values upon exit.
+        """
+        cls._initialize_preferences()
+        cls._preferences = cls._preferences.new_child()
+        cls.set_prefs(**kwargs)
+        yield
+        cls._preferences = cls._preferences.parents
+
+    # get attribute {{{3
+    def __getattr__(self, name):
+        try:
+            return self.get_pref(name)
+        except KeyError:
+            raise AttributeError(name)
+
     # recognizers {{{2
     @classmethod
     def _initialize_recognizers(cls):
         # Build regular expressions used to recognize quantities
+
         # identify desired scale factors {{{3
         known_sf = ''.join(MAPPINGS)
-        if cls.input_sf is None:
+        if cls.get_pref('input_sf') is None:
             input_sf = known_sf
         else:
-            input_sf = cls.input_sf
+            input_sf = cls.get_pref('input_sf')
             unknown_sf = set(input_sf) - set(known_sf)
             if unknown_sf:
                 unknown_sf = ', '.join(sorted(unknown_sf))
@@ -581,7 +762,8 @@ class Quantity(float):
         cls, value, model=None, units=None, scale=None,
         name=None, desc=None, ignore_sf=None
     ):
-        ignore_sf = cls.ignore_sf if ignore_sf is None else ignore_sf
+        if ignore_sf is None:
+            ignore_sf = cls.get_pref('ignore_sf')
         data = {}
 
         # intialize Quantity if required
@@ -616,7 +798,7 @@ class Quantity(float):
                     sf = get_sf(match)
                     sf = sf if sf != '_' else ''
                     units = get_units(match)
-                    if sf+units in cls.known_units:
+                    if sf+units in cls.get_pref('known_units'):
                         sf, units = '', sf+units
                     mantissa = mantissa.replace('_', '')
                     number = float(mantissa + MAPPINGS.get(sf, [sf])[0])
@@ -629,9 +811,12 @@ class Quantity(float):
                 number, u, mantissa, sf = recognize_number(value, ignore_sf)
             except ValueError:
                 # not a simple number, try the assignment recognizer
-                match = re.match(cls.assign_rec, value)
+                match = re.match(cls.get_pref('assign_rec'), value)
                 if match:
-                    n, val, d = match.groups()
+                    args = match.groupdict()
+                    n = args.get('name', '')
+                    val = args['val']
+                    d = args.get('desc', '')
                     number, u, mantissa, sf = recognize_number(val, ignore_sf)
                     if n:
                         data['name'] = n.strip()
@@ -701,7 +886,7 @@ class Quantity(float):
         if desc:
             self.desc = desc
 
-        if cls.keep_components:
+        if cls.get_pref('keep_components'):
             try:
                 # If we got a string, keep the pieces so we can reconstruct it
                 # exactly as it was given. Needed for 'full' precision.
@@ -898,7 +1083,7 @@ class Quantity(float):
             try:
                 sf = self.map_sf.get(sf, sf)
             except AttributeError:
-                sf = self.map_sf.__func__(sf)
+                sf = self.map_sf(sf)
 
         # move decimal point as needed
         if shift:
@@ -1078,186 +1263,6 @@ class Quantity(float):
             # unrecognized format, just provide something reasonable
             return self.render()
 
-
-    # set_preferences() {{{2
-    @classmethod
-    def set_preferences(cls, **kwargs):
-        """Set class preferences.
-
-        :param show_si:
-            Use SI scale factors by default.
-        :type show_si: boolean
-
-        :param prec:
-            Default precision  in digits where 0 corresponds to 1 digit.  Must
-            be nonnegative.  This precision is used when the full precision is
-            not required. Default is 4.
-        :type prec: integer
-
-        :param full_prec:
-            Default full precision in digits where 0 corresponds to 1 digit.
-            Must be nonnegative.  This precision is used when the full precision
-            is requested and the precision is not otherwise known. Default is 12.
-        :type full_prec: integer
-
-        :param spacer:
-            The spacer text to be inserted in a string between the numeric value
-            and the scale factor when units are present.  Is generally specified
-            to be '' or ' '; use the latter if you prefer a space between the
-            number and the units. Generally using ' ' makes numbers easier to
-            read, particularly with complex units, and using '' is easier to
-            parse.  You could also use a Unicode thin space.
-        :type spacer: string
-
-        :param unity_sf:
-            The output scale factor for unity, generally '' or '_'. The default
-            is '', but use '_' if you want there to be no ambiguity between
-            units and scale factors. For example, 0.3 would be rendered as
-            '300m', and 300 m would be rendered as '300_m'.
-        :type unity_sf: string
-
-        :param output_sf:
-            Which scale factors to output, generally one would only use familiar
-            scale factors. The default is 'TGMkmunpfa', which gets rid or the
-            very large ('YZEP') and very small ('zy') scale factors that many
-            people do not recognize. 
-        :type output_sf: string
-
-        :param input_sf:
-            Which scale factors to recognize when reading numbers.  The default
-            is 'YZEPTGMKk_cmuμnpfazy'.  You can use this to ignore the scale
-            factors you never expect to reduce the chance of a scale factor/unit
-            ambiguity.  For example, if you expect to encounter temperatures in
-            Kelvin and can do without 'K' as a scale factor, you might use
-            'TGMK_munpfa'. This also gets rid of the unusual scale factors.
-        :type input_sf: string
-
-        :param ignore_sf:
-            Whether all scale factors should be ignored by default.
-        :type ignore_sf: boolean
-
-        :param map_sf:
-            Use this to change the way individual scale factors are rendered,
-            ex: map_sf={'u': 'μ'} to render micro using mu. If a function is
-            given, it takes a single string argument, the nominal scale factor,
-            and returns a string, the desired scale factor.
-        :type map_sf: dictionary or function
-
-        :param known_units:
-            List of units that are expected to be used in preference to a scale
-            factor when the leading character could be mistaken as a scale
-            factor.  If a string is given, it is split at white space to form
-            the list. When set, any previous known units are overridden.
-        :type known_units: list or string
-
-        :param show_label:
-            Cause render() to add name and description by default if they are
-            available.  By default this is False.
-        :type show_label: boolean
-
-        :param strip_dp:
-            When rendering, strip the decimal points from numbers even if they
-            can then be mistaken for integers. By default this is True.
-        :type strip_dp: boolean
-
-        :param reltol:
-            Relative tolerance, used by :meth:`Quantity.is_close()` when
-            determining equivalence.  Default is 1μ.
-        :type reltol: float
-
-        :param abstol:
-            Absolute tolerance, used by :meth:`Quantity.is_close()` when
-            determining equivalence.  Default is 1p.
-        :type abstol: float
-
-        :param keep_components:
-            Indicate whether components should be kept if quantity value was
-            given as string. Doing so takes a bit of space, but allows the
-            original precision of the number to be recreated when full precision
-            is requested.
-        :type keep_components: boolean
-
-        :param label_fmt:
-            Format string when label is requested.  Is passed through string
-            .format() method. Format string takes three possible arguments named
-            *n*, *q*, and *d* for the name, value and description.  A typical
-            value is::
-
-                '{n} = {v}'
-
-            You can also pass two format strings as a tuple, The first is used
-            if the description is present, otherwise second is used (the second 
-            should not contain the *d* argument).  For example::
-
-                ('{n} = {v} -- {d}', '{n} = {v}')
-
-            When given as a tuple, there is an additional argument available: 
-            *V*.  It should only be used in the first format string and is the 
-            quantity formatted with the second string. It is helpful because any 
-            argument formatting is applied to the combination, which gives you 
-            a way line up the descriptions::
-
-                ('{V:<16}  # {d}', '{n}: {v}')
-        :type label_fmt: string or tuple
-
-        :param assign_rec:
-            Regular expression used to recognize an assignment.  Used in
-            constructor and extract(). By default an '=' or ':' separates the
-            name from the value and a '--', '#' or '//' separates the value from
-            the description, if a description is given. So recognizes the
-            following forms::
-
-                'vel = 60 m/s'
-                'vel = 60 m/s -- velocity'
-                'vel = 60 m/s # velocity'
-                'vel = 60 m/s // velocity'
-                'vel: 60 m/s'
-                'vel: 60 m/s -- velocity'
-                'vel: 60 m/s # velocity'
-                'vel: 60 m/s // velocity'
-
-        :type assign_rec: string
-
-        Any values not passed in are left alone. Pass in *None* to reset a
-        preference to its default value.
-        """
-
-        for key, value in kwargs.items():
-            if key not in DEFAULTS:
-                raise NameError('%s: unknown.' % key)
-            if value is None:
-                # attributes that were passed as None are to be returned to
-                # their default value
-                if cls == Quantity:
-                    # this is base class, override value with the default value
-                    setattr(cls, key, DEFAULTS[key])
-                else:
-                    # delete the attribute so value of parent class is used.
-                    delattr(cls, key)
-            else:
-                # override with the desired value
-                if key in ['known_units'] and is_str(value):
-                    value = value.split()
-                setattr(cls, key, value)
-            if key == 'input_sf':
-                cls._initialize_recognizers()
-
-    # get_preference() {{{2
-    @classmethod
-    def get_preference(cls, key):
-        """Get class preference
-
-        Returns the value of given preference.
-
-        :param name:
-            Name of the desired preference. See
-            :meth:`Quantity.set_preferences()` for list of preferences.
-        :type name: string
-        """
-        if key not in DEFAULTS:
-            raise NameError('%s: unknown.' % key)
-        return getattr(cls, key)
-
     # extract() {{{2
     @classmethod
     def extract(cls, text):
@@ -1295,9 +1300,12 @@ class Quantity(float):
         import keyword
         quantities = {}
         for line in text.splitlines():
-            match = re.match(cls.assign_rec, line)
+            match = re.match(cls.get_pref('assign_rec'), line)
             if match:
-                name, value, desc = match.groups()
+                args = match.groupdict()
+                name = args.get('name', '')
+                value = args['val']
+                desc = args.get('desc', '')
                 if not value:
                     continue
                 if not name:

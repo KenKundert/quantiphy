@@ -5,7 +5,7 @@ from quantiphy import Quantity
 import sys
 
 def test_format():
-    Quantity.set_preferences(spacer=' ', label_fmt=None)
+    Quantity.set_prefs(spacer=' ', label_fmt=None)
     q=Quantity('f = 1420.405751786 MHz -- frequency of hydrogen line')
     assert '{}'.format(q) == '1.4204 GHz'
     assert '{:.8}'.format(q) == '1.42040575 GHz'
@@ -30,7 +30,7 @@ def test_format():
     assert float(q) == 2e-9
 
 def test_full_format():
-    Quantity.set_preferences(spacer=' ', label_fmt=None, prec='full')
+    Quantity.set_prefs(spacer=' ', label_fmt=None, prec='full')
     q=Quantity('f = 1420.405751786 MHz -- frequency of hydrogen line')
     assert '{}'.format(q) == '1.420405751786 GHz'
     assert '{:.8}'.format(q) == '1.42040575 GHz'
@@ -55,7 +55,7 @@ def test_full_format():
     assert float(q) == 2e-9
 
 def test_scaled_format():
-    Quantity.set_preferences(spacer=' ', label_fmt=None, prec=None)
+    Quantity.set_prefs(spacer=' ', label_fmt=None, prec=None)
     q=Quantity('Tboil = 100 °C -- boiling point of water')
     assert '{}'.format(q) == '100 °C'
     assert '{:.8}'.format(q) == '100 °C'

@@ -298,14 +298,14 @@ def test_number_recognition():
         assert case.name not in names, '%s: duplicate test name' % case.name
         names.add(case.name)
 
-        Quantity.set_preferences(
+        Quantity.set_prefs(
             prec=None, full_prec=None, spacer='', unity_sf=None, output_sf=None,
             ignore_sf=None, label_fmt=None, assign_rec=None, show_units=True,
             strip_dp=True
         )
         try:
             if case.prefs:
-                Quantity.set_preferences(**case.prefs)
+                Quantity.set_prefs(**case.prefs)
             q = Quantity(case.text)
             assert ((q.render(show_si=False, show_units=False), q.units) == case.raw), case.name
             assert (str(q) == case.formatted), case.name
@@ -318,7 +318,7 @@ def test_number_recognition():
         except Exception:
             print('%s: unexpected exception occurred.' % case.name)
             raise
-    Quantity.set_preferences(
+    Quantity.set_prefs(
         prec=None, full_prec=None, spacer=None, unity_sf=None, output_sf=None,
         ignore_sf=None, label_fmt=None, assign_rec=None
     )

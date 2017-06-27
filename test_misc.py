@@ -7,7 +7,7 @@ import sys
 from textwrap import dedent
 
 def test_misc():
-    Quantity.set_preferences(spacer=' ')
+    Quantity.set_prefs(spacer=' ')
     q = Quantity(1420405751.786, 'Hz')
     assert q.render(show_si=False, show_units=False) == '1.4204e9'
 
@@ -59,11 +59,33 @@ def test_misc():
     assert repr(q).replace("u'", "'") == "Quantity('inf Hz')"
         # the replace is used to get rid of unicode marker in python2
 
+    class Foo(Quantity):
+        pass
+    Foo.set_prefs(assign_rec=r'(?P<name>\w+)\s*=\s*(?P<val>.*)')
+    q = Foo('seven = 7')
+    assert q.name == 'seven'
+    assert str(q) == '7'
     with pytest.raises(ValueError):
-        class Foo(Quantity):
-            pass
-        Foo.set_preferences(assign_rec=r'(\w+)\s*=\s*(.*)')
         q = Foo('%')
+    with pytest.raises(KeyError):
+        Foo.set_prefs(assign_rec=r'(\w+)\s*=\s*(.*)') # no named groups
+        print(Foo.get_pref('assign_rec'))
+        Foo('seven = 7')
+
+    assert Foo.get_pref('prec') == 4
+    assert Foo.get_pref('full_prec') == 12
+    with Foo.prefs(prec=5, full_prec=13):
+        assert Foo.get_pref('prec') == 5
+        assert Foo.get_pref('full_prec') == 13
+        with Foo.prefs(prec=6, full_prec=14):
+            assert Foo.get_pref('prec') == 6
+            assert Foo.get_pref('full_prec') == 14
+        assert Foo.get_pref('prec') == 5
+        assert Foo.get_pref('full_prec') == 13
+    assert Foo.get_pref('prec') == 4
+    assert Foo.get_pref('full_prec') == 12
+
+
 
     with pytest.raises(ValueError):
         q = Quantity('x*y = z')
@@ -80,11 +102,11 @@ def test_misc():
     with pytest.raises(ValueError):
         Quantity('x\ny = z')
 
-    Quantity.set_preferences(label_fmt='{x}')
+    Quantity.set_prefs(label_fmt='{x}')
     with pytest.raises(KeyError):
         '{:S}'.format(Quantity('f = 1kHz'))
 
-    Quantity.set_preferences(label_fmt=('{n} = {v}  # {d}', '{n} = {v}'))
+    Quantity.set_prefs(label_fmt=('{n} = {v}  # {d}', '{n} = {v}'))
     q1 = Quantity('10ns', name='trise')
     q2 = Quantity('10ns', name='trise', desc='rise time')
     assert '{:G}'.format(q1) == 'trise = 1e-08'
@@ -98,10 +120,10 @@ def test_misc():
 
     class Derived(Quantity):
         pass
-    Derived.set_preferences(prec=8)
+    Derived.set_prefs(prec=8)
     mu = Derived('mu0')
     assert mu.render() == '1.25663706 uH/m'
-    Derived.set_preferences(prec=None)
+    Derived.set_prefs(prec=None)
     assert mu.render() == '1.2566 uH/m'
 
     q = Quantity('Tclk = 10ns -- clock period')
@@ -138,26 +160,35 @@ def test_misc():
     p = Quantity('3_1_4_1.592_65_36mRads')
     assert p.render() == '3.1416 Rads'
 
-    Quantity.set_preferences(known_units='au pc')
+    Quantity.set_prefs(known_units='au pc')
     d1 = Quantity('1 au')
     d2 = Quantity('1000 pc')
     assert d1.render(show_si=False) == '1 au'
     assert d2.render() == '1 kpc'
 
-    p = Quantity.get_preference(key='known_units')
+    p = Quantity.get_pref(name='known_units')
     assert ' '.join(p) == 'au pc'
 
     if sys.version_info.major == 3:
         class Foo(Quantity):
             pass
-        Foo.set_preferences(map_sf=Foo.map_sf_to_greek)
         t = Foo('1us')
+
+        assert Foo.get_pref('map_sf') == {}
+        assert Quantity.get_pref('map_sf') == {}
+
+        Foo.set_prefs(map_sf=Foo.map_sf_to_greek)
         assert t.render() == '1 μs'
+        assert Foo.get_pref('map_sf') == Foo.map_sf_to_greek
+        assert Quantity.get_pref('map_sf') == {}
 
-        Foo.set_preferences(map_sf=Quantity.map_sf_to_sci_notation)
+        Foo.set_prefs(map_sf=Quantity.map_sf_to_sci_notation)
         assert t.render(show_si=False) == '1×10⁻⁶ s'
+        assert Foo.get_pref('map_sf') == Foo.map_sf_to_sci_notation
+        assert Quantity.get_pref('map_sf') == {}
 
-    Quantity.set_preferences(label_fmt=('{V:<18}  # {d}', '{n} = {v}'))
+    print(Quantity.get_pref('map_sf'))
+    Quantity.set_prefs(label_fmt=('{V:<18}  # {d}', '{n} = {v}'))
     T = Quantity('T = 300K -- ambient temperature', ignore_sf=True)
     k = Quantity('k')
     q = Quantity('q')
@@ -180,7 +211,7 @@ def test_misc():
     """).strip()
     assert result == expected
 
-    Quantity.set_preferences(label_fmt=('{V:<18}  # {d}', '{n}: {v}'))
+    Quantity.set_prefs(label_fmt=('{V:<18}  # {d}', '{n}: {v}'))
     result = '{:S}\n{:S}\n{:S}\n{:S}'.format(T, k, q, Vt)
     expected = dedent("""
         T: 300 K            # ambient temperature
@@ -203,27 +234,27 @@ def test_misc():
     assert processed == '0 s'
 
     # test input_sf
-    Quantity.set_preferences(input_sf='GMk', unity_sf='_', spacer='')
+    Quantity.set_prefs(input_sf='GMk', unity_sf='_', spacer='')
     assert Quantity('10m').render(show_si=False) == '10_m'
-    Quantity.set_preferences(input_sf=None, unity_sf='_')
+    Quantity.set_prefs(input_sf=None, unity_sf='_')
     assert Quantity('10m').render(show_si=False) == '10e-3'
-    with pytest.raises(ValueError, message='q, w: unknown scale factors'):
-        Quantity.set_preferences(input_sf='GMkwq', unity_sf='_', spacer='')
-    Quantity.set_preferences(input_sf=None, unity_sf=None, spacer=None)
+    with pytest.raises(ValueError):
+        Quantity.set_prefs(input_sf='GMkwq', unity_sf='_', spacer='')
+    Quantity.set_prefs(input_sf=None, unity_sf=None, spacer=None)
 
     # test map_sf
-    Quantity.set_preferences(map_sf=Quantity.map_sf_to_greek)
+    Quantity.set_prefs(map_sf=Quantity.map_sf_to_greek)
     assert Quantity('10e-6 m').render() == '10 μm'
-    Quantity.set_preferences(map_sf=Quantity.map_sf_to_sci_notation)
+    Quantity.set_prefs(map_sf=Quantity.map_sf_to_sci_notation)
     assert Quantity('10e-6 m').render() == '10 μm'
     assert Quantity('10e-6 m').render(show_si=False) == '10×10⁻⁶ m'
-    Quantity.set_preferences(map_sf=None)
+    Quantity.set_prefs(map_sf=None)
 
-    # test set_preferences error handling
-    with pytest.raises(NameError, message='fuzz: unknown.'):
-        Quantity.set_preferences(fuzz=True)
-    with pytest.raises(NameError, message='fuzz: unknown.'):
-        fuzz = Quantity.get_preference('fuzz')
+    # test set_prefs error handling
+    with pytest.raises(KeyError):
+        Quantity.set_prefs(fuzz=True)
+    with pytest.raises(KeyError):
+        fuzz = Quantity.get_pref('fuzz')
 
     mvi_raw_conv = '''
 Status @ 0.00000000e+00s: Tests started for mylib.sh:MiM.

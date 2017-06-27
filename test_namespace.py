@@ -3,7 +3,7 @@
 from quantiphy import Quantity
 
 def test_namespace():
-    Quantity.set_preferences(spacer=' ')
+    Quantity.set_prefs(spacer=' ')
     globals().update(Quantity.extract('''
         h_line = 1420.405751786 MHz -- Frequency of the hydrogen line
         k = 13.806488e-24 J/K -- Boltzmann's constant

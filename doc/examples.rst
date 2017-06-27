@@ -148,7 +148,7 @@ compute the thermal voltage: *Vt = kT/q*.
 .. code-block:: python
 
     >>> from quantiphy import Quantity
-    >>> Quantity.set_preferences(
+    >>> Quantity.set_prefs(
     ...     show_label=True,
     ...     label_fmt=('{V:<18}  # {d}', '{n} = {v}')
     ... )
@@ -254,7 +254,7 @@ produces an SVG version of the results using MatPlotLib.
     from matplotlib.ticker import FuncFormatter
     import matplotlib.pyplot as pl
     from quantiphy import Quantity
-    Quantity.set_preferences(prec=2)
+    Quantity.set_prefs(prec=2)
 
     # define the axis formatting routines
     def freq_fmt(val, pos):
