@@ -188,6 +188,85 @@ since all the quantities have descriptions, the first string in *label_fmt* is
 used to format the output.
 
 
+.. _timeit example:
+
+Timeit Example
+--------------
+
+A Python module that benefits from *QuantiPhy* is *timeit*, a package in the 
+standard library that runs a code snippet a number of times and prints the 
+elapsed time for the test. However, from a usability perspective it has several 
+issues. First, it prints out the elapsed time of all the repetitions rather than 
+dividing the elapsed time by the number of repetitions and reporting the average 
+time per operation.  So it can quickly allow you to compare the relative speed 
+of various operations, but it does not directly give you a sense of the time 
+required in absolute terms. Second, it does not label its output, so it is not 
+clear what is being displayed.  Here is an example where *timeit* has been 
+fortified with *QuantiPhy* to make the output more readable.  To make it more 
+interesting, the timing results are run on *QuantiPhy* itself.  The results give 
+you a feel for how much slower *QuantiPhy* is to both convert strings to 
+quantities and quantities to strings compared into the built-in float class.
+
+.. code-block:: python
+
+    from quantiphy import Quantity
+    from timeit import timeit
+
+    # preferences
+    trials = 100_000
+    Quantity.set_prefs(label_fmt=('{V:20} {d}', '{n} = {v}:'))
+
+    # build the raw data, arrays of random numbers
+    from random import random, randint
+    from quantiphy import Quantity
+    s_numbers = []
+    s_quantities = []
+    numbers = []
+    quantities = []
+    for i in range(trials):
+        mantissa = 20*random()-10
+        exponent = randint(-35, 35)
+        number = '%0.25fe%s' % (mantissa, exponent)
+        quantity = number + ' Hz'
+        s_numbers.append(number)
+        s_quantities.append(quantity)
+        numbers.append(float(number))
+        quantities.append(Quantity(number, 'Hz'))
+
+    # define testcases
+    testcases = [
+        '[float(v) for v in s_numbers]',
+        '[Quantity(v) for v in s_quantities]',
+        '[str(v) for v in numbers]',
+        '[str(v) for v in quantities]',
+    ]
+
+    # run testcases and print results
+    for case in testcases:
+        elapsed = timeit(case, number=1, globals=globals())
+        per_op = Quantity(elapsed/trials, name='Time/op', units='s', desc=case)
+        print(f'{per_op:S}')
+
+The results are::
+
+    Time/op = 503.01 ns: [float(v) for v in s_numbers]
+    Time/op = 15.37 us:  [Quantity(v) for v in s_quantities]
+    Time/op = 1.009 us:  [str(v) for v in numbers]
+    Time/op = 23.221 us: [str(v) for v in quantities]
+
+You can see that *QuantiPhy* is considerably slower than the float class, which 
+you should be aware of if you are processing large quantities of numbers.
+
+Contrast this with the normal output from *timeit*::
+
+    0.05213119700783864
+    1.574107409993303
+    0.10471829099697061
+    2.3749650190002285
+
+The information is there, but just takes longer to make sense of it.
+
+
 .. _disk usage example:
 
 Disk Usage Example
