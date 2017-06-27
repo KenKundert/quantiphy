@@ -132,9 +132,9 @@ calculations on Quantities).
 :class:`quantiphy.Quantity` is used to convert a number string, such as '155.52 
 Mb/s' into an internal representation that includes the value and the units: 
 155.52e6 and 'b/s'.  The scaling factor is properly interpreted. Once a value is 
-converted to a Quantity, it can be treated just like a normal float. The main 
-difference occurs when it is time to convert it back to a string. When doing so, 
-the scale factor and units are included by default.
+converted to a *Quantity*, it can be treated just like a normal *float*. The 
+main difference occurs when it is time to convert it back to a string. When 
+doing so, the scale factor and units are included by default.
 
 
 .. _thermal voltage example:
@@ -143,7 +143,8 @@ Thermal Voltage Example
 -----------------------
 
 In this example, quantities are used to represent all of the values used to 
-compute the thermal voltage: *Vt = kT/q*.
+compute the thermal voltage: *Vt = kT/q*. It is not terribly useful, but does 
+demonstrate several of the features of *QuantiPhy*.
 
 .. code-block:: python
 
@@ -165,8 +166,8 @@ compute the thermal voltage: *Vt = kT/q*.
     Vt = 25.852 mV      # thermal voltage
 
 The first part of this example imports :class:`quantiphy.Quantity` and sets the 
-*label_fmt* preference to display both the value and the description when upper 
-case format codes are used. *label_fmt* is given as a tuple of two strings, the 
+*show_label* and *label_fmt* preferences to display both the value and the 
+description by default.  *label_fmt* is given as a tuple of two strings, the 
 first will be used when the description is present, the second is used when it 
 is not. In the first string, the ``{V:<16}`` is replaced by the expansion of the 
 second string, left justified with a field width of 16, and the ``{d}`` is 
@@ -179,13 +180,13 @@ temperature is given in Kelvin (K), and normally if the temperature were given
 as the string '300 K', the units would be confused for the scale factor. As 
 mentioned in :ref:`ambiguity` the 'K' would be treated as a scale factor unless 
 you took explicit steps. In this case, this issue is circumvented by specifying 
-the units in the model along with the name and description. The model is also 
-used when creating *Vt* to specify the name, units, and description.
+the units in the *model* along with the name and description. The *model* is 
+also used when creating *Vt* to specify the name, units, and description.
 
-The last part simply prints the four values. It uses the :S format specification 
-to indicated that the full quantity description should be printed. In this case, 
-since all the quantities have descriptions, the first string in *label_fmt* is 
-used to format the output.
+The last part simply prints the four values. The *show_label* preference is set, 
+so names and descriptions are printed along with the values. In this case, since 
+all the quantities have descriptions, the first string in *label_fmt* is used to 
+format the output.
 
 
 .. _timeit example:
@@ -214,7 +215,7 @@ quantities and quantities to strings compared into the built-in float class.
 
     # preferences
     trials = 100_000
-    Quantity.set_prefs(label_fmt=('{V:20} {d}', '{n} = {v}:'))
+    Quantity.set_prefs(show_label=True, label_fmt=('{V:20} {d}', '{n} = {v}:'))
 
     # build the raw data, arrays of random numbers
     from random import random, randint
@@ -242,17 +243,19 @@ quantities and quantities to strings compared into the built-in float class.
     ]
 
     # run testcases and print results
+    print('For {} iterations ...'.format(Quantity(trials)))
     for case in testcases:
         elapsed = timeit(case, number=1, globals=globals())
-        per_op = Quantity(elapsed/trials, name='Time/op', units='s', desc=case)
-        print(f'{per_op:S}')
+        per_op = Quantity(elapsed/trials, name='Time/Op', units='s', desc=case)
+        print(f'{per_op}')
 
 The results are::
 
-    Time/op = 503.01 ns: [float(v) for v in s_numbers]
-    Time/op = 15.37 us:  [Quantity(v) for v in s_quantities]
-    Time/op = 1.009 us:  [str(v) for v in numbers]
-    Time/op = 23.221 us: [str(v) for v in quantities]
+    For 100k iterations ...
+    Time/Op = 503.01 ns: [float(v) for v in s_numbers]
+    Time/Op = 15.37 us:  [Quantity(v) for v in s_quantities]
+    Time/Op = 1.009 us:  [str(v) for v in numbers]
+    Time/Op = 23.221 us: [str(v) for v in quantities]
 
 You can see that *QuantiPhy* is considerably slower than the float class, which 
 you should be aware of if you are processing large quantities of numbers.
@@ -272,10 +275,10 @@ The information is there, but just takes longer to make sense of it.
 Disk Usage Example
 ------------------
 
-Here is a simple example that uses *QuantiPhy*. It runs the *du* command, which 
-prints out the disk usage of files and directories.  The results from *du* are 
-gathered and then sorted by size and then the size and name of each item is 
-printed.
+Here is a simple example that uses *QuantiPhy* to clean up the output from the 
+Linux disk usage utility.  It runs the *du* command, which prints out the disk 
+usage of files and directories.  The results from *du* are gathered and then 
+sorted by size and then the size and name of each item is printed.
 
 Quantity is used to scale the filesize reported by *du* from KB to B. Then the 
 list of files is sorted by size. Here we are exploiting the fact that quantities 
@@ -312,6 +315,12 @@ presenting the results.
     except KeyboardInterrupt:
         display('dus: killed by user.')
 
+And here is an example of the programs output::
+
+    204 kB  quantiphy/doc
+    440 kB  quantiphy/examples/delta-sigma
+    464 kB  quantiphy/examples
+    1.6 MB  quantiphy
 
 .. _matplotlib example:
 
