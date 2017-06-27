@@ -247,7 +247,7 @@ quantities and quantities to strings compared into the built-in float class.
     for case in testcases:
         elapsed = timeit(case, number=1, globals=globals())
         per_op = Quantity(elapsed/trials, name='Time/Op', units='s', desc=case)
-        print(f'{per_op}')
+        print(per_op)
 
 The results are::
 
