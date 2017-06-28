@@ -16,15 +16,15 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 # Imports {{{1
-from __future__ import division, unicode_literals
-import re
-import math
+from __future__ import division
 try:
     from collections import ChainMap
 except ImportError:  # pragma: no cover
     from chainmap import ChainMap
-from contextlib import contextmanager
 from six import string_types, python_2_unicode_compatible
+import re
+import math
+import sys
 
 # Utilities {{{1
 # is_str {{{2
@@ -296,7 +296,7 @@ DEFAULTS = {
     'strip_dp': True,
     'unity_sf': '',
 }
-CURRENCY_SYMBOLS = '$£€'
+CURRENCY_SYMBOLS = '$£€' if sys.version_info.major == 3 else '$'
 
 
 # Quantity class {{{1
@@ -584,25 +584,33 @@ class Quantity(float):
         return cls._preferences[name]
 
     # preferences {{{3
+    # first create a context manager
+    class ContextManager:
+        def __init__(self, cls, kwargs):
+            self.cls = cls
+            self.kwargs = kwargs
+        def __enter__(self):
+            cls = self.cls
+            cls._initialize_preferences()
+            cls._preferences = cls._preferences.new_child()
+            cls.set_prefs(**self.kwargs)
+        def __exit__(self, *args):
+            self.cls._preferences = self.cls._preferences.parents
+
     @classmethod
-    @contextmanager
     def prefs(cls, **kwargs):
         """Set class preferences.
 
         This is just like :meth:`Quantity.set_prefs()`, except it is designed to
         work as a context manager. For example::
 
-            with Quantity.preferences(ignore_sf=True):
+            with Quantity.prefs(ignore_sf=True):
                 ...
 
         In this case the specified values are used within the *with* statement,
         and then return to their original values upon exit.
         """
-        cls._initialize_preferences()
-        cls._preferences = cls._preferences.new_child()
-        cls.set_prefs(**kwargs)
-        yield
-        cls._preferences = cls._preferences.parents
+        return cls.ContextManager(cls, kwargs)
 
     # get attribute {{{3
     def __getattr__(self, name):

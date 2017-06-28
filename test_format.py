@@ -1,6 +1,5 @@
 # encoding: utf8
 
-from __future__ import unicode_literals
 from quantiphy import Quantity
 import sys
 
@@ -56,22 +55,23 @@ def test_full_format():
 
 def test_scaled_format():
     Quantity.set_prefs(spacer=' ', label_fmt=None, prec=None)
-    q=Quantity('Tboil = 100 °C -- boiling point of water')
-    assert '{}'.format(q) == '100 °C'
-    assert '{:.8}'.format(q) == '100 °C'
-    assert '{:.8s°F}'.format(q) == '212 °F'
-    assert '{:.8S°F}'.format(q) == 'Tboil = 212 °F'
-    assert '{:.8q°F}'.format(q) == '212 °F'
-    assert '{:.8Q°F}'.format(q) == 'Tboil = 212 °F'
-    assert '{:r°F}'.format(q) == '212'
-    assert '{:R°F}'.format(q) == 'Tboil = 212'
-    assert '{:u°F}'.format(q) == '°F'
-    assert '{:f°F}'.format(q) == '212.0000'
-    assert '{:F°F}'.format(q) == 'Tboil = 212.0000'
-    assert '{:e°F}'.format(q) == '2.1200e+02'
-    assert '{:E°F}'.format(q) == 'Tboil = 2.1200e+02'
-    assert '{:g°F}'.format(q) == '212'
-    assert '{:G°F}'.format(q) == 'Tboil = 212'
-    assert '{:n°F}'.format(q) == 'Tboil'
-    assert '{:d°F}'.format(q) == 'boiling point of water'
-    assert '{:X°F}'.format(q) == '100 °C'
+    if sys.version_info.major == 3:
+        q=Quantity('Tboil = 100 °C -- boiling point of water')
+        assert '{}'.format(q) == '100 °C'
+        assert '{:.8}'.format(q) == '100 °C'
+        assert '{:.8s°F}'.format(q) == '212 °F'
+        assert '{:.8S°F}'.format(q) == 'Tboil = 212 °F'
+        assert '{:.8q°F}'.format(q) == '212 °F'
+        assert '{:.8Q°F}'.format(q) == 'Tboil = 212 °F'
+        assert '{:r°F}'.format(q) == '212'
+        assert '{:R°F}'.format(q) == 'Tboil = 212'
+        assert '{:u°F}'.format(q) == '°F'
+        assert '{:f°F}'.format(q) == '212.0000'
+        assert '{:F°F}'.format(q) == 'Tboil = 212.0000'
+        assert '{:e°F}'.format(q) == '2.1200e+02'
+        assert '{:E°F}'.format(q) == 'Tboil = 2.1200e+02'
+        assert '{:g°F}'.format(q) == '212'
+        assert '{:G°F}'.format(q) == 'Tboil = 212'
+        assert '{:n°F}'.format(q) == 'Tboil'
+        assert '{:d°F}'.format(q) == 'boiling point of water'
+        assert '{:X°F}'.format(q) == '100 °C'

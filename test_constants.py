@@ -1,6 +1,5 @@
 # encoding: utf8
 
-from __future__ import unicode_literals
 from quantiphy import Quantity, add_constant, set_unit_system
 import pytest
 

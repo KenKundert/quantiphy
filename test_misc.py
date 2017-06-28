@@ -1,6 +1,5 @@
 # encoding: utf8
 
-from __future__ import unicode_literals
 from quantiphy import Quantity, add_constant
 import pytest
 import sys
@@ -69,7 +68,6 @@ def test_misc():
         q = Foo('%')
     with pytest.raises(KeyError):
         Foo.set_prefs(assign_rec=r'(\w+)\s*=\s*(.*)') # no named groups
-        print(Foo.get_pref('assign_rec'))
         Foo('seven = 7')
 
     assert Foo.get_pref('prec') == 4
@@ -187,7 +185,6 @@ def test_misc():
         assert Foo.get_pref('map_sf') == Foo.map_sf_to_sci_notation
         assert Quantity.get_pref('map_sf') == {}
 
-    print(Quantity.get_pref('map_sf'))
     Quantity.set_prefs(label_fmt=('{V:<18}  # {d}', '{n} = {v}'))
     T = Quantity('T = 300K -- ambient temperature', ignore_sf=True)
     k = Quantity('k')
@@ -243,12 +240,13 @@ def test_misc():
     Quantity.set_prefs(input_sf=None, unity_sf=None, spacer=None)
 
     # test map_sf
-    Quantity.set_prefs(map_sf=Quantity.map_sf_to_greek)
-    assert Quantity('10e-6 m').render() == '10 μm'
-    Quantity.set_prefs(map_sf=Quantity.map_sf_to_sci_notation)
-    assert Quantity('10e-6 m').render() == '10 μm'
-    assert Quantity('10e-6 m').render(show_si=False) == '10×10⁻⁶ m'
-    Quantity.set_prefs(map_sf=None)
+    if sys.version_info.major == 3:
+        Quantity.set_prefs(map_sf=Quantity.map_sf_to_greek)
+        assert Quantity('10e-6 m').render() == '10 μm'
+        Quantity.set_prefs(map_sf=Quantity.map_sf_to_sci_notation)
+        assert Quantity('10e-6 m').render() == '10 μm'
+        assert Quantity('10e-6 m').render(show_si=False) == '10×10⁻⁶ m'
+        Quantity.set_prefs(map_sf=None)
 
     # test set_prefs error handling
     with pytest.raises(KeyError):
