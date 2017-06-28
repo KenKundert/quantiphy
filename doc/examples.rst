@@ -150,8 +150,10 @@ demonstrate several of the features of *QuantiPhy*.
 
     >>> from quantiphy import Quantity
     >>> Quantity.set_prefs(
-    ...     show_label=True,
-    ...     label_fmt=('{V:<18}  # {d}', '{n} = {v}')
+    ...     show_label = True,
+    ...     show_desc = True,
+    ...     label_fmt = '{n} = {v}',
+    ...     label_fmt_full = '{V:<18}  # {d}',
     ... )
 
     >>> T = Quantity(300, 'T K ambient temperature')
@@ -215,7 +217,12 @@ quantities and quantities to strings compared into the built-in float class.
 
     # preferences
     trials = 100_000
-    Quantity.set_prefs(show_label=True, label_fmt=('{V:20} {d}', '{n} = {v}:'))
+    Quantity.set_prefs(
+        show_label = True,
+        show_desc = True,
+        label_fmt = '{n} = {v}:',
+        label_fmt_full = '{V:20} {d}',
+    )
 
     # build the raw data, arrays of random numbers
     from random import random, randint

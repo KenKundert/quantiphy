@@ -285,10 +285,12 @@ DEFAULTS = {
     'keep_components': True,
     'known_units': [],
     'label_fmt': '{n} = {v}',
+    'label_fmt_full': '{n} = {v} -- {d}',
     'map_sf': {},
     'output_sf': 'TGMkmunpfa',
     'prec': 4,
     'reltol': 1e-6,
+    'show_desc': False,
     'show_label': False,
     'show_si': True,
     'show_units': True,
@@ -466,27 +468,37 @@ class Quantity(float):
         :type known_units: list or string
 
         :param label_fmt:
-            Format string when label is requested.  Is passed through string
-            .format() method. Format string takes three possible arguments named
-            *n*, *q*, and *d* for the name, value and description.  A typical
-            value is::
+            Format string used when label is requested if the quantity does not
+            have a description or if the description was not requested (if
+            *show_desc* is False).  Is passed through string .format() method.
+            Format string takes two possible arguments named *n* and *v*
+            for the name and value.  A typical values include::
 
-                '{n} = {v}'
+                '{n} = {v}'    (default)
+                '{n}: {v}'
+        :type label_fmt: string
 
-            You can also pass two format strings as a tuple, The first is used
-            if the description is present, otherwise second is used (the second 
-            should not contain the *d* argument).  For example::
+        :param label_fmt_full:
+            Format string used when label is requested if the quantity 
+            has a description and the description was requested (if
+            *show_desc* is True).  Is passed through string .format() method.
+            Format string takes four possible arguments named *n*, *v*, *d* and *V*
+            for the name, value, description, and value as formatted by *label_fmt*.
+            Typical value include::
 
-                ('{n} = {v} -- {d}', '{n} = {v}')
+                '{n} = {v} --  {d}'    (default)
+                '{n} = {v} # {d}'
+                '{n} = {v} // {d}'
+                '{n}: {v} -- {d}'
+                '{V} -- {d}'
+                '{V:<20}  # {d}'
 
-            When given as a tuple, there is an additional argument available: 
-            *V*.  It should only be used in the first format string and is the 
-            quantity formatted with the second string. It is helpful because any 
-            argument formatting is applied to the combination, which gives you 
-            a way line up the descriptions::
-
-                ('{V:<16}  # {d}', '{n}: {v}')
-        :type label_fmt: string or tuple
+            The last example shows the *V* argument with alignment and width
+            modifiers.  In this case the modifiers apply to the name and value
+            after being they are combined with the *label_fmt*. This is
+            typically done when printing several quantities, one per line,
+            because it allows you to line up the descriptions.
+        :type label_fmt_full: string
 
         :param map_sf:
             Use this to change the way individual scale factors are rendered,
@@ -513,10 +525,22 @@ class Quantity(float):
             determining equivalence.  Default is 1μ.
         :type reltol: float
 
+        :param show_desc:
+            Whether the description should be shown if it is available when
+            showing the label.  By default *show_desc* is False.
+        :type show_desc: boolean
+
         :param show_label:
-            Cause render() to add name and description by default if they are
-            available.  By default this is False.
-        :type show_label: boolean
+            Add the name and possibly the description when rendering a quantity
+            to a string.  Either *label_fmt* or *label_fmt_full* is used to
+            label the quantity.
+
+            - Neither is used if *show_label* is False,
+            - otherwise *label_fmt* is used if quantity does not have a
+              description or if *show_label* is 'a' (short for abbreviated),
+            - otherwise *label_fmt_full* is used if *show_desc* is True or
+              *show_label* is 'f' (short for full).
+        :type show_label: 'f', 'a', or boolean
 
         :param show_si:
             Use SI scale factors by default.
@@ -597,12 +621,14 @@ class Quantity(float):
         def __exit__(self, *args):
             self.cls._preferences = self.cls._preferences.parents
 
+    # now, return the context manager
     @classmethod
     def prefs(cls, **kwargs):
         """Set class preferences.
 
         This is just like :meth:`Quantity.set_prefs()`, except it is designed to
-        work as a context manager. For example::
+        work as a context manager, meaning that it is meant to be used with
+        Python's *with* statement. For example::
 
             with Quantity.prefs(ignore_sf=True):
                 ...
@@ -618,6 +644,19 @@ class Quantity(float):
             return self.get_pref(name)
         except KeyError:
             raise AttributeError(name)
+
+    # label formatter {{{3
+    def _label(self, value, show_label):
+        show_label = self.show_label if show_label is None else show_label
+        if not show_label or not self.name:
+            return value
+        Value = value
+        if self.desc and show_label != 'a' and (show_label == 'f' or self.show_desc):
+            Value = self.label_fmt.format(n=self.name, v=value)
+            label_fmt = self.label_fmt_full
+        else:
+            label_fmt = self.label_fmt
+        return label_fmt.format(n=self.name, v=value, d=self.desc, V=Value)
 
     # recognizers {{{2
     @classmethod
@@ -949,9 +988,16 @@ class Quantity(float):
         :type prec: integer or 'full'
 
         :param show_label:
-            Whether *label_fmt* should be used to include name and perhaps
-            description in string.
-        :type show_label: boolean
+            Add the name and possibly the description when rendering a quantity
+            to a string.  Either *label_fmt* or *label_fmt_full* is used to
+            label the quantity.
+
+            - neither is used if *show_label* is False,
+            - otherwise *label_fmt* is used if quantity does not have a
+              description or if *show_label* is 'a' (short for abbreviated),
+            - otherwise *label_fmt_full* is used if *show_desc* is True or
+              *show_label* is 'f' (short for full).
+        :type show_label: 'f', 'a', or boolean
 
         :param scale:
             - If a float, it scales the displayed value (the quantity is
@@ -971,23 +1017,6 @@ class Quantity(float):
         no corresponding unit converter.
         """
 
-
-        use_fmt = self.show_label if show_label is None else show_label
-        if use_fmt and self.label_fmt and self.name:
-            def format(value):
-                Value = value
-                if is_str(self.label_fmt):
-                    label_fmt = self.label_fmt
-                elif self.desc:
-                    label_fmt = self.label_fmt[0]
-                    if '{V' in label_fmt:
-                        Value = self.label_fmt[1].format(n=self.name, v=value)
-                else:
-                    label_fmt = self.label_fmt[1]
-                return label_fmt.format(n=self.name, v=value, d=self.desc, V=Value)
-        else:
-            format = lambda x: x
-
         # initialize units and si
         show_units = self.show_units if show_units is None else show_units
         units = self.units if show_units else ''
@@ -995,7 +1024,8 @@ class Quantity(float):
 
         # check for infinities or NaN
         if self.is_infinite() or self.is_nan():
-            return format(_combine(str(self.real), '', units, ' '))
+            value = _combine(str(self.real), '', units, ' ')
+            return self._label(value, show_label)
 
         # convert into scientific notation with proper precision
         if prec is None:
@@ -1113,7 +1143,8 @@ class Quantity(float):
             if mantissa[-1] == '.':
                 mantissa += '0'
 
-        return format(_combine(mantissa, sf, units, self.spacer))
+        value =  _combine(mantissa, sf, units, self.spacer)
+        return self._label(value, show_label)
 
     # is_close() {{{2
     def is_close(self, other, reltol=None, abstol=None, check_units=True):
@@ -1254,18 +1285,7 @@ class Quantity(float):
                     prec += 1
                 value = '{0:.{1}{2}}'.format(value, prec, ftype.lower())
                 if ftype.isupper():
-                    Value = value
-                    name = getattr(self, 'name', '')
-                    desc = getattr(self, 'desc', '')
-                    if is_str(self.label_fmt):
-                        label_fmt = self.label_fmt
-                    elif desc:
-                        label_fmt = self.label_fmt[0]
-                        if name and '{V' in label_fmt:
-                            Value = self.label_fmt[1].format(n=name, v=value)
-                    else:
-                        label_fmt = self.label_fmt[1]
-                    value = label_fmt.format(n=name, v=value, d=desc, V=Value)
+                    value = self._label(value, True)
             return '{0:{1}{2}s}'.format(value, align, width)
         else:
             # unrecognized format, just provide something reasonable

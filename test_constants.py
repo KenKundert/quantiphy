@@ -4,7 +4,8 @@ from quantiphy import Quantity, add_constant, set_unit_system
 import pytest
 
 def test_constants():
-    Quantity.set_prefs(spacer=' ', label_fmt='{n} = {v} -- {d}')
+    Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None)
+    Quantity.set_prefs(show_desc=True)
     assert '{:.12q}'.format(Quantity('h')) == '662.607004e-36 J-s'
     assert '{:.12q}'.format(Quantity('hbar')) == '105.45718e-36 J-s'
     assert '{:.12q}'.format(Quantity('ħ')) == '105.45718e-36 J-s'

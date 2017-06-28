@@ -33,3 +33,6 @@ Releases
     - changed name of preference methods:
       set_preferences -> set_prefs, get_preference -> get_pref
     - added Quantity.prefs() (preferences context manager)
+    - split label_fmt preference into two: label_fmt and label_fmt_full
+    - added show_desc preference
+    - allow show_label to be either 'a' or 'f' as well True or False

@@ -292,6 +292,7 @@ test_cases = [
 
 names = set()
 def test_number_recognition():
+    Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None)
     for case in test_cases:
         if not case:
             continue

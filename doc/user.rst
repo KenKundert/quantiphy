@@ -476,6 +476,38 @@ to a string. For example:
     >>> h_line.render(show_si=False)
     '1.4204e9 Hz'
 
+    >>> h_line.render(show_units=False)
+    '1.4204G'
+
+    >>> h_line.render(show_si=False, show_units=False)
+    '1.4204e9'
+
+*show_label* allows you to display the name and description of the quantity when 
+rendering. If *show_label* is *False*, the quantity is not labeled with the name 
+or description. Otherwise the quantity is labeled under the control of the 
+*show_label* value and the *show_desc*, *label_fmt* and *label_fmt_full*  
+preferences (described further in :ref:`preferences` and 
+:meth:`quantiphy.Quantity.set_prefs()`).  If *show_label* is 'a' (for 
+abbreviated) or if the quantity has no description, *label_fmt* is used to label 
+the quantity with its name.  If *show_label* is 'f' (for full), *label_fmt_full* 
+is used to label the quantity with its name and description.  Otherwise 
+*label_fmt_full* is used if *show_desc* is True and *label_fmt* otherwise.
+
+.. code-block:: python
+
+    >>> freq.render(show_label=True)
+    'Fin = 100 MHz'
+
+    >>> freq.render(show_label='f')
+    'Fin = 100 MHz -- input frequency'
+
+    >>> Quantity.set_prefs(show_desc=True)
+    >>> freq.render(show_label=True)
+    'Fin = 100 MHz -- input frequency'
+
+    >>> freq.render(show_label='a')
+    'Fin = 100 MHz'
+
 You can also access the full precision of the quantity:
 
 .. code-block:: python
@@ -632,12 +664,18 @@ Access the name or description of the quantity using 'n' and 'd'.
     input frequency
 
 Using the upper case versions of the format codes that print the numerical value 
-of the quantity (SQRFEG) to indicate that the name and perhaps description 
-should be included as well (as if the *show_label* preference were set). They 
-are under the control of the *label_fmt* preference.
+of the quantity (SQRFEG) indicates that the quantity should be labeled with its 
+name and perhaps its description (as if the *show_label* preference were set). 
+They are under the control of the *show_desc*, *label_fmt* and *label_fmt_full*  
+preferences (described further in :ref:`preferences` and 
+:meth:`quantiphy.Quantity.set_prefs()`).
+
+If *show_desc* is False or the quantity does not have a description, then 
+*label_fmtl* use used to add the labeling.
 
 .. code-block:: python
 
+    >>> Quantity.set_prefs(show_desc=False)
     >>> trise = Quantity('10ns', name='trise')
 
     >>> print('{:S}'.format(trise))
@@ -664,13 +702,12 @@ are under the control of the *label_fmt* preference.
     >>> print('{:S}'.format(freq))
     Fin = 100 MHz
 
-By default, *label_fmt* does not display the description. When changing this, 
-one often supplies two values as a tuple to *label_fmt*, in which case the first 
-is used if there is a description and the second used otherwise.
+If *show_desc* is True and the quantity has a description, then *label_fmt_full* 
+is used if the quantity has a description.
 
 .. code-block:: python
 
-    >>> Quantity.set_prefs(label_fmt=('{n} = {v} -- {d}', '{n} = {v}'))
+    >>> Quantity.set_prefs(show_desc=True)
 
     >>> print('{:S}'.format(trise))
     trise = 10 ns
@@ -1031,8 +1068,9 @@ return them in a dictionary.  For example:
     >>> quantities = Quantity.extract(design_parameters)
 
     >>> Quantity.set_prefs(
-    ...     label_fmt=('{V:<18}  # {d}', '{n} = {v}'),
-    ...     show_label=True
+    ...     label_fmt='{n} = {v}',
+    ...     label_fmt_full='{V:<18}  # {d}',
+    ...     show_label='f',
     ... )
     >>> for q in quantities.values():
     ...     print(q)
@@ -1088,8 +1126,9 @@ a version that displays the name and description by default.
     >>> from inform import os_error, fatal, display
 
     >>> class VerboseQuantity(Quantity):
-    ...    show_label = True
-    ...    label_fmt = ('{V:<18} -- {d}', '{n} = {v}')
+    ...    show_label = 'f'
+    ...    label_fmt = '{n} = {v}'
+    ...    label_fmt_full = '{V:<18} -- {d}'
 
     >>> filename = 'parameters'
     >>> try:

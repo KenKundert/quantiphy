@@ -6,7 +6,7 @@ import sys
 import pytest
 
 def test_simple_scaling():
-    Quantity.set_prefs(spacer=' ', label_fmt=None)
+    Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None)
     q=Quantity('1kg')
     assert q.render() == '1 kg'
     assert q.render(scale=0.001, show_units=False) == '1'
@@ -32,7 +32,8 @@ def test_simple_scaling():
     assert q.render(scale=dB) == '-40 dBV'
 
 def test_temperature():
-    Quantity.set_prefs(spacer=' ', label_fmt=None, ignore_sf=True)
+    Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None)
+    Quantity.set_prefs(ignore_sf=True)
     if sys.version_info.major == 3:
         q=Quantity('100 °C')
         assert q.render() == '100 °C'
@@ -108,7 +109,8 @@ def test_temperature():
     assert q.render() == '273.15 K'
 
 def test_distance():
-    Quantity.set_prefs(spacer=' ', label_fmt=None, ignore_sf=False)
+    Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None)
+    Quantity.set_prefs(ignore_sf=False)
     q=Quantity('1_m')
     assert q.render() == '1 m'
     assert q.render(scale='cm', show_si=False) == '100 cm'
@@ -177,7 +179,8 @@ def test_distance():
     assert q.render() == '149.67 Gm'
 
 def test_mass():
-    Quantity.set_prefs(spacer=' ', label_fmt=None, ignore_sf=False)
+    Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None)
+    Quantity.set_prefs(ignore_sf=False)
     q=Quantity('1 g')
     assert q.render() == '1 g'
     assert q.render(scale='oz') == '35.274 moz'
@@ -194,7 +197,8 @@ def test_mass():
     assert q.render() == '453.59 g'
 
 def test_time():
-    Quantity.set_prefs(spacer=' ', label_fmt=None, ignore_sf=True)
+    Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None)
+    Quantity.set_prefs(ignore_sf=True)
     q=Quantity('86400 s')
     assert q.render() == '86.4 ks'
     assert q.render(scale='sec') == '86.4 ksec'
