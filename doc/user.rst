@@ -153,6 +153,8 @@ the following ways can be used to specify 1ns:
 Currency units ($£€) are a bit different than other units, they are placed 
 at the front of the quantity.
 
+.. code-block:: python
+
     >>> print(Quantity('$11_200_000'))
     $11.2M
 
@@ -934,7 +936,7 @@ undesired.
 
 To retrieve a preference, use the :meth:`quantiphy.Quantity.get_pref` class 
 method. This is useful with *known_units*. Normally setting *known_units* 
-overrides the existing units. You can simply add more with::
+overrides the existing units. You can simply add more with:
 
 .. code-block:: python
 
