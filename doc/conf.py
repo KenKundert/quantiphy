@@ -48,7 +48,7 @@ copyright = u'2017, Ken Kundert'
 # built documents.
 #
 # The full version, including alpha/beta/rc tags.
-release = '1.3.12'
+release = '1.3.13'
 # The short X.Y version.
 version = '.'.join(release.split('.')[0:2])
 
