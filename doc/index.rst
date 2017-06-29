@@ -3,9 +3,10 @@ QuantiPhy: Physical Quantities
 
 | Version: 1.3.12
 | Released: 2017-06-28
-| Please report all bugs and suggestions to
-  `quantiphy@nurdletech.com <mailto://quantiphy@nurdletech.com>`_ or
-  `Github <https://github.com/KenKundert/quantiphy>`_.
+| Please post all bugs and suggestions at
+  `Github <https://github.com/KenKundert/quantiphy/issues>`_
+  (or contact me directly at
+  `quantiphy@nurdletech.com <mailto://quantiphy@nurdletech.com>`_).
 
 
 What?

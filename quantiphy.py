@@ -151,6 +151,8 @@ UnitConversion('s', 'min', 60)
 UnitConversion('s', 'hr hour', 3600)
 UnitConversion('s', 'day', 86400)
 
+# Bit conversions {{{2
+UnitConversion('b', 'B', 8)
 
 # Constants {{{1
 #  set_unit_system {{{2

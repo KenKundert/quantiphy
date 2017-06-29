@@ -158,7 +158,7 @@ at the front of the quantity.
     >>> print(Quantity('$11_200_000'))
     $11.2M
 
-    >>> print(Quantity(11.2e6 '$'))
+    >>> print(Quantity(11.2e6, '$'))
     $11.2M
 
 When given as a string, the number may use any of the following scale factors 
@@ -338,6 +338,7 @@ C, °C: K, C, °C, F, °F, R, °R
 m:     km, m, cm, mm, um, μm, micron, nm, Å, angstrom, mi, mile, miles
 g:     oz, lb, lbs
 s:     s, sec, min, hour, hr , day
+b:     B
 ====== ===============================================================
 
 You can also create your own converters using :class:`quantiphy.UnitConversion`:

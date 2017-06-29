@@ -55,7 +55,7 @@ make the table easier to interpret:
 
     >>> table3 = """
     ...     SDH     | Rate (Mb/s)   | f1 (kHz)| f2 (kHz) | f3 (kHz)| f4 (MHz)
-    ...     --------+---------------+---------+----------+---------+--------
+    ...     --------+---------------+---------+----------+---------+---------
     ...     STM-1   | 155.52        | 0.5     | 6.5      | 65      | 1.3
     ...     STM-4   | 622.08        | 1       | 2.5      | 250     | 5
     ...     STM-16  | 2488.32       | 5       | 100      | 1000    | 20
@@ -135,6 +135,56 @@ Mb/s' into an internal representation that includes the value and the units:
 converted to a *Quantity*, it can be treated just like a normal *float*. The 
 main difference occurs when it is time to convert it back to a string. When 
 doing so, the scale factor and units are included by default.
+
+
+.. _dram:
+
+DRAM Prices
+-----------
+
+Here is a table that was found on the Internet that gives the number of bits of 
+dynamic RAM a dollar would purchase over time:
+
+.. code-block:: python
+
+    >>> bits_per_dollar = '''
+    ...    1973 490
+    ...    1978 2780
+    ...    1983 16400
+    ...    1988 91800
+    ...    1993 368000
+    ...    1998 4900000
+    ...    2003 26300000
+    ...    2008 143000000
+    ...    2013 833000000
+    ...    2018 5000000000
+    ... '''
+
+It is pretty easy to read in the early years, but by the turn of the millennium 
+you have to start counting the zeros by hand to understand the number.  And are 
+those bits or bytes?  Reformatting with *QuantiPhy* makes it much more readable:
+
+.. code-block:: python
+
+    >>> for line in bits_per_dollar.strip().split('\n'):
+    ...     year, bits = line.split()
+    ...     bits = Quantity(bits, 'b')
+    ...     print(f'{year}    {bits:7q}    {bits:qB}')
+    1973    490 b      61.25 B
+    1978    2.78 kb    347.5 B
+    1983    16.4 kb    2.05 kB
+    1988    91.8 kb    11.475 kB
+    1993    368 kb     46 kB
+    1998    4.9 Mb     612.5 kB
+    2003    26.3 Mb    3.2875 MB
+    2008    143 Mb     17.875 MB
+    2013    833 Mb     104.12 MB
+    2018    5 Gb       625 MB
+
+Notice that *bits* was printed twice. The first time the formatting code 
+included a width specification, but in the second the desired unit of measure 
+was specified (*B*), which caused the underlying value to be converted from bits 
+to bytes.
 
 
 .. _thermal voltage example:
