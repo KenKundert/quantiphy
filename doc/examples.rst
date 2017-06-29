@@ -365,7 +365,7 @@ presenting the results.
         files.sort(key=lambda x: x[0])
 
         for each in files:
-            display(*each, sep='\t')
+            display('{:>7.2s}  {}'.format(*each))
 
     except OSError as err:
         fatal(os_error(err))
@@ -374,10 +374,10 @@ presenting the results.
 
 And here is an example of the programs output::
 
-    204 kB  quantiphy/doc
-    440 kB  quantiphy/examples/delta-sigma
-    464 kB  quantiphy/examples
-    1.6 MB  quantiphy
+     460 kB  quantiphy/examples/delta-sigma
+     464 kB  quantiphy/examples
+    1.54 kB  quantiphy/doc
+    3.48 MB  quantiphy
 
 .. _matplotlib example:
 
