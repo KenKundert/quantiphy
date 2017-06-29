@@ -18,7 +18,7 @@ the units if you live in the UK and assume that she was an adult, or you might
 assume kilograms if you lived anywhere else and assume she was a small child.
 The units are very important, and in general it is always best to keep the unit 
 of measure with the number and present the complete value when working with 
-quantities. To do otherwise invites confusion.  Users often stumble on numbers 
+quantities. To do otherwise invites confusion.  Readers often stumble on numbers 
 without units as they mentally try to determine the units from context.  
 Quantity values should be treated in a manner similar to money, which is also 
 a quantity. Monetary amounts are almost always given with their units (a 
@@ -31,16 +31,16 @@ provide another important benefit.  They naturally support the SI scale factors,
 which for those that are familiar with them are much easer to read and write 
 than the alternatives. The most common SI scale factors are:
 
-    |   T (10\ :sup:`12`)
-    |   G (10\ :sup:`9`)
-    |   M (10\ :sup:`6`)
-    |   k (10\ :sup:`3`)
-    |   m (10\ :sup:`-3`)
-    |   μ (10\ :sup:`-6`)
-    |   n (10\ :sup:`-9`)
-    |   p (10\ :sup:`-12`)
-    |   f (10\ :sup:`-15`)
-    |   a (10\ :sup:`-18`)
+    |   T (10\ :sup:`12`) tera
+    |   G (10\ :sup:`9`) giga
+    |   M (10\ :sup:`6`) mega
+    |   k (10\ :sup:`3`) kilo
+    |   m (10\ :sup:`-3`) milli
+    |   μ (10\ :sup:`-6`) micro
+    |   n (10\ :sup:`-9`) nano
+    |   p (10\ :sup:`-12`) pico
+    |   f (10\ :sup:`-15`) fempto
+    |   a (10\ :sup:`-18`) atto
 
 Numbers with SI scale factors are commonly used in science and engineering
 to represent physical quantities because it is easy to read and write numbers
@@ -153,33 +153,34 @@ the following ways can be used to specify 1ns:
 Currency units ($£€) are a bit different than other units, they are placed 
 at the front of the quantity.
 
-    >>> period = Quantity('$11_200_000')
-    >>> print(period)
+    >>> print(Quantity('$11_200_000'))
+    $11.2M
+
+    >>> print(Quantity(11.2e6 '$'))
     $11.2M
 
 When given as a string, the number may use any of the following scale factors 
 (though you can use the *input_sf* preference to prune this list if desired):
 
-    |   Y (10\ :sup:`24`)
-    |   Z (10\ :sup:`21`)
-    |   E (10\ :sup:`18`)
-    |   P (10\ :sup:`15`)
-    |   T (10\ :sup:`12`)
-    |   G (10\ :sup:`9`)
-    |   M (10\ :sup:`6`)
-    |   k (10\ :sup:`3`)
+    |   Y (10\ :sup:`24`) yotta
+    |   Z (10\ :sup:`21`) zetta
+    |   E (10\ :sup:`18`) exa
+    |   P (10\ :sup:`15`) peta
+    |   T (10\ :sup:`12`) tera
+    |   G (10\ :sup:`9`) giga
+    |   M (10\ :sup:`6`) mega
+    |   k (10\ :sup:`3`) kilo
     |   _ (1)
-    |   c (10\ :sup:`-2`)
-    |   % (10\ :sup:`-2`)
-    |   m (10\ :sup:`-3`)
-    |   u (10\ :sup:`-6`)
-    |   μ (10\ :sup:`-6`)
-    |   n (10\ :sup:`-9`)
-    |   p (10\ :sup:`-12`)
-    |   f (10\ :sup:`-15`)
-    |   a (10\ :sup:`-18`)
-    |   z (10\ :sup:`-21`)
-    |   y (10\ :sup:`-24`)
+    |   c (10\ :sup:`-2`) centi
+    |   m (10\ :sup:`-3`) milli
+    |   u (10\ :sup:`-6`) micro
+    |   μ (10\ :sup:`-6`) micro
+    |   n (10\ :sup:`-9`) nano
+    |   p (10\ :sup:`-12`) pico
+    |   f (10\ :sup:`-15`) fempto
+    |   a (10\ :sup:`-18`) atto
+    |   z (10\ :sup:`-21`) zepto
+    |   y (10\ :sup:`-24`) yocto
 
 When specifying the value as a string you may also give a name and description, 
 and if you do they become available as the attributes *name* and *desc*.  This 
@@ -278,7 +279,7 @@ Quantities tend to be used primarily when reading and writing numbers, and less
 often when processing numbers.  Often data comes in an undesirable form. For 
 example, imagine data that has been normalized to kilograms but the numbers 
 themselves have neither units or scale factors.  *QuantiPhy* allows you to scale 
-tne number and assign the units when creating the quantity:
+the number and assign the units when creating the quantity:
 
 .. code-block:: python
 
@@ -444,22 +445,22 @@ a string:
 SI scale factors are used by default when converting numbers to strings. The 
 following scale factors could be used:
 
-    |   Y (10\ :sup:`24`)
-    |   Z (10\ :sup:`21`)
-    |   E (10\ :sup:`18`)
-    |   P (10\ :sup:`15`)
-    |   T (10\ :sup:`12`)
-    |   G (10\ :sup:`9`)
-    |   M (10\ :sup:`6`)
-    |   k (10\ :sup:`3`)
-    |   m (10\ :sup:`-3`)
-    |   u (10\ :sup:`-6`)
-    |   n (10\ :sup:`-9`)
-    |   p (10\ :sup:`-12`)
-    |   f (10\ :sup:`-15`)
-    |   a (10\ :sup:`-18`)
-    |   z (10\ :sup:`-21`)
-    |   y (10\ :sup:`-24`)
+    |   Y (10\ :sup:`24`) yotta
+    |   Z (10\ :sup:`21`) zetta
+    |   E (10\ :sup:`18`) exa
+    |   P (10\ :sup:`15`) peta
+    |   T (10\ :sup:`12`) tera
+    |   G (10\ :sup:`9`) giga
+    |   M (10\ :sup:`6`) mega
+    |   k (10\ :sup:`3`) kilo
+    |   m (10\ :sup:`-3`) milli
+    |   u (10\ :sup:`-6`) micro
+    |   n (10\ :sup:`-9`) nano
+    |   p (10\ :sup:`-12`) pico
+    |   f (10\ :sup:`-15`) fempto
+    |   a (10\ :sup:`-18`) atto
+    |   z (10\ :sup:`-21`) zepto
+    |   y (10\ :sup:`-24`) yocto
 
 However, only the scale factors listed in the *output_sf* preference are 
 actually used, and by default that is set to 'TGMkmunpfa', which avoids the more
@@ -481,6 +482,9 @@ to a string. For example:
 
     >>> h_line.render(show_si=False, show_units=False)
     '1.4204e9'
+
+    >>> h_line.render(prec=6)
+    '1.420406 GHz'
 
 *show_label* allows you to display the name and description of the quantity when 
 rendering. If *show_label* is *False*, the quantity is not labeled with the name 
@@ -507,6 +511,7 @@ is used to label the quantity with its name and description.  Otherwise
 
     >>> freq.render(show_label='a')
     'Fin = 100 MHz'
+
 
 You can also access the full precision of the quantity:
 
@@ -566,8 +571,8 @@ created to do the conversion simply based on the units:
     5.5755 lb
 
 In an earlier example the units of time and temperature data were converted to 
-normal SI units. Presumably this make processing easier. Now, when producing 
-output, the units can be converted back to the original units if desired:
+normal SI units. Presumably this makes processing easier. Now, when producing 
+the output, the units can be converted back to the original units if desired:
 
 .. code-block:: python
 
@@ -753,7 +758,7 @@ are built in:
 Name      MKS value              CGS value             Description
 ========  =====================  ===================== ==========================
 h         6.626070040e-34 J-s    6.626070040e-27 erg-s Plank's constant
-hbar, ħ   1.054571800e-34 J-s    1.054571800e-27 erg-s Reduces Plank's constant
+hbar, ħ   1.054571800e-34 J-s    1.054571800e-27 erg-s Reduced Plank's constant
 k         1.38064852e-23 J/K     1.38064852e-16 erg/K  Boltzmann's constant
 q         1.6021766208e-19 C     4.80320425e-10 Fr     elementary charge
 c         2.99792458e8 m/s       2.99792458e8 m/s      speed of light
@@ -903,6 +908,8 @@ not affect the subclass.
 You can also go the other way and override the preferences on a specific 
 quantity.
 
+.. code-block:: python
+
     >>> print(hy_wavelength)
     211.06 mm
 
@@ -914,6 +921,8 @@ This is often the way to go with quantities that have :index:`logarithmic units`
 such as decibels (:index:`dB`) or shannons (Sh) (or the related bit, digits, 
 nats, hartleys, etc.). In these cases use of SI scale factors is often 
 undesired.
+
+.. code-block:: python
 
     >>> gain = Quantity(0.25, 'dB')
     >>> print(gain)
@@ -927,12 +936,16 @@ To retrieve a preference, use the :meth:`quantiphy.Quantity.get_pref` class
 method. This is useful with *known_units*. Normally setting *known_units* 
 overrides the existing units. You can simply add more with::
 
+.. code-block:: python
+
     >>> Quantity.set_prefs(known_units=Quantity.get_pref('known_units') + ['K'])
 
 A variation on :meth:`quantiphy.Quantity.set_prefs` is 
 :meth:`quantiphy.Quantity.prefs`. It is basically the same, except that it is 
 meant to work with Python's *with* statement to temporarily override 
 preferences:
+
+.. code-block:: python
 
     >>> with Quantity.prefs(show_si=False, show_units=False):
     ...     for time, temp in data:
@@ -1111,7 +1124,7 @@ In this example the output of :meth:`quantiphy.Quantity.extract()` is added into
 the local names space.  This is an example of how simulation scripts could be 
 written. The system and simulation parameters would be gathered together at the 
 top into a multiline string, which would then be read and loaded into the local 
-name space. It allows you to quickly give a complete description to a collection 
+name space. It allows you to quickly give a complete description of a collection 
 of parameters when the goal is to put something together quickly in an 
 expressive manner.
 
