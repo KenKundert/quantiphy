@@ -77,6 +77,7 @@ def test_scaled_format():
         assert '{:n°F}'.format(q) == 'Tboil'
         assert '{:d°F}'.format(q) == 'boiling point of water'
         assert '{:X°F}'.format(q) == '100 °C'
+        assert '{!r}'.format(q) == "Quantity('100 °C')"
 
 def test_number_fmt():
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None, show_desc=False)

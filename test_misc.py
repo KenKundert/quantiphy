@@ -277,6 +277,17 @@ def test_misc():
         assert Quantity('10e-6 m').render() == '10 μm'
         assert Quantity('10e-6 m').render(show_si=False) == '10×10⁻⁶ m'
         Quantity.set_prefs(map_sf=None)
+    sf_map = {
+        'u': ' PPM',
+        'n': ' PPB',
+        'p': ' PPT',
+        'f': ' PPQ',
+    }
+    with Quantity.prefs(map_sf=sf_map):
+        assert Quantity('10e-6').render() == '10 PPM'
+        assert Quantity('1e-7').render() == '100 PPB'
+        assert Quantity('1e-12').render() == '1 PPT'
+        assert Quantity('1e-13').render() == '100 PPQ'
 
     # test set_prefs error handling
     with pytest.raises(KeyError):

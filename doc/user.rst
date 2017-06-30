@@ -910,10 +910,30 @@ naturally want different precisions:
     ...     frequencies.append((Temperature(temp, 'C'),  Frequency(freq, 'Hz')))
 
     >>> for temp, freq in frequencies:
-    ...     print(temp, freq)
-    -25C 999.988kHz
-    25C 1.00021MHz
-    75C 1.00178MHz
+    ...     print(f'{temp:>4s}  {freq}')
+    -25C  999.988kHz
+     25C  1.00021MHz
+     75C  1.00178MHz
+
+In this example, a subclass is created that is intended to report in 
+concentrations.
+
+.. code-block:: python
+
+    >>> class Concentration(Quantity):
+    ...     pass
+    >>> Concentration.set_prefs(
+    ...     map_sf = dict(u=' PPM', n= ' PPB', p=' PPT'),
+    ...     show_label = True,
+    ... )
+
+    >>> pollutants = dict(CO=5, SO2=20, NO2=0.10)
+    >>> concentrations = [Concentration(v, scale=1e-6, name=k) for k, v in pollutants.items()]
+    >>> for each in concentrations:
+    ...     print(each)
+    CO = 5 PPM
+    SO2 = 20 PPM
+    NO2 = 100 PPB
 
 When a subclass is created, the preferences active in the main class are copied 
 into the subclass. Subsequent changes to the preferences in the main class do 

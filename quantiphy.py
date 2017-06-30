@@ -714,7 +714,7 @@ class Quantity(float):
 
         # identify desired scale factors {{{3
         known_sf = ''.join(MAPPINGS)
-        if cls.get_pref('input_sf') is None:
+        if cls.get_pref('input_sf') is None: # pragma: no cover
             input_sf = known_sf
         else:
             input_sf = cls.get_pref('input_sf')
