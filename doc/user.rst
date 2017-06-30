@@ -1082,22 +1082,25 @@ Formatting Tabular Data
 -----------------------
 
 When creating tables it is often desirable to align the decimal points of the 
-numbers, and perhaps aligning the units. You can use the *number_fmt* to arrange 
+numbers, and perhaps align the units. You can use the *number_fmt* to arrange 
 this. *number_fmt* is a format string that if specified is used to convert the 
 components of a number into the final number. You can control the widths and 
-alignments of the components to implement specific alignments. This string is 
-passed to the string *format* function with named arguments. The arguments are 
-named *whole*, *frac* and *units*.  More information about the content of the 
-components can be found in :meth:`quantiphy.Quantity.set_prefs()`.
+alignments of the components to implement specific arrangements.  *number_fmt* 
+is passed to the string *format* function with named arguments: *whole*, *frac* 
+and *units*, which contains the integer part of the number, the fractional part 
+including the decimal point, and the units including the scale factor.  More 
+information about the content of the components can be found in 
+:meth:`quantiphy.Quantity.set_prefs()`.
 
 For example, you can align the decimal point and units of a column of numbers 
 like this:
 
 .. code-block:: python
 
-    >>> lengths = [Quantity(l.strip()) for l in '''
-    ...     1 mm, 10 mm, 100 mm, 1.234 mm, 12.34 mm, 123.4 mm
-    ... '''.split(',')]
+    >>> lengths = [
+    ...     Quantity(l)
+    ...     for l in '1mm, 10mm, 100mm, 1.234mm, 12.34mm, 123.4mm'.split(',')
+    ... ]
 
     >>> with Quantity.prefs(number_fmt='{whole:>3s}{frac:<4s} {units}'):
     ...     for l in lengths:
@@ -1110,8 +1113,8 @@ like this:
     123.4   mm
 
 You can also give a function as the value for *number_fmt* rather than a string.  
-It would be called *whole*, *frac* and *units* as arguments given in that order.  
-The function is expected to return the assembled number as a string. For 
+It would be called with *whole*, *frac* and *units* as arguments given in that 
+order.  The function is expected to return the assembled number as a string. For 
 example:
 
 .. code-block:: python
@@ -1149,7 +1152,7 @@ Quantity for each column that requires distinct formatting:
     >>> Frequency.set_prefs(prec=5, number_fmt = '{whole:>3s}{frac:<6s} {units}')
 
     >>> frequencies = []
-    >>> for each in '-25.3 999987.7, 25.1  1000207.1, 74.9  1001782.3'.split(','):
+    >>> for each in '-25.3 999987.7, 25.1 1000207.1, 74.9 1001782.3'.split(','):
     ...     temp, freq = each.split()
     ...     frequencies.append((Temperature(temp, 'C'),  Frequency(freq, 'Hz')))
 

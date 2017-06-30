@@ -490,23 +490,24 @@ class Quantity(float):
         :type map_sf: dictionary or function
 
         :param number_fmt:
-            Format string used to convert the components number into a string.
-            Normally this is not necessary. However, it can be used to perform
-            special formatting that is helpful when aligning numbers in tables.
-            It allows you to specify the widths and alignments of the individual
-            components. There are three named components: *whole*, *frac*, and
-            *units*.  *whole* contains the portion of the mantissa to the left
-            of the radix (decimal point). It is the whole mantissa if there is
-            no radix. It also includes the sign and the leading units (currency
-            symbols), if any. *frac* contains the radix and the fractional part.
-            It also contains the exponent if the number has one. *units*
-            contains the scale factor and units.  The following value can be
-            used to align both the radix and the units, and give the number a
-            fixed width:
+            Format string used to convert the components of the number into the
+            number itself.  Normally this is not necessary. However, it can be
+            used to perform special formatting that is helpful when aligning
+            numbers in tables.  It allows you to specify the widths and
+            alignments of the individual components. There are three named
+            components: *whole*, *frac*, and *units*.  *whole* contains the
+            portion of the mantissa to the left of the radix (decimal point). It
+            is the whole mantissa if there is no radix. It also includes the
+            sign and the leading units (currency symbols), if any. *frac*
+            contains the radix and the fractional part.  It also contains the
+            exponent if the number has one. *units* contains the scale factor
+            and units.  The following value can be used to align both the radix
+            and the units, and give the number a fixed width::
 
                 number_fmt = '{whole:>3s}{frac:<4s} {units:<3s}'
 
-            The various widths could be adjusted to fit a variety of needs.
+            The various widths and alignments could be adjusted to fit a variety
+            of needs.
 
             It is also possible to specify a function as *number_fmt*, in which
             case it is passed the three values in order (*whole*, *frac* and
@@ -517,7 +518,7 @@ class Quantity(float):
             Which scale factors to output, generally one would only use familiar
             scale factors. The default is 'TGMkmunpfa', which gets rid or the
             very large ('YZEP') and very small ('zy') scale factors that many
-            people do not recognize. 
+            people do not recognize.
         :type output_sf: string
 
         :param prec:
