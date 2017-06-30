@@ -32,27 +32,6 @@ def is_str(obj):
     # Identifies strings in all their various guises.
     return isinstance(obj, string_types)
 
-# _combine {{{2
-def _combine(mantissa, sf, units, spacer):
-    mantissa = mantissa.lstrip('+')
-    if units:
-        if units in CURRENCY_SYMBOLS:
-            # prefix the value with the units
-            if mantissa[0] == '-':
-                # if negative, the sign goes before the currency symbol
-                return '-' + units + mantissa[1:] + sf
-            else:
-                return units + mantissa + sf
-        else:
-            if sf in MAPPINGS:
-                # has a scale factor
-                return mantissa + spacer + sf + units
-            else:
-                # has an exponent
-                return mantissa + sf + spacer + units
-    else:
-        return mantissa + sf
-
 # _named_regex {{{2
 def named_regex(name, regex):
     return '(?P<%s>%s)' % (name, regex)
@@ -289,6 +268,7 @@ DEFAULTS = {
     'label_fmt': '{n} = {v}',
     'label_fmt_full': '{n} = {v} -- {d}',
     'map_sf': {},
+    'number_fmt': None,
     'output_sf': 'TGMkmunpfa',
     'prec': 4,
     'reltol': 1e-6,
@@ -297,7 +277,7 @@ DEFAULTS = {
     'show_si': True,
     'show_units': True,
     'spacer': ' ',
-    'strip_dp': True,
+    'strip_radix': True,
     'unity_sf': '',
 }
 CURRENCY_SYMBOLS = '$£€' if sys.version_info.major == 3 else '$'
@@ -509,6 +489,30 @@ class Quantity(float):
             and returns a string, the desired scale factor.
         :type map_sf: dictionary or function
 
+        :param number_fmt:
+            Format string used to convert the components number into a string.
+            Normally this is not necessary. However, it can be used to perform
+            special formatting that is helpful when aligning numbers in tables.
+            It allows you to specify the widths and alignments of the individual
+            components. There are three named components: *whole*, *frac*, and
+            *units*.  *whole* contains the portion of the mantissa to the left
+            of the radix (decimal point). It is the whole mantissa if there is
+            no radix. It also includes the sign and the leading units (currency
+            symbols), if any. *frac* contains the radix and the fractional part.
+            It also contains the exponent if the number has one. *units*
+            contains the scale factor and units.  The following value can be
+            used to align both the radix and the units, and give the number a
+            fixed width:
+
+                number_fmt = '{whole:>3s}{frac:<4s} {units:<3s}'
+
+            The various widths could be adjusted to fit a variety of needs.
+
+            It is also possible to specify a function as *number_fmt*, in which
+            case it is passed the three values in order (*whole*, *frac* and
+            *units*) and it expected to return the number as a string.
+        :type number_fmt: dictionary or function
+
         :param output_sf:
             Which scale factors to output, generally one would only use familiar
             scale factors. The default is 'TGMkmunpfa', which gets rid or the
@@ -557,10 +561,10 @@ class Quantity(float):
             parse.  You could also use a Unicode thin space.
         :type spacer: string
 
-        :param strip_dp:
-            When rendering, strip the decimal points from numbers even if they
+        :param strip_radix:
+            When rendering, strip the radix (decimal point) from numbers even if they
             can then be mistaken for integers. By default this is True.
-        :type strip_dp: boolean
+        :type strip_radix: boolean
 
         :param unity_sf:
             The output scale factor for unity, generally '' or '_'. The default
@@ -659,6 +663,48 @@ class Quantity(float):
         else:
             label_fmt = self.label_fmt
         return label_fmt.format(n=self.name, v=value, d=self.desc, V=Value)
+
+    # _combine {{{2
+    def _combine(self, mantissa, sf, units, spacer):
+        if self.number_fmt:
+            parts = mantissa.split('.')
+            whole_part = parts[0]
+            frac_part = ''.join(parts[1:])
+            if frac_part:
+                frac_part = '.' + frac_part
+            if units in CURRENCY_SYMBOLS:
+                if whole_part[0] == '-':
+                    whole_part = '-' + units + whole_part[1:]
+                else:
+                    whole_part = units + whole_part
+                units = ''
+            if sf not in MAPPINGS:
+                frac_part += sf
+                sf = ''
+            if callable(self.number_fmt):
+                return self.number_fmt(whole_part, frac_part, sf+units)
+            return self.number_fmt.format(
+                whole=whole_part, frac=frac_part, units=sf+units
+            )
+
+        mantissa = mantissa.lstrip('+')
+        if units:
+            if units in CURRENCY_SYMBOLS:
+                # prefix the value with the units
+                if mantissa[0] == '-':
+                    # if negative, the sign goes before the currency symbol
+                    return '-' + units + mantissa[1:] + sf
+                else:
+                    return units + mantissa + sf
+            else:
+                if sf in MAPPINGS:
+                    # has a scale factor
+                    return mantissa + spacer + sf + units
+                else:
+                    # has an exponent
+                    return mantissa + sf + spacer + units
+        else:
+            return mantissa + sf
 
     # recognizers {{{2
     @classmethod
@@ -1026,7 +1072,7 @@ class Quantity(float):
 
         # check for infinities or NaN
         if self.is_infinite() or self.is_nan():
-            value = _combine(str(self.real), '', units, ' ')
+            value = self._combine(str(self.real), '', units, ' ')
             return self._label(value, show_label)
 
         # convert into scientific notation with proper precision
@@ -1139,13 +1185,13 @@ class Quantity(float):
             mantissa = mantissa.rstrip("0")
 
         # remove trailing decimal point
-        if sf or show_units or self.strip_dp:
+        if sf or show_units or self.strip_radix:
             mantissa = mantissa.rstrip(".")
         else:
             if mantissa[-1] == '.':
                 mantissa += '0'
 
-        value =  _combine(mantissa, sf, units, self.spacer)
+        value =  self._combine(mantissa, sf, units, self.spacer)
         return self._label(value, show_label)
 
     # is_close() {{{2

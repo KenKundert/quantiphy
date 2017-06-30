@@ -36,3 +36,5 @@ Releases
     - split label_fmt preference into two: label_fmt and label_fmt_full
     - added show_desc preference
     - allow show_label to be either 'a' or 'f' as well True or False
+    - renamed strip_dp option to strip_radix
+    - added number_fmt option

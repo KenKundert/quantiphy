@@ -161,6 +161,17 @@ at the front of the quantity.
     >>> print(Quantity(11.2e6, '$'))
     $11.2M
 
+When using currency units, if the number has a sign, it should precede the 
+units:
+
+.. code-block:: python
+
+    >>> print(Quantity('-$11_200_000'))
+    -$11.2M
+
+    >>> print(Quantity(-11.2e6, '$'))
+    -$11.2M
+
 When given as a string, the number may use any of the following scale factors 
 (though you can use the *input_sf* preference to prune this list if desired):
 
@@ -1065,6 +1076,90 @@ specify *ignore_sf* for that specific conversion. The effect is the same either
 way, 'K' is interpreted as a unit rather than a scale factor.
 
 
+.. _tabular data:
+
+Formatting Tabular Data
+.......................
+
+When creating tables it is often desirable to align the decimal points of the 
+numbers, and perhaps aligning the units. You can use the *number_fmt* to arrange 
+this. *number_fmt* is a format string that if specified is used to convert the 
+components of a number into the final number. You can control the widths and 
+alignments of the components to implement specific alignments. This string is 
+passed to the string *format* function with named arguments. The arguments are 
+named *whole*, *frac* and *units*.  More information about the content of the 
+components can be found in :meth:`quantiphy.Quantity.set_prefs()`.
+
+For example, you can align the decimal point and units of a column of numbers 
+like this:
+
+.. code-block:: python
+
+    >>> lengths = [Quantity(l.strip()) for l in '''
+    ...     1 mm, 10 mm, 100 mm, 1.234 mm, 12.34 mm, 123.4 mm
+    ... '''.split(',')]
+
+    >>> with Quantity.prefs(number_fmt='{whole:>3s}{frac:<4s} {units}'):
+    ...     for l in lengths:
+    ...         print(l)
+      1     mm
+     10     mm
+    100     mm
+      1.234 mm
+     12.34  mm
+    123.4   mm
+
+You can also give a function as the value for *number_fmt* rather than a string.  
+It would be called *whole*, *frac* and *units* as arguments given in that order.  
+The function is expected to return the assembled number as a string. For 
+example:
+
+.. code-block:: python
+
+    >>> def fmt_num(whole, frac, units):
+    ...     return '{mantissa:<5s} {units}'.format(mantissa=whole+frac, units=units)
+
+    >>> with Quantity.prefs(number_fmt=fmt_num):
+    ...     for l in lengths:
+    ...         print(l)
+    1     mm
+    10    mm
+    100   mm
+    1.234 mm
+    12.34 mm
+    123.4 mm
+
+If there are multiple columns it might be necessary to apply a different format 
+to each column. In this case, it often makes sense to create a subclass of 
+Quantity for each column that requires distinct formatting:
+
+.. code-block:: python
+
+    >>> def format_temperature(whole, frac, units):
+    ...     return '{:>5s} {:<5s}'.format(whole+frac, units)
+
+    >>> class Temperature(Quantity):
+    ...     pass
+    >>> Temperature.set_prefs(
+    ...     prec = 1, known_units = 'K', number_fmt = format_temperature
+    ... )
+
+    >>> class Frequency(Quantity):
+    ...     pass
+    >>> Frequency.set_prefs(prec=5, number_fmt = '{whole:>3s}{frac:<6s} {units}')
+
+    >>> frequencies = []
+    >>> for each in '-25.3 999987.7, 25.1  1000207.1, 74.9  1001782.3'.split(','):
+    ...     temp, freq = each.split()
+    ...     frequencies.append((Temperature(temp, 'C'),  Frequency(freq, 'Hz')))
+
+    >>> for temp, freq in frequencies:
+    ...     print(temp, freq)
+      -25 C     999.988   kHz
+       25 C       1.00021 MHz
+       75 C       1.00178 MHz
+
+
 .. _extract:
 
 Extract Quantities
@@ -1263,6 +1358,16 @@ behavior can be overridden by specifying *check_units*.
 Exceptional Values
 ------------------
 
+*QuantiPhy* supports NaN (not a number) and infinite values:
+
+   >>> inf = Quantity('inf Hz')
+   >>> print(inf)
+   inf Hz
+
+   >>> nan = Quantity('NaN Hz')
+   >>> print(nan)
+   nan Hz
+
 You can test whether the value of the quantity is infinite or is not-a-number
 using :meth:`quantiphy.Quantity.is_infinite()` or 
 :meth:`quantiphy.Quantity.is_nan()`:
@@ -1272,8 +1377,14 @@ using :meth:`quantiphy.Quantity.is_infinite()` or
    >>> h_line.is_infinite()
    False
 
+   >>> inf.is_infinite()
+   True
+
    >>> h_line.is_nan()
    False
+
+   >>> nan.is_nan()
+   True
 
 
 .. _exceptions:

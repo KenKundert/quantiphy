@@ -261,12 +261,12 @@ test_cases = [
     Case('cleanser', '0.00314159265ns', ('3.14159265e-12', 's'), '3.14159265ps', {'prec':'full'}),
 
     # test full precision
-    Case('chestnut', '1 ns', ('1e-9', 's'), '1ns', {'strip_dp':True}),
-    Case('alpha', '1 s', ('1', 's'), '1s', {'strip_dp':True}),
-    Case('parka', '1 ns', ('1e-9', 's'), '1n', {'strip_dp':False, 'show_units':False}),
-    Case('creeper', '1 s', ('1.0', 's'), '1.0', {'strip_dp':False, 'show_units':False}),
-    Case('walkabout', '1 ns', ('1e-9', 's'), '1n', {'strip_dp':False, 'prec':'full', 'show_units':False}),
-    Case('substance', '1 s', ('1.0', 's'), '1.0', {'strip_dp':False, 'prec':'full', 'show_units':False}),
+    Case('chestnut', '1 ns', ('1e-9', 's'), '1ns', {'strip_radix':True}),
+    Case('alpha', '1 s', ('1', 's'), '1s', {'strip_radix':True}),
+    Case('parka', '1 ns', ('1e-9', 's'), '1n', {'strip_radix':False, 'show_units':False}),
+    Case('creeper', '1 s', ('1.0', 's'), '1.0', {'strip_radix':False, 'show_units':False}),
+    Case('walkabout', '1 ns', ('1e-9', 's'), '1n', {'strip_radix':False, 'prec':'full', 'show_units':False}),
+    Case('substance', '1 s', ('1.0', 's'), '1.0', {'strip_radix':False, 'prec':'full', 'show_units':False}),
 
     # test preferences
     Case('flotation', '1420.405751786 MHz', ('1e9', 'Hz'), '1GHz', {'prec':0}),
@@ -302,7 +302,7 @@ def test_number_recognition():
         Quantity.set_prefs(
             prec=None, full_prec=None, spacer='', unity_sf=None, output_sf=None,
             ignore_sf=None, label_fmt=None, assign_rec=None, show_units=True,
-            strip_dp=True
+            strip_radix=True
         )
         try:
             if case.prefs:
