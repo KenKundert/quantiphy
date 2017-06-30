@@ -1079,7 +1079,7 @@ way, 'K' is interpreted as a unit rather than a scale factor.
 .. _tabular data:
 
 Formatting Tabular Data
-.......................
+-----------------------
 
 When creating tables it is often desirable to align the decimal points of the 
 numbers, and perhaps aligning the units. You can use the *number_fmt* to arrange 
