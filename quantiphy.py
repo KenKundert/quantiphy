@@ -217,28 +217,28 @@ __version__ = '1.3.14'
 __released__ = '2017-06-30'
 
 # These mappings are only used when reading numbers
+# The key for these mappings must be a single character
 MAPPINGS = {
-    'Y': ('e24',  1e24 ),
-    'Z': ('e21',  1e21 ),
-    'E': ('e18',  1e18 ),
-    'P': ('e15',  1e15 ),
-    'T': ('e12',  1e12 ),
-    'G': ('e9',   1e9  ),
-    'M': ('e6',   1e6  ),
-    'K': ('e3',   1e3  ),
-    'k': ('e3',   1e3  ),
-    '_': ('',     1    ),
-    '' : ('',     1    ),
-    'c': ('e-2',  1e-2 ),  # only available for input, not used in output
-    'm': ('e-3',  1e-3 ),
-    'u': ('e-6',  1e-6 ),
-    'μ': ('e-6',  1e-6 ),
-    'n': ('e-9',  1e-9 ),
-    'p': ('e-12', 1e-12),
-    'f': ('e-15', 1e-15),
-    'a': ('e-18', 1e-18),
-    'z': ('e-21', 1e-21),
-    'y': ('e-24', 1e-24),
+    'Y': 'e24',
+    'Z': 'e21',
+    'E': 'e18',
+    'P': 'e15',
+    'T': 'e12',
+    'G': 'e9',
+    'M': 'e6',
+    'K': 'e3',
+    'k': 'e3',
+    '_': '',
+    'c': 'e-2',  # only available for input, not used in output
+    'm': 'e-3',
+    'u': 'e-6',
+    'μ': 'e-6',
+    'n': 'e-9',
+    'p': 'e-12',
+    'f': 'e-15',
+    'a': 'e-18',
+    'z': 'e-21',
+    'y': 'e-24',
 }
 
 # These mappings are only used when writing numbers
@@ -892,12 +892,11 @@ class Quantity(float):
                 if match:
                     mantissa = get_mant(match)
                     sf = get_sf(match)
-                    sf = sf if sf != '_' else ''
                     units = get_units(match)
                     if sf+units in cls.get_pref('known_units'):
                         sf, units = '', sf+units
                     mantissa = mantissa.replace('_', '')
-                    number = float(mantissa + MAPPINGS.get(sf, [sf])[0])
+                    number = float(mantissa + MAPPINGS.get(sf, sf))
                     return number, units, mantissa, sf
             else:
                 raise ValueError('%s: not a valid number.' % value)
@@ -1088,7 +1087,7 @@ class Quantity(float):
                 exp = int(sf)
             except ValueError:
                 if sf:
-                    exp = int(MAPPINGS.get(sf, [sf])[0].lstrip('e'))
+                    exp = int(MAPPINGS.get(sf, sf).lstrip('e'))
                 else:
                     exp = 0
 
