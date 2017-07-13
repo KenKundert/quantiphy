@@ -527,3 +527,12 @@ Summary @ 900.51 us: 7 tests run, 1 failures detected, 0 faults detected, 0 test
     assert processed == mvi_si_full
     processed = Quantity.all_from_si_fmt(mvi_raw_si, show_si=False, prec='full')
     assert processed == mvi_conv_full
+
+    processed = Quantity.all_from_si_fmt('1420.40575MHz+1420.40575MHz+1420.40575MHz', show_si=True)
+    assert processed == '1.4204 GHz+1.4204 GHz+1.4204 GHz'
+
+    processed = Quantity.all_from_si_fmt('1420.40575MHz+abc+1420.40575MHz+abc+1420.40575MHz', show_si=True)
+    assert processed == '1.4204 GHz+abc+1.4204 GHz+abc+1.4204 GHz'
+
+    processed = Quantity.all_from_si_fmt('1420.40575e+6+1420.40575e+6', show_si=True)
+    assert processed == '1420.40575e+6+1420.40575e+6'

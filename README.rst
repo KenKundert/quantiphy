@@ -17,7 +17,7 @@ QuantiPhy - Physical Quantities
 .. image:: https://img.shields.io/pypi/pyversions/quantiphy.svg
     :target: https://pypi.python.org/pypi/quantiphy/
 
-.. IGNORE: pypi statics are broken and unlikely to be fixed
+.. IGNORE: pypi statistics are broken and unlikely to be fixed
     .. image:: https://img.shields.io/pypi/dm/quantiphy.svg
         :target: https://pypi.python.org/pypi/quantiphy/
 

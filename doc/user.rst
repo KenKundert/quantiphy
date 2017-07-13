@@ -420,19 +420,23 @@ value:
 
 .. code-block:: python
 
-    >>> period = Quantity('1us')
-    >>> print(period)
-    1 us
+    >>> import math
+    >>> sagan_freq = math.pi * h_line
+    >>> sagan = Quantity(sagan_freq, h_line)
+    >>> print(sagan_freq)
+    4462336274.927585
 
-    >>> frequency = 1/period
-    >>> print(frequency)
-    1000000.0
+    >>> print(sagan)
+    4.4623 GHz
 
-    >>> type(period)
+    >>> type(h_line)
     <class 'quantiphy.Quantity'>
 
-    >>> type(frequency)
+    >>> type(sagan_freq)
     <class 'float'>
+
+    >>> type(sagan)
+    <class 'quantiphy.Quantity'>
 
 Notice that when performing arithmetic operations on quantities the units 
 are completely ignored and do not propagate in any way to the newly computed 

@@ -841,7 +841,10 @@ class Quantity(float):
         sf_or_units = '[a-zA-Z_μ°ÅΩ℧]+'
             # must match units or scale factors: add μ, make non-optional
         left_delimit = r'(?:\A|(?<=[^a-zA-Z0-9_.]))'
-        right_delimit = r'(?=[^-+0-9_]|\Z)'
+        right_delimit = r'(?=[^-+0-9]|\Z)'
+            # right_delim excludes [-+0-9] to avoid matches with 1e2, 1e-2, 1e+2
+            # this is not great because it seems like it should fail for
+            # 10uA+20uA, but it does not and I don't know why.
         cls.embedded_si_notation = re.compile(
             '{left_delimit}{mantissa}{sf_or_units}{right_delimit}'.format(
                 **locals()
