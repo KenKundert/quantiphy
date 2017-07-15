@@ -101,9 +101,9 @@ You use *Quantity* to convert numbers and units in various forms to quantities:
    >>> print(Fhy)
    1.4204 GHz
 
-   >>> Rsense = Quantity('1e-4 Ohms')
+   >>> Rsense = Quantity('1e-4 Ω')
    >>> print(Rsense)
-   100 uOhms
+   100 uΩ
 
    >>> cost = Quantity('$11_200_000')
    >>> print(cost)
@@ -128,7 +128,7 @@ the quantity:
    22400000.0
 
    >>> Rsense.units
-   'Ohms'
+   'Ω'
 
    >>> str(Tboil)
    '100 °C'

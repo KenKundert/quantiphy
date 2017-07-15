@@ -231,15 +231,15 @@ If given as a string, the value may also be the name of a known constant:
     160.22e-21 C
 
 If you only specify a real number for the value, then the units, name, and 
-description do not get values. But even if given as a string or quantity the 
-value may not contain these extra attributes. This is where the second argument, 
-the model, helps.  It may be another quantity or it may be a string.  Any 
-attributes that are not provided by the first argument are taken from the second 
-if available.  If the second argument is a string, it is split.  If it contains 
-one value, that value is taken to be the units, if it contains two, those values 
-are taken to be the name and units, and it it contains more than two, the 
-remaining values are taken to be the description.  If the model is a quantity, 
-only the units are inherited. For example:
+description do not get values. Even if given as a string or quantity the value 
+may not contain these extra attributes. This is where the second argument, the 
+model, helps.  It may be another quantity or it may be a string.  Any attributes 
+that are not provided by the first argument are taken from the second if 
+available.  If the second argument is a string, it is split.  If it contains one 
+value, that value is taken to be the units, if it contains two, those values are 
+taken to be the name and units, and it it contains more than two, the remaining 
+values are taken to be the description.  If the model is a quantity, only the 
+units are inherited. For example:
 
 .. code-block:: python
 
@@ -361,12 +361,16 @@ You can also create your own converters using :class:`quantiphy.UnitConversion`:
     >>> UnitConversion('m', 'pc parsec', 3.0857e16)
     <...>
 
-    >>> d = Quantity('5 μpc', scale='m')
-    >>> print(d)
+    >>> d_sol = Quantity('5 μpc', scale='m')
+    >>> print(d_sol)
     154.28 Gm
 
 This unit conversion says, when converting units of 'm' to either 'pc' or 
 'parsec' multiply by 3.0857e16, when going the other way, divide by 3.0857e16.
+
+    >>> d_sol = Quantity('154.285 Gm', scale='pc')
+    >>> print(d_sol)
+    5 upc
 
 When using unit conversions it is important to only convert to units without 
 scale factors (such as those in the first column above) when creating 

@@ -186,6 +186,10 @@ included a width specification, but in the second the desired unit of measure
 was specified (*B*), which caused the underlying value to be converted from bits 
 to bytes.
 
+Also it is important to recognize that *QuantiPhy* is using decimal rather than 
+binary scale factors. So 5 GB is 5 gigabyte and not 5 gibibyte.  In otherwords 
+5 GB represents 5×10⁹ B and not 5×2³⁰ B.
+
 
 .. _thermal voltage example:
 
@@ -399,32 +403,19 @@ produces an SVG version of the results using MatPlotLib.
     from matplotlib.ticker import FuncFormatter
     import matplotlib.pyplot as pl
     from quantiphy import Quantity
-    Quantity.set_prefs(prec=2)
-
-    # define the axis formatting routines
-    def freq_fmt(val, pos):
-        return Quantity(val, 'Hz').render()
-    freq_formatter = FuncFormatter(freq_fmt)
-
-    def volt_fmt(val, pos):
-        return Quantity(val, 'V').render()
-    volt_formatter = FuncFormatter(volt_fmt)
 
     # read the data from delta-sigma.smpl
     data = np.fromfile('delta-sigma.smpl', sep=' ')
     time, wave = data.reshape((2, len(data)//2), order='F')
 
     # print out basic information about the data
-    timestep = Quantity(time[1] - time[0], 's')
-    nonperiodicity = Quantity(wave[-1] - wave[0], 'V')
-    points = len(time)
-    period = Quantity(timestep * len(time), 's')
-    freq_res = Quantity(1/period, 'Hz')
-    print('timestep:', timestep)
-    print('nonperiodicity:', nonperiodicity)
-    print('timepoints:', points)
-    print('period:', period)
-    print('freq resolution:', freq_res)
+    timestep = Quantity(time[1] - time[0], name='Time step', units='s')
+    nonperiodicity = Quantity(wave[-1] - wave[0], name='Nonperiodicity', units='V')
+    points = Quantity(len(time), name='Time points')
+    period = Quantity(timestep * len(time), name='Period', units='s')
+    freq_res = Quantity(1/period, name='Frequency resolution', units='Hz')
+    with Quantity.prefs(show_label=True, prec=2):
+        print(timestep, nonperiodicity, points, period, freq_res, sep='\n')
 
     # create the window
     window = np.kaiser(len(time), 11)/0.37
@@ -435,6 +426,10 @@ produces an SVG version of the results using MatPlotLib.
     # transform the data into the frequency domain
     spectrum = 2*fftshift(fft(windowed))/len(time)
     freq = fftshift(fftfreq(len(wave), timestep))
+
+    # define the axis formatting routines
+    freq_formatter = FuncFormatter(lambda v, p: str(Quantity(v, 'Hz')))
+    volt_formatter = FuncFormatter(lambda v, p: str(Quantity(v, 'V')))
 
     # generate graphs of the resulting spectrum
     fig = pl.figure()
@@ -450,11 +445,11 @@ produces an SVG version of the results using MatPlotLib.
 
 This script produces the following textual output::
 
-    timestep: 20 ns
-    nonperiodicity: 2.3 pV
-    timepoints: 28k
-    period: 560 us
-    freq resolution: 1.79 kHz
+    Time step = 20 ns
+    Nonperiodicity = 2.3 pV
+    Time points = 28k
+    Period = 560 us
+    Frequency resolution = 1.79 kHz
 
 And the following is one of the two graphs produced:
 
