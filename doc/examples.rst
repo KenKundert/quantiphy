@@ -186,7 +186,7 @@ included a width specification, but in the second the desired unit of measure
 was specified (*B*), which caused the underlying value to be converted from bits 
 to bytes.
 
-Also it is important to recognize that *QuantiPhy* is using decimal rather than 
+It is important to recognize that *QuantiPhy* is using decimal rather than 
 binary scale factors. So 5 GB is 5 gigabyte and not 5 gibibyte.  In otherwords 
 5 GB represents 5×10⁹ B and not 5×2³⁰ B.
 
@@ -403,6 +403,7 @@ produces an SVG version of the results using MatPlotLib.
     from matplotlib.ticker import FuncFormatter
     import matplotlib.pyplot as pl
     from quantiphy import Quantity
+    Quantity.set_prefs(map_sf=Quantity.map_sf_to_greek)
 
     # read the data from delta-sigma.smpl
     data = np.fromfile('delta-sigma.smpl', sep=' ')
@@ -448,7 +449,7 @@ This script produces the following textual output::
     Time step = 20 ns
     Nonperiodicity = 2.3 pV
     Time points = 28k
-    Period = 560 us
+    Period = 560 μs
     Frequency resolution = 1.79 kHz
 
 And the following is one of the two graphs produced:
