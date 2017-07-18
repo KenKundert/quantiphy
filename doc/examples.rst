@@ -3,6 +3,7 @@
 Examples
 ========
 
+
 .. _motivation example:
 
 Motivating Example
@@ -266,6 +267,7 @@ quantities and quantities to strings compared into the built-in float class.
 
 .. code-block:: python
 
+    #!/usr/bin/env python3
     from quantiphy import Quantity
     from timeit import timeit
 
@@ -274,8 +276,8 @@ quantities and quantities to strings compared into the built-in float class.
     Quantity.set_prefs(
         show_label = True,
         show_desc = True,
-        label_fmt = '{n} = {v}:',
-        label_fmt_full = '{V:20} {d}',
+        label_fmt = '{n:>40}: {v}',
+        map_sf = Quantity.map_sf_to_greek
     )
 
     # build the raw data, arrays of random numbers
@@ -307,16 +309,16 @@ quantities and quantities to strings compared into the built-in float class.
     print('For {} iterations ...'.format(Quantity(trials)))
     for case in testcases:
         elapsed = timeit(case, number=1, globals=globals())
-        per_op = Quantity(elapsed/trials, name='Time/Op', units='s', desc=case)
-        print(per_op)
+        result = Quantity(elapsed/trials, units='s/op', name=case)
+        print(result)
 
 The results are::
 
     For 100k iterations ...
-    Time/Op = 503.01 ns: [float(v) for v in s_numbers]
-    Time/Op = 15.37 us:  [Quantity(v) for v in s_quantities]
-    Time/Op = 1.009 us:  [str(v) for v in numbers]
-    Time/Op = 23.221 us: [str(v) for v in quantities]
+               [float(v) for v in s_numbers]: 519.93 ns/op
+         [Quantity(v) for v in s_quantities]: 15.621 μs/op
+                   [str(v) for v in numbers]: 1.1269 μs/op
+                [str(v) for v in quantities]: 29.082 μs/op
 
 You can see that *QuantiPhy* is considerably slower than the float class, which 
 you should be aware of if you are processing large quantities of numbers.
@@ -382,6 +384,7 @@ And here is an example of the programs output::
      464 kB  quantiphy/examples
     1.54 kB  quantiphy/doc
     3.48 MB  quantiphy
+
 
 .. _matplotlib example:
 
