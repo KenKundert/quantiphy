@@ -18,11 +18,12 @@ the units if you live in the UK and assume that she was an adult, or you might
 assume kilograms if you lived anywhere else and assume she was a small child.
 The units are very important, and in general it is always best to keep the unit 
 of measure with the number and present the complete value when working with 
-quantities. To do otherwise invites confusion.  Readers often stumble on numbers 
-without units as they mentally try to determine the units from context.  
-Quantity values should be treated in a manner similar to money, which is also 
-a quantity. Monetary amounts are almost always given with their units (a 
-currency symbol).
+quantities. To do otherwise invites confusion.  Just ask `NASA 
+<http://www.cnn.com/TECH/space/9909/30/mars.metric.02/>`_.  Readers often 
+stumble on numbers without units as they mentally try to determine the units 
+from context.  Quantity values should be treated in a manner similar to money, 
+which is also a quantity. Monetary amounts are almost always given with their 
+units (a currency symbol).
 
 Having a single object represent a quantity in a programming language is useful 
 because it binds the units to the number making it more likely that the units 
@@ -150,6 +151,24 @@ the following ways can be used to specify 1ns:
     >>> print(period)
     1 ns
 
+    >>> period2 = Quantity(period)
+    >>> print(period2)
+    1 ns
+
+If given as a string, the value may also be the name of a known :ref:`constant 
+<constants>`:
+
+.. code-block:: python
+
+    >>> k = Quantity('k')
+    >>> q = Quantity('q')
+    >>> print(k, q, sep='\n')
+    13.806e-24 J/K
+    160.22e-21 C
+
+The following constants are pre-defined: *h*, *ħ*, *k*, *q*, *c*, *0°C'*, *ε₀*, 
+*μ₀*, and *Z₀*. You may add your own constants.
+
 Currency units ($£€) are a bit different than other units, they are placed 
 at the front of the quantity.
 
@@ -219,16 +238,6 @@ For example:
     >>> period = Quantity('Tclk = 10ns -- clock period')
     >>> print(f'{period.name} = {period}  # {period.desc}')
     Tclk = 10 ns  # clock period
-
-If given as a string, the value may also be the name of a known constant:
-
-.. code-block:: python
-
-    >>> k = Quantity('k')
-    >>> q = Quantity('q')
-    >>> print(k, q, sep='\n')
-    13.806e-24 J/K
-    160.22e-21 C
 
 If you only specify a real number for the value, then the units, name, and 
 description do not get values. Even if given as a string or quantity the value 
@@ -426,10 +435,10 @@ value:
 
     >>> import math
     >>> sagan_freq = math.pi * h_line
-    >>> sagan = Quantity(sagan_freq, h_line)
     >>> print(sagan_freq)
     4462336274.927585
 
+    >>> sagan = Quantity(sagan_freq, h_line)
     >>> print(sagan)
     4.4623 GHz
 
@@ -782,22 +791,22 @@ Name      MKS value              CGS value             Description
 h         6.626070040e-34 J-s    6.626070040e-27 erg-s Plank's constant
 hbar, ħ   1.054571800e-34 J-s    1.054571800e-27 erg-s Reduced Plank's constant
 k         1.38064852e-23 J/K     1.38064852e-16 erg/K  Boltzmann's constant
-q         1.6021766208e-19 C     4.80320425e-10 Fr     elementary charge
-c         2.99792458e8 m/s       2.99792458e8 m/s      speed of light
-0C, 0°C   273.15 K               273.15 K              O Celsius
-eps0, ε₀  8.854187817e-12 F/m    ---                   permittivity of free space
-mu0, μ₀   4e-7π H/m              ---                   permeability of free space
-Z0, Z₀    376.730313461 Ohms     ---                   characteristic impedance
+q         1.6021766208e-19 C     4.80320425e-10 Fr     Elementary charge
+c         2.99792458e8 m/s       2.99792458e8 m/s      Speed of light
+0C, 0°C   273.15 K               273.15 K              0 Celsius
+eps0, ε₀  8.854187817e-12 F/m    ---                   Permittivity of free space
+mu0, μ₀   4e-7π H/m              ---                   Permeability of free space
+Z0, Z₀    376.730313461 Ohms     ---                   Characteristic impedance
                                                        of free space
 ========  =====================  ===================== ==========================
 
-Constants are given in base units rather than the natural units for the unit 
-system. For example, when using the CGS unit system, the speed of light is given 
-as 300Mm/s (rather than 30Gcm/s).
+Constants are given in base units (*g*, *m*, etc.) rather than the natural units 
+for the unit system (*kg*, *cm*, etc.). For example, when using the CGS unit 
+system, the speed of light is given as 300Mm/s (rather than 30Gcm/s).
 
 As shown, these constants are partitioned into two *unit systems*: *mks* and 
-*cgs*.  Only those constants that are associated with the active unit system, or 
-those that are not associated with any unit system, are available when creating 
+*cgs*.  Only those constants that are associated with the active unit system and 
+those that are not associated with any unit system are available when creating 
 a new quantity. You can activate a unit system using 
 :func:`quantiphy.set_unit_system`.  Doing so deactivates the previous system. By 
 default, the *mks* system is active.
@@ -1028,6 +1037,9 @@ scale factor by specifying the *unity_sf* argument to
     >>> l = Quantity(1, 'm')
     >>> print(l)
     1_m
+
+This is often a good way to go if you are outputting numbers intended to be read 
+by people and machines.
 
 If you need to interpret numbers that have units and are known not to have scale 
 factors, you can specify the *ignore_sf* preference:

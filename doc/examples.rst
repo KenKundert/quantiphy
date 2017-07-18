@@ -328,7 +328,7 @@ Contrast this with the normal output from *timeit*::
     0.10471829099697061
     2.3749650190002285
 
-The information is there, but just takes longer to make sense of it.
+The essential information is there, but just takes longer to make sense of it.
 
 
 .. _disk usage example:
