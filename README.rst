@@ -101,7 +101,7 @@ You use *Quantity* to convert numbers and units in various forms to quantities:
    >>> print(Fhy)
    1.4204 GHz
 
-   >>> Rsense = Quantity('1e-4 Ω')
+   >>> Rsense = Quantity('1e-4Ω')
    >>> print(Rsense)
    100 uΩ
 
