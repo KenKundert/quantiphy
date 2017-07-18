@@ -134,7 +134,7 @@ UnitConversion('s', 'day', 86400)
 UnitConversion('b', 'B', 8)
 
 # Constants {{{1
-#  set_unit_system {{{2
+# set_unit_system {{{2
 def set_unit_system(unit_system):
     """Activates a unit system.
 
@@ -159,6 +159,7 @@ _default_unit_system = 'mks'
 _constants = {None: {}, _default_unit_system: {}}
 set_unit_system(_default_unit_system)
 
+# add_constant {{{2
 def add_constant(value, alias=None, unit_systems=None):
     """
     Saves a quantity in such a way that it can later be recalled by name when
@@ -550,7 +551,9 @@ class Quantity(float):
         :type show_label: 'f', 'a', or boolean
 
         :param show_si:
-            Use SI scale factors by default.
+            Use SI scale factors by default. If this is not set, engineering
+            format is used.  Engineering format is normal E-notation except that
+            the exponents are constrained to be a multiple of 3.
         :type show_si: boolean
 
         :param spacer:
@@ -1030,7 +1033,11 @@ class Quantity(float):
         :type show_units: boolean
 
         :param show_si:
-            Whether SI scale factors should be used.
+            Whether SI scale factors should be used.  If true, SI scale factors
+            are used if the appropriate scale factor is available, otherwise
+            engineering format is used. If false, engineering format is used for
+            all numbers.  Engineering format is normal E-notation except that
+            the exponents are constrained to be a multiple of 3.
         :type show_si: boolean
 
         :param prec:
