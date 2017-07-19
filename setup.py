@@ -23,7 +23,7 @@ setup(
     long_description=readme,
     author="Ken Kundert",
     author_email='quantiphy@nurdletech.com',
-    url='http://nurdletech.com/linux-utilities/quantiphy',
+    url='https://quantiphy.readthedocs.io',
     download_url='https://github.com/kenkundert/quantiphy/tarball/master',
     license='GPLv3+',
     zip_safe=True,

@@ -274,8 +274,8 @@ quantities and quantities to strings compared into the built-in float class.
     # preferences
     trials = 100_000
     Quantity.set_prefs(
+        prec = 2,
         show_label = True,
-        show_desc = True,
         label_fmt = '{n:>40}: {v}',
         map_sf = Quantity.map_sf_to_greek
     )
@@ -315,10 +315,10 @@ quantities and quantities to strings compared into the built-in float class.
 The results are::
 
     For 100k iterations ...
-               [float(v) for v in s_numbers]: 519.93 ns/op
-         [Quantity(v) for v in s_quantities]: 15.621 μs/op
-                   [str(v) for v in numbers]: 1.1269 μs/op
-                [str(v) for v in quantities]: 29.082 μs/op
+               [float(v) for v in s_numbers]: 638 ns/op
+         [Quantity(v) for v in s_quantities]: 15.3 μs/op
+                   [str(v) for v in numbers]: 1.03 μs/op
+                [str(v) for v in quantities]: 28.1 μs/op
 
 You can see that *QuantiPhy* is considerably slower than the float class, which 
 you should be aware of if you are processing large quantities of numbers.

@@ -20,7 +20,7 @@ Releases
     - reworked constants
     - added unit systems for physical constants
 
-1.4 (2017-07-??):
+2.0 (2017-07-15):
     - created formal documentation
     - enhanced label_fmt to accept {V}
     - allow quantity to be passed as value to Quantity
@@ -28,7 +28,7 @@ Releases
     - raise NameError rather than Assertion for unknown preferences
     - added Quantity.all_from_conv_fmt() and Quantity.all_from_si_fmt()
     - change assign_rec to support more formats
-    - changed Contant() to add_constant()
+    - changed Constant() to add_constant()
     - changed the way preferences are implemented
     - changed name of preference methods:
       set_preferences -> set_prefs, get_preference -> get_pref
