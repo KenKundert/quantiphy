@@ -247,6 +247,6 @@ texinfo_documents = [
 #KSK: add custom css code if present
 def setup(app):
     import os
-    if os.path.exists('css/custom.css'):
+    if os.path.exists('.static/css/custom.css'):
         app.add_stylesheet('css/custom.css')
 

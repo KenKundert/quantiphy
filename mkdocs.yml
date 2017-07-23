@@ -1,4 +1,0 @@
-theme: readthedocs
-docs_dir: doc
-extra.css:
-    - .static/css/custom.css
