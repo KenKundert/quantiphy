@@ -1,0 +1,2 @@
+theme: readthedocs
+extra.css: [.static/css/custom.css]
