@@ -1,2 +1,4 @@
 theme: readthedocs
-extra.css: [.static/css/custom.css]
+docs_dir: doc
+extra.css:
+    - .static/css/custom.css
