@@ -232,7 +232,7 @@ def add_constant(value, alias=None, unit_systems=None):
         *unit_systems* is not given, the constant is not associated with a unit
         system, meaning that it is always available regardless of which unit
         system is active.
-    :type unit_systems: list or string
+    :type unit_systems: list or str
 
     :raises ValueError:
         *value* must be an instance of :class:`Quantity` or it must be a string
@@ -1737,7 +1737,7 @@ class Quantity(float):
         :returns:
             A copy of *text* with all number formatted with SI scale factors
             have been reformatted.
-        :rtype: string
+        :rtype: str
 
         Example::
 

@@ -1446,7 +1446,7 @@ cannot convert into a number:
    ...     print(err)
    g: not a valid number.
 
-A KeyError is raised if a unit conversion is requested but no suitable unit
+A *KeyError* is raised if a unit conversion is requested but no suitable unit
 converter is available.
 
 .. code-block:: python
@@ -1456,7 +1456,17 @@ converter is available.
    ...
    KeyError: "Unable to convert between 'pc' and 'mi'."
 
-A NameError is raised if a constant is created without a name or if you try to 
+A *KeyError* is also raised if you specify an unknown preference.
+
+.. code-block:: python
+
+   >>> Quantity.set_prefs(precision=6)
+   Traceback (most recent call last):
+   ...
+   KeyError: 'precision'
+
+
+A *NameError* is raised if a constant is created without a name or if you try to 
 set or get a preference that is not supported.
 
 .. code-block:: python
