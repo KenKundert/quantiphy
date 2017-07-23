@@ -101,6 +101,9 @@ def test_constants():
     assert '{:S}'.format(Quantity('mu0')) == 'μ₀ = 1.2566 uH/m -- permeability of free space'
     assert '{:S}'.format(Quantity('Z0')) == 'Z₀ = 376.73 Ohms -- characteristic impedance of free space'
 
+    add_constant('f_hy = 1420.405751786 MHz -- Frequency of hydrogen line')
+    assert str(Quantity('f_hy')) == '1.4204 GHz'
+
     add_constant(Quantity('1420.405751786 MHz'), 'hline')
     assert str(Quantity('hline')) == '1.4204 GHz'
     add_constant(Quantity(4.80320427e-10, 'Fr'), 'q', 'esu gaussian')

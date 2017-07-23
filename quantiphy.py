@@ -1571,6 +1571,8 @@ class Quantity(float):
 
         Example::
             >>> sagan_frequencies = r'''
+            ...     -- Carl Sagan's SETI frequencies
+            ...
             ...     f_hy = 1420.405751786 MHz -- Hydrogen line frequency
             ...     f_sagan1 = 4462.336274928 MHz -- Sagan's first frequency: pi*f_hy
             ...     f_sagan2 = 8924.672549855 MHz -- Sagan's second frequency: 2*pi*f_hy
@@ -1581,6 +1583,10 @@ class Quantity(float):
             f_hy = 1.4204 GHz -- Hydrogen line frequency
             f_sagan1 = 4.4623 GHz -- Sagan's first frequency: pi*f_hy
             f_sagan2 = 8.9247 GHz -- Sagan's second frequency: 2*pi*f_hy
+
+            >>> globals().update(freqs)
+            >>> print(f_sagan2)
+            8.9247 GHz
 
         """
         import keyword

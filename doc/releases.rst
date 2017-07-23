@@ -38,3 +38,8 @@ Releases
     - allow show_label to be either 'a' or 'f' as well True or False
     - renamed strip_dp option to strip_radix
     - added number_fmt option
+
+
+Latest development release:
+    | Version: 2.0.8
+    | Released: 2017-07-22
