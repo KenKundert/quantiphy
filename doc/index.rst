@@ -1,7 +1,7 @@
 QuantiPhy: Physical Quantities
 ==============================
 
-| Version: 2.0.10
+| Version: 2.0.11
 | Released: 2017-07-22
 | Please post all bugs and suggestions at
   `Github <https://github.com/KenKundert/quantiphy/issues>`_
