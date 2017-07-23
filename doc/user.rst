@@ -220,16 +220,16 @@ conversion is under the control of the *assign_rec* preference.  The default
 version of *assign_rec* accepts either '=' or ':' to separate the name from the 
 value, and either '--', '#', or '//' to separate the value from the description 
 if a description is given. Thus, by default *QuantiPhy* recognizes 
-specifications of the following forms:
+specifications of the following forms::
 
-    | <name> = <value>
-    | <name> = <value> -- <description>
-    | <name> = <value> # <description>
-    | <name> = <value> // <description>
-    | <name>: <value>
-    | <name>: <value> -- <description>
-    | <name>: <value> # <description>
-    | <name>: <value> // <description>
+    <name> = <value>
+    <name> = <value> -- <description>
+    <name> = <value> # <description>
+    <name> = <value> // <description>
+    <name>: <value>
+    <name>: <value> -- <description>
+    <name>: <value> # <description>
+    <name>: <value> // <description>
 
 For example:
 

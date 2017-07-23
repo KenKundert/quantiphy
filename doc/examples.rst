@@ -406,7 +406,7 @@ produces an SVG version of the results using MatPlotLib.
     from matplotlib.ticker import FuncFormatter
     import matplotlib.pyplot as pl
     from quantiphy import Quantity
-    Quantity.set_prefs(map_sf=Quantity.map_sf_to_greek)
+    Quantity.set_prefs(map_sf=Quantity.map_sf_to_sci_notation)
 
     # read the data from delta-sigma.smpl
     data = np.fromfile('delta-sigma.smpl', sep=' ')
@@ -461,3 +461,19 @@ And the following is one of the two graphs produced:
 
 Notice the axis labels in the generated graph.  Use of *QuantiPhy* makes the 
 widely scaled units compact and easy to read.
+
+MatPlotLib provides the `EngFormatter 
+<https://matplotlib.org/examples/api/engineering_formatter.html>`_ that you can 
+use as an alternative to *QuantiPhy* for formatting your axes with SI scale 
+factors, which also provides the *format_eng* function for converting floats to 
+strings formatted with SI scale factors and units. So if your needs are limited, 
+as they are in this example, that is generally a good way to go. One aspect of 
+*QuantiPhi* that you might prefer is they way it handles very large or very 
+small numbers. As the numbers get either very large or very small *EngFormatter* 
+starts by using unfamiliar scale factors (*YZPEzy*) and then reverts to 
+e-notation. *QuantiPhy* allows you to control whether to use unfamiliar scale 
+factors but does not use them by default. It also can be configured to revert to 
+engineering scientific notation (ex: 13.806×10⁻²⁴ J/K) when no scale factors are 
+appropriate.  Though not necessary, that was done above with the line::
+
+    Quantity.set_prefs(map_sf=Quantity.map_sf_to_sci_notation)

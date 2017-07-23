@@ -121,11 +121,13 @@ def test_misc():
     with pytest.raises(ValueError):
         Quantity.extract('1ns')
 
-    with pytest.raises(ValueError):
-        Quantity.extract('x*y = z')
+    # this used to be an ValueError because 'x*y' is not an identifier
+    vals = Quantity.extract('x*y = 1 m/s')
+    assert str(vals['x*y']) == '1 m/s'
 
-    with pytest.raises(ValueError):
-        Quantity.extract('in = 1mA')
+    # this used to be an ValueError because 'in' is a python keyword
+    vals = Quantity.extract('in = 1mA')
+    assert str(vals['in']) == '1 mA'
 
     with pytest.raises(ValueError):
         Quantity('x\ny = z')

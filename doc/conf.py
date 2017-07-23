@@ -217,7 +217,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'quantiphy', u'QuantiPhy Documentation',
-     [u'Ken Kundert'], 1)
+     [u'Ken Kundert'], 3)
 ]
 
 # If true, show URL addresses after external links.
@@ -231,7 +231,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
   ('index', 'QuantiPhy', u'QuantiPhy Documentation',
-   u'Ken Kundert', 'QuantiPhy', 'One line description of project.',
+   u'Ken Kundert', 'QuantiPhy', 'Physical Quantities.',
    'Miscellaneous'),
 ]
 
@@ -244,6 +244,9 @@ texinfo_documents = [
 # How to display URL addresses: 'footnote', 'no', or 'inline'.
 #texinfo_show_urls = 'footnote'
 
-# Order used for autodoc members
-autodoc_member_order = 'bysource'
+#KSK: add custom css code if present
+def setup(app):
+    import os
+    if os.path.exists('css/custom.css'):
+        app.add_stylesheet('css/custom.css')
 

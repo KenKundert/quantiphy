@@ -109,9 +109,8 @@ class UnitConversion(object):
         >>> UnitConversion('m', 'pc parsec', 3.0857e16)
         <...>
 
-    This establishes a conversion between meters (m) and parsecs (parsec, pc) that can go both ways.
-
-    Example::
+    This establishes a conversion between meters (m) and parsecs (parsec, pc)
+    that can go both ways::
 
         >>> d_sol = Quantity('5 μpc', scale='m')
         >>> print(d_sol)
@@ -318,9 +317,6 @@ SMALL_SCALE_FACTORS = 'munpfazy'
 FORMAT_SPEC = re.compile(r'\A([<>]?)(\d*)(?:\.(\d+))?(?:([qQrRusSeEfFgGdn])([a-zA-Z°ÅΩ℧%][-^/()\w]*)?)?\Z')
 #                             ^align ^width    ^prec     ^format            ^units
 
-# Regular expression for recognizing identifiers
-IDENTIFIER = re.compile(r'\A[_a-zA-Z][\w]*\Z')
-
 # Defaults {{{1
 DEFAULTS = {
     'abstol': 1e-12,
@@ -351,7 +347,7 @@ CURRENCY_SYMBOLS = '$£€' if sys.version_info.major == 3 else '$'
 # Quantity class {{{1
 @python_2_unicode_compatible
 class Quantity(float):
-    # docstring {{{2
+    # description {{{2
     """Create a Physical Quantity
 
     A quantity is a number paired with a unit of measure.
@@ -360,9 +356,9 @@ class Quantity(float):
         The value of the quantity.  If a string, it may be the name of a
         pre-defined constant or it may be a number that may be specified with SI
         scale factors and/or units.  For example, the following are all valid:
-        '2.5ns', '1.7 MHz', '1e6ohms', '2.8_V', '1e12 F', '$10_000', '42', 'ħ',
+        '2.5ns', '1.7 MHz', '1e6Ω', '2.8_V', '1e4 m/s', '$10_000', '42', 'ħ',
         etc.  The string may also have name and description if they are provided
-        in a way recognizable by *assign_rec*. For example, 'trise = 10ns --
+        in a way recognizable by *assign_rec*. For example, 'trise: 10ns --
         rise time' or 'trise = 10ns # rise time' would work with the default
         recognizer.
     :type value: real, string or quantity
@@ -412,7 +408,8 @@ class Quantity(float):
         A string was passed that cannot be converted to a quantity.
 
     You can use *Quantity* to create quantities from floats, strings, or other
-    quantities.  If use floats, you *model* or *units* to specify the units.
+    quantities.  If a float is given, *model* or *units* would be used to
+    specify the units.
 
     Examples::
 
@@ -483,16 +480,20 @@ class Quantity(float):
     def set_prefs(cls, **kwargs):
         """Set class preferences.
 
+        Any values not passed in are left alone.
+        Pass in *None* to reset a preference to its default value.
+
         :arg float abstol:
             Absolute tolerance, used by :meth:`Quantity.is_close()` when
-            determining equivalence.  Default is 1p.
+            determining equivalence.  Default is 10⁻¹².
+
 
         :arg str assign_rec:
             Regular expression used to recognize an assignment.  Used in
             constructor and extract(). By default an '=' or ':' separates the
             name from the value and a '--', '#' or '//' separates the value from
-            the description, if a description is given. So recognizes the
-            following forms::
+            the description, if a description is given. So the default
+            recognizes the following forms::
 
                 'vel = 60 m/s'
                 'vel = 60 m/s -- velocity'
@@ -515,7 +516,8 @@ class Quantity(float):
             is requested and the precision is not otherwise known. Default is 12.
 
         :arg bool ignore_sf:
-            Whether all scale factors should be ignored by default.
+            Whether all scale factors should be ignored by default when
+            recognizing numbers.
 
         :arg str input_sf:
             Which scale factors to recognize when reading numbers.  The default
@@ -573,7 +575,10 @@ class Quantity(float):
             Use this to change the way individual scale factors are rendered,
             ex: map_sf={'u': 'μ'} to render micro using mu. If a function is
             given, it takes a single string argument, the nominal scale factor,
-            and returns a string, the desired scale factor.
+            and returns a string, the desired scale factor. *QuantiPhy* provides
+            two predefined functions intended for use with *maps_sf*:
+            :meth:`Quantity.map_sf_to_greek` and
+            :meth:`Quantity.map_sf_to_sci_notation`.
         :type map_sf: dictionary or function
 
         :arg number_fmt:
@@ -614,7 +619,7 @@ class Quantity(float):
 
         :arg float reltol:
             Relative tolerance, used by :meth:`Quantity.is_close()` when
-            determining equivalence.  Default is 1μ.
+            determining equivalence.  Default is 10⁻⁶.
 
         :arg bool show_desc:
             Whether the description should be shown if it is available when
@@ -659,9 +664,6 @@ class Quantity(float):
             '300m', and 300 m would be rendered as '300_m'.
 
         :raises KeyError: unknown preference.
-
-        Any values not passed in are left alone.
-        Pass in *None* to reset a preference to its default value.
 
         Example::
 
@@ -743,15 +745,16 @@ class Quantity(float):
 
         This is just like :meth:`Quantity.set_prefs()`, except it is designed to
         work as a context manager, meaning that it is meant to be used with
-        Python's *with* statement. For example::
+        Python's *with* statement. It allows preferences to be set to new values
+        temporarily. They are reset upon exiting the *with* statement. For
+        example::
 
             >>> with Quantity.prefs(ignore_sf=True):
             ...     t = Quantity('600_000 K')
-            >>> print(t)
+            >>> t_bad = Quantity('600_000 K')
+            >>> print(t, t_bad, sep=newline)
             600 kK
-
-        In this case the specified values are used within the *with* statement,
-        and then return to their original values upon exit.
+            600M
 
         See :meth:`Quantity.set_prefs()` for list of available arguments.
 
@@ -1391,9 +1394,9 @@ class Quantity(float):
             used, which defaults to 1p.
 
         :arg bool check_units:
-            If True (the default) compare the units of the two values, if they 
-            differ return False. Otherwise only compare the numeric values, 
-            ignoring the units.
+            If True (the default), and if *other* is a quantity, compare the
+            units of the two values, if they differ return False. Otherwise only
+            compare the numeric values, ignoring the units.
 
         :returns:
             Returns true if ``abs(a - b) <= max(reltol * max(abs(a), abs(b)), abstol)``
@@ -1404,11 +1407,11 @@ class Quantity(float):
         Example::
 
             >>> print(
-            ...     c.is_close(c),
-            ...     c.is_close(c+1),
-            ...     c.is_close(c+1e4),
-            ...     c.is_close(Quantity(c+1, 'm/s')),
-            ...     c.is_close(Quantity(c+1, 'Hz')),
+            ...     c.is_close(c),                     # should pass, is identical
+            ...     c.is_close(c+1),                   # should pass, is close
+            ...     c.is_close(c+1e4),                 # should fail, not close
+            ...     c.is_close(Quantity(c+1, 'm/s')),  # should pass, is close
+            ...     c.is_close(Quantity(c+1, 'Hz')),   # should fail, wrong units
             ... )
             True True False True False
 
@@ -1542,39 +1545,47 @@ class Quantity(float):
         :arg str quantities:
             The string that contains the quantities, one definition per
             line.  Each is parsed by *assign_rec*. By default, the lines are
-            assumed to be of the form:
+            assumed to be of the form::
 
-                ``<name> = <value> [-- <description>]``
+                [<name> = <value>]
+                [<name> = <value>] [-- <description>]
+                [<name> = <value>] [# <description>]
+                [<name> = <value>] [// <description>]
+                [<name>: <value>]
+                [<name>: <value>] [-- <description>]
+                [<name>: <value>] [# <description>]
+                [<name>: <value>] [// <description>]
 
-                ``<name> = <value> [# <description>]``
+            The brackets indicate that the name/value pair and the description
+            is optional.  However, <name> must be given if <value> is given.
 
-            <name>: Must be a valid identifier (ex: c_load).
+            <name>: the name is used as a key for the value.
 
             <value>: A number with optional units (ex: 3 or 1pF or 1 kOhm),
             the units need not be a simple identifier (ex: 9.07 GHz/V).
 
             <description>: Optional textual description (ex: Gain of PD (Imax)).
 
-            Blank lines an any line that does not contain a value is ignored. So
-            with the default *assign_rec*, lines with the following form are
-            ignored:
+            Blank lines and any line that does not contain a value are ignored.
+            So with the default *assign_rec*, lines with the following form are
+            ignored::
 
-                ``-- comment``
+                -- comment
 
-                ``# comment``
+                # comment
+                // comment
 
         :returns:
             a dictionary of quantities for the values specified in the argument.
         :rtype: dict
 
         :raises ValueError:
-            Value is not a valid number or was given without a valid identifier
-            as a name.
+            Value is not a valid number or was not given a name.
 
         Example::
 
             >>> sagan_frequencies = r'''
-            ...     -- Carl Sagan's SETI frequencies
+            ...     -- Carl Sagan's SETI frequencies of high interest
             ...
             ...     f_hy = 1420.405751786 MHz -- Hydrogen line frequency
             ...     f_sagan1 = 4462.336274928 MHz -- Sagan's first frequency: pi*f_hy
@@ -1606,18 +1617,17 @@ class Quantity(float):
                 if not value:
                     continue
                 if not name:
-                    raise ValueError('{}: no variable name given.'.format(line))
+                    raise ValueError('{}: name not given.'.format(line))
                 name = name.strip()
                 quantity = cls(value, name=name, desc=desc)
-                if IDENTIFIER.match(name) and not keyword.iskeyword( name):
-                    quantities[name] = quantity
-                else:  # pragma: no cover
-                    raise ValueError('{}: not a valid identifier.'.format(name))
+                quantities[name] = quantity
             else:  # pragma: no cover
                 raise ValueError('{}: not a valid number.'.format(line))
         return quantities
 
     # map_sf_to_sci_notation() {{{2
+    # The explicit references to unicode here is for backward compatibility with
+    # python2. It can be removed when python2 support is dropped.
     _SCI_NOTATION_MAPPER = {
         ord(u'e'): u'×10',
         ord(u'+'): u'',
@@ -1640,19 +1650,22 @@ class Quantity(float):
         """ Render scale factors in scientific notation
 
         Pass this function to *map_sf* preference if you prefer your large and
-        small numbers in classic scientific notation. Set *show_si* False to
-        format all numbers in scientific notation.
+        small numbers in classic scientific notation. It also causes 'u' to be
+        converted to 'μ'. Set *show_si* False to format all numbers in
+        scientific notation.
 
         Example::
 
             >>> with Quantity.prefs(map_sf=Quantity.map_sf_to_sci_notation):
-            ...     print(Quantity('k').render(show_label='f'))
+            ...     print(
+            ...         Quantity('k').render(show_label='f'),
+            ...         Quantity('mu0').render(show_label='f'),
+            ...         sep=newline,
+            ...     )
             k = 13.806×10⁻²⁴ J/K -- Boltzmann's constant
+            μ₀ = 1.2566 μH/m -- permeability of free space
 
         """
-        # The explicit references to unicode here and in _SCI_NOTATION_MAPPER are
-        # for backward compatibility with python2. They can be removed when
-        # python2 support is dropped.
         return sf.translate(Quantity._SCI_NOTATION_MAPPER)
 
     # map_sf_to_greek() {{{2
@@ -1690,8 +1703,8 @@ class Quantity(float):
             preferences, but any valid argument to :meth:`Quantity.render()` can
             be passed in to control the rendering.
         :returns:
-            A copy of *text* with all number formatted conventionally have been
-            reformatted.
+            A copy of *text* where all numbers that were formatted
+            conventionally have been reformatted.
         :rtype: str
 
         Example::
@@ -1725,18 +1738,18 @@ class Quantity(float):
 
         :arg str text:
             A search and replace is performed on this text. The search looks for
-            numbers and quantities in SI notation (must have either a scale
-            factor or units or both).  They are replaced with the same number
-            rendered as a quantity. To be recognized any units must be simple
-            (only letters or underscores, no digits or symbols) and the units
-            must be immediately adjacent to the number.
+            numbers and quantities formatted in SI notation (must have either a
+            scale factor or units or both).  They are replaced with the same
+            number rendered as a quantity. To be recognized any units must be
+            simple (only letters or underscores, no digits or symbols) and the
+            units must be immediately adjacent to the number.
         :arg \**kwargs:
             By default the numbers are rendered using the currently active
             preferences, but any valid argument to :meth:`Quantity.render()` can
             be passed in to control the rendering.
         :returns:
-            A copy of *text* with all number formatted with SI scale factors
-            have been reformatted.
+            A copy of *text* where all numbers that were formatted with SI scale
+            factors have been reformatted.
         :rtype: str
 
         Example::
