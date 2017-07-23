@@ -214,7 +214,7 @@ def add_constant(value, alias=None, unit_systems=None):
 
     :arg quantity value:
         The value of the constant. Must be a quantity or a string that can be
-        converted to a quantity.
+        directly converted to a quantity.
 
     :arg str alias:
         An alias for the constant. Can be used to access the constant from as an
@@ -239,8 +239,7 @@ def add_constant(value, alias=None, unit_systems=None):
         that can be converted to a quantity.
 
     :raises NameError:
-        *alias* was not specified and no name was available in the in the
-        quantity *value*.
+        *alias* was not specified and no name was available from *value*.
 
     The constant is saved under *name* if given, and under the name contained
     within *value* if available.  It is not necessary to supply both names, one
@@ -620,6 +619,9 @@ class Quantity(float):
         :arg bool show_desc:
             Whether the description should be shown if it is available when
             showing the label.  By default *show_desc* is False.
+
+            .. deprecated:: 2.0
+               Use ``show_label='f'`` instead.
 
         :arg show_label:
             Add the name and possibly the description when rendering a quantity
@@ -1570,6 +1572,7 @@ class Quantity(float):
             as a name.
 
         Example::
+
             >>> sagan_frequencies = r'''
             ...     -- Carl Sagan's SETI frequencies
             ...
@@ -1585,7 +1588,9 @@ class Quantity(float):
             f_sagan2 = 8.9247 GHz -- Sagan's second frequency: 2*pi*f_hy
 
             >>> globals().update(freqs)
-            >>> print(f_sagan2)
+            >>> print(f_hy, f_sagan1, f_sagan2, sep=newline)
+            1.4204 GHz
+            4.4623 GHz
             8.9247 GHz
 
         """
