@@ -113,7 +113,8 @@ def test_misc():
     assert Foo.get_pref('prec') == 4
     assert Foo.get_pref('full_prec') == 12
 
-
+    q = Quantity('1.8_V')
+    assert q.render(prec='full') == '1.8 V'
 
     with pytest.raises(ValueError):
         q = Quantity('x*y = z')

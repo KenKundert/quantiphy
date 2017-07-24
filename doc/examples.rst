@@ -268,8 +268,9 @@ quantities and quantities to strings compared into the built-in float class.
 .. code-block:: python
 
     #!/usr/bin/env python3
-    from quantiphy import Quantity
     from timeit import timeit
+    from random import random, randint
+    from quantiphy import Quantity
 
     # preferences
     trials = 100_000
@@ -281,8 +282,6 @@ quantities and quantities to strings compared into the built-in float class.
     )
 
     # build the raw data, arrays of random numbers
-    from random import random, randint
-    from quantiphy import Quantity
     s_numbers = []
     s_quantities = []
     numbers = []
@@ -474,6 +473,7 @@ starts by using unfamiliar scale factors (*YZPEzy*) and then reverts to
 e-notation. *QuantiPhy* allows you to control whether to use unfamiliar scale 
 factors but does not use them by default. It also can be configured to revert to 
 engineering scientific notation (ex: 13.806×10⁻²⁴ J/K) when no scale factors are 
-appropriate.  Though not necessary, that was done above with the line::
+appropriate.  Though not necessary for this example, that was done above with 
+the line::
 
     Quantity.set_prefs(map_sf=Quantity.map_sf_to_sci_notation)

@@ -292,7 +292,7 @@ MAPPINGS = {
     'M': 'e6',
     'K': 'e3',
     'k': 'e3',
-    '_': '',
+    '_': 'e0',
     'c': 'e-2',  # only available for input, not used in output
     'm': 'e-3',
     'u': 'e-6',

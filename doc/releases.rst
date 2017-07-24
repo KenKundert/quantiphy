@@ -1,14 +1,14 @@
 Releases
 ========
 
-1.0 (2016-11-26):
+**1.0 (2016-11-26)**:
     - Initial production release.
 
-1.1 (2016-11-27):
+**1.1 (2016-11-27)**:
     - Added *known_units* preference.
     - Added *get_preference* class method.
 
-1.2 (2017-02-24):
+**1.2 (2017-02-24)**:
     - allow digits after decimal point to be optional
     - support underscores in numbers
     - allow options to be monkey-patched on to Quantity objects
@@ -16,11 +16,11 @@ Releases
     - fix some issues in full precision mode
     - ranamed some options, arguments and methods
 
-1.3 (2017-03-19):
+**1.3 (2017-03-19)**:
     - reworked constants
     - added unit systems for physical constants
 
-2.0 (2017-07-15):
+**2.0 (2017-07-15)**:
     - created formal documentation
     - enhanced label_fmt to accept {V}
     - allow quantity to be passed as value to Quantity
@@ -40,6 +40,6 @@ Releases
     - added number_fmt option
 
 
-Latest development release:
+**Latest development release**:
     | Version: 2.0.12
     | Released: 2017-07-23
