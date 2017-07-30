@@ -97,6 +97,7 @@ tweaked somewhat to handle tables 2 and 3):
 
     >>> from quantiphy import Quantity
 
+    >>> # parse the table
     >>> sdh = []
     >>> lines = table1.strip().split('\n')
     >>> for line in lines[2:]:
@@ -106,6 +107,7 @@ tweaked somewhat to handle tables 2 and 3):
     ...     critical_freqs = [Quantity(f) for f in fields[2:]]
     ...     sdh.append((name, rate, critical_freqs))
 
+    >>> # print the table in a form suitable for humans
     >>> for name, rate, freqs in sdh:
     ...     print('{:8s}: {:12s} {:9s} {:9s} {:9s} {}'.format(name, rate, *freqs))
     STM-1   : 155.52 Mb/s  500 Hz    6.5 kHz   65 kHz    1.3 MHz
@@ -114,7 +116,7 @@ tweaked somewhat to handle tables 2 and 3):
     STM-64  : 9.9533 Gb/s  20 kHz    400 kHz   4 MHz     80 MHz
     STM-256 : 39.813 Gb/s  80 kHz    1.92 MHz  16 MHz    320 MHz
 
-
+    >>> # print the table in a form suitable for machines
     >>> for name, rate, freqs in sdh:
     ...     print('{:8s}: {:.4e} {:.4e} {:.4e} {:.4e} {:.4e}'.format(name, rate, *(1*f for f in freqs)))
     STM-1   : 1.5552e+08 5.0000e+02 6.5000e+03 6.5000e+04 1.3000e+06
@@ -204,19 +206,16 @@ demonstrate several of the features of *QuantiPhy*.
 .. code-block:: python
 
     >>> from quantiphy import Quantity
-    >>> Quantity.set_prefs(
-    ...     show_label = True,
-    ...     show_desc = True,
+    >>> with Quantity.prefs(
+    ...     show_label = 'f',
     ...     label_fmt = '{n} = {v}',
     ...     label_fmt_full = '{V:<18}  # {d}',
-    ... )
-
-    >>> T = Quantity(300, 'T K ambient temperature')
-    >>> k = Quantity('k')
-    >>> q = Quantity('q')
-    >>> Vt = Quantity(k*T/q, 'Vt V thermal voltage')
-
-    >>> print(T, k, q, Vt, sep='\n')
+    ... ):
+    ...     T = Quantity(300, 'T K ambient temperature')
+    ...     k = Quantity('k')
+    ...     q = Quantity('q')
+    ...     Vt = Quantity(k*T/q, 'Vt V thermal voltage')
+    ...     print(T, k, q, Vt, sep='\n')
     T = 300 K           # ambient temperature
     k = 13.806e-24 J/K  # Boltzmann's constant
     q = 160.22e-21 C    # elementary charge
@@ -240,11 +239,63 @@ you took explicit steps. In this case, this issue is circumvented by specifying
 the units in the *model* along with the name and description. The *model* is 
 also used when creating *Vt* to specify the name, units, and description.
 
-The last part simply prints the four values. The *show_label* preference is set, 
-so names and descriptions are printed along with the values. In this case, since 
-all the quantities have descriptions, the first string in *label_fmt* is used to 
-format the output.
+The last part simply prints the four values. The *show_label* preference is set 
+so that names and descriptions are printed along with the values. In this case, 
+since all the quantities have descriptions, *label_fmt_full* is used to format 
+the output.
 
+
+.. _unicode example:
+
+Unicode Text Example
+--------------------
+
+In this example *QuantiPhy* formats quantities to be embedded in text.  To make 
+the text as clean as possible, *QuantiPhy* is configured to use Unicode scale 
+factors and the Unicode non-breaking space as the spacer.  The non-breaking 
+space prevents units from being placed on a separate line from their number, 
+making the quantity easier to read.
+
+.. code-block:: python
+
+    >>> from quantiphy import Quantity
+    >>> import textwrap
+
+    >>> Quantity.set_prefs(
+    ...     map_sf = Quantity.map_sf_to_sci_notation,
+    ...     spacer = Quantity.non_breaking_space
+    ... )
+
+    >>> constants = [
+    ...     Quantity('h'),
+    ...     Quantity('hbar'),
+    ...     Quantity('k'),
+    ...     Quantity('q'),
+    ...     Quantity('c'),
+    ...     Quantity('0C'),
+    ...     Quantity('eps0'),
+    ...     Quantity('mu0'),
+    ... ]
+
+    >>> # generate some sentences that contain quantities
+    >>> sentences = [f'{q.desc.capitalize()} is {q}.' for q in constants]
+
+    >>> # combine the sentences into a left justified paragraph
+    >>> print(textwrap.fill('  '.join(sentences)))
+    Plank's constant is 662.61×10⁻³⁶ J-s.  Reduced plank's constant is
+    105.46×10⁻³⁶ J-s.  Boltzmann's constant is 13.806×10⁻²⁴ J/K.
+    Elementary charge is 160.22×10⁻²¹ C.  Speed of light is 299.79 Mm/s.
+    Zero degrees celsius in kelvin is 273.15 K.  Permittivity of free
+    space is 8.8542 pF/m.  Permeability of free space is 1.2566 μH/m.
+
+When rendered in your browser with a variable width font, the result looks like 
+this:
+
+    Plank's constant is 662.61×10⁻³⁶ J-s.  Reduced plank's constant is
+    105.46×10⁻³⁶ J-s.  Boltzmann's constant is 13.806×10⁻²⁴ J/K.
+    Elementary charge is 160.22×10⁻²¹ C.  Speed of light is 299.79 Mm/s.
+    Zero degrees celsius in kelvin is 273.15 K.  Permittivity of free
+    space is 8.8542 pF/m.  Permeability of free space is 1.2566 μH/m.
 
 .. _timeit example:
 
@@ -329,7 +380,7 @@ Contrast this with the normal output from *timeit*::
     0.10471829099697061
     2.3749650190002285
 
-The essential information is there, but just takes longer to make sense of it.
+The essential information is there, but it takes longer to make sense of it.
 
 
 .. _disk usage example:
@@ -474,6 +525,8 @@ e-notation. *QuantiPhy* allows you to control whether to use unfamiliar scale
 factors but does not use them by default. It also can be configured to revert to 
 engineering scientific notation (ex: 13.806×10⁻²⁴ J/K) when no scale factors are 
 appropriate.  Though not necessary for this example, that was done above with 
-the line::
+the line:
+
+.. code-block:: python
 
     Quantity.set_prefs(map_sf=Quantity.map_sf_to_sci_notation)

@@ -452,6 +452,7 @@ class Quantity(float):
     sf_free_number_converters = None
         # These must be initialized to None, but will be set the first time
         # Quantity is instantiated.
+    non_breaking_space = ' '
 
     # preferences {{{2
     _initialized = set()
@@ -651,7 +652,9 @@ class Quantity(float):
             to be '' or ' '; use the latter if you prefer a space between the
             number and the units. Generally using ' ' makes numbers easier to
             read, particularly with complex units, and using '' is easier to
-            parse.  You could also use a Unicode thin space.
+            parse.  You could also use a Unicode non-breaking space ' '. For
+            your convenience, you can access a non-breaking space using
+            Quantity.non_breaking_space.
 
         :arg bool strip_radix:
             When rendering, strip the radix (decimal point) from numbers even if they
@@ -842,6 +845,7 @@ class Quantity(float):
 
         # components {{{3
         sign = named_regex('sign', '[-+]?')
+        space = r'[\s ]'  # the space in this regex is a non-breaking space
         required_digits = r'(?:[0-9][0-9_]*[0-9]|[0-9]+)'  # allow interior underscores
         optional_digits = r'(?:[0-9][0-9_]*[0-9]|[0-9]*)'
         mantissa = named_regex(
@@ -852,15 +856,15 @@ class Quantity(float):
         )
         exponent = named_regex('exp', '[eE][-+]?[0-9]+')
         scale_factor = named_regex('sf', '[%s]' % input_sf)
-        units = named_regex('units', r'(?:[a-zA-Z°ÅΩ℧%][-^/()\w]*)?')
-            # examples: Ohms, V/A, J-s, m/s^2, H/(m-s), Ω, %
+        units = named_regex('units', r'(?:[a-zA-Z°ÅΩ℧%][-^/()\w·⁻⁰¹²³⁴⁵⁶⁷⁸⁹]*)?')
+            # examples: Ohms, V/A, J-s, m/s^2, H/(m-s), Ω, %, m·s⁻²
             # leading char must be letter to avoid 1.0E-9s -> (1e18, '-9s')
         currency = named_regex('currency', '[%s]' % CURRENCY_SYMBOLS)
         nan = named_regex('nan', '(?i)inf|nan')
 
         # number_with_scale_factor {{{3
         number_with_scale_factor = (
-            r'{sign}{mantissa}\s*{scale_factor}{units}'.format(**locals()),
+            r'{sign}{mantissa}{space}*{scale_factor}{units}'.format(**locals()),
             lambda match: match.group('sign') + match.group('mant'),
             lambda match: match.group('sf'),
             lambda match: match.group('units')
@@ -868,7 +872,7 @@ class Quantity(float):
 
         # number_with_exponent {{{3
         number_with_exponent = (
-            r'{sign}{mantissa}{exponent}\s*{units}'.format(**locals()),
+            r'{sign}{mantissa}{exponent}{space}*{units}'.format(**locals()),
             lambda match: match.group('sign') + match.group('mant'),
             lambda match: match.group('exp').lower(),
             lambda match: match.group('units')
@@ -877,7 +881,7 @@ class Quantity(float):
         # simple_number {{{3
         # this one must be processed after number_with_scale_factor
         simple_number = (
-            r'{sign}{mantissa}\s*{units}'.format(**locals()),
+            r'{sign}{mantissa}{space}*{units}'.format(**locals()),
             lambda match: match.group('sign') + match.group('mant'),
             lambda match: '',
             lambda match: match.group('units')
@@ -885,7 +889,7 @@ class Quantity(float):
 
         # currency_with_scale_factor {{{3
         currency_with_scale_factor = (
-            r'{sign}{currency}{mantissa}\s*{scale_factor}'.format(**locals()),
+            r'{sign}{currency}{mantissa}{space}*{scale_factor}'.format(**locals()),
             lambda match: match.group('sign') + match.group('mant'),
             lambda match: match.group('sf'),
             lambda match: match.group('currency')
@@ -909,7 +913,7 @@ class Quantity(float):
 
         # nan_with_units {{{3
         nan_with_units = (
-            r'{sign}{nan}\s+{units}'.format(**locals()),
+            r'{sign}{nan}{space}+{units}'.format(**locals()),
             lambda match: match.group('sign') + match.group('nan').lower(),
             lambda match: '',
             lambda match: match.group('units')
@@ -957,18 +961,19 @@ class Quantity(float):
             # or obvious unicode units, ex: °ÅΩ℧
         sf_or_units = '[a-zA-Z_μ°ÅΩ℧]+'
             # must match units or scale factors: add μ, make non-optional
+        space = '[ ]?'  # optional non-breaking space (do not use a normal space)
         left_delimit = r'(?:\A|(?<=[^a-zA-Z0-9_.]))'
         right_delimit = r'(?=[^-+0-9]|\Z)'
             # right_delim excludes [-+0-9] to avoid matches with 1e2, 1e-2, 1e+2
             # this is not great because it seems like it should fail for
             # 10uA+20uA, but it does not and I don't know why.
         cls.embedded_si_notation = re.compile(
-            '{left_delimit}{mantissa}{sf_or_units}{right_delimit}'.format(
+            '{left_delimit}{mantissa}{space}{sf_or_units}{right_delimit}'.format(
                 **locals()
             )
         )
         cls.embedded_e_notation = re.compile(
-            '{left_delimit}{mantissa}{exponent}?{smpl_units}{right_delimit}'.format(
+            '{left_delimit}{mantissa}{exponent}?{space}{smpl_units}{right_delimit}'.format(
                 **locals()
             )
         )

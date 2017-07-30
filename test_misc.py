@@ -260,6 +260,16 @@ def test_misc():
     processed = Quantity.all_from_si_fmt('1420405751.786_Hz', show_si=False)
     assert processed == '1.4204e9 Hz'
 
+    if sys.version_info.major == 3:
+        # spacer is non-breaking space
+        processed = Quantity.all_from_conv_fmt('1420405751.786 Hz', show_si=True)
+        assert processed == '1.4204 GHz'
+
+        q = Quantity('3.45e6 m·s⁻²')
+        assert q.render() == '3.45 Mm·s⁻²'
+        q = Quantity('accel = 3.45e6 m·s⁻² -- acceleration')
+        assert q.render() == '3.45 Mm·s⁻²'
+
     processed = Quantity.all_from_si_fmt('0s', show_si=True)
     assert processed == '0 s'
 
