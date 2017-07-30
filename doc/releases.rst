@@ -21,6 +21,11 @@ Releases
     - added unit systems for physical constants
 
 **2.0 (2017-07-15)**:
+    This is a 'coming of age' release where the emphasis shifts from finding the 
+    right interface to providing an interface that is stable over time. This 
+    release includes the first formal documentation and a number of new features 
+    and refinements to the API.
+
     - created formal documentation
     - enhanced label_fmt to accept {V}
     - allow quantity to be passed as value to Quantity
@@ -40,6 +45,10 @@ Releases
     - added number_fmt option
 
 
-**Latest development release**:
-    | Version: 2.0.13
-    | Released: 2017-07-30
+**2.1 (2017-07-30)**:
+    The primary focus of this release was on improving the documentation, though 
+    there are a few small feature enhancements.
+
+    - added support for SI standard composite units
+    - added support for non-breaking space as spacer
+    - removed constraint in extract() that names must be identifiers

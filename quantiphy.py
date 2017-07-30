@@ -626,7 +626,7 @@ class Quantity(float):
             Whether the description should be shown if it is available when
             showing the label.  By default *show_desc* is False.
 
-            .. deprecated:: 2.0
+            .. deprecated:: 2.1
                Use ``show_label='f'`` instead.
 
         :arg show_label:

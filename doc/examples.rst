@@ -356,7 +356,7 @@ quantities and quantities to strings compared into the built-in float class.
     ]
 
     # run testcases and print results
-    print('For {} iterations ...'.format(Quantity(trials)))
+    print(f'For {Quantity(trials)} values ...')
     for case in testcases:
         elapsed = timeit(case, number=1, globals=globals())
         result = Quantity(elapsed/trials, units='s/op', name=case)
