@@ -41,5 +41,5 @@ Releases
 
 
 **Latest development release**:
-    | Version: 2.0.12
-    | Released: 2017-07-23
+    | Version: 2.0.13
+    | Released: 2017-07-30
