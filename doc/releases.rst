@@ -52,3 +52,7 @@ Releases
     - added support for SI standard composite units
     - added support for non-breaking space as spacer
     - removed constraint in extract() that names must be identifiers
+
+**Latest development release**:
+    | Version: 2.1.0
+    | Released: 2017-07-30

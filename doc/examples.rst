@@ -14,10 +14,12 @@ units into physical quantities.  Physical quantities are very commonly
 encountered when working with real-world systems when numbers are involved. And 
 when encountered, the numbers often use SI scale factors to make them easier to 
 read and write.  Surprisingly, most computer languages do not support numbers in 
-these forms, meaning that when working with physical quantities, one often has 
-to choose between using a form that is easy for computers to read or one that is 
-easy for humans to read. For example, consider this table of critical 
-frequencies needed in jitter tolerance measurements in optical communication:
+these forms.
+
+When working with physical quantities, one often has to choose between using 
+a form that is easy for computers to read or one that is easy for humans to 
+read. For example, consider this table of critical frequencies needed in jitter 
+tolerance measurements in optical communication:
 
 .. code-block:: python
 
@@ -222,13 +224,13 @@ demonstrate several of the features of *QuantiPhy*.
     Vt = 25.852 mV      # thermal voltage
 
 The first part of this example imports :class:`quantiphy.Quantity` and sets the 
-*show_label* and *label_fmt* preferences to display both the value and the 
-description by default.  *label_fmt* is given as a tuple of two strings, the 
-first will be used when the description is present, the second is used when it 
-is not. In the first string, the ``{V:<16}`` is replaced by the expansion of the 
-second string, left justified with a field width of 16, and the ``{d}`` is 
-replaced by the description. On the second string the ``{n}`` is replaced by the 
-*name* and ``{v}`` is replaced by the value (numeric value and units).
+*show_label*, *label_fmt* and *label_fmt_full* preferences to display both the 
+value and the description by default.  *label_fmt* is used when the description 
+is not present and *label_fmt_full* is used when it is present.  In *label_fmt* 
+the ``{n}`` is replaced by the *name* and ``{v}`` is replaced by the value 
+(numeric value and units).  In *label_fmt_full*, the ``{V:<18}`` is replaced by 
+the expansion of *label_fmt*, left justified with a field width of 18, and the 
+``{d}`` is replaced by the description.
 
 The second part defines four quantities. The first is given in a very specific 
 way to avoid the ambiguity between units and scale factors. In this case, the 
@@ -518,8 +520,8 @@ use as an alternative to *QuantiPhy* for formatting your axes with SI scale
 factors, which also provides the *format_eng* function for converting floats to 
 strings formatted with SI scale factors and units. So if your needs are limited, 
 as they are in this example, that is generally a good way to go. One aspect of 
-*QuantiPhi* that you might prefer is they way it handles very large or very 
-small numbers. As the numbers get either very large or very small *EngFormatter* 
+*QuantiPhi* that you might prefer is the way it handles very large or very small 
+numbers. As the numbers get either very large or very small *EngFormatter* 
 starts by using unfamiliar scale factors (*YZPEzy*) and then reverts to 
 e-notation. *QuantiPhy* allows you to control whether to use unfamiliar scale 
 factors but does not use them by default. It also can be configured to revert to 

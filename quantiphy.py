@@ -1564,12 +1564,15 @@ class Quantity(float):
             The brackets indicate that the name/value pair and the description
             is optional.  However, <name> must be given if <value> is given.
 
-            <name>: the name is used as a key for the value.
+            <name>:
+                the name is used as a key for the value.
 
-            <value>: A number with optional units (ex: 3 or 1pF or 1 kOhm),
-            the units need not be a simple identifier (ex: 9.07 GHz/V).
+            <value>:
+                A number with optional units (ex: 3 or 1pF or 1 kOhm),
+                the units need not be a simple identifier (ex: 9.07 GHz/V).
 
-            <description>: Optional textual description (ex: Gain of PD (Imax)).
+            <description>:
+                Optional textual description (ex: Frequency of hydrogen line).
 
             Blank lines and any line that does not contain a value are ignored.
             So with the default *assign_rec*, lines with the following form are
