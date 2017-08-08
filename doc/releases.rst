@@ -54,5 +54,5 @@ Releases
     - removed constraint in extract() that names must be identifiers
 
 **Latest development release**:
-    | Version: 2.1.0
-    | Released: 2017-07-30
+    | Version: 2.1.1
+    | Released: 2017-08-07
