@@ -91,6 +91,25 @@ Now *distance_to_sun* contains two items, the number 150000000000.0 and the
 units 'm'.  The 'G' was interpreted as the *giga* scale factor, which scales by 
 10\ :sup:`9`.
 
+It is worth considering the alternative for a moment:
+
+.. code-block:: python
+
+    >>> d_sol = float('150000000000.0')
+    >>> print(f'{d_sol} m')
+    150000000000.0 m
+
+Ignoring the difficulty in writing and reading the number, there is another 
+important difference. The units are placed in the print statement and not kept 
+with the number. This makes the value ambiguous, it clutters the print 
+statement, and it introduces a vulnerability. When coming back and refactoring 
+your code after some time has passed, you might change the units of the number 
+and forget to change the units in the print statement. This is particularly 
+likely if the number is defined far from where it is printed. The result is that 
+erroneous results are printed and is always a risk when two related pieces of 
+information are specified far from one another. *QuantiPhy* addresses this issue 
+by binding the value and the units into one object.
+
 :class:`quantiphy.Quantity` is a subclass of float, and so *distance_to_sun* can 
 be used just like any real number. For example, you can convert the distance to 
 miles using:
