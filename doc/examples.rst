@@ -571,13 +571,12 @@ This example demonstrates use of *UnitConversion*.
     eth2usd = UnitConversion(('$', 'USD'), ('Ξ', 'ETH'), data['ETH']['USD'])
     bcc2usd = UnitConversion(('$', 'USD'), 'BCH',        data['BCH']['USD'])
     btc2eth = UnitConversion(('Ξ', 'ETH'), ('Ƀ', 'BTC'), data['BTC']['ETH'])
-    eth2btc = UnitConversion(('Ƀ', 'BTC'), ('Ξ', 'ETH'), data['ETH']['BTC'])
     total = Quantity(sum(q.scale('$') for q in [btc, eth, bcc]), '$')
 
     display(dedent(f'''
         Current Prices:
             BTC = {btc2usd.convert()} or {btc2eth.convert()}
-            ETH = {eth2usd.convert()} or {eth2btc.convert()}
+            ETH = {eth2usd.convert()} or {btc2eth.convert(1, 'Ξ', 'Ƀ')}
             BCH = {bcc2usd.convert()}
 
         My Holdings:
