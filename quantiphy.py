@@ -56,6 +56,25 @@ def is_str(obj):
 def named_regex(name, regex):
     return '(?P<%s>%s)' % (name, regex)
 
+def _scale(scale, number, units):
+    if is_str(scale):
+        # if scale is string, it contains the units to convert from
+        number = _convert_units(scale, units, number)
+        units = scale
+    else:
+        try:
+            # otherwise, it might be a function
+            number, units = scale(number, units)
+        except TypeError:
+            try:
+                # otherwise, assume it is a scale factor and units
+                multiplier, units = scale
+            except TypeError:
+                # otherwise, assume it is just a scale factor
+                multiplier = scale
+            number *= multiplier
+    return number, units
+
 # Unit Conversions {{{1
 _unit_conversions = {}
 def _convert_units(to_units, from_units, value):
@@ -106,11 +125,17 @@ class UnitConversion(object):
     Example::
 
         >>> from quantiphy import Quantity, UnitConversion
-        >>> UnitConversion('m', 'pc parsec', 3.0857e16)
-        <...>
+        >>> m2pc = UnitConversion('m', 'pc parsec', 3.0857e16)
 
-    This establishes a conversion between meters (m) and parsecs (parsec, pc)
-    that can go both ways::
+    Normally one simply discards the return value of UnitConversion, but if kept
+    you can convert it to a string to get a summary of the conversion::
+
+        >>> print(str(m2pc))
+        m = 3.0857e+16*pc
+
+    The act of creating this unit conversion establishes a conversion between
+    meters (m) and parsecs (parsec, pc) that is accessible when creating or
+    rendering quantities and can go both ways::
 
         >>> d_sol = Quantity('5 μpc', scale='m')
         >>> print(d_sol)
@@ -122,12 +147,12 @@ class UnitConversion(object):
 
     """
     def __init__(self, to_units, from_units, slope=1, intercept=0):
-        to_units = to_units.split() if is_str(to_units) else to_units
-        from_units = from_units.split() if is_str(from_units) else from_units
+        self.to_units = to_units.split() if is_str(to_units) else to_units
+        self.from_units = from_units.split() if is_str(from_units) else from_units
         self.slope = slope
         self.intercept = intercept
-        for to in to_units:
-            for frm in from_units:
+        for to in self.to_units:
+            for frm in self.from_units:
                 _unit_conversions[(to, frm)] = self._forward
                 _unit_conversions[(frm, to)] = self._reverse
 
@@ -136,6 +161,71 @@ class UnitConversion(object):
 
     def _reverse(self, value):
         return (value - self.intercept)/self.slope
+
+    def convert(self, value=1, from_units=None, to_units=None):
+        """Convert value to quantity with new units.
+
+        A convenience method. Normally it is not needed because once created, a
+        unit conversion becomes directly accessible to quantities and can be
+        used both when creating or rendering the quantity.
+
+        :arg real value:
+            The value to convert. May be a real number or a quantity. If not
+            given it is taken to be 1.
+
+        :arg str from_units:
+            The units to convert from.
+            If not give, the class's first from_units are used.
+
+        :arg str to_units:
+            The units to convert to.
+            If not give, the class's first to_units are used.
+
+        If the from_units were found among the class's from_units, and the
+        to_units were found among the class's to_units, then a forward
+        conversion is performed.
+
+        If the from_units were found among the class's to_units, and the
+        to_units were found among the class's from_units, then a reverse
+        conversion is performed.
+
+        :raises KeyError:
+            The given units are not supported by the underlying class.
+
+        Example::
+
+            >>> m2pc.convert()
+            Quantity('30.857e15 m')
+
+            >>> m2pc.convert(1, 'pc', 'm')
+            Quantity('30.857e15 m')
+
+            >>> m2pc.convert(30.857e15, 'm', 'pc')
+            Quantity('1 pc')
+
+        """
+        if from_units is None:
+            from_units = self.from_units[0]
+        if to_units is None:
+            to_units = self.to_units[0]
+        if from_units in self.from_units and to_units in self.to_units:
+            return Quantity(self._forward(value), to_units)
+        elif from_units in self.to_units and to_units in self.from_units:
+            return Quantity(self._reverse(value), to_units)
+        elif from_units not in (self.to_units + self.from_units):
+            raise KeyError('{}: unknown from-units.'.format(from_units))
+        raise KeyError('{}: unknown to-units.'.format(to_units))
+
+    def __str__(self):
+        if self.intercept:
+            return '{} = {}*{} + {}'.format(
+                self.to_units[0], self.slope, self.from_units[0],
+                Quantity(self.intercept, self.to_units[0])
+            )
+        else:
+            return '{} = {}*{}'.format(
+                self.to_units[0], self.slope, self.from_units[0]
+            )
 
 # Temperature conversions {{{2
 UnitConversion('C °C', 'C °C')
@@ -314,7 +404,7 @@ SMALL_SCALE_FACTORS = 'munpfazy'
     # These must be given in order, one for every three decades.
 
 # Regular expression for recognizing and decomposing string .format method codes
-FORMAT_SPEC = re.compile(r'\A([<>]?)(\d*)(?:\.(\d+))?(?:([qQrRusSeEfFgGdn])([a-zA-Z°ÅΩ℧%][-^/()\w]*)?)?\Z')
+FORMAT_SPEC = re.compile(r'\A([<>]?)(\d*)(?:\.(\d+))?(?:([qQrRusSeEfFgGdn])([a-zA-Z°ÅΩ℧$%][-^/()\w]*)?)?\Z')
 #                             ^align ^width    ^prec     ^format            ^units
 
 # Defaults {{{1
@@ -341,7 +431,7 @@ DEFAULTS = {
     'strip_radix': True,
     'unity_sf': '',
 }
-CURRENCY_SYMBOLS = '$£€' if sys.version_info.major == 3 else '$'
+CURRENCY_SYMBOLS = '$£€ɃΞ' if sys.version_info.major == 3 else '$'
 
 
 # Quantity class {{{1
@@ -387,7 +477,7 @@ class Quantity(float):
         - If a string, it is taken to the be desired units. This value along
           with the units of the given value are used to select a known unit
           conversion, which is applied to create the quantity.
-    :type scale: float, tuple, func, or string):
+    :type scale: float, tuple, func, or string:
 
     :arg str name:
         Overrides the name taken from *value* or *model*.
@@ -559,7 +649,7 @@ class Quantity(float):
             for the name, value, description, and value as formatted by *label_fmt*.
             Typical value include::
 
-                '{n} = {v} --  {d}'    (default)
+                '{n} = {v} -- {d}'    (default)
                 '{n} = {v} # {d}'
                 '{n} = {v} // {d}'
                 '{n}: {v} -- {d}'
@@ -1077,22 +1167,7 @@ class Quantity(float):
         # perform specified conversion if requested
         if scale:
             original = number
-            if is_str(scale):
-                # if scale is string, it contains the units to convert from
-                number = _convert_units(scale, units, number)
-                units = scale
-            else:
-                try:
-                    # otherwise, it might be a function
-                    number, units = scale(number, units)
-                except TypeError:
-                    try:
-                        # otherwise, assume it is a scale factor and units
-                        multiplier, units = scale
-                    except TypeError:
-                        # otherwise, assume it is just a scale factor
-                        multiplier = scale
-                    number *= multiplier
+            number, units = _scale(scale, number, units)
             if original != number:
                 # must erase mantissa which is not out of date
                 mantissa = None
@@ -1163,6 +1238,40 @@ class Quantity(float):
 
         """
         return self.real, self.units
+
+    # scale() {{{2
+    def scale(self, scale):
+        """Scale a quantity to create a new quantity.
+
+        :arg scale:
+            - If a float, it scales the displayed value (the quantity is
+              multiplied by scale before being converted to the string).
+            - If a tuple, the first value, a float, is treated as a scale factor
+              and the second value, a string, is take to be the units of the
+              displayed value.
+            - If a function, it takes two arguments, the value and the units of
+              the quantity and it returns two values, the value and units of
+              the displayed value.
+            - If a string, it is taken to the be desired units. This value along
+              with the units of the quantity are used to select a known unit
+              conversion, which is applied to create the displayed value.
+        :type scale: real, pair, function, or string:
+
+        :raises KeyError:
+            A unit conversion was requested and there is no corresponding unit
+            converter.
+
+        Example::
+
+            >>> Tf = Tfreeze.scale('°F')
+            >>> Tb = Tboil.scale('°F')
+            >>> print(Tf, Tb, sep=newline)
+            32 °F
+            212 °F
+
+        """
+        number, units = _scale(scale, self.real, self.units)
+        return Quantity(number, units)
 
     # render() {{{2
     def render(
@@ -1246,7 +1355,6 @@ class Quantity(float):
             212 °F
 
         """
-
         # initialize units and si
         show_units = self.show_units if show_units is None else show_units
         units = self.units if show_units else ''
@@ -1302,22 +1410,7 @@ class Quantity(float):
             # scale if desired
             number = self.real
             if scale:
-                if is_str(scale):
-                    # if scale is string, it contains the units to convert to
-                    number = _convert_units(scale, self.units, number)
-                    units = scale
-                else:
-                    try:
-                        # otherwise, it might be a function
-                        number, units = scale(number, self.units)
-                    except TypeError:
-                        try:
-                            # otherwise, assume it is a scale factor and units
-                            multiplier, units = scale
-                        except TypeError:
-                            # otherwise, assume it is just a scale factor
-                            multiplier = scale
-                        number *= multiplier
+                number, units = _scale(scale, number, self.units)
                 if not show_units:
                     units = ''
 
@@ -1534,6 +1627,7 @@ class Quantity(float):
                 value = '{0:.{1}{2}}'.format(value, prec, ftype.lower())
                 if ftype.isupper():
                     value = self._label(value, True)
+                width = '' if width == '0' else ''
             return '{0:{1}{2}s}'.format(value, align, width)
         else:
             # unrecognized format, just provide something reasonable

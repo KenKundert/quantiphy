@@ -532,3 +532,70 @@ the line:
 .. code-block:: python
 
     Quantity.set_prefs(map_sf=Quantity.map_sf_to_sci_notation)
+
+
+.. _cryptocurrency example:
+
+Cryptocurrency Example
+----------------------
+
+In this example *QuantiPhy* is used to perform conversions from the prices of 
+various crypto currencies to dollars. The latest prices are downloaded from 
+cryptocompare.com. A summary of the prices is printed and then they are 
+multiplied by my holdings to find the total worth of the portfolio, which is 
+also printed.
+
+This example demonstrates use of *UnitConversion*.
+
+.. code-block:: python
+
+    #!/usr/bin/env python3
+
+    import requests
+    from inform import display, render, debug
+    from textwrap import dedent
+    from quantiphy import Quantity, UnitConversion
+
+    Quantity.set_prefs(prec=2)
+
+    # my holdings
+    btc = Quantity(2, 'Ƀ')
+    eth = Quantity(5, 'Ξ')
+    bcc = Quantity(10, 'BCH')
+
+    # download latest asset prices from cryptocompare.com
+    r = requests.get('https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,ETH,BCH&tsyms=BTC,ETH,USD')
+    data = r.json()
+
+    btc2usd = UnitConversion(('$', 'USD'), ('Ƀ', 'BTC'), data['BTC']['USD'])
+    eth2usd = UnitConversion(('$', 'USD'), ('Ξ', 'ETH'), data['ETH']['USD'])
+    bcc2usd = UnitConversion(('$', 'USD'), 'BCH',        data['BCH']['USD'])
+    btc2eth = UnitConversion(('Ξ', 'ETH'), ('Ƀ', 'BTC'), data['BTC']['ETH'])
+    eth2btc = UnitConversion(('Ƀ', 'BTC'), ('Ξ', 'ETH'), data['ETH']['BTC'])
+    total = Quantity(sum(q.scale('$') for q in [btc, eth, bcc]), '$')
+
+    display(dedent(f'''
+        Current Prices:
+            BTC = {btc2usd.convert()} or {btc2eth.convert()}
+            ETH = {eth2usd.convert()} or {eth2btc.convert()}
+            BCH = {bcc2usd.convert()}
+
+        My Holdings:
+            BTC = {btc:q$}
+            ETH = {eth:q$}
+            BCH = {bcc:q$}
+            Total = {total:q}
+    ''').strip())
+
+This script produces the following textual output::
+
+    Current Prices:
+        BTC = $7.44k or Ξ24.9
+        ETH = $299 or Ƀ40.1m
+        BCH = $604
+
+    My Holdings:
+        BTC = $14.9k
+        ETH = $1.5k
+        BCH = $6.04k
+        Total = $22.4k

@@ -14,6 +14,7 @@ Unit Conversion
 ===============
 
 .. autoclass:: quantiphy.UnitConversion
+    :members:
 
 
 Constants and Unit Systems
