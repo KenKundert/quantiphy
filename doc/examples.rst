@@ -604,10 +604,10 @@ It demonstrates some of the features of *UnitConversion*.
               1 ZEC = {zec2usd.convert()}
 
         Holdings:
-            {btc:>7s} = {btc:q$}
-            {eth:>7s} = {eth:q$}
-            {bch:>7s} = {bch:q$}
-            {zec:>7s} = {zec:q$}
+            {btc:>7q} = {btc:q$}
+            {eth:>7q} = {eth:q$}
+            {bch:>7q} = {bch:q$}
+            {zec:>7q} = {zec:q$}
               Total = {total:q}
     ''').strip())
 
