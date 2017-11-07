@@ -614,14 +614,14 @@ It demonstrates some of the features of *UnitConversion*.
 The output of the script looks like this::
 
     Current Prices:
-        1 BTC = $7.15k or Ξ24
-        1 ETH = $299 or Ƀ41.7m
-        1 BCH = $604
-        1 ZEC = $231
+          1 BTC = $7.15k or Ξ24
+          1 ETH = $299 or Ƀ41.7m
+          1 BCH = $604
+          1 ZEC = $231
 
     Holdings:
-        Ƀ100 = $715k
-        Ξ100 = $29.9k
+           Ƀ100 = $715k
+           Ξ100 = $29.9k
         100 BCH = $60.4k
         100 ZEC = $23.1k
-        Total = $829k
+          Total = $829k

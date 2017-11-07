@@ -288,6 +288,14 @@ test_cases = [
     Case('eastward', '3.141592 Hz', ('3.1416', 'Hz'), '3.1416 Hz', {'spacer':' '}),
     Case('string', '1420.405751786MHz', ('1.4204e9', 'Hz'), '1.4204e9Hz', {'output_sf':''}),
     Case('airliner', '1ns', ('1', 'ns'), '1ns', {'ignore_sf':True}),
+    Case('anchorage', '1000 MHz', ('1e9', 'Hz'), '1GHz', dict(prec=0, strip_zeros=False)),
+    Case('moorland', '1000 MHz', ('1e9', 'Hz'), '1GHz', dict(prec=0, strip_zeros=True)),
+    Case('rinse', '1000 MHz', ('1.0e9', 'Hz'), '1.0GHz', dict(prec=1, strip_zeros=False)),
+    Case('drugstore', '1000 MHz', ('1e9', 'Hz'), '1GHz', dict(prec=1, strip_zeros=True)),
+    Case('aspen', '1000 MHz', ('1.00e9', 'Hz'), '1.00GHz', dict(prec=2, strip_zeros=False)),
+    Case('resolve', '1000 MHz', ('1e9', 'Hz'), '1GHz', dict(prec=2, strip_zeros=True)),
+    Case('cultivate', '1000 MHz', ('1.000e9', 'Hz'), '1.000GHz', dict(prec=3, strip_zeros=False)),
+    Case('mantis', '1000 MHz', ('1e9', 'Hz'), '1GHz', dict(prec=3, strip_zeros=True)),
 ]
 
 names = set()
@@ -302,7 +310,7 @@ def test_number_recognition():
         Quantity.set_prefs(
             prec=None, full_prec=None, spacer='', unity_sf=None, output_sf=None,
             ignore_sf=None, label_fmt=None, assign_rec=None, show_units=True,
-            strip_radix=True
+            strip_radix=True, strip_zeros=True
         )
         try:
             if case.prefs:

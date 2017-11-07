@@ -429,6 +429,7 @@ DEFAULTS = {
     'show_units': True,
     'spacer': ' ',
     'strip_radix': True,
+    'strip_zeros': True,
     'unity_sf': '',
 }
 CURRENCY_SYMBOLS = '$£€ɃΞ' if sys.version_info.major == 3 else '$'
@@ -747,8 +748,14 @@ class Quantity(float):
             Quantity.non_breaking_space.
 
         :arg bool strip_radix:
-            When rendering, strip the radix (decimal point) from numbers even if they
-            can then be mistaken for integers. By default this is True.
+            When rendering, strip the radix (decimal point) if not needed from
+            numbers even if they could then be mistaken for integers. If this
+            setting is False, the radix is still striped if the number has a
+            scale factor. By default this is True.
+
+        :arg bool strip_zeros:
+            When rendering, strip off any unneeded zeros from the number. By
+            default this is True.
 
         :arg str unity_sf:
             The output scale factor for unity, generally '' or '_'. The default
@@ -1439,34 +1446,33 @@ class Quantity(float):
                     if SMALL_SCALE_FACTORS[index-1] in self.output_sf:
                         sf = SMALL_SCALE_FACTORS[index-1]
 
-        # render the scale factor if approprite
+        # render the scale factor if appropriate
         if self.map_sf:
             try:
                 sf = self.map_sf.get(sf, sf)
             except AttributeError:
                 sf = self.map_sf(sf)
 
-        # move decimal point as needed
-        if shift:
-            mantissa += '00'
-            whole, frac = mantissa.split('.')
-            if shift == 1:
-                 mantissa = whole + frac[0:1] + '.' + frac[1:]
-            else:
-                 mantissa = whole + frac[0:2] + '.' + frac[2:]
-
-        # remove trailing zeros (except if mantissa does not contain a .)
-        if mantissa.find('.') >= 0:
-            mantissa = mantissa.rstrip("0")
+        # shift the decimal place as needed
+        sign = '-' if mantissa[0] == '-' else ''
+        mantissa = mantissa.lstrip('-').replace('.', '')
+        if self.strip_zeros:
+            mantissa = mantissa.rstrip('0')
+        mantissa += (shift + 1 - len(mantissa))*'0'
+        mantissa = sign + mantissa[0:(shift+1)] + '.' + mantissa[(shift+1):]
 
         # remove trailing decimal point
-        if sf or show_units or self.strip_radix:
-            mantissa = mantissa.rstrip(".")
-        else:
+        if sf or self.strip_radix: # could also add 'or units'
+            mantissa = mantissa.rstrip('.')
+        elif self.strip_zeros:
+            # a trailing radix is not very attractive, so add a zero except if
+            # strip_zeros is set, which is where we are trying to retain the
+            # number of digits specified by prec to convey the number of
+            # significant figures.
             if mantissa[-1] == '.':
                 mantissa += '0'
 
-        value =  self._combine(mantissa, sf, units, self.spacer)
+        value = self._combine(mantissa, sf, units, self.spacer)
         return self._label(value, show_label)
 
     # is_close() {{{2
