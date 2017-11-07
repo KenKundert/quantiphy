@@ -539,62 +539,87 @@ the line:
 Cryptocurrency Example
 ----------------------
 
-In this example *QuantiPhy* is used to perform conversions from the prices of 
-various crypto currencies to dollars. The latest prices are downloaded from 
-cryptocompare.com. A summary of the prices is printed and then they are 
-multiplied by my holdings to find the total worth of the portfolio, which is 
-also printed.
+This example is displays the current price of various cryptocurrencies and the 
+total value of a hypothetical portfolio of currencies. *QuantiPhy* performs 
+conversions from the prices of various currencies to dollars.  The latest prices 
+are downloaded from cryptocompare.com.  A summary of the prices is printed and 
+then they are multiplied by the portfolio holdings to find the total worth of
+the portfolio, which is also printed.
 
-This example demonstrates use of *UnitConversion*.
+It demonstrates some of the features of *UnitConversion*.
 
 .. code-block:: python
 
     #!/usr/bin/env python3
 
     import requests
-    from inform import display, render, debug
     from textwrap import dedent
     from quantiphy import Quantity, UnitConversion
 
     Quantity.set_prefs(prec=2)
 
-    # my holdings
-    btc = Quantity(2, 'Ƀ')
-    eth = Quantity(5, 'Ξ')
-    bcc = Quantity(10, 'BCH')
+    # holdings
+    btc = Quantity(100, 'Ƀ')
+    bch = Quantity(100, 'BCH')
+    eth = Quantity(100, 'Ξ')
+    zec = Quantity(100, 'ZEC')
+    holdings = [btc, eth, bch, zec]
 
     # download latest asset prices from cryptocompare.com
-    r = requests.get('https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,ETH,BCH&tsyms=BTC,ETH,USD')
+    currencies = dict(
+        fsyms = 'BTC,ETH,BCH,ZEC',
+        tsyms = 'ETH,USD',
+    )
+    url_args = '&'.join(f'{k}={v}' for k, v in currencies.items())
+    base_url = f'https://min-api.cryptocompare.com/data/pricemulti'
+    url = '?'.join([base_url, url_args])
+    r = requests.get(url)
     data = r.json()
 
-    btc2usd = UnitConversion(('$', 'USD'), ('Ƀ', 'BTC'), data['BTC']['USD'])
-    eth2usd = UnitConversion(('$', 'USD'), ('Ξ', 'ETH'), data['ETH']['USD'])
-    bcc2usd = UnitConversion(('$', 'USD'), 'BCH',        data['BCH']['USD'])
-    btc2eth = UnitConversion(('Ξ', 'ETH'), ('Ƀ', 'BTC'), data['BTC']['ETH'])
-    total = Quantity(sum(q.scale('$') for q in [btc, eth, bcc]), '$')
+    # define unit conversions
+    units = {
+        'USD': ('$', 'USD'),
+        'BTC': ('Ƀ', 'BTC'),
+        'ETH': ('Ξ', 'ETH'),
+        'BCH': ('BCH',    ),
+        'ZEC': ('ZEC',    ),
+    }
+    def get_converter(fm, to):
+        return UnitConversion(units[to], units[fm], data[fm][to])
+    btc2usd = get_converter('BTC', 'USD')
+    eth2usd = get_converter('ETH', 'USD')
+    bch2usd = get_converter('BCH', 'USD')
+    zec2usd = get_converter('ZEC', 'USD')
+    btc2eth = get_converter('BTC', 'ETH')
 
-    display(dedent(f'''
+    # sum total holdings
+    total = Quantity(sum(q.scale('$') for q in holdings), '$')
+
+    # show summary of conversions and holdings
+    print(dedent(f'''
         Current Prices:
-            BTC = {btc2usd.convert()} or {btc2eth.convert()}
-            ETH = {eth2usd.convert()} or {btc2eth.convert(1, 'Ξ', 'Ƀ')}
-            BCH = {bcc2usd.convert()}
+            1 BTC = {btc2usd.convert()} or {btc2eth.convert()}
+            1 ETH = {eth2usd.convert()} or {btc2eth.convert(1, 'Ξ', 'Ƀ')}
+            1 BCH = {bch2usd.convert()}
+            1 ZEC = {zec2usd.convert()}
 
-        My Holdings:
-            BTC = {btc:q$}
-            ETH = {eth:q$}
-            BCH = {bcc:q$}
+        Holdings:
+            {btc:>7s} = {btc:q$}
+            {eth:>7s} = {eth:q$}
+            {bch:>7s} = {bch:q$}
+            {zec:>7s} = {zec:q$}
             Total = {total:q}
     ''').strip())
 
-This script produces the following textual output::
+Current Prices:
+        1 BTC = $7.15k or Ξ24
+        1 ETH = $299 or Ƀ41.7m
+        1 BCH = $604
+        1 ZEC = $231
 
-    Current Prices:
-        BTC = $7.44k or Ξ24.9
-        ETH = $299 or Ƀ40.1m
-        BCH = $604
-
-    My Holdings:
-        BTC = $14.9k
-        ETH = $1.5k
-        BCH = $6.04k
-        Total = $22.4k
+Holdings:
+       Ƀ100 = $715k
+       Ξ100 = $29.9k
+    100 BCH = $60.4k
+    100 ZEC = $23.1k
+      Total = $829k
