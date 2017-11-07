@@ -574,7 +574,7 @@ It demonstrates some of the features of *UnitConversion*.
     base_url = f'https://min-api.cryptocompare.com/data/pricemulti'
     url = '?'.join([base_url, url_args])
     r = requests.get(url)
-    data = r.json()
+    conversions = r.json()
 
     # define unit conversions
     units = {
@@ -585,7 +585,7 @@ It demonstrates some of the features of *UnitConversion*.
         'ZEC': ('ZEC',    ),
     }
     def get_converter(fm, to):
-        return UnitConversion(units[to], units[fm], data[fm][to])
+        return UnitConversion(units[to], units[fm], conversions[fm][to])
     btc2usd = get_converter('BTC', 'USD')
     eth2usd = get_converter('ETH', 'USD')
     bch2usd = get_converter('BCH', 'USD')
@@ -598,28 +598,30 @@ It demonstrates some of the features of *UnitConversion*.
     # show summary of conversions and holdings
     print(dedent(f'''
         Current Prices:
-            1 BTC = {btc2usd.convert()} or {btc2eth.convert()}
-            1 ETH = {eth2usd.convert()} or {btc2eth.convert(1, 'Ξ', 'Ƀ')}
-            1 BCH = {bch2usd.convert()}
-            1 ZEC = {zec2usd.convert()}
+              1 BTC = {btc2usd.convert()} or {btc2eth.convert()}
+              1 ETH = {eth2usd.convert()} or {btc2eth.convert(1, 'Ξ', 'Ƀ')}
+              1 BCH = {bch2usd.convert()}
+              1 ZEC = {zec2usd.convert()}
 
         Holdings:
             {btc:>7s} = {btc:q$}
             {eth:>7s} = {eth:q$}
             {bch:>7s} = {bch:q$}
             {zec:>7s} = {zec:q$}
-            Total = {total:q}
+              Total = {total:q}
     ''').strip())
 
-Current Prices:
+The output of the script looks like this::
+
+    Current Prices:
         1 BTC = $7.15k or Ξ24
         1 ETH = $299 or Ƀ41.7m
         1 BCH = $604
         1 ZEC = $231
 
-Holdings:
-       Ƀ100 = $715k
-       Ξ100 = $29.9k
-    100 BCH = $60.4k
-    100 ZEC = $23.1k
-      Total = $829k
+    Holdings:
+        Ƀ100 = $715k
+        Ξ100 = $29.9k
+        100 BCH = $60.4k
+        100 ZEC = $23.1k
+        Total = $829k
