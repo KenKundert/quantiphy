@@ -169,17 +169,19 @@ class UnitConversion(object):
         unit conversion becomes directly accessible to quantities and can be
         used both when creating or rendering the quantity.
 
-        :arg real value:
-            The value to convert. May be a real number or a quantity. If not
-            given it is taken to be 1.
+        :arg value:
+            The value to convert. May be a real number or a quantity.
+            Alternately, may simply be a string, in which case it is taken to be
+            the from_units. If the value is not given it is taken to be 1.
+        :type arg: real or string or Quantity
 
         :arg str from_units:
             The units to convert from.
-            If not give, the class's first from_units are used.
+            If not given, the class's first from_units are used.
 
         :arg str to_units:
             The units to convert to.
-            If not give, the class's first to_units are used.
+            If not given, the class's first to_units are used.
 
         If the from_units were found among the class's from_units, and the
         to_units were found among the class's to_units, then a forward
@@ -194,27 +196,50 @@ class UnitConversion(object):
 
         Example::
 
-            >>> m2pc.convert()
-            Quantity('30.857e15 m')
+            >>> m = m2pc.convert()
+            >>> print(str(m))
+            30.857e15 m
 
-            >>> m2pc.convert(1, 'pc', 'm')
-            Quantity('30.857e15 m')
+            >>> pc = m2pc.convert(m)
+            >>> print(str(pc))
+            1 pc
 
-            >>> m2pc.convert(30.857e15, 'm', 'pc')
+            >>> m = m2pc.convert(pc)
+            >>> print(str(m))
+            30.857e15 m
+
+            >>> m2pc.convert(30.857e15, 'm')
             Quantity('1 pc')
 
+            >>> m2pc.convert(1000, 'pc')
+            Quantity('30.857e18 m')
+
+            >>> m2pc.convert('pc')
+            Quantity('30.857e15 m')
+
         """
+        if is_str(value):
+            if not from_units:
+                from_units = value
+            value = 1
         if from_units is None:
-            from_units = self.from_units[0]
-        if to_units is None:
-            to_units = self.to_units[0]
-        if from_units in self.from_units and to_units in self.to_units:
+            try:
+                from_units = value.units
+            except AttributeError:
+                pass
+        if to_units in self.to_units:
             return Quantity(self._forward(value), to_units)
-        elif from_units in self.to_units and to_units in self.from_units:
+        if to_units in self.from_units:
             return Quantity(self._reverse(value), to_units)
-        elif from_units not in (self.to_units + self.from_units):
-            raise KeyError('{}: unknown from-units.'.format(from_units))
-        raise KeyError('{}: unknown to-units.'.format(to_units))
+        if not from_units:
+            return Quantity(self._forward(value), self.to_units[0])
+        if from_units in self.from_units:
+            return Quantity(self._forward(value), self.to_units[0])
+        if from_units in self.to_units:
+            return Quantity(self._reverse(value), self.from_units[0])
+        if to_units:
+            raise KeyError('{}: unknown to_units.'.format(to_units))
+        raise KeyError('{}: unknown from_units.'.format(from_units))
 
     def __str__(self):
         if self.intercept:
@@ -753,9 +778,16 @@ class Quantity(float):
             setting is False, the radix is still striped if the number has a
             scale factor. By default this is True.
 
+            Use strip_radix=False when generating output that will be read by a
+            parser that distinguishes between integers and reals based on the
+            presence of a decimal point.
+
         :arg bool strip_zeros:
             When rendering, strip off any unneeded zeros from the number. By
             default this is True.
+
+            Use strip_zeros=False when you would like to indicated the precision
+            of your numbers based on the number of digits shown.
 
         :arg str unity_sf:
             The output scale factor for unity, generally '' or '_'. The default

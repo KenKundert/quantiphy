@@ -188,7 +188,7 @@ If given as a string, the value may also be the name of a known :ref:`constant
 The following constants are pre-defined: *h*, *ħ*, *k*, *q*, *c*, *0°C'*, *ε₀*, 
 *μ₀*, and *Z₀*. You may add your own constants.
 
-Currency units ($£€) are a bit different than other units, they are placed 
+Currency units ($£€ɃΞ) are a bit different than other units, they are placed 
 at the front of the quantity.
 
 .. code-block:: python
@@ -386,8 +386,7 @@ You can also create your own converters using :class:`quantiphy.UnitConversion`:
 
     >>> from quantiphy import UnitConversion
 
-    >>> UnitConversion('m', 'pc parsec', 3.0857e16)
-    <...>
+    >>> m2pc = UnitConversion('m', 'pc parsec', 3.0857e16)
 
     >>> d_sol = Quantity('5 μpc', scale='m')
     >>> print(d_sol)
@@ -399,6 +398,31 @@ This unit conversion says, when converting units of 'm' to either 'pc' or
     >>> d_sol = Quantity('154.285 Gm', scale='pc')
     >>> print(d_sol)
     5 upc
+
+Notice that the return value of *UnitConversion* was not used. It is enough to 
+simply create the *UnitConversion* for it to be available to *Quantity*. So, it 
+is normal to not capture the return value. However, there are two things you can 
+do with the return value. First you can convert it to a string to get 
+a description of the relationship. This is largely used as a sanity check:
+
+.. code-block:: python
+
+    >>> print(str(m2pc))
+    m = 3.0857e+16*pc
+
+In addition, you can use it to directly perform conversions:
+
+.. code-block:: python
+
+    >>> m = m2pc.convert(1, 'pc')
+    >>> print(str(m))
+    30.857e15 m
+
+    >>> kpc = m2pc.convert(30.857e+18, 'm')
+    >>> print(str(kpc))
+    1 kpc
+
+You can find an example of this usage in :ref:`cryptocurrency example`.
 
 When using unit conversions it is important to only convert to units without 
 scale factors (such as those in the first column above) when creating 

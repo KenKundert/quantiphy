@@ -216,12 +216,12 @@ demonstrate several of the features of *QuantiPhy*.
     ...     T = Quantity(300, 'T K ambient temperature')
     ...     k = Quantity('k')
     ...     q = Quantity('q')
-    ...     Vt = Quantity(k*T/q, 'Vt V thermal voltage')
+    ...     Vt = Quantity(k*T/q, f'Vt V thermal voltage at {T:q}')
     ...     print(T, k, q, Vt, sep='\n')
     T = 300 K           # ambient temperature
     k = 13.806e-24 J/K  # Boltzmann's constant
     q = 160.22e-21 C    # elementary charge
-    Vt = 25.852 mV      # thermal voltage
+    Vt = 25.852 mV      # thermal voltage at 300 K
 
 The first part of this example imports :class:`quantiphy.Quantity` and sets the 
 *show_label*, *label_fmt* and *label_fmt_full* preferences to display both the 
@@ -599,7 +599,7 @@ It demonstrates some of the features of *UnitConversion*.
     print(dedent(f'''
         Current Prices:
               1 BTC = {btc2usd.convert()} or {btc2eth.convert()}
-              1 ETH = {eth2usd.convert()} or {btc2eth.convert(1, 'Ξ', 'Ƀ')}
+              1 ETH = {eth2usd.convert()} or {btc2eth.convert(1, 'Ξ')}
               1 BCH = {bch2usd.convert()}
               1 ZEC = {zec2usd.convert()}
 
