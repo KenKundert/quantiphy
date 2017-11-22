@@ -53,6 +53,12 @@ Releases
     - added support for non-breaking space as spacer
     - removed constraint in extract() that names must be identifiers
 
+**2.2 (2017-11-22)**:
+    - added Quantity.scale()
+    - added UnitConversion.convert()
+    - added strip_zeros
+    - added no-op conversions (units change but value stays the same: ex. $->USD)
+
 **Latest development release**:
     | Version: 2.1.8
     | Released: 2017-11-07
