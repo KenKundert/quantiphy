@@ -567,8 +567,8 @@ It demonstrates some of the features of *UnitConversion*.
 
     # download latest asset prices from cryptocompare.com
     currencies = dict(
-        fsyms = 'BTC,ETH,BCH,ZEC',
-        tsyms = 'ETH,USD',
+        fsyms = 'BTC,ETH,BCH,ZEC',  # from symbols
+        tsyms = 'ETH,USD',          # to symbols
     )
     url_args = '&'.join(f'{k}={v}' for k, v in currencies.items())
     base_url = f'https://min-api.cryptocompare.com/data/pricemulti'
@@ -604,24 +604,24 @@ It demonstrates some of the features of *UnitConversion*.
               1 ZEC = {zec2usd.convert()}
 
         Holdings:
-            {btc:>7q} = {btc:q$}
-            {eth:>7q} = {eth:q$}
-            {bch:>7q} = {bch:q$}
-            {zec:>7q} = {zec:q$}
+            {btc:>7qBTC} = {btc:q$} {100*btc.scale('$')/total:.0f}%
+            {eth:>7qETH} = {eth:q$} {100*eth.scale('$')/total:.0f}%
+            {bch:>7qBCH} = {bch:q$} {100*bch.scale('$')/total:.0f}%
+            {zec:>7qZEC} = {zec:q$} {100*zec.scale('$')/total:.0f}%
               Total = {total:q}
     ''').strip())
 
 The output of the script looks like this::
 
     Current Prices:
-          1 BTC = $7.15k or Ξ24
-          1 ETH = $299 or Ƀ41.7m
-          1 BCH = $604
-          1 ZEC = $231
+        1 BTC = $8.22k or Ξ22.4
+        1 ETH = $366 or Ƀ44.6m
+        1 BCH = $1.26k
+        1 ZEC = $310
 
     Holdings:
-           Ƀ100 = $715k
-           Ξ100 = $29.9k
-        100 BCH = $60.4k
-        100 ZEC = $23.1k
-          Total = $829k
+        100 BTC = $822k   81%
+        100 ETH = $36.6k  4%
+        100 BCH = $126k   12%
+        100 ZEC = $31k    3%
+        Total = $1.02M

@@ -94,7 +94,9 @@ class UnitConversion(object):
     object itself is normally discarded). Once created, it is automatically
     employed by :class:`Quantity` when a conversion is requested with the given
     units. A forward conversion is performed if the from and to units match, and
-    a reversion conversion is performed if they are swapped.
+    a reversion conversion is performed if they are swapped. A no-op conversion
+    is performed when converting one from- unit to another or one to-unit to
+    another.
 
     :arg to_units:
         A collection of units. If given as a single string it is split.
@@ -122,6 +124,12 @@ class UnitConversion(object):
 
         *new_value* = (*given_value* - *intercept*)/*slope*
 
+    **No-Op Conversion**:
+    The following conversion is applied if the given units are among 
+    the *to_units* and the desired units are among the *from_units*:
+
+        *new_value* = *given_value*
+
     Example::
 
         >>> from quantiphy import Quantity, UnitConversion
@@ -145,22 +153,43 @@ class UnitConversion(object):
         >>> print(d_ac.render(scale='m'))
         41.344e15 m
 
+        >>> d_ac = Quantity(1.339848, units='pc')
+        >>> print(f'{d_ac:qparsec}')
+        1.3398 parsec
+
     """
     def __init__(self, to_units, from_units, slope=1, intercept=0):
         self.to_units = to_units.split() if is_str(to_units) else to_units
         self.from_units = from_units.split() if is_str(from_units) else from_units
         self.slope = slope
         self.intercept = intercept
+
+        # add to known unit conversion
         for to in self.to_units:
             for frm in self.from_units:
                 _unit_conversions[(to, frm)] = self._forward
                 _unit_conversions[(frm, to)] = self._reverse
+
+        # add no-op converters to allow a from-units to be converted to another
+        for u1 in self.from_units:
+            for u2 in self.from_units:
+                if u1 != u2:
+                    _unit_conversions[(u1, u2)] = self._no_op
+
+        # add no-op converters to allow a to-units to be converted to another
+        for u1 in self.to_units:
+            for u2 in self.to_units:
+                if u1 != u2:
+                    _unit_conversions[(u1, u2)] = self._no_op
 
     def _forward(self, value):
         return value*self.slope + self.intercept
 
     def _reverse(self, value):
         return (value - self.intercept)/self.slope
+
+    def _no_op(self, value):
+        return value
 
     def convert(self, value=1, from_units=None, to_units=None):
         """Convert value to quantity with new units.
@@ -778,16 +807,16 @@ class Quantity(float):
             setting is False, the radix is still striped if the number has a
             scale factor. By default this is True.
 
-            Use strip_radix=False when generating output that will be read by a
-            parser that distinguishes between integers and reals based on the
+            Set strip_radix to False when generating output that will be read by
+            a parser that distinguishes between integers and reals based on the
             presence of a decimal point.
 
         :arg bool strip_zeros:
             When rendering, strip off any unneeded zeros from the number. By
             default this is True.
 
-            Use strip_zeros=False when you would like to indicated the precision
-            of your numbers based on the number of digits shown.
+            Set strip_zeros to False when you would like to indicated the
+            precision of your numbers based on the number of digits shown.
 
         :arg str unity_sf:
             The output scale factor for unity, generally '' or '_'. The default
@@ -817,7 +846,7 @@ class Quantity(float):
             kwargs['known_units'] = kwargs['known_units'].split()
         for k, v in kwargs.items():
             if k not in DEFAULTS.keys():
-                 raise KeyError(k)
+                raise KeyError(k)
             if v is None:
                 try:
                     del cls._preferences[k]
@@ -862,11 +891,13 @@ class Quantity(float):
         def __init__(self, cls, kwargs):
             self.cls = cls
             self.kwargs = kwargs
+
         def __enter__(self):
             cls = self.cls
             cls._initialize_preferences()
             cls._preferences = cls._preferences.new_child()
             cls.set_prefs(**self.kwargs)
+
         def __exit__(self, *args):
             self.cls._preferences = self.cls._preferences.parents
 
@@ -980,7 +1011,7 @@ class Quantity(float):
         mantissa = named_regex(
             'mant',
             r'(?:{od}\.?{rd})|(?:{rd}\.?{od})'.format(
-                rd = required_digits, od = optional_digits
+                rd=required_digits, od=optional_digits
             ),  # leading or trailing digits are optional, but not both
         )
         exponent = named_regex('exp', '[eE][-+]?[0-9]+')
@@ -1494,7 +1525,7 @@ class Quantity(float):
         mantissa = sign + mantissa[0:(shift+1)] + '.' + mantissa[(shift+1):]
 
         # remove trailing decimal point
-        if sf or self.strip_radix: # could also add 'or units'
+        if sf or self.strip_radix:  # could also add 'or units'
             mantissa = mantissa.rstrip('.')
         elif self.strip_zeros:
             # a trailing radix is not very attractive, so add a zero except if
@@ -1745,7 +1776,6 @@ class Quantity(float):
             8.9247 GHz
 
         """
-        import keyword
         quantities = {}
         for line in text.splitlines():
             match = re.match(cls.get_pref('assign_rec'), line)

@@ -401,9 +401,10 @@ This unit conversion says, when converting units of 'm' to either 'pc' or
 
 Notice that the return value of *UnitConversion* was not used. It is enough to 
 simply create the *UnitConversion* for it to be available to *Quantity*. So, it 
-is normal to not capture the return value. However, there are two things you can 
-do with the return value. First you can convert it to a string to get 
-a description of the relationship. This is largely used as a sanity check:
+is normal to not capture the return value of *UnitConversion*. However, there 
+are two things you can do with the return value. First you can convert it to 
+a string to get a description of the relationship. This is largely used as 
+a sanity check:
 
 .. code-block:: python
 
