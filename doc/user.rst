@@ -10,12 +10,12 @@ Overview
 
 *QuantiPhy* adds support for quantities to Python. Quantities are little more 
 than a number combined with its units. They are used to represent physical 
-quantities. For example, your height and weight are both quantities, having both 
-a value and units, and both are important. For example, if I told you that 
-Mariam's weight was 8, you might assume pounds as the unit of measure if you 
-lived in the US and think Mariam was an infant, or you might assume stones as 
-the units if you live in the UK and assume that she was an adult, or you might 
-assume kilograms if you lived anywhere else and assume she was a small child.
+quantities. Your height and weight are both quantities, having both a value and 
+units, and both are important. For example, if I told you that Mariam's weight 
+was 8, you might assume pounds as the unit of measure if you lived in the US and 
+think Mariam was an infant, or you might assume stones as the units if you live 
+in the UK and assume that she was an adult, or you might assume kilograms if you 
+lived anywhere else and assume she was a small child.
 The units are very important, and in general it is always best to keep the unit 
 of measure with the number and present the complete value when working with 
 quantities. To do otherwise invites confusion.  Just ask `NASA 
@@ -455,6 +455,38 @@ seconds:
     1.2 ks  455.37 K
 
 
+Creating a Quantity by Scaling an Existing Quantity
+...................................................
+
+The :meth:`quantiphy.Quantity.scale` method scales the value of a quantity and 
+then uses the new value to create a new Quantity. For example:
+
+.. code-block:: python
+
+    >>> import math
+
+    >>> h_line = Quantity('1420.405751786 MHz')
+    >>> sagan = h_line.scale(math.pi)
+    >>> print(sagan)
+    4.4623 GHz
+
+    >>> type(h_line)
+    <class 'quantiphy.Quantity'>
+
+    >>> type(sagan)
+    <class 'quantiphy.Quantity'>
+
+Any value that can be passed to the *scale* argument for 
+:class:`quantiphy.Quantity` or :meth:`quantiphy.Quantity.render` can be passed 
+to the *scale* method.
+
+.. code-block:: python
+
+    >>> Tboil_C = Tboil.scale('C')
+    >>> print(Tboil_C)
+    100 C
+
+
 Accessing Quantity Values
 .........................
 
@@ -462,8 +494,6 @@ There are a variety of ways of accessing the value of a quantity. If you are
 just interested in its numeric value, you access it with:
 
 .. code-block:: python
-
-    >>> h_line = Quantity('1420.405751786 MHz')
 
     >>> h_line.real
     1420405751.786
@@ -477,22 +507,21 @@ value:
 
 .. code-block:: python
 
-    >>> import math
-    >>> sagan_freq = math.pi * h_line
-    >>> print(sagan_freq)
-    4462336274.927585
+    >>> second_sagan_freq = 2 * math.pi * h_line
+    >>> print(second_sagan_freq)
+    8924672549.85517
 
-    >>> sagan = Quantity(sagan_freq, h_line)
-    >>> print(sagan)
-    4.4623 GHz
+    >>> sagan2 = Quantity(second_sagan_freq, h_line)
+    >>> print(sagan2)
+    8.9247 GHz
 
     >>> type(h_line)
     <class 'quantiphy.Quantity'>
 
-    >>> type(sagan_freq)
+    >>> type(second_sagan_freq)
     <class 'float'>
 
-    >>> type(sagan)
+    >>> type(sagan2)
     <class 'quantiphy.Quantity'>
 
 Notice that when performing arithmetic operations on quantities the units 
