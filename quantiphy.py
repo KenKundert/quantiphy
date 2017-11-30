@@ -457,9 +457,19 @@ BIG_SCALE_FACTORS = 'kMGTPEZY'
 SMALL_SCALE_FACTORS = 'munpfazy'
     # These must be given in order, one for every three decades.
 
+# Supported currency symbols (these go on left side of number)
+CURRENCY_SYMBOLS = '$£€ɃΞ' if sys.version_info.major == 3 else '$'
+
 # Regular expression for recognizing and decomposing string .format method codes
-FORMAT_SPEC = re.compile(r'\A([<>]?)(\d*)(?:\.(\d+))?(?:([qQrRusSeEfFgGdn])([a-zA-Z°ÅΩ℧$%][-^/()\w]*)?)?\Z')
-#                             ^align ^width    ^prec     ^format            ^units
+FORMAT_SPEC = re.compile(r'''\A
+    ([<>]?)                             # alignment
+    (\d*)                               # width
+    (?:\.(\d+))?                        # precision
+    (?:
+        ([qQrRusSeEfFgGdn])             # format
+        ([a-zA-Z°ÅΩ℧%{cs}][-^/()\w]*)?  # units
+    )?
+\Z'''.format(cs=CURRENCY_SYMBOLS), re.VERBOSE)
 
 # Defaults {{{1
 DEFAULTS = {
@@ -486,7 +496,6 @@ DEFAULTS = {
     'strip_zeros': True,
     'unity_sf': '',
 }
-CURRENCY_SYMBOLS = '$£€ɃΞ' if sys.version_info.major == 3 else '$'
 
 
 # Quantity class {{{1
@@ -1659,21 +1668,18 @@ class Quantity(float):
                     value = getattr(self, 'name', '')
                 elif ftype == 'd':
                     value = getattr(self, 'desc', '')
-                else:  # pragma: no cover
-                    raise ValueError(
-                        "Unknown format code '%s' for object of type 'Quantity'." % ftype
-                    )
                 return '{0:{1}{2}s}'.format(value, align, width)
             label = ftype.isupper()
-            if ftype in 'sS':  # note that ftype = '' matches this case
+            ftype = ftype.lower()
+            if ftype in 's':  # note that ftype = '' matches this case
                 label = label if ftype else None
                 value = self.render(prec=prec, show_label=label, scale=scale)
-            elif ftype in 'qQ':
+            elif ftype == 'q':
                 value = self.render(
                     prec=prec, show_si=True, show_units=True, show_label=label,
                     scale=scale
                 )
-            elif ftype in 'rR':
+            elif ftype == 'r':
                 value = self.render(
                     prec=prec, show_si=True, show_units=False, show_label=label,
                     scale=scale
@@ -1691,16 +1697,15 @@ class Quantity(float):
                     prec = self.prec
                 if prec == 'full':
                     prec = self.full_prec
-                if ftype in 'gG':
+                if ftype == 'g':
                     prec += 1
-                value = '{0:.{1}{2}}'.format(value, prec, ftype.lower())
-                if ftype.isupper():
+                value = '{0:.{1}{2}}'.format(value, prec, ftype)
+                if label:
                     value = self._label(value, True)
                 width = '' if width == '0' else ''
             return '{0:{1}{2}s}'.format(value, align, width)
         else:
-            # unrecognized format, just provide something reasonable
-            return self.render()
+            raise ValueError("Invalid format specifier '{}' for {}.".format(template, self.render()))
 
     # extract() {{{2
     @classmethod

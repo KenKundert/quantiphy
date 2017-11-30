@@ -23,7 +23,6 @@ def test_format():
     assert '{:G}'.format(q) == 'f = 1.4204e+09'
     assert '{:n}'.format(q) == 'f'
     assert '{:d}'.format(q) == 'frequency of hydrogen line'
-    assert '{:X}'.format(q) == '1.4204 GHz'
 
     q=Quantity('2ns')
     assert float(q) == 2e-9
@@ -49,7 +48,6 @@ def test_full_format():
     assert '{:G}'.format(q) == 'f = 1420405751.786'
     assert '{:n}'.format(q) == 'f'
     assert '{:d}'.format(q) == 'frequency of hydrogen line'
-    assert '{:X}'.format(q) == '1.420405751786 GHz'
 
     q=Quantity('2ns')
     assert float(q) == 2e-9
@@ -76,7 +74,6 @@ def test_scaled_format():
         assert '{:G°F}'.format(q) == 'Tboil = 212'
         assert '{:n°F}'.format(q) == 'Tboil'
         assert '{:d°F}'.format(q) == 'boiling point of water'
-        assert '{:X°F}'.format(q) == '100 °C'
         assert '{!r}'.format(q) == "Quantity('100 °C')"
         assert '{:.8s°C}'.format(q) == '100 °C'
 
