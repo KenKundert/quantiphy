@@ -29,7 +29,7 @@ Having a single object represent a quantity in a programming language is useful
 because it binds the units to the number making it more likely that the units 
 will be presented with the number. In addition, quantities from *QuantiPhy* 
 provide another important benefit.  They naturally support the SI scale factors, 
-which for those that are familiar with them are much easer to read and write 
+which for those that are familiar with them are much easier to read and write 
 than the alternatives. The most common SI scale factors are:
 
     |   T (10\ :sup:`12`) tera
@@ -368,7 +368,7 @@ provide them for this mechanism to work.
     373.15 K
 
 To do this conversion, *QuantiPhy* examines the given units (°F) and the desired 
-units (K) and choses the appropriate converter.  *QuantiPhy* provides 
+units (K) and chooses the appropriate converter.  *QuantiPhy* provides 
 a collection of pre-defined converters for common units:
 
 ====== ===============================================================

@@ -90,7 +90,7 @@ information, but in the second two tables the readability has been traded off in
 order to make the data easier to read into a computer because in most languages 
 there is no easy way to read numbers that have either units or scale factors.
 
-*QuanitiPhy* makes it easy to read and generate numbers with units and scale 
+*QuantiPhy* makes it easy to read and generate numbers with units and scale 
 factors so you do not have to choose between human and computer readability.  
 For example, the above tables could be read with the following code (it must be 
 tweaked somewhat to handle tables 2 and 3):
@@ -192,7 +192,7 @@ was specified (*B*), which caused the underlying value to be converted from bits
 to bytes.
 
 It is important to recognize that *QuantiPhy* is using decimal rather than 
-binary scale factors. So 5 GB is 5 gigabyte and not 5 gibibyte.  In otherwords 
+binary scale factors. So 5 GB is 5 gigabyte and not 5 gibibyte.  In other words 
 5 GB represents 5×10⁹ B and not 5×2³⁰ B.
 
 
@@ -287,7 +287,7 @@ making the quantity easier to read.
     Plank's constant is 662.61×10⁻³⁶ J-s.  Reduced plank's constant is
     105.46×10⁻³⁶ J-s.  Boltzmann's constant is 13.806×10⁻²⁴ J/K.
     Elementary charge is 160.22×10⁻²¹ C.  Speed of light is 299.79 Mm/s.
-    Zero degrees celsius in kelvin is 273.15 K.  Permittivity of free
+    Zero degrees Celsius in Kelvin is 273.15 K.  Permittivity of free
     space is 8.8542 pF/m.  Permeability of free space is 1.2566 μH/m.
 
 When rendered in your browser with a variable width font, the result looks like 
@@ -296,7 +296,7 @@ this:
     Plank's constant is 662.61×10⁻³⁶ J-s.  Reduced plank's constant is
     105.46×10⁻³⁶ J-s.  Boltzmann's constant is 13.806×10⁻²⁴ J/K.
     Elementary charge is 160.22×10⁻²¹ C.  Speed of light is 299.79 Mm/s.
-    Zero degrees celsius in kelvin is 273.15 K.  Permittivity of free
+    Zero degrees Celsius in Kelvin is 273.15 K.  Permittivity of free
     space is 8.8542 pF/m.  Permeability of free space is 1.2566 μH/m.
 
 .. _timeit example:
@@ -520,7 +520,7 @@ use as an alternative to *QuantiPhy* for formatting your axes with SI scale
 factors, which also provides the *format_eng* function for converting floats to 
 strings formatted with SI scale factors and units. So if your needs are limited, 
 as they are in this example, that is generally a good way to go. One aspect of 
-*QuantiPhi* that you might prefer is the way it handles very large or very small 
+*QuantiPhy* that you might prefer is the way it handles very large or very small 
 numbers. As the numbers get either very large or very small *EngFormatter* 
 starts by using unfamiliar scale factors (*YZPEzy*) and then reverts to 
 e-notation. *QuantiPhy* allows you to control whether to use unfamiliar scale 
