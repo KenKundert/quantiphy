@@ -16,7 +16,7 @@ What?
 A quantity is the pairing of a number and a unit of measure that indicates the 
 amount of some measurable thing.  *QuantiPhy* provides quantity objects that 
 keep the units with the number, making it easy to share them as single object.  
-They subclass float and so can be used anywhere a number is appropriate.
+They subclass float and so can be used anywhere a real number is appropriate.
 
 
 Why?

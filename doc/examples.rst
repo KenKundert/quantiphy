@@ -287,7 +287,7 @@ making the quantity easier to read.
     Plank's constant is 662.61×10⁻³⁶ J-s.  Reduced plank's constant is
     105.46×10⁻³⁶ J-s.  Boltzmann's constant is 13.806×10⁻²⁴ J/K.
     Elementary charge is 160.22×10⁻²¹ C.  Speed of light is 299.79 Mm/s.
-    Zero degrees Celsius in Kelvin is 273.15 K.  Permittivity of free
+    Zero degrees celsius in kelvin is 273.15 K.  Permittivity of free
     space is 8.8542 pF/m.  Permeability of free space is 1.2566 μH/m.
 
 When rendered in your browser with a variable width font, the result looks like 

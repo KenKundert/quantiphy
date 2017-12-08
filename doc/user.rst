@@ -747,7 +747,7 @@ You can also use the floating point format type specifiers:
 .. code-block:: python
 
     >>> print('{:f}'.format(h_line))
-    1420405751.7860
+    1420405751.786
 
     >>> print('{:e}'.format(h_line))
     1.4204e+09
@@ -797,10 +797,10 @@ If *show_desc* is False or the quantity does not have a description, then
     trise = 10n
 
     >>> print('{:F}'.format(trise))
-    trise = 0.0000
+    trise = 0
 
     >>> print('{:E}'.format(trise))
-    trise = 1.0000e-08
+    trise = 1e-08
 
     >>> print('{:G}'.format(trise))
     trise = 1e-08

@@ -1700,9 +1700,17 @@ class Quantity(float):
                 if ftype == 'g':
                     prec += 1
                 value = '{0:.{1}{2}}'.format(value, prec, ftype)
+                width = '' if width == '0' else ''
+                if self.strip_zeros:
+                    if 'e' in value:
+                        mantissa, exponent = value.split('e')
+                        if '.' in mantissa:
+                            mantissa = mantissa.rstrip('0').rstrip('.')
+                        value = mantissa + 'e' + exponent
+                    elif '.' in value:
+                        value = value.rstrip('0').rstrip('.')
                 if label:
                     value = self._label(value, True)
-                width = '' if width == '0' else ''
             return '{0:{1}{2}s}'.format(value, align, width)
         else:
             raise ValueError("Invalid format specifier '{}' for {}.".format(template, self.render()))
