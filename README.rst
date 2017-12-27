@@ -78,7 +78,8 @@ a simplicity in use that cannot be matched by the other packages.
 Quick Start
 -----------
 
-Install with::
+You can find the documentation on `ReadTheDocs
+<https://quantiphy.readthedocs.io>`_.  Install with::
 
    pip3 install quantiphy
 
