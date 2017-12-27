@@ -458,7 +458,12 @@ SMALL_SCALE_FACTORS = 'munpfazy'
     # These must be given in order, one for every three decades.
 
 # Supported currency symbols (these go on left side of number)
-CURRENCY_SYMBOLS = '$£€ɃΞ' if sys.version_info.major == 3 else '$'
+CURRENCY_SYMBOLS = '$£€¥₹ɃΞ' if sys.version_info.major == 3 else '$'
+
+# Unit symbols that are not simple letters.
+# Do not include % as it will be picked up when converting text to numbers,
+# which is generally not desired (you would end up converting 0.001% to 1m%).
+UNIT_SYMBOLS = '°ÅΩ℧'
 
 # Regular expression for recognizing and decomposing string .format method codes
 FORMAT_SPEC = re.compile(r'''\A
@@ -467,9 +472,9 @@ FORMAT_SPEC = re.compile(r'''\A
     (?:\.(\d+))?                        # precision
     (?:
         ([qQrRusSeEfFgGdn])             # format
-        ([a-zA-Z°ÅΩ℧%{cs}][-^/()\w]*)?  # units
+        ([a-zA-Z%{us}{cs}][-^/()\w]*)?  # units
     )?
-\Z'''.format(cs=CURRENCY_SYMBOLS), re.VERBOSE)
+\Z'''.format(cs=CURRENCY_SYMBOLS, us=UNIT_SYMBOLS), re.VERBOSE)
 
 # Defaults {{{1
 DEFAULTS = {
@@ -1025,9 +1030,13 @@ class Quantity(float):
         )
         exponent = named_regex('exp', '[eE][-+]?[0-9]+')
         scale_factor = named_regex('sf', '[%s]' % input_sf)
-        units = named_regex('units', r'(?:[a-zA-Z°ÅΩ℧%][-^/()\w·⁻⁰¹²³⁴⁵⁶⁷⁸⁹]*)?')
+        units = named_regex(
+            'units', r'(?:[a-zA-Z%{us}][-^/()\w·⁻⁰¹²³⁴⁵⁶⁷⁸⁹]*)?'.format(
+                us=UNIT_SYMBOLS
+            )
             # examples: Ohms, V/A, J-s, m/s^2, H/(m-s), Ω, %, m·s⁻²
             # leading char must be letter to avoid 1.0E-9s -> (1e18, '-9s')
+        )
         currency = named_regex('currency', '[%s]' % CURRENCY_SYMBOLS)
         nan = named_regex('nan', '(?i)inf|nan')
 
@@ -1125,10 +1134,10 @@ class Quantity(float):
         ]
 
         # numbers embedded in text {{{3
-        smpl_units = '[a-zA-Z_°ÅΩ℧]*'
+        smpl_units = '[a-zA-Z_{us}]*'.format(us=UNIT_SYMBOLS)
             # may only contain alphabetic characters, ex: V, A, _Ohms, etc.
             # or obvious unicode units, ex: °ÅΩ℧
-        sf_or_units = '[a-zA-Z_μ°ÅΩ℧]+'
+        sf_or_units = '[a-zA-Z_μ{us}]+'.format(us=UNIT_SYMBOLS)
             # must match units or scale factors: add μ, make non-optional
         space = '[ ]?'  # optional non-breaking space (do not use a normal space)
         left_delimit = r'(?:\A|(?<=[^a-zA-Z0-9_.]))'
