@@ -371,14 +371,15 @@ To do this conversion, *QuantiPhy* examines the given units (°F) and the desire
 units (K) and chooses the appropriate converter.  *QuantiPhy* provides 
 a collection of pre-defined converters for common units:
 
-====== ===============================================================
+====== ================================================================
 K:     K, F, °F, R, °R
 C, °C: K, C, °C, F, °F, R, °R
-m:     km, m, cm, mm, um, μm, micron, nm, Å, angstrom, mi, mile, miles
+m:     km, m, cm, mm, um, μm, micron, nm, Å, angstrom, mi, mile, miles,
+       in, inch, inches
 g:     oz, lb, lbs
-s:     s, sec, min, hour, hr , day
+s:     s, sec, min, hour, hr, day
 b:     B
-====== ===============================================================
+====== ================================================================
 
 You can also create your own converters using :class:`quantiphy.UnitConversion`:
 

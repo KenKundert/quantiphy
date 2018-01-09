@@ -298,6 +298,7 @@ UnitConversion('m', 'um μm micron', 1/1000000)
 UnitConversion('m', 'nm', 1/1000000000)
 UnitConversion('m', 'Å angstrom', 1/10000000000)
 UnitConversion('m', 'mi mile miles', 1609.344)
+UnitConversion('m', 'in inch inches', 0.0254)
 
 # Mass conversions {{{2
 UnitConversion('g', 'lb lbs', 453.59237)

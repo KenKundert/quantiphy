@@ -124,6 +124,9 @@ def test_distance():
     assert q.render(scale='mi') == '621.37 umi'
     assert q.render(scale='mile') == '621.37 umile'
     assert q.render(scale='miles') == '621.37 umiles'
+    assert q.render(scale='in') == '39.37 in'
+    assert q.render(scale='inch') == '39.37 inch'
+    assert q.render(scale='inches') == '39.37 inches'
 
     q=Quantity('1_m')
     assert q.render() == '1 m'
