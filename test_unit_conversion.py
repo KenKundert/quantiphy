@@ -1,6 +1,6 @@
 # encoding: utf8
 
-from quantiphy import Quantity
+from quantiphy import Quantity, UnitConversion
 import math
 import sys
 import pytest
@@ -224,3 +224,62 @@ def test_time():
 
     q=Quantity('60 sec', scale='s')
     assert q.render() == '60 s'
+
+def test_scale():
+    secs = Quantity('86400 s')
+    days = secs.scale('day')
+    assert secs.render() == '86.4 ks'
+    assert days.render() == '1 day'
+
+def test_coversion():
+    conversion = UnitConversion('USD', 'BTC', 100000)
+    assert str(conversion) == 'USD = 100000*BTC'
+
+    result = conversion.convert(1, 'BTC', 'USD')
+    assert str(result) == '100 kUSD'
+
+    result = conversion.convert(1, 'USD', 'BTC')
+    assert str(result) == '10 uBTC'
+
+    result = conversion.convert(from_units='BTC', to_units='USD')
+    assert str(result) == '100 kUSD'
+
+    result = conversion.convert(from_units='USD', to_units='BTC')
+    assert str(result) == '10 uBTC'
+
+    result = conversion.convert('BTC')
+    assert str(result) == '100 kUSD'
+
+    result = conversion.convert('USD')
+    assert str(result) == '10 uBTC'
+
+    result = conversion.convert(10)
+    assert str(result) == '1 MUSD'
+
+    dollar = Quantity('200000 USD')
+    bitcoin = conversion.convert(dollar)
+    assert str(bitcoin) == '2 BTC'
+
+    dollar = conversion.convert(bitcoin)
+    assert str(dollar) == '200 kUSD'
+
+    conversion = UnitConversion('F', 'C', 1.8, 32)
+    assert str(conversion) == 'F = 1.8*C + 32 F'
+
+    result = conversion.convert(0, 'C', 'F')
+    assert str(result) == '32 F'
+
+    result = conversion.convert(32, to_units='C')
+    assert str(result) == '0 C'
+
+    result = conversion.convert(32, from_units='F')
+    assert str(result) == '0 C'
+
+    with pytest.raises(KeyError, message='X: unknown to_units.'):
+        result = conversion.convert(0, from_units='X', to_units='X')
+
+    result = conversion.convert(0, to_units='X')
+    assert str(result) == '32 F'
+
+    with pytest.raises(KeyError, message='X: unknown from_units.'):
+        result = conversion.convert(0, from_units='X')

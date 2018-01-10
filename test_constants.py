@@ -121,3 +121,6 @@ def test_constants():
 
     with pytest.raises(NameError, message='No name specified.'):
         add_constant(Quantity(4.80320427e-10, 'Fr'), unit_systems='esu gaussian')
+
+    with pytest.raises(ValueError, message='Expected a quantity for value.'):
+        add_constant(1)

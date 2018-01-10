@@ -157,6 +157,14 @@ class UnitConversion(object):
         >>> print(f'{d_ac:qparsec}')
         1.3398 parsec
 
+    The conversion can employ both a slope and an intercept, and if you convert
+    the converter object to a string, it summarizes the conversion, which can
+    help you avoid mistakes::
+
+        conversion = UnitConversion('F', 'C', 1.8, 32)
+        print(str(conversion))
+        F = 1.8*C + 32 F
+
     """
     def __init__(self, to_units, from_units, slope=1, intercept=0):
         self.to_units = to_units.split() if is_str(to_units) else to_units
