@@ -10,8 +10,9 @@ def test_simple_scaling():
     q=Quantity('1kg')
     assert q.render() == '1 kg'
     assert q.render(scale=0.001, show_units=False) == '1'
-    with pytest.raises(KeyError, message="Unable to convert between 'fuzz' and 'g'."):
+    with pytest.raises(KeyError) as exception:
         q.render(scale='fuzz')
+    assert exception.value.args[0] == "Unable to convert between 'fuzz' and 'g'."
 
     q=Quantity('1', units='g', scale=1000)
     assert q.render() == '1 kg'
@@ -275,11 +276,13 @@ def test_coversion():
     result = conversion.convert(32, from_units='F')
     assert str(result) == '0 C'
 
-    with pytest.raises(KeyError, message='X: unknown to_units.'):
+    with pytest.raises(KeyError) as exception:
         result = conversion.convert(0, from_units='X', to_units='X')
+    assert exception.value.args[0] == 'X: unknown to_units.'
 
     result = conversion.convert(0, to_units='X')
     assert str(result) == '32 F'
 
-    with pytest.raises(KeyError, message='X: unknown from_units.'):
+    with pytest.raises(KeyError) as exception:
         result = conversion.convert(0, from_units='X')
+    assert exception.value.args[0] == 'X: unknown from_units.'

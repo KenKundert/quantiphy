@@ -56,8 +56,9 @@ def test_constants():
     assert str(Quantity('c')) == '299.79 Mm/s'
     assert str(Quantity('0C')) == '273.15 K'
 
-    with pytest.raises(ValueError, message='fuzz: not a valid number.'):
+    with pytest.raises(ValueError) as exception:
         str(Quantity('fuzz'))
+    assert exception.value.args[0] == 'fuzz: not a valid number.'
 
     assert '{:S}'.format(Quantity('h')) == "h = 6.6261e-27 erg-s -- Plank's constant"
     assert '{:S}'.format(Quantity('hbar')) == "ħ = 1.0546e-27 erg-s -- reduced Plank's constant"
@@ -119,8 +120,10 @@ def test_constants():
     assert str(Quantity('q')) == '16.022e-21 abC'
     set_unit_system('mks')
 
-    with pytest.raises(NameError, message='No name specified.'):
+    with pytest.raises(NameError) as exception:
         add_constant(Quantity(4.80320427e-10, 'Fr'), unit_systems='esu gaussian')
+    assert exception.value.args[0] == 'No name specified.'
 
-    with pytest.raises(ValueError, message='Expected a quantity for value.'):
+    with pytest.raises(ValueError) as exception:
         add_constant(1)
+    assert exception.value.args[0] == 'Expected a quantity for value.'

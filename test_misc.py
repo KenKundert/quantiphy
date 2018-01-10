@@ -94,11 +94,13 @@ def test_misc():
     q = Foo('seven = 7')
     assert q.name == 'seven'
     assert str(q) == '7'
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError) as exception:
         q = Foo('%')
-    with pytest.raises(KeyError):
+    assert exception.value.args[0] == '%: not a valid number.'
+    with pytest.raises(KeyError) as exception:
         Foo.set_prefs(assign_rec=r'(\w+)\s*=\s*(.*)') # no named groups
         Foo('seven = 7')
+    assert exception.value.args[0] == 'val'
 
     assert Foo.get_pref('prec') == 4
     assert Foo.get_pref('full_prec') == 12
@@ -116,11 +118,13 @@ def test_misc():
     q = Quantity('1.8_V')
     assert q.render(prec='full') == '1.8 V'
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError) as exception:
         q = Quantity('x*y = z')
+    assert exception.value.args[0] == 'z: not a valid number.'
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError) as exception:
         Quantity.extract('1ns')
+    assert exception.value.args[0] == '1ns: name not given.'
 
     # this used to be an ValueError because 'x*y' is not an identifier
     vals = Quantity.extract('x*y = 1 m/s')
@@ -130,12 +134,14 @@ def test_misc():
     vals = Quantity.extract('in = 1mA')
     assert str(vals['in']) == '1 mA'
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError) as exception:
         Quantity('x\ny = z')
+    assert exception.value.args[0] == 'z: not a valid number.'
 
     Quantity.set_prefs(label_fmt='{x}')
-    with pytest.raises(KeyError):
+    with pytest.raises(KeyError) as exception:
         '{:S}'.format(Quantity('f = 1kHz'))
+    assert exception.value.args[0] == 'x'
 
     Quantity.set_prefs(label_fmt_full='{n} = {v}  # {d}', label_fmt='{n} = {v}', show_desc=True)
     q1 = Quantity('10ns', name='trise')
@@ -278,8 +284,9 @@ def test_misc():
     assert Quantity('10m').render(show_si=False) == '10_m'
     Quantity.set_prefs(input_sf=None, unity_sf='_')
     assert Quantity('10m').render(show_si=False) == '10e-3'
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError) as exception:
         Quantity.set_prefs(input_sf='GMkwq', unity_sf='_', spacer='')
+    assert exception.value.args[0] == 'q, w: unknown scale factors.'
     Quantity.set_prefs(input_sf=None, unity_sf=None, spacer=None)
 
     # test map_sf
@@ -303,10 +310,12 @@ def test_misc():
         assert Quantity('1e-13').render() == '100 PPQ'
 
     # test set_prefs error handling
-    with pytest.raises(KeyError):
+    with pytest.raises(KeyError) as exception:
         Quantity.set_prefs(fuzz=True)
-    with pytest.raises(KeyError):
+    assert exception.value.args[0] == 'fuzz'
+    with pytest.raises(KeyError) as exception:
         fuzz = Quantity.get_pref('fuzz')
+    assert exception.value.args[0] == 'fuzz'
 
     c = Quantity('c')
     Quantity.set_prefs(label_fmt=None, label_fmt_full=None)
@@ -549,3 +558,7 @@ Summary @ 900.51 us: 7 tests run, 1 failures detected, 0 faults detected, 0 test
 
     processed = Quantity.all_from_si_fmt('1420.40575e+6+1420.40575e+6', show_si=True)
     assert processed == '1420.40575e+6+1420.40575e+6'
+
+
+
+

@@ -1,6 +1,7 @@
 # encoding: utf8
 
 from quantiphy import Quantity
+import pytest
 import sys
 
 def test_format():
@@ -26,6 +27,11 @@ def test_format():
 
     q=Quantity('2ns')
     assert float(q) == 2e-9
+
+    with pytest.raises(ValueError) as exception:
+        q = Quantity('1ns')
+        '{:z}'.format(q)
+    assert exception.value.args[0] == "Invalid format specifier 'z' for 1 ns."
 
 def test_full_format():
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None, show_desc=False)
