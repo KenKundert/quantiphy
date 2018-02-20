@@ -60,5 +60,5 @@ Releases
     - added no-op conversions (units change but value stays the same: ex. $->USD)
 
 **Latest development release**:
-    | Version: 2.2.6
-    | Released: 2018-01-09
+    | Version: 2.2.7
+    | Released: 2018-02-20
