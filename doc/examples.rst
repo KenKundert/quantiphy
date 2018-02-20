@@ -438,6 +438,120 @@ And here is an example of the programs output::
     3.48 MB  quantiphy
 
 
+.. _simulation example:
+
+Parameterized Simulation Example
+--------------------------------
+
+In this example, Python is used to perform a simulation of a ΔΣ modulator. There 
+are a collection of parameters that control the simulation, which are placed at 
+the top of the Python file as documentation. :meth:`quantiphy.Quantity.extract` 
+is used to access these parameters and control the simulation. In this way, 
+modifying the simulation parameters is easy and the documentation is always up 
+to date.
+
+.. code-block:: python
+
+    #!/usr/bin/env python3
+
+    """
+    Simulates a second-order ΔΣ modulator with the following parameter values:
+
+        Fclk = 50MHz           -- clock frequency
+        Fin = 200kHz           -- input frequency
+        Vin = 950mV            -- input voltage amplitude (peak)
+        gain1 = 0.5            -- gain of first integrator
+        gain2 = 0.5            -- gain of second integrator
+        Vmax = 1               -- quantizer maximum input voltage
+        Vmin = -1              -- quantizer minimum input voltage
+        -- levels = 16            -- quantizer output levels
+        levels = 4             -- quantizer output levels
+        Tstop = 1/Fin "s"      -- how many input periods to simulate
+        Tstart = -0.5/Fin "s"  -- initial transient interval (discarded)
+
+    The values given above are used in the simulation, no further modification 
+    of the code given below is required when changing these parameters.
+    """
+
+    from quantiphy import Quantity
+    from math import sin, tau
+    from inform import display, error, os_error
+
+    parameters = Quantity.extract(__doc__, ignore_nonconforming_lines=True)
+    globals().update(parameters)
+    display('Simulation parameters:')
+    for v in parameters.values():
+        display('   ', v.render(show_label='f'))
+
+    class Integrator:
+        def __init__(self, gain=1):
+            self.state = 0
+            self.gain = gain
+
+        def update(self, vin):
+            self.state += vin
+            return self.state
+
+
+    class Quantizer:
+        def __init__(self, v_max, v_min, levels):
+            self.v_min = v_min
+            self.levels = levels
+            self.delta = (v_max - v_min)/(levels - 1)
+
+        def update(self, v_in):
+            level = (v_in - self.v_min) // self.delta
+            level = 0 if level < 0 else level
+            level = self.levels-1 if level >= self.levels else level
+            return int(level), self.delta*level + self.v_min
+
+
+    class Source:
+        def __init__(self, f_in, amp):
+            self.omega = tau*f_in
+            self.amp = amp
+
+        def update(self, t):
+            return self.amp*sin(self.omega*t)
+
+
+    # instantiate components
+    integrator1 = Integrator(gain1)
+    integrator2 = Integrator(gain2)
+    quantizer = Quantizer(Vmax, Vmin, levels)
+    sine = Source(Fin, Vin)
+
+    # run simulation
+    t = Tstart
+    dt = 1/Fclk
+    v_out = 0
+    t_stop = periods/Fin
+    try:
+        fvin = open('vin', 'w')
+        fvout = open('vout', 'w')
+        fdout = open('dout', 'w')
+        while t < t_stop:
+            v_in = sine.update(t)
+            v_int1 = integrator1.update(v_in - v_out)
+            v_int2 = integrator2.update(v_int1 - v_out)
+            d_out, v_out = quantizer.update(v_int2)
+            if (t >= 0):
+                print(t, v_in, file=fvin)
+                print(t, v_out, file=fvout)
+                print(t, d_out, file=fdout)
+            t += dt
+    except OSError as e:
+        error(os_error(e))
+
+Notice that *level* was specified twice, but the first proceeded by `--` causing 
+it to be ignored.
+
+The output of this example can be used as the input to the next. With these 
+parameters, it produces this waveform:
+
+..  image:: wave.png
+
+
 .. _matplotlib example:
 
 MatPlotLib Example

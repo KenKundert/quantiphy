@@ -488,7 +488,19 @@ FORMAT_SPEC = re.compile(r'''\A
 # Defaults {{{1
 DEFAULTS = {
     'abstol': 1e-12,
-    'assign_rec': r'\A\s*((?P<name>[^=:]+)\s*[=:]\s*)?(?P<val>.*?)(\s*(#|--|//)\s*(?P<desc>.*?)\s*)?\Z',
+    'assign_rec': r'''
+        \A((
+            (\#|--|//).*                             # simple comment
+        )|(
+            (
+                (?P<name>[^(=:]+?)\s*                # name: \.+
+                (\(\s*(?P<qname>[^)]*?)\s*\)\s*)?    # qname: (.*)
+                [=:]\s*
+            )?
+            (?P<val>.+?)                             # value: .+
+            (\s*(\#|--|//)\s*(?P<desc>.*?))?         # description: (--|//|#) .*
+        ))\Z
+    ''',
     'full_prec': 12,
     'ignore_sf': False,
     'input_sf': ''.join(MAPPINGS.keys()),
@@ -509,6 +521,16 @@ DEFAULTS = {
     'strip_radix': True,
     'strip_zeros': True,
     'unity_sf': '',
+}
+
+# These constants are available to expressions in extract strings.
+# Be aware that this dictionary is passed as globals to eval, so it gets
+# polluted with things like __builtins__.
+CONSTANTS = {
+    'pi': math.pi,
+    'π': math.pi,
+    'tau': 2*math.pi,
+    'τ': 2*math.pi,
 }
 
 
@@ -656,7 +678,6 @@ class Quantity(float):
             Absolute tolerance, used by :meth:`Quantity.is_close()` when
             determining equivalence.  Default is 10⁻¹².
 
-
         :arg str assign_rec:
             Regular expression used to recognize an assignment.  Used in
             constructor and extract(). By default an '=' or ':' separates the
@@ -678,6 +699,42 @@ class Quantity(float):
             For example::
 
                 assign_req = r'(?P<name>.*+) = (?P<val>.*?) -- (?P<desc>.*?)',
+
+            The regular expression is interpreted using the re.VERBOSE flag.
+
+            When used with :meth:`quantiphy.Quantity.extract` there are a few
+            more features.
+
+            First, you may also introduce comments using '--', '#', or '//'::
+
+                '-- comment'
+                '# comment'
+                '// comment'
+
+            Second, you can specify an alternate name using by placing in within
+            parentheses following the name::
+
+                'wavelength (λ) = 21 cm -- wavelength of hydrogen line'
+
+            In this case, the name attribute for the quantity will be 'λ' and
+            the quantity will be filed in the output dictionary using
+            'wavelength' as the key. If the alternate name is not given, then
+            'wavelength' is used for the quantity name and dictionary key.
+
+            Third, the value may be an expression involving the previously
+            specified values if the evaluate argument is specified as True.
+            When doing so, you can specify the units by following the value
+            expression with a double-quoted string. The expressions may contain
+            numeric literals, previously defined quantities, and the constants
+            pi and tau.  For example::
+
+                parameters = Quantity.extract(r'''
+                    Fin = 250MHz -- frequency of input stimulus
+                    Tstop = 10/Fin "s" -- simulation stop time
+                ''', evaluate=True)
+
+            In this example, the value for *Tstop* is given as an expression
+            involving *Fin*.
 
         :arg int full_prec:
             Default full precision in digits where 0 corresponds to 1 digit.
@@ -1200,7 +1257,7 @@ class Quantity(float):
             else:
                 number_converters = cls.all_number_converters
             for pattern, get_mant, get_sf, get_units in number_converters:
-                match = pattern.match(value)
+                match = pattern.match(value.replace(',', ''))
                 if match:
                     mantissa = get_mant(match)
                     sf = get_sf(match)
@@ -1218,7 +1275,7 @@ class Quantity(float):
                 number, u, mantissa, sf = recognize_number(value, ignore_sf)
             except ValueError:
                 # not a simple number, try the assignment recognizer
-                match = re.match(cls.get_pref('assign_rec'), value)
+                match = re.match(cls.get_pref('assign_rec'), value, re.VERBOSE)
                 if match:
                     args = match.groupdict()
                     n = args.get('name', '')
@@ -1735,31 +1792,32 @@ class Quantity(float):
 
     # extract() {{{2
     @classmethod
-    def extract(cls, text):
+    def extract(cls, text, evaluate=True, ignore_nonconforming_lines=True):
         """Extract quantities
 
         Takes a string that contains quantity definitions, one per line, and 
         returns those quantities in a dictionary.
 
-        :arg str quantities:
+        :arg str text:
             The string that contains the quantities, one definition per
             line.  Each is parsed by *assign_rec*. By default, the lines are
             assumed to be of the form::
 
-                [<name> = <value>]
-                [<name> = <value>] [-- <description>]
-                [<name> = <value>] [# <description>]
-                [<name> = <value>] [// <description>]
-                [<name>: <value>]
-                [<name>: <value>] [-- <description>]
-                [<name>: <value>] [# <description>]
-                [<name>: <value>] [// <description>]
+                [<name> [(<qname>)] = <value>] [-- <description>]
+
+            where '=' may be replaced by ':' and '--' may be replaced by '//' or
+            '#'.  In addition, bracket delimit optional fields and parentheses
+            represent literal parentheses.  Each of the fields are allowed be
+            largely arbitrary strings.
 
             The brackets indicate that the name/value pair and the description
             is optional.  However, <name> must be given if <value> is given.
 
             <name>:
                 the name is used as a key for the value.
+
+            <qname>:
+                the name taken by the quantity.
 
             <value>:
                 A number with optional units (ex: 3 or 1pF or 1 kOhm),
@@ -1773,9 +1831,21 @@ class Quantity(float):
             ignored::
 
                 -- comment
-
                 # comment
                 // comment
+
+        :arg str evaluate:
+            When true extract attempt to evaluate a value it does not recognize
+            as a number. In this case the expression for the value may be
+            followed by a string surrounded by double quotes, which is taken as
+            the units.  For example: Tstop = 5/Fin "s". The expressions may only
+            contain number literals, quantities defined previously in the same set of
+            definitions, and the constants pi and tau (2*pi), which may be named
+            π or τ. The units should not include a scale factor.
+
+        :arg str ignore_nonconforming_lines:
+            When true extract will ignore all lines that are not matched by
+            *assign_rec*.
 
         :returns:
             a dictionary of quantities for the values specified in the argument.
@@ -1790,15 +1860,15 @@ class Quantity(float):
             ...     -- Carl Sagan's SETI frequencies of high interest
             ...
             ...     f_hy = 1420.405751786 MHz -- Hydrogen line frequency
-            ...     f_sagan1 = 4462.336274928 MHz -- Sagan's first frequency: pi*f_hy
-            ...     f_sagan2 = 8924.672549855 MHz -- Sagan's second frequency: 2*pi*f_hy
+            ...     f_sagan1 = pi*f_hy "Hz" -- Sagan's first frequency
+            ...     f_sagan2 = 2*pi*f_hy "Hz" -- Sagan's second frequency
             ... '''
-            >>> freqs = Quantity.extract(sagan_frequencies)
+            >>> freqs = Quantity.extract(sagan_frequencies, evaluate=True)
             >>> for f in freqs.values():
             ...     print(f.render(show_label='f'))
             f_hy = 1.4204 GHz -- Hydrogen line frequency
-            f_sagan1 = 4.4623 GHz -- Sagan's first frequency: pi*f_hy
-            f_sagan2 = 8.9247 GHz -- Sagan's second frequency: 2*pi*f_hy
+            f_sagan1 = 4.4623 GHz -- Sagan's first frequency
+            f_sagan2 = 8.9247 GHz -- Sagan's second frequency
 
             >>> globals().update(freqs)
             >>> print(f_hy, f_sagan1, f_sagan2, sep=newline)
@@ -1809,21 +1879,43 @@ class Quantity(float):
         """
         quantities = {}
         for line in text.splitlines():
-            match = re.match(cls.get_pref('assign_rec'), line)
+            line = line.strip()
+            if not line:
+                continue
+            match = re.match(cls.get_pref('assign_rec'), line, re.VERBOSE)
             if match:
                 args = match.groupdict()
                 name = args.get('name', '')
+                qname = args.get('qname', '')
+                qname = name if not qname else qname
                 value = args['val']
                 desc = args.get('desc', '')
-                if not value:
+                if not name or not value:
+                    if not name and not value:
+                        continue
+                    if not ignore_nonconforming_lines:
+                        raise ValueError('line not recognized: {}'.format(line))
                     continue
-                if not name:
-                    raise ValueError('{}: name not given.'.format(line))
                 name = name.strip()
-                quantity = cls(value, name=name, desc=desc)
+                try:
+                    quantity = cls(value, name=qname, desc=desc)
+                except ValueError:
+                    if evaluate:
+                        # extract the units if given (they are embedded in "")
+                        components = value.split()
+                        if components[-1][0] == '"' and components[-1][-1] == '"':
+                            units = components[-1][1:-1]
+                            value = ' '.join(components[:-1])
+                        else:
+                            units = ''
+                        value = eval(value, CONSTANTS, quantities)
+                        quantity = cls(value, units=units, name=qname, desc=desc)
+                    else:
+                        raise
                 quantities[name] = quantity
-            else:  # pragma: no cover
-                raise ValueError('{}: not a valid number.'.format(line))
+            else:
+                if not ignore_nonconforming_lines:
+                    raise ValueError('line not recognized: {}'.format(line))
         return quantities
 
     # map_sf_to_sci_notation() {{{2

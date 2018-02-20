@@ -123,8 +123,8 @@ def test_misc():
     assert exception.value.args[0] == 'z: not a valid number.'
 
     with pytest.raises(ValueError) as exception:
-        Quantity.extract('1ns')
-    assert exception.value.args[0] == '1ns: name not given.'
+        Quantity.extract('1ns', ignore_nonconforming_lines=False)
+    assert exception.value.args[0] == 'line not recognized: 1ns'
 
     # this used to be an ValueError because 'x*y' is not an identifier
     vals = Quantity.extract('x*y = 1 m/s')

@@ -571,8 +571,8 @@ However, only the scale factors listed in the *output_sf* preference are
 actually used, and by default that is set to 'TGMkmunpfa', which avoids the more
 uncommon scale factors.
 
-The render() method allows you to control the process of converting a quantity 
-to a string. For example:
+The :meth:`quantipyy.Quantity.render` method allows you to control the process 
+of converting a quantity to a string. For example:
 
 .. code-block:: python
 
@@ -1306,18 +1306,31 @@ return them in a dictionary.  For example:
     Kdet = 88.3 uA      # Gain of phase detector
     Kvco = 9.07 GHz/V   # Gain of VCO
 
-:meth:`quantiphy.Quantity.extract()` ignores blank lines and any line that does 
-not have a value, so you can insert comments into the string by giving 
-a description without a name or value:
+The string is processed one line at a time and may contain any number of 
+quantity definitions.  Blank lines are ignored.  Each non-blank line is passed 
+through *assign_rec* to determine if it is recognized as an assignment.  If it 
+is recognized, the *assign_rec* named fields (*name*, *qname*, *val*, and 
+*desc*) are used when creating the quantity.  The default recognizer allows you 
+to separate the name from the value with either '=' or ':'. It allows you to 
+separate the value from the description using '--', '//', or '#'. These 
+substrings are also used to introduce comments, so you could start a line with 
+'#' and it would be treated as a comment.
+If the line is not recognized, then it would either be ignored or treated as an 
+error, depending on the value of the *ignore_nonconforming_lines* argument, 
+which defaults to True.
+
+In this example, the first line is non conforming, but will be ignored. The last 
+is a comment and so is ignored regardless of *ignore_nonconforming_lines*:
 
 .. code-block:: python
 
     >>> design_parameters = '''
-    ...     -- PLL Design Parameters
+    ...     PLL Design Parameters
     ...
     ...     Fref = 156 MHz  -- Reference frequency
     ...     Kdet = 88.3 uA  -- Gain of phase detector
     ...     Kvco = 9.07 GHz/V  -- Gain of VCO
+    ...     -- Kvco = 5 GHz/V -- Gain of VCO
     ... '''
     >>> globals().update(Quantity.extract(design_parameters))
 
@@ -1328,20 +1341,14 @@ a description without a name or value:
 
 In this case the output of the :meth:`quantiphy.Quantity.extract()` call is fed 
 into globals().update() so as to add the quantities into the module namespace, 
-making the quantities accessible as local variables.
-
-Any number of quantities may be given, with each quantity given on its own line.  
-The identifier given to the left '=' is the name of the variable in the local 
-namespace that is used to hold the quantity. The text after the '--' is used as 
-a description of the quantity.
-
-In this example the output of :meth:`quantiphy.Quantity.extract()` is added into 
-the local names space.  This is an example of how simulation scripts could be 
-written. The system and simulation parameters would be gathered together at the 
-top into a multiline string, which would then be read and loaded into the local 
-name space. It allows you to quickly give a complete description of a collection 
-of parameters when the goal is to put something together quickly in an 
-expressive manner.
+making the quantities accessible as local variables.  This is an example of how 
+simulation scripts could be written. The system and simulation parameters would 
+be gathered together at the top into a multiline string, which would then be 
+read and loaded into the local name space. It allows you to quickly give 
+a complete description of a collection of parameters when the goal is to put 
+something together quickly in an expressive manner.  Another example of this 
+ideas is shown a bit further down where the module docstring is used to contain 
+the quantity definitions.
 
 Here is an example that uses this feature to read parameters from a file. This 
 is basically the same idea as above, except the design parameters are kept in 
@@ -1362,15 +1369,70 @@ a version that displays the name and description by default.
     >>> try:
     ...     with open(filename) as f:
     ...         globals().update(VerboseQuantity.extract(f.read()))
-    ... except OSError as err:
-    ...     fatal(os_error(err))
-    ... except ValueError as err:
-    ...     fatal(err, culprit=filename)
+    ... except OSError as e:
+    ...     fatal(os_error(e))
+    ... except ValueError as e:
+    ...     fatal(e, culprit=filename)
 
     >>> display(Fref, Kdet, Kvco, sep='\n')
     Fref = 156 MHz     -- Reference frequency
     Kdet = 88.3 uA     -- Gain of phase detector (Imax)
     Kvco = 9.07 GHz/V  -- Gain of VCO
+
+With :meth:`quantiphy.Quantity.extract()`  the values of quantities can be given 
+as a expression that contains previously defined quantities. This requires that 
+you set the *evaluate* argument to True. For example:
+
+.. code-block:: python
+
+    #!/usr/bin/env python3
+    """
+    Simulates a second-order ΔΣ modulator with the following parameter values:
+
+        Fclk = 50MHz        -- clock frequency
+        Fin = 200kHz        -- input frequency
+        Vin = 950mV         -- input voltage amplitude (peak)
+        gain1 = 0.5V/V      -- gain of first integrator
+        gain2 = 0.5V/V      -- gain of second integrator
+        Vmax = 1V           -- quantizer maximum input voltage
+        Vmin = -1V          -- quantizer minimum input voltage
+        levels = 5          -- quantizer output levels
+        Tstop = 2/Fin "s"   -- simulation stop time
+        Tstart = -1/Fin "s" -- initial transient interval (discarded)
+
+    The values given above are used in the simulation, no further
+    modification of the code given below is required when changing
+    these parameters.
+    """
+
+    from quantiphy import Quantity
+
+    parameters = Quantity.extract(__doc__, evaluate=True)
+    globals().update(parameters)
+
+    print('Simulation parameters:')
+    for v in parameters.values():
+        print('   ', v.render(show_label='f'))
+
+    ...
+
+This example produces::
+
+    Simulation parameters:
+        Fclk = 50 MHz -- clock frequency
+        Fin = 200 kHz -- input frequency
+        Vin = 950 mV -- input voltage amplitude (peak)
+        gain1 = 500 mV/V -- gain of first integrator
+        gain2 = 500 mV/V -- gain of second integrator
+        Vmax = 1 V -- quantizer maximum input voltage
+        Vmin = -1 V -- quantizer minimum input voltage
+        levels = 5 -- quantizer output levels
+        Tstop = 5 us -- simulation stop time
+        Tstart = -5 us -- initial transient interval (discarded)
+
+Notice in this case the parameters were specified and read out of the docstring 
+at the top of the file. In this way, the parameters become very easy to set and 
+the documentation is always up to date.
 
 
 .. _translate:
@@ -1516,8 +1578,8 @@ cannot convert into a number:
 
    >>> try:
    ...     q = Quantity('g')
-   ... except ValueError as err:
-   ...     print(err)
+   ... except ValueError as e:
+   ...     print(e)
    g: not a valid number.
 
 A *KeyError* is raised if a unit conversion is requested but no suitable unit

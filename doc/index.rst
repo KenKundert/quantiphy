@@ -27,7 +27,7 @@ science and engineering. SI scale factors make it possible to cleanly represent
 both very large and very small quantities in a form that is both easy to read 
 and write.  While generally better for humans, no general programming language 
 provides direct support for reading or writing quantities with SI scale factors, 
-making it difficult to write software that communicates effectively with humans.  
+making it difficult to write software that communicates effectively with people.  
 *QuantiPhy* addresses this deficiency, making it natural and simple to both 
 input and output physical quantities.
 
