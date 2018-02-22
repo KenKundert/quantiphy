@@ -1381,8 +1381,8 @@ a version that displays the name and description by default.
 
 With :meth:`quantiphy.Quantity.extract()`  the values of quantities can be given 
 as a expression that contains previously defined quantities (or :ref:`physical 
-constants <physical-constants> or select mathematical constants (pi, tau, π, or 
-τ).  This feature is disabled if the *evaluate* argument is False.  For example:
+constants <constants>` or select mathematical constants (pi, tau, π, or τ).  
+This feature is disabled if the *evaluate* argument is False.  For example:
 
 .. code-block:: python
 

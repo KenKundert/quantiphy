@@ -57,8 +57,14 @@ Releases
     - added Quantity.scale()
     - added UnitConversion.convert()
     - added strip_zeros
-    - added no-op conversions (units change but value stays the same: ex. $->USD)
+    - added no-op conversions (units change but value stays the same: ex.  $ → USD)
 
 **Latest development release**:
     | Version: 2.2.8
     | Released: 2018-02-21
+
+    - enhanced Quantity.extract()
+
+      * non-conforming lines can now be ignored
+      * values may be expressions
+      * can specify a quantity name distinct from dictionary name
