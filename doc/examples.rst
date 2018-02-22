@@ -464,9 +464,9 @@ to date.
         gain2 = 0.5            -- gain of second integrator
         Vmax = 1               -- quantizer maximum input voltage
         Vmin = -1              -- quantizer minimum input voltage
-        -- levels = 16            -- quantizer output levels
+        # levels = 16            -- quantizer output levels
         levels = 4             -- quantizer output levels
-        Tstop = 1/Fin "s"      -- how many input periods to simulate
+        Tstop = 1/Fin "s"      -- simulation stop time
         Tstart = -0.5/Fin "s"  -- initial transient interval (discarded)
 
     The values given above are used in the simulation, no further modification 
@@ -476,12 +476,6 @@ to date.
     from quantiphy import Quantity
     from math import sin, tau
     from inform import display, error, os_error
-
-    parameters = Quantity.extract(__doc__, ignore_nonconforming_lines=True)
-    globals().update(parameters)
-    display('Simulation parameters:')
-    for v in parameters.values():
-        display('   ', v.render(show_label='f'))
 
     class Integrator:
         def __init__(self, gain=1):
@@ -514,6 +508,15 @@ to date.
         def update(self, t):
             return self.amp*sin(self.omega*t)
 
+
+    # read simulation parameters and load into module namespace
+    parameters = Quantity.extract(__doc__)
+    globals().update(parameters)
+
+    # display the simulation parameters
+    display('Simulation parameters:')
+    for v in parameters.values():
+        display('   ', v.render(show_label='f'))
 
     # instantiate components
     integrator1 = Integrator(gain1)

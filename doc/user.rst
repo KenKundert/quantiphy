@@ -1380,8 +1380,9 @@ a version that displays the name and description by default.
     Kvco = 9.07 GHz/V  -- Gain of VCO
 
 With :meth:`quantiphy.Quantity.extract()`  the values of quantities can be given 
-as a expression that contains previously defined quantities. This requires that 
-you set the *evaluate* argument to True. For example:
+as a expression that contains previously defined quantities (or :ref:`physical 
+constants <physical-constants> or select mathematical constants (pi, tau, π, or 
+τ).  This feature is disabled if the *evaluate* argument is False.  For example:
 
 .. code-block:: python
 

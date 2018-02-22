@@ -20,7 +20,7 @@ input and output physical quantities.
 """
 
 # License {{{1
-# Copyright (C) 2016 Kenneth S. Kundert
+# Copyright (C) 2016-2018 Kenneth S. Kundert
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -524,13 +524,11 @@ DEFAULTS = {
 }
 
 # These constants are available to expressions in extract strings.
-# Be aware that this dictionary is passed as globals to eval, so it gets
-# polluted with things like __builtins__.
 CONSTANTS = {
     'pi': math.pi,
     'π': math.pi,
-    'tau': 2*math.pi,
-    'τ': 2*math.pi,
+    'tau': getattr(math, 'tau', 2*math.pi),
+    'τ': getattr(math, 'tau', 2*math.pi),
 }
 
 
@@ -1835,13 +1833,14 @@ class Quantity(float):
                 // comment
 
         :arg str evaluate:
-            When true extract attempt to evaluate a value it does not recognize
+            When true extract attempts to evaluate a value it does not recognize
             as a number. In this case the expression for the value may be
             followed by a string surrounded by double quotes, which is taken as
             the units.  For example: Tstop = 5/Fin "s". The expressions may only
-            contain number literals, quantities defined previously in the same set of
-            definitions, and the constants pi and tau (2*pi), which may be named
-            π or τ. The units should not include a scale factor.
+            contain number literals, quantities defined previously in the same
+            set of definitions, physical quantities, and the constants pi and
+            tau (2*pi), which may be named π or τ. The units should not include
+            a scale factor.
 
         :arg str ignore_nonconforming_lines:
             When true extract will ignore all lines that are not matched by
@@ -1908,7 +1907,8 @@ class Quantity(float):
                             value = ' '.join(components[:-1])
                         else:
                             units = ''
-                        value = eval(value, CONSTANTS, quantities)
+                        predefined = ChainMap(quantities, _active_constants, CONSTANTS)
+                        value = eval(value, None, predefined)
                         quantity = cls(value, units=units, name=qname, desc=desc)
                     else:
                         raise
