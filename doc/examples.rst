@@ -454,7 +454,7 @@ to date.
 
     #!/usr/bin/env python3
 
-    """
+    r"""
     Simulates a second-order ΔΣ modulator with the following parameter values:
 
         Fclk = 50MHz           -- clock frequency
@@ -468,6 +468,9 @@ to date.
         levels = 4             -- quantizer output levels
         Tstop = 1/Fin "s"      -- simulation stop time
         Tstart = -0.5/Fin "s"  -- initial transient interval (discarded)
+        vin_file = 'vin.data'   -- output data file
+        vout_file = 'vout.wave' -- output data file
+        data_file = 'dout.wave' -- output data file
 
     The values given above are used in the simulation, no further modification 
     of the code given below is required when changing these parameters.
@@ -515,8 +518,11 @@ to date.
 
     # display the simulation parameters
     display('Simulation parameters:')
-    for v in parameters.values():
-        display('   ', v.render(show_label='f'))
+    for k, v in parameters.items():
+        try:
+            display(f'   ', v.render(show_label='f'))
+        except AttributeError:
+            display(f'    {k} = {v}')
 
     # instantiate components
     integrator1 = Integrator(gain1)
@@ -528,7 +534,7 @@ to date.
     t = Tstart
     dt = 1/Fclk
     v_out = 0
-    t_stop = periods/Fin
+    t_stop = Tstop
     try:
         fvin = open('vin', 'w')
         fvout = open('vout', 'w')
@@ -742,3 +748,39 @@ The output of the script looks like this::
         100 BCH = $126k   12%
         100 ZEC = $31k    3%
         Total = $1.02M
+
+If you prefer the output in fixed-point format, you can replace the last part of 
+this code with:
+
+.. code-block:: python
+
+    # show summary of conversions and holdings
+    print(dedent(f'''
+        Current Prices:
+            1 BTC = {btc2usd.convert():,.2p} or {btc2eth.convert():,.4p}
+            1 ETH = {eth2usd.convert():,.2p} or {btc2eth.convert(1, 'Ξ'):,.4p}
+            1 BCH = {bch2usd.convert():,.2p}
+            1 ZEC = {zec2usd.convert():,.2p}
+
+        Holdings:
+            {btc:>7qBTC} = {btc:15,.2p$} {100*btc.scale('$')/total:.0f}%
+            {eth:>7qETH} = {eth:15,.2p$} {100*eth.scale('$')/total:.0f}%
+            {bch:>7qBCH} = {bch:15,.2p$} {100*bch.scale('$')/total:.0f}%
+            {zec:>7qZEC} = {zec:15,.2p$} {100*zec.scale('$')/total:.0f}%
+            Total = {total:,.2p}
+    ''').strip())
+
+If you do, the output of the script looks like this::
+
+    Current Prices:
+        1 BTC = $10,609.47 or Ξ12.2100
+        1 ETH = $866.65 or Ƀ0.0819
+        1 BCH = $1,241.11
+        1 ZEC = $396.16
+
+    Holdings:
+        100 BTC = $1,060,947.00   81%
+        100 ETH = $86,665.00      7%
+        100 BCH = $124,111.00     9%
+        100 ZEC = $39,616.00      3%
+        Total = $1,311,339.00

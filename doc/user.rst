@@ -571,7 +571,7 @@ However, only the scale factors listed in the *output_sf* preference are
 actually used, and by default that is set to 'TGMkmunpfa', which avoids the more
 uncommon scale factors.
 
-The :meth:`quantipyy.Quantity.render` method allows you to control the process 
+The :meth:`quantiphy.Quantity.render` method allows you to control the process 
 of converting a quantity to a string. For example:
 
 .. code-block:: python
@@ -633,6 +633,15 @@ if it was specified as a string and if the *keep_components* preference is True.
 Otherwise a fixed number of digits, specified in the *full_prec* preference, is 
 used (default=12).  Generally one uses 'full' when generating output that is 
 intended to be read by a machine.
+
+An alternative to *render* is :meth:`quantiphy.Quantity.fixed`. It converts the 
+quantity to a string in fixed-point format:
+
+.. code-block:: python
+
+    >>> total = Quantity('$11.2M')
+    >>> print(total.fixed(prec=2, show_commas=True, strip_zeros=False))
+    $11,200,000.00
 
 
 Scaling When Rendering a Quantity
@@ -717,18 +726,76 @@ You can also specify the width and alignment.
 
 .. code-block:: python
 
-    >>> print('|{:15.6}|'.format(h_line))
-    |1.420406 GHz   |
+    >>> print('|{:16.6}|'.format(h_line))
+    |1.420406 GHz    |
 
-    >>> print('|{:<15.6}|'.format(h_line))
-    |1.420406 GHz   |
+    >>> print('|{:<16.6}|'.format(h_line))
+    |1.420406 GHz    |
 
-    >>> print('|{:>15.6}|'.format(h_line))
-    |   1.420406 GHz|
+    >>> print('|{:>16.6}|'.format(h_line))
+    |    1.420406 GHz|
 
-The 'q' type specifier can be used to explicitly indicate that both the number 
-and the units are desired and that SI scale factors should be used, regardless 
-of the current preferences.
+    >>> print('|{:^16.6}|'.format(h_line))
+    |  1.420406 GHz  |
+
+The general form of the format specifiers supported by quantities is::
+
+   format_spec ::=  [align][width][,][.precision][type]
+
+*align* specifies the alignment using one of the following characters:
+
+   ===== =======================================================================
+   Align Meaning
+   ===== =======================================================================
+   >     Right justification.
+   <     Left justification.
+   ^     Center justification.
+   ===== =======================================================================
+
+*width* is a literal integer that specifies the minimum width of the string.
+
+The comma is a literal comma that when present indicates that commas should be 
+added to the whole part of the mantissa, every three digits.
+
+*precision* is a literal integer that specifies the precision.
+
+And finally, *type* specifies which form should be used when formatting the 
+value. The choices include:
+
+   ==== ========================================================================
+   Type Meaning
+   ==== ========================================================================
+        Use default formatting options.
+   s    Use default formatting options.
+   q    Format using SI scale factors and show the units.
+   r    Format using SI scale factors but do not show the units.
+   p    Format using fixed-point notation and show the units.
+   e    Format using exponent notation but do not show the units.
+   f    Format using fixed-point notation but do not show the units.
+   g    Format using fixed-point or exponential notation, whichever is shorter, 
+        but do not show the units.
+   u    Only format the units.
+   n    Only format the name.
+   d    Only format the description.
+   ==== ========================================================================
+
+You can capitalize any of the format characters that output the value of the 
+quantity (any of 'sqrpefg', but not 'und'). If you do, the label will also be 
+included.
+
+These format specifiers are generally included in format strings. However, in 
+addition, *Quantitphy* provides the :meth:`quantiphy.Quantity.format` method 
+that converts a quantity to a string based on a naked format string. For 
+example:
+
+.. code-block:: python
+
+    >>> print(h_line.format('.6q'))
+    1.420406 GHz
+
+The 'q' type specifier is used to explicitly indicate that both the number and 
+the units are desired and that SI scale factors should be used, regardless of 
+the current preferences.
 
 .. code-block:: python
 
@@ -746,6 +813,9 @@ scale factors is desired, and the units should not be included.
 You can also use the floating point format type specifiers:
 
 .. code-block:: python
+
+    >>> print('{:p}'.format(h_line))
+    1420405751.7860 Hz
 
     >>> print('{:f}'.format(h_line))
     1420405751.786
@@ -848,6 +918,15 @@ information back into the original units:
     0 min   450 °F
     10 min  400 °F
     20 min  360 °F
+
+Any format specification that is not recognized by *QuantiPhy* is simply passed 
+on to the underlying float. For example:
+
+.. code-block:: python
+
+    >>> total = Quantity(1976794.98, '$')
+    >>> print(f'TOTAL: {total:#,.2f}')
+    TOTAL: 1,976,794.98
 
 
 .. _constants:

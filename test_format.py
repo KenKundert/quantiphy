@@ -24,6 +24,10 @@ def test_format():
     assert '{:G}'.format(q) == 'f = 1.4204e+09'
     assert '{:n}'.format(q) == 'f'
     assert '{:d}'.format(q) == 'frequency of hydrogen line'
+    assert '{:p}'.format(q) == '1420405751.7860 Hz'
+    assert '{:,p}'.format(q) == '1,420,405,751.7860 Hz'
+    assert '{:P}'.format(q) == 'f = 1420405751.7860 Hz'
+    assert '{:,P}'.format(q) == 'f = 1,420,405,751.7860 Hz'
 
     q=Quantity('2ns')
     assert float(q) == 2e-9
@@ -31,7 +35,7 @@ def test_format():
     with pytest.raises(ValueError) as exception:
         q = Quantity('1ns')
         '{:z}'.format(q)
-    assert exception.value.args[0] == "Invalid format specifier 'z' for 1 ns."
+    assert exception.value.args[0] == "Unknown format code 'z' for object of type 'float'"
 
 def test_full_format():
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None, show_desc=False)
@@ -54,6 +58,39 @@ def test_full_format():
     assert '{:G}'.format(q) == 'f = 1420405751.786'
     assert '{:n}'.format(q) == 'f'
     assert '{:d}'.format(q) == 'frequency of hydrogen line'
+    assert '{:.2p}'.format(q) == '1420405751.79 Hz'
+    assert '{:,.2p}'.format(q) == '1,420,405,751.79 Hz'
+    assert '{:.2P}'.format(q) == 'f = 1420405751.79 Hz'
+    assert '{:,.2P}'.format(q) == 'f = 1,420,405,751.79 Hz'
+
+    q=Quantity('2ns')
+    assert float(q) == 2e-9
+
+def test_currency():
+    Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None, show_desc=False)
+    Quantity.set_prefs(prec='full')
+    q=Quantity('Total = $1000k -- a large amount of money')
+    assert '{}'.format(q) == '$1M'
+    assert '{:.8}'.format(q) == '$1M'
+    assert '{:.8s}'.format(q) == '$1M'
+    assert '{:.8S}'.format(q) == 'Total = $1M'
+    assert '{:.8q}'.format(q) == '$1M'
+    assert '{:.8Q}'.format(q) == 'Total = $1M'
+    assert '{:r}'.format(q) == '1M'
+    assert '{:R}'.format(q) == 'Total = 1M'
+    assert '{:u}'.format(q) == '$'
+    assert '{:.4f}'.format(q) == '1000000'
+    assert '{:.4F}'.format(q) == 'Total = 1000000'
+    assert '{:e}'.format(q) == '1e+06'
+    assert '{:E}'.format(q) == 'Total = 1e+06'
+    assert '{:g}'.format(q) == '1000000'
+    assert '{:G}'.format(q) == 'Total = 1000000'
+    assert '{:n}'.format(q) == 'Total'
+    assert '{:d}'.format(q) == 'a large amount of money'
+    assert '{:.2p}'.format(q) == '$1000000.00'
+    assert '{:,.2p}'.format(q) == '$1,000,000.00'
+    assert '{:.2P}'.format(q) == 'Total = $1000000.00'
+    assert '{:,.2P}'.format(q) == 'Total = $1,000,000.00'
 
     q=Quantity('2ns')
     assert float(q) == 2e-9
@@ -82,6 +119,10 @@ def test_scaled_format():
         assert '{:d°F}'.format(q) == 'boiling point of water'
         assert '{!r}'.format(q) == "Quantity('100 °C')"
         assert '{:.8s°C}'.format(q) == '100 °C'
+        assert '{:p°F}'.format(q) == '212.0000 °F'
+        assert '{:,.2p°F}'.format(q) == '212.00 °F'
+        assert '{:P°F}'.format(q) == 'Tboil = 212.0000 °F'
+        assert '{:,.2P°F}'.format(q) == 'Tboil = 212.00 °F'
 
 def test_number_fmt():
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None, show_desc=False)
@@ -142,3 +183,11 @@ def test_number_fmt():
         assert '<{:s}>'.format(Quantity('1.234 mm')) == '<1.234 mm>'
         assert '<{:s}>'.format(Quantity('12.34 mm')) == '<12.34 mm>'
         assert '<{:s}>'.format(Quantity('123.4 mm')) == '<123.4 mm>'
+
+def test_alignment():
+    assert '<{:<16s}>'.format(Quantity('h')) == '<662.61e-36 J-s  >'
+    assert '<{:^16s}>'.format(Quantity('h')) == '< 662.61e-36 J-s >'
+    assert '<{:>16s}>'.format(Quantity('h')) == '<  662.61e-36 J-s>'
+    assert '<{:<17s}>'.format(Quantity('h')) == '<662.61e-36 J-s   >'
+    assert '<{:^17s}>'.format(Quantity('h')) == '< 662.61e-36 J-s  >'
+    assert '<{:>17s}>'.format(Quantity('h')) == '<   662.61e-36 J-s>'

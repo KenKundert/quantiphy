@@ -476,19 +476,20 @@ UNIT_SYMBOLS = '°ÅΩ℧'
 
 # Regular expression for recognizing and decomposing string .format method codes
 FORMAT_SPEC = re.compile(r'''\A
-    ([<>]?)                             # alignment
+    ([<^>]?)                            # alignment
     (\d*)                               # width
+    (,?)                                # comma
     (?:\.(\d+))?                        # precision
     (?:
-        ([qQrRusSeEfFgGdn])             # format
+        ([qpPQrRusSeEfFgGdn])           # format
         ([a-zA-Z%{us}{cs}][-^/()\w]*)?  # units
     )?
 \Z'''.format(cs=CURRENCY_SYMBOLS, us=UNIT_SYMBOLS), re.VERBOSE)
 
 # Defaults {{{1
-DEFAULTS = {
-    'abstol': 1e-12,
-    'assign_rec': r'''
+DEFAULTS = dict(
+    abstol = 1e-12,
+    assign_rec = r'''
         \A((
             (\#|--|//).*                             # simple comment
         )|(
@@ -501,27 +502,28 @@ DEFAULTS = {
             (\s*(\#|--|//)\s*(?P<desc>.*?))?         # description: (--|//|#) .*
         ))\Z
     ''',
-    'full_prec': 12,
-    'ignore_sf': False,
-    'input_sf': ''.join(MAPPINGS.keys()),
-    'keep_components': True,
-    'known_units': [],
-    'label_fmt': '{n} = {v}',
-    'label_fmt_full': '{n} = {v} -- {d}',
-    'map_sf': {},
-    'number_fmt': None,
-    'output_sf': 'TGMkmunpfa',
-    'prec': 4,
-    'reltol': 1e-6,
-    'show_desc': False,
-    'show_label': False,
-    'show_si': True,
-    'show_units': True,
-    'spacer': ' ',
-    'strip_radix': True,
-    'strip_zeros': True,
-    'unity_sf': '',
-}
+    full_prec = 12,
+    ignore_sf = False,
+    input_sf = ''.join(MAPPINGS.keys()),
+    keep_components = True,
+    known_units = [],
+    label_fmt = '{n} = {v}',
+    label_fmt_full = '{n} = {v} -- {d}',
+    map_sf = {},
+    number_fmt = None,
+    output_sf = 'TGMkmunpfa',
+    prec = 4,
+    reltol = 1e-6,
+    show_commas = False,
+    show_desc = False,
+    show_label = False,
+    show_si = True,  # deprecated
+    show_units = True,
+    spacer = ' ',
+    strip_radix = True,
+    strip_zeros = True,
+    unity_sf = '',
+)
 
 # These constants are available to expressions in extract strings.
 CONSTANTS = {
@@ -844,6 +846,10 @@ class Quantity(float):
         :arg float reltol:
             Relative tolerance, used by :meth:`Quantity.is_close()` when
             determining equivalence.  Default is 10⁻⁶.
+
+        :arg bool show_commas:
+            When rendering to fixed-point string, add commas to the whole part
+            of the mantissa, every three digits. By default this is False.
 
         :arg bool show_desc:
             Whether the description should be shown if it is available when
@@ -1428,7 +1434,7 @@ class Quantity(float):
     # render() {{{2
     def render(
         self, show_units=None, show_si=None, prec=None, show_label=None,
-        scale=None
+        strip_zeros=None, strip_radix=None, scale=None,
     ):
         """Convert quantity to a string.
 
@@ -1458,6 +1464,16 @@ class Quantity(float):
             - otherwise *label_fmt_full* is used if *show_desc* is True or
               *show_label* is 'f' (short for full).
         :type show_label: 'f', 'a', or boolean
+
+        :arg strip_zeros:
+            Remove contiguous zeros from end of fractional part. If not
+            specified, the global *strip_zeros* setting is used.
+        :type strip_zeros: boolean
+
+        :arg strip_radix:
+            Remove radix if there is nothing to the right of it.  If not
+            specified, the global *strip_radix* setting is used.
+        :type strip_radix: boolean
 
         :arg scale:
             - If a float, it scales the displayed value (the quantity is
@@ -1507,10 +1523,14 @@ class Quantity(float):
             212 °F
 
         """
-        # initialize units and si
-        show_units = self.show_units if show_units is None else show_units
-        units = self.units if show_units else ''
+        # initialize various options
         show_si = self.show_si if show_si is None else show_si
+        show_units = self.show_units if show_units is None else show_units
+        strip_zeros = self.strip_zeros if strip_zeros is None else strip_zeros
+        strip_radix = self.strip_radix if strip_radix is None else strip_radix
+        units = self.units if show_units else ''
+        if prec is None:
+            prec = self.prec
 
         # check for infinities or NaN
         if self.is_infinite() or self.is_nan():
@@ -1518,8 +1538,6 @@ class Quantity(float):
             return self._label(value, show_label)
 
         # convert into scientific notation with proper precision
-        if prec is None:
-            prec = self.prec
         if prec == 'full' and hasattr(self, '_mantissa') and not scale:
             mantissa = self._mantissa
             sf = self._scale_factor
@@ -1601,15 +1619,15 @@ class Quantity(float):
         # shift the decimal place as needed
         sign = '-' if mantissa[0] == '-' else ''
         mantissa = mantissa.lstrip('-').replace('.', '')
-        if self.strip_zeros:
+        if strip_zeros:
             mantissa = mantissa.rstrip('0')
         mantissa += (shift + 1 - len(mantissa))*'0'
         mantissa = sign + mantissa[0:(shift+1)] + '.' + mantissa[(shift+1):]
 
         # remove trailing decimal point
-        if sf or self.strip_radix:  # could also add 'or units'
+        if sf or strip_radix:  # could also add 'or units'
             mantissa = mantissa.rstrip('.')
-        elif self.strip_zeros:
+        elif strip_zeros:
             # a trailing radix is not very attractive, so add a zero except if
             # strip_zeros is set, which is where we are trying to retain the
             # number of digits specified by prec to convey the number of
@@ -1618,6 +1636,133 @@ class Quantity(float):
                 mantissa += '0'
 
         value = self._combine(mantissa, sf, units, self.spacer)
+        return self._label(value, show_label)
+
+    # fixed() {{{2
+    def fixed(
+        self, show_units=None, prec=None, show_label=None, show_commas=False,
+        strip_zeros=None, strip_radix=None, scale=None,
+    ):
+        """Convert quantity to fixed-point.
+
+        :arg bool show_units:
+            Whether the units should be included in the string.
+
+        :arg prec:
+            The desired precision (one plus this value is the desired number of
+            digits). If specified as 'full', the full original precision is used.
+        :type prec: integer or 'full'
+
+        :arg show_label:
+            Add the name and possibly the description when rendering a quantity
+            to a string.  Either *label_fmt* or *label_fmt_full* is used to
+            label the quantity.
+
+            - neither is used if *show_label* is False,
+            - otherwise *label_fmt* is used if quantity does not have a
+              description or if *show_label* is 'a' (short for abbreviated),
+            - otherwise *label_fmt_full* is used if *show_desc* is True or
+              *show_label* is 'f' (short for full).
+        :type show_label: 'f', 'a', or boolean
+
+        :arg show_commas:
+            Add commas to whole part of mantissa, every three digits. If not
+            specified, the global *strip_zeros* setting is used.
+        :type commas: boolean
+
+        :arg strip_zeros:
+            Remove contiguous zeros from end of fractional part. If not
+            specified, the global *strip_zeros* setting is used.
+        :type strip_zeros: boolean
+
+        :arg strip_radix:
+            Remove radix if there is nothing to the right of it.  If not
+            specified, the global *strip_radix* setting is used.
+        :type strip_radix: boolean
+
+        :arg scale:
+            - If a float, it scales the displayed value (the quantity is
+              multiplied by scale before being converted to the string).
+            - If a tuple, the first value, a float, is treated as a scale factor
+              and the second value, a string, is take to be the units of the
+              displayed value.
+            - If a function, it takes two arguments, the value and the units of
+              the quantity and it returns two values, the value and units of
+              the displayed value.
+            - If a string, it is taken to the be desired units. This value along
+              with the units of the quantity are used to select a known unit
+              conversion, which is applied to create the displayed value.
+        :type scale: real, pair, function, or string:
+
+        :raises KeyError:
+            A unit conversion was requested and there is no corresponding unit
+            converter.
+
+        Example::
+
+            >>> t = Quantity('Total = $1000000 -- the total')
+            >>> print(
+            ...     t.fixed(),
+            ...     t.fixed(show_commas=True),
+            ...     t.fixed(show_units=False),
+            ...     t.fixed(prec=2, strip_zeros=False, show_commas=True),
+            ...     t.fixed(prec=6),
+            ...     t.fixed(strip_zeros=False, prec=6),
+            ...     t.fixed(strip_zeros=False, prec='full'),
+            ...     t.fixed(show_label=True),
+            ...     t.fixed(show_label='f'),
+            ...     sep=newline
+            ... )
+            $1000000
+            $1,000,000
+            1000000
+            $1,000,000.00
+            $1000000
+            $1000000.000000
+            $1000000.000000000000
+            Total = $1000000
+            Total = $1000000 -- the total
+
+            >>> print(
+            ...     t.fixed(scale=(1/10000, 'BTC')),
+            ...     t.fixed(scale=(1/1000, 'ETH')),
+            ...     t.fixed(scale=(1/1000, 'ETH'), show_units=False),
+            ...     sep=newline
+            ... )
+            100 BTC
+            1000 ETH
+            1000
+
+        """
+        # initialize various options
+        show_units = self.show_units if show_units is None else show_units
+        show_commas = self.show_commas if show_commas is None else show_commas
+        strip_zeros = self.strip_zeros if strip_zeros is None else strip_zeros
+        strip_radix = self.strip_radix if strip_radix is None else strip_radix
+        units = self.units if show_units else ''
+        if prec is None:
+            prec = self.prec
+
+        # check for infinities or NaN
+        if self.is_infinite() or self.is_nan():
+            value = self._combine(str(self.real), '', units, ' ')
+            return self._label(value, show_label)
+
+        # handle fixed point formatting
+        if prec == 'full':
+            prec = self.full_prec
+        if scale:
+            number, units = _scale(scale, float(self), self.units)
+            units = units if show_units else ''
+        else:
+            number = float(self)
+        comma = ',' if show_commas else ''
+        mantissa = '{0:{1}.{2}f}'.format(number, comma, prec)
+        if strip_zeros:
+            mantissa = mantissa.rstrip('0')
+        if strip_radix:
+            mantissa = mantissa.rstrip('.')
+        value = self._combine(mantissa, '', units, self.spacer)
         return self._label(value, show_label)
 
     # is_close() {{{2
@@ -1694,8 +1839,8 @@ class Quantity(float):
             self.render(show_units=True, show_si=show_si, prec='full')
         )
 
-    # __format__() {{{2
-    def __format__(self, template):
+    # format() {{{2
+    def format(self, template):
         """Convert quantity to string for Python string format function.
 
         Supports the normal floating point and string format types as well some
@@ -1705,16 +1850,24 @@ class Quantity(float):
         :arg str template: the format string.
         :raises ValueError: unknown format code.
 
-        The format is specified using AW.PT where:
-        A is character and gives the alignment: either '', '>', or '<'
-        W is integer and gives the width
-        P is integer and gives the precision
-        T is char and gives the type: choose from q, r, s, e, f, g, u, n, d, ...
+        The format is specified using AW.PT where if::
+
+            >>> q = Quantity('f = 1420.405751786 MHz -- hydrogen line')
+
+        then::
+
+           A is character and gives the alignment: either '', '>', '<', or '^'
+           W is integer and gives the width
+           P is integer and gives the precision
+           T is char and gives the type: choose from p, q, r, s, e, f, g, u, n, d, ...
+
            q = quantity [si=y, units=y, label=n] (ex: 1.4204GHz)
            Q = quantity [si=y, units=y, label=y] (ex: f = 1.4204GHz)
            r = real [si=y, units=n, label=n] (ex: 1.4204G)
            R = real [si=y, units=n, label=y] (ex: f = 1.4204G)
              = string [] (ex: 1.4204GHz)
+           p = fixed-point [fixed=y, units=y, label=n] (ex: 1420405751.7860 Hz)
+           P = fixed-point [fixed=y, units=y, label=y] (ex: f = 1420405751.7860 Hz)
            s = string [label=n] (ex: 1.4204GHz)
            S = string [label=y] (ex: f = 1.4204GHz)
            e = exponential form [si=n, units=n, label=n] (ex: 1.4204e9)
@@ -1730,7 +1883,7 @@ class Quantity(float):
         """
         match = FORMAT_SPEC.match(template)
         if match:
-            align, width, prec, ftype, units = match.groups()
+            align, width, comma, prec, ftype, units = match.groups()
             scale = units if units else None
             prec = int(prec) if prec else None
             ftype = ftype if ftype else ''
@@ -1757,7 +1910,16 @@ class Quantity(float):
                     prec=prec, show_si=True, show_units=False, show_label=label,
                     scale=scale
                 )
+            elif ftype == 'p':
+                value = self.fixed(
+                    prec=prec, show_units=True, show_label=label,
+                    show_commas=comma, strip_zeros=False, scale=scale
+                )
             else:
+                if prec is None:
+                    prec = self.prec
+                if prec == 'full':
+                    prec = self.full_prec
                 if scale:
                     # this is a hack that will include the scaling
                     value = float(self.render(
@@ -1772,7 +1934,7 @@ class Quantity(float):
                     prec = self.full_prec
                 if ftype == 'g':
                     prec += 1
-                value = '{0:.{1}{2}}'.format(value, prec, ftype)
+                value = '{0:{1}.{2}{3}}'.format(value, comma, prec, ftype)
                 width = '' if width == '0' else ''
                 if self.strip_zeros:
                     if 'e' in value:
@@ -1786,7 +1948,9 @@ class Quantity(float):
                     value = self._label(value, True)
             return '{0:{1}{2}s}'.format(value, align, width)
         else:
-            raise ValueError("Invalid format specifier '{}' for {}.".format(template, self.render()))
+            # Not a valid Quantiphy format specifier, so pass it on to float
+            return '{0:{1}}'.format(self.real, template)
+    __format__ = format
 
     # extract() {{{2
     @classmethod
@@ -1909,7 +2073,11 @@ class Quantity(float):
                             units = ''
                         predefined = ChainMap(quantities, _active_constants, CONSTANTS)
                         value = eval(value, None, predefined)
-                        quantity = cls(value, units=units, name=qname, desc=desc)
+                        try:
+                            quantity = cls(value, units=units, name=qname, desc=desc)
+                        except ValueError:
+                            # not suitable to be a quantity, so just save value
+                            quantity = value
                     else:
                         raise
                 quantities[name] = quantity
