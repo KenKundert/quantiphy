@@ -60,7 +60,7 @@ Releases
     - added no-op conversions (units change but value stays the same: ex.  $ → USD)
 
 **Latest development release**:
-    | Version: 2.2.9
+    | Version: 2.2.10
     | Released: 2018-03-01
 
     - enhanced Quantity.extract()
