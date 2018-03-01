@@ -747,7 +747,7 @@ The output of the script looks like this::
         100 ETH = $36.6k  4%
         100 BCH = $126k   12%
         100 ZEC = $31k    3%
-        Total = $1.02M
+          Total = $1.02M
 
 If you prefer the output in fixed-point format, you can replace the last part of 
 this code with:
@@ -757,30 +757,30 @@ this code with:
     # show summary of conversions and holdings
     print(dedent(f'''
         Current Prices:
-            1 BTC = {btc2usd.convert():,.2p} or {btc2eth.convert():,.4p}
-            1 ETH = {eth2usd.convert():,.2p} or {btc2eth.convert(1, 'Ξ'):,.4p}
-            1 BCH = {bch2usd.convert():,.2p}
-            1 ZEC = {zec2usd.convert():,.2p}
+            1 BTC = {btc2usd.convert():.10,.2p} or {btc2eth.convert():,.4p}
+            1 ETH = {eth2usd.convert():.10,.2p} or {btc2eth.convert(1, 'Ξ'):,.4p}
+            1 BCH = {bch2usd.convert():.10,.2p}
+            1 ZEC = {zec2usd.convert():.10,.2p}
 
         Holdings:
-            {btc:>7qBTC} = {btc:15,.2p$} {100*btc.scale('$')/total:.0f}%
-            {eth:>7qETH} = {eth:15,.2p$} {100*eth.scale('$')/total:.0f}%
-            {bch:>7qBCH} = {bch:15,.2p$} {100*bch.scale('$')/total:.0f}%
-            {zec:>7qZEC} = {zec:15,.2p$} {100*zec.scale('$')/total:.0f}%
-            Total = {total:,.2p}
+            {btc:>7qBTC} = {btc:>13,.2p$} {100*btc.scale('$')/total:.0f}%
+            {eth:>7qETH} = {eth:>13,.2p$} {100*eth.scale('$')/total:.0f}%
+            {bch:>7qBCH} = {bch:>13,.2p$} {100*bch.scale('$')/total:.0f}%
+            {zec:>7qZEC} = {zec:>13,.2p$} {100*zec.scale('$')/total:.0f}%
+              Total = {total:>13,.2p}
     ''').strip())
 
 If you do, the output of the script looks like this::
 
     Current Prices:
-        1 BTC = $10,609.47 or Ξ12.2100
-        1 ETH = $866.65 or Ƀ0.0819
-        1 BCH = $1,241.11
-        1 ZEC = $396.16
+        1 BTC = $10,913.34 or Ξ12.4400
+        1 ETH =    $875.27 or Ƀ0.0804
+        1 BCH =  $1,290.40
+        1 ZEC =    $399.39
 
     Holdings:
-        100 BTC = $1,060,947.00   81%
-        100 ETH = $86,665.00      7%
-        100 BCH = $124,111.00     9%
-        100 ZEC = $39,616.00      3%
-        Total = $1,311,339.00
+        100 BTC = $1,091,334.00 81%
+        100 ETH =    $87,527.00 6%
+        100 BCH =   $129,040.00 10%
+        100 ZEC =    $39,939.00 3%
+          Total = $1,347,840.00
