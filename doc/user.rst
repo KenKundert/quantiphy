@@ -774,9 +774,9 @@ value. The choices include:
    f    Format using fixed-point notation but do not show the units.
    g    Format using fixed-point or exponential notation, whichever is shorter, 
         but do not show the units.
-   u    Only format the units.
-   n    Only format the name.
-   d    Only format the description.
+   u    Only include the units.
+   n    Only include the name.
+   d    Only include the description.
    ==== ========================================================================
 
 You can capitalize any of the format characters that output the value of the 
@@ -792,6 +792,31 @@ example:
 
     >>> print(h_line.format('.6q'))
     1.420406 GHz
+
+Here is an example of these format types:
+
+.. code-block:: python
+
+    >>> h_line = Quantity('f = 1420.405751786 MHz -- hydrogen line')
+    >>> for f in 'sSpPqQrReEfFgGund':
+    ...     print(f + ':', h_line.format(f))
+    s: 1.4204 GHz
+    S: f = 1.4204 GHz -- hydrogen line
+    p: 1420405751.7860 Hz
+    P: f = 1420405751.7860 Hz -- hydrogen line
+    q: 1.4204 GHz
+    Q: f = 1.4204 GHz -- hydrogen line
+    r: 1.4204G
+    R: f = 1.4204G -- hydrogen line
+    e: 1.4204e+09
+    E: f = 1.4204e+09 -- hydrogen line
+    f: 1420405751.786
+    F: f = 1420405751.786 -- hydrogen line
+    g: 1.4204e+09
+    G: f = 1.4204e+09 -- hydrogen line
+    u: Hz
+    n: f
+    d: hydrogen line
 
 The 'q' type specifier is used to explicitly indicate that both the number and 
 the units are desired and that SI scale factors should be used, regardless of 

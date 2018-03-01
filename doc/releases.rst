@@ -68,3 +68,14 @@ Releases
       * non-conforming lines can now be ignored
       * values may be expressions
       * can specify a quantity name distinct from dictionary name
+
+    - enhanced the formatting capabilities.
+
+      * added center alignment
+      * added p format
+      * added strip_zeros, strip_radix to render()
+      * added fixed() method
+      * added format() method
+      * support any format specifier supported by Python for floats
+
+
