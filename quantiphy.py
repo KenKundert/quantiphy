@@ -1703,21 +1703,23 @@ class Quantity(float):
             >>> print(
             ...     t.fixed(),
             ...     t.fixed(show_commas=True),
-            ...     t.fixed(show_units=False),
-            ...     t.fixed(prec=2, strip_zeros=False, show_commas=True),
-            ...     t.fixed(prec=6),
-            ...     t.fixed(strip_zeros=False, prec=6),
-            ...     t.fixed(strip_zeros=False, prec='full'),
-            ...     t.fixed(show_label=True),
-            ...     t.fixed(show_label='f'),
-            ...     sep=newline
-            ... )
+            ...     t.fixed(show_units=False), sep=newline)
             $1000000
             $1,000,000
             1000000
+
+            >>> print(
+            ...     t.fixed(prec=2, strip_zeros=False, show_commas=True),
+            ...     t.fixed(prec=6),
+            ...     t.fixed(strip_zeros=False, prec=6), sep=newline)
             $1,000,000.00
             $1000000
             $1000000.000000
+
+            >>> print(
+            ...     t.fixed(strip_zeros=False, prec='full'),
+            ...     t.fixed(show_label=True),
+            ...     t.fixed(show_label='f'), sep=newline)
             $1000000.000000000000
             Total = $1000000
             Total = $1000000 -- the total
@@ -1725,9 +1727,7 @@ class Quantity(float):
             >>> print(
             ...     t.fixed(scale=(1/10000, 'BTC')),
             ...     t.fixed(scale=(1/1000, 'ETH')),
-            ...     t.fixed(scale=(1/1000, 'ETH'), show_units=False),
-            ...     sep=newline
-            ... )
+            ...     t.fixed(scale=(1/1000, 'ETH'), show_units=False), sep=newline)
             100 BTC
             1000 ETH
             1000
@@ -1840,7 +1840,7 @@ class Quantity(float):
 
     # format() {{{2
     def format(self, template):
-        """Convert quantity to string for Python string format function.
+        """Convert quantity to string under the guidance of a template.
 
         Supports the normal floating point and string format types as well some
         new ones. If the format code is given in upper case, *label_fmt* is used
@@ -1849,16 +1849,21 @@ class Quantity(float):
         :arg str template: the format string.
         :raises ValueError: unknown format code.
 
-        The format is specified using AW.PT where if::
+        The format is specified using AW,.PT where::
 
-            >>> q = Quantity('f = 1420.405751786 MHz -- hydrogen line')
+           A is a character and gives the alignment: either '', '>', '<', or '^'
+           W is an integer and gives the width of the final string
+           , is a literal comma, it indicates that the whole part of the
+             mantissa should be partitioned into groups of three digits
+             separated by commas
+           .P is a literal period followed by an integer that gives the precision
+           T is a character and gives the type: choose from p, q, r, s, e, f, g, u, n, d, ...
+
+        If::
+
+           q = Quantity('f = 1420.405751786 MHz -- hydrogen line')
 
         then::
-
-           A is character and gives the alignment: either '', '>', '<', or '^'
-           W is integer and gives the width
-           P is integer and gives the precision
-           T is char and gives the type: choose from p, q, r, s, e, f, g, u, n, d, ...
 
            q = quantity [si=y, units=y, label=n] (ex: 1.4204GHz)
            Q = quantity [si=y, units=y, label=y] (ex: f = 1.4204GHz)
