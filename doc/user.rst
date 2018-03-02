@@ -1635,10 +1635,10 @@ behavior can be overridden by specifying *check_units*.
 
 .. code-block:: python
 
-   >>> Quantity('10ns').is_close(Quantity('10nm'))
+   >>> Quantity('$10').is_close(Quantity('10 USD'))
    False
 
-   >>> Quantity('10ns').is_close(Quantity('10nm'), check_units=False)
+   >>> Quantity('$10').is_close(Quantity('10 USD'), check_units=False)
    True
 
 
