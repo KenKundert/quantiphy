@@ -1851,13 +1851,13 @@ class Quantity(float):
 
         The format is specified using AW,.PT where::
 
-           A is a character and gives the alignment: either '', '>', '<', or '^'
-           W is an integer and gives the width of the final string
-           , is a literal comma, it indicates that the whole part of the
-             mantissa should be partitioned into groups of three digits
-             separated by commas
-           .P is a literal period followed by an integer that gives the precision
-           T is a character and gives the type: choose from p, q, r, s, e, f, g, u, n, d, ...
+           A   is a character and gives the alignment: either '', '>', '<', or '^'
+           W   is an integer and gives the width of the final string
+           ,   is a literal comma, it indicates that the whole part of the
+               mantissa should be partitioned into groups of three digits
+               separated by commas
+           .P  is a literal period followed by an integer that gives the precision
+           T   is a character and gives the type: choose from p, q, r, s, e, f, g, u, n, d, ...
 
         If::
 
@@ -1865,24 +1865,24 @@ class Quantity(float):
 
         then::
 
-           q = quantity [si=y, units=y, label=n] (ex: 1.4204GHz)
-           Q = quantity [si=y, units=y, label=y] (ex: f = 1.4204GHz)
-           r = real [si=y, units=n, label=n] (ex: 1.4204G)
-           R = real [si=y, units=n, label=y] (ex: f = 1.4204G)
-             = string [] (ex: 1.4204GHz)
-           p = fixed-point [fixed=y, units=y, label=n] (ex: 1420405751.7860 Hz)
-           P = fixed-point [fixed=y, units=y, label=y] (ex: f = 1420405751.7860 Hz)
-           s = string [label=n] (ex: 1.4204GHz)
-           S = string [label=y] (ex: f = 1.4204GHz)
-           e = exponential form [si=n, units=n, label=n] (ex: 1.4204e9)
-           E = exponential form [si=n, units=n, label=y] (ex: f = 1.4204e9)
-           f = float [na] (ex: 1420400000.0000)
-           F = float [na] (ex: f = 1420400000.0000)
-           g = float [na] (ex: 1.4204e+09)
-           G = float [na] (ex: f = 1.4204e+09)
-           u = units [na] (ex: Hz)
-           n = name [na] (ex: f)
-           d = description [na] (ex: hydrogen line)
+           q: quantity [si=y, units=y, label=n] (ex: 1.4204GHz)
+           Q: quantity [si=y, units=y, label=y] (ex: f = 1.4204GHz)
+           r: real [si=y, units=n, label=n] (ex: 1.4204G)
+           R: real [si=y, units=n, label=y] (ex: f = 1.4204G)
+            : string [] (ex: 1.4204GHz)
+           p: fixed-point [fixed=y, units=y, label=n] (ex: 1420405751.7860 Hz)
+           P: fixed-point [fixed=y, units=y, label=y] (ex: f = 1420405751.7860 Hz)
+           s: string [label=n] (ex: 1.4204GHz)
+           S: string [label=y] (ex: f = 1.4204GHz)
+           e: exponential form [si=n, units=n, label=n] (ex: 1.4204e9)
+           E: exponential form [si=n, units=n, label=y] (ex: f = 1.4204e9)
+           f: float [na] (ex: 1420400000.0000)
+           F: float [na] (ex: f = 1420400000.0000)
+           g: float [na] (ex: 1.4204e+09)
+           G: float [na] (ex: f = 1.4204e+09)
+           u: units [na] (ex: Hz)
+           n: name [na] (ex: f)
+           d: description [na] (ex: hydrogen line)
 
         """
         match = FORMAT_SPEC.match(template)
