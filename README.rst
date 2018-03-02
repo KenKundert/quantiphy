@@ -81,7 +81,7 @@ Quick Start
 You can find the documentation on `ReadTheDocs
 <https://quantiphy.readthedocs.io>`_.  Install with::
 
-   pip3 install quantiphy
+   pip3 install --user quantiphy
 
 Requires Python3.3 or better.  Python2.7 is also supported, however support for 
 unicode is weak.

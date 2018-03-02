@@ -757,8 +757,8 @@ this code with:
     # show summary of conversions and holdings
     print(dedent(f'''
         Current Prices:
-            1 BTC = {btc2usd.convert():.10,.2p} or {btc2eth.convert():,.4p}
-            1 ETH = {eth2usd.convert():.10,.2p} or {btc2eth.convert(1, 'Ξ'):,.4p}
+            1 BTC = {btc2usd.convert():.10,.2p} or {btc2eth.convert():>8,.4p}
+            1 ETH = {eth2usd.convert():.10,.2p} or {btc2eth.convert(1, 'Ξ'):>8,.4p}
             1 BCH = {bch2usd.convert():.10,.2p}
             1 ZEC = {zec2usd.convert():.10,.2p}
 
@@ -774,7 +774,7 @@ If you do, the output of the script looks like this::
 
     Current Prices:
         1 BTC = $10,913.34 or Ξ12.4400
-        1 ETH =    $875.27 or Ƀ0.0804
+        1 ETH =    $875.27 or  Ƀ0.0804
         1 BCH =  $1,290.40
         1 ZEC =    $399.39
 

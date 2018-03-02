@@ -722,16 +722,15 @@ class Quantity(float):
             'wavelength' is used for the quantity name and dictionary key.
 
             Third, the value may be an expression involving the previously
-            specified values if the evaluate argument is specified as True.
-            When doing so, you can specify the units by following the value
-            expression with a double-quoted string. The expressions may contain
-            numeric literals, previously defined quantities, and the constants
-            pi and tau.  For example::
+            specified values. When doing so, you can specify the units by
+            following the value expression with a double-quoted string. The
+            expressions may contain numeric literals, previously defined
+            quantities, and the constants pi and tau.  For example::
 
                 parameters = Quantity.extract(r'''
                     Fin = 250MHz -- frequency of input stimulus
                     Tstop = 10/Fin "s" -- simulation stop time
-                ''', evaluate=True)
+                ''')
 
             In this example, the value for *Tstop* is given as an expression
             involving *Fin*.
@@ -1429,7 +1428,7 @@ class Quantity(float):
 
         """
         number, units = _scale(scale, self.real, self.units)
-        return Quantity(number, units)
+        return self.__class__(number, units)
 
     # render() {{{2
     def render(
@@ -1954,7 +1953,7 @@ class Quantity(float):
 
     # extract() {{{2
     @classmethod
-    def extract(cls, text, evaluate=True, ignore_nonconforming_lines=True):
+    def extract(cls, text, predefined=None):
         """Extract quantities
 
         Takes a string that contains quantity definitions, one per line, and 
@@ -1985,6 +1984,19 @@ class Quantity(float):
                 A number with optional units (ex: 3 or 1pF or 1 kOhm),
                 the units need not be a simple identifier (ex: 9.07 GHz/V).
 
+                The value may also be an expression.  When giving an expression,
+                you may follow it with a string surrounded by double quotes,
+                which is taken as the units.  For example: Tstop = 5/Fin "s".
+                The expressions may only contain value defined previously in the
+                same set of definitions, values contained in *predefined*,
+                physical constants, the mathematical constants pi and tau
+                (2*pi), which may be named π or τ, or number literals. The units
+                should not include a scale factor.
+
+                When processing the value, it is passed as an argument to
+                Quantity, if cannot be converted to a quantity, then it is
+                treated as a Python expression.
+
             <description>:
                 Optional textual description (ex: Frequency of hydrogen line).
 
@@ -1996,19 +2008,11 @@ class Quantity(float):
                 # comment
                 // comment
 
-        :arg str evaluate:
-            When true extract attempts to evaluate a value it does not recognize
-            as a number. In this case the expression for the value may be
-            followed by a string surrounded by double quotes, which is taken as
-            the units.  For example: Tstop = 5/Fin "s". The expressions may only
-            contain number literals, quantities defined previously in the same
-            set of definitions, physical quantities, and the constants pi and
-            tau (2*pi), which may be named π or τ. The units should not include
-            a scale factor.
-
-        :arg str ignore_nonconforming_lines:
-            When true extract will ignore all lines that are not matched by
-            *assign_rec*.
+        :arg dict predefined:
+            A dictionary of predefined values. When specified, these values
+            become available to be used in the expressions that give values to
+            the values being defined.  You can use *locals()* as this argument
+            to make all local variables available.
 
         :returns:
             a dictionary of quantities for the values specified in the argument.
@@ -2026,7 +2030,7 @@ class Quantity(float):
             ...     f_sagan1 = pi*f_hy "Hz" -- Sagan's first frequency
             ...     f_sagan2 = 2*pi*f_hy "Hz" -- Sagan's second frequency
             ... '''
-            >>> freqs = Quantity.extract(sagan_frequencies, evaluate=True)
+            >>> freqs = Quantity.extract(sagan_frequencies)
             >>> for f in freqs.values():
             ...     print(f.render(show_label='f'))
             f_hy = 1.4204 GHz -- Hydrogen line frequency
@@ -2040,6 +2044,8 @@ class Quantity(float):
             8.9247 GHz
 
         """
+        if not predefined:
+            predefined = {}
         quantities = {}
         for line in text.splitlines():
             line = line.strip()
@@ -2054,36 +2060,28 @@ class Quantity(float):
                 value = args['val']
                 desc = args.get('desc', '')
                 if not name or not value:
-                    if not name and not value:
-                        continue
-                    if not ignore_nonconforming_lines:
-                        raise ValueError('line not recognized: {}'.format(line))
                     continue
                 name = name.strip()
                 try:
                     quantity = cls(value, name=qname, desc=desc)
                 except ValueError:
-                    if evaluate:
-                        # extract the units if given (they are embedded in "")
-                        components = value.split()
-                        if components[-1][0] == '"' and components[-1][-1] == '"':
-                            units = components[-1][1:-1]
-                            value = ' '.join(components[:-1])
-                        else:
-                            units = ''
-                        predefined = ChainMap(quantities, _active_constants, CONSTANTS)
-                        value = eval(value, None, predefined)
-                        try:
-                            quantity = cls(value, units=units, name=qname, desc=desc)
-                        except ValueError:
-                            # not suitable to be a quantity, so just save value
-                            quantity = value
+                    # extract the units if given (they are embedded in "")
+                    components = value.split()
+                    if components[-1][0] == '"' and components[-1][-1] == '"':
+                        units = components[-1][1:-1]
+                        value = ' '.join(components[:-1])
                     else:
-                        raise
+                        units = ''
+                    symbols = ChainMap(
+                        quantities, predefined, _active_constants, CONSTANTS
+                    )
+                    value = eval(value, None, symbols)
+                    try:
+                        quantity = cls(value, units=units, name=qname, desc=desc)
+                    except ValueError:
+                        # not suitable to be a quantity, so just save value
+                        quantity = value
                 quantities[name] = quantity
-            else:
-                if not ignore_nonconforming_lines:
-                    raise ValueError('line not recognized: {}'.format(line))
         return quantities
 
     # map_sf_to_sci_notation() {{{2

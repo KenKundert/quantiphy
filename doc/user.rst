@@ -1419,12 +1419,11 @@ to separate the name from the value with either '=' or ':'. It allows you to
 separate the value from the description using '--', '//', or '#'. These 
 substrings are also used to introduce comments, so you could start a line with 
 '#' and it would be treated as a comment.
-If the line is not recognized, then it would either be ignored or treated as an 
-error, depending on the value of the *ignore_nonconforming_lines* argument, 
-which defaults to True.
+If the line is not recognized, then it is ignored.
 
-In this example, the first line is non conforming, but will be ignored. The last 
-is a comment and so is ignored regardless of *ignore_nonconforming_lines*:
+In this example, the first line is nonconforming and so is ignored. The last is 
+a comment, the comment character any anything beyond is ignored. Finally, empty 
+lines are ignored.
 
 .. code-block:: python
 
@@ -1485,8 +1484,8 @@ a version that displays the name and description by default.
 
 With :meth:`quantiphy.Quantity.extract()`  the values of quantities can be given 
 as a expression that contains previously defined quantities (or :ref:`physical 
-constants <constants>` or select mathematical constants (pi, tau, π, or τ).  
-This feature is disabled if the *evaluate* argument is False.  For example:
+constants <constants>` or select mathematical constants (pi, tau, π, or τ).  For 
+example:
 
 .. code-block:: python
 
@@ -1512,7 +1511,7 @@ This feature is disabled if the *evaluate* argument is False.  For example:
 
     from quantiphy import Quantity
 
-    parameters = Quantity.extract(__doc__, evaluate=True)
+    parameters = Quantity.extract(__doc__)
     globals().update(parameters)
 
     print('Simulation parameters:')
