@@ -1430,17 +1430,21 @@ lines are ignored.
     >>> design_parameters = '''
     ...     PLL Design Parameters
     ...
-    ...     Fref = 156 MHz  -- Reference frequency
-    ...     Kdet = 88.3 uA  -- Gain of phase detector
-    ...     Kvco = 9.07 GHz/V  -- Gain of VCO
-    ...     -- Kvco = 5 GHz/V -- Gain of VCO
+    ...     Fref = 156 MHz      -- Reference frequency
+    ...     Kdet = 88.3 uA      -- Gain of phase detector
+    ...     Kvco = 9.07 GHz/V   -- Gain of VCO
+    ...     -- Kvco = 5 GHz/V     -- Gain of VCO
+    ...     N = 128             -- Divide ratio
+    ...     Fout = N*Fref "Hz"  -- Output Frequency
     ... '''
     >>> globals().update(Quantity.extract(design_parameters))
 
-    >>> print(f'{Fref:S}\n{Kdet:S}\n{Kvco:S}', sep='\n')
+    >>> print(f'{Fref:S}\n{Kdet:S}\n{Kvco:S}\n{N:S}\n{Fout:}')
     Fref = 156 MHz      # Reference frequency
     Kdet = 88.3 uA      # Gain of phase detector
     Kvco = 9.07 GHz/V   # Gain of VCO
+    N = 128             # Divide ratio
+    Fout = 19.968 GHz   # Output Frequency
 
 In this case the output of the :meth:`quantiphy.Quantity.extract()` call is fed 
 into globals().update() so as to add the quantities into the module namespace, 
@@ -1477,10 +1481,12 @@ a version that displays the name and description by default.
     ... except ValueError as e:
     ...     fatal(e, culprit=filename)
 
-    >>> display(Fref, Kdet, Kvco, sep='\n')
+    >>> display(Fref, Kdet, Kvco, N, Fout, sep='\n')
     Fref = 156 MHz     -- Reference frequency
     Kdet = 88.3 uA     -- Gain of phase detector (Imax)
     Kvco = 9.07 GHz/V  -- Gain of VCO
+    N = 128            -- Divide ratio
+    Fout = 19.968 GHz  -- Output Frequency
 
 With :meth:`quantiphy.Quantity.extract()`  the values of quantities can be given 
 as a expression that contains previously defined quantities (or :ref:`physical 
