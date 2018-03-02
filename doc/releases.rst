@@ -63,8 +63,8 @@ Releases
     - added no-op conversions (units change but value stays the same, ex: $ → USD)
 
 **Latest development release**:
-    | Version: 2.2.11
-    | Released: 2018-03-01
+    | Version: 2.2.12
+    | Released: 2018-03-02
 
     - enhanced :meth:`quantiphy.Quantity.extract()`
 
