@@ -203,8 +203,8 @@ def test_sagan():
     qs = Quantity.extract(
         r"""
             Carl Sagan's frequencies
-            :   These are the frequencies that Carl Sagan picked as being of very
-            :   high interest to SETI.
+            -- These are the frequencies that Carl Sagan asserted were of
+            -- high interest to SETI.
 
             f_hy ($f_{\rm hy}$) = 1420.405751786 MHz -- Hydrogen line frequency
             f_sagan1 ($f_{\rm sagan1}$) = pi*f_hy "Hz" -- Sagan's first frequency
@@ -251,3 +251,23 @@ def test_sagan():
     assert a_dict == {0:0, 1:1}
     assert not qs
 
+def test_assign_rec():
+    with Quantity.prefs(
+        assign_rec=r'(?P<name>\w+?)\s*=\s*(?P<val>\w*)(\s+(--)\s*(?P<desc>.*?))?\Z'
+    ):
+        qs = Quantity.extract(
+            r"""
+                -- The Hydrogen Line
+                bad = --    Also known as the 21 cm line
+                = bad --    The spectral line associated with a spin flip.
+
+                f_hy = 1420MHz -- Hydrogen line frequency
+            """
+        )
+        f_hy = qs.pop('f_hy')
+        assert f_hy.is_close(Quantity(1.42e9, 'Hz'), check_units=True)
+        assert f_hy.is_close(1.42e9)
+        assert f_hy.units == 'Hz'
+        assert f_hy.name == 'f_hy'
+        assert f_hy.desc == 'Hydrogen line frequency'
+        assert not qs
