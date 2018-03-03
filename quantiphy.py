@@ -597,6 +597,9 @@ class Quantity(float):
     :raises ValueError:
         A string was passed that cannot be converted to a quantity.
 
+    :raises TypeError:
+        A value of unsupported type was passed in.
+
     You can use *Quantity* to create quantities from floats, strings, or other
     quantities.  If a float is given, *model* or *units* would be used to
     specify the units.
@@ -1924,6 +1927,8 @@ class Quantity(float):
                     prec = self.prec
                 if prec == 'full':
                     prec = self.full_prec
+                if ftype == 'g':
+                    prec += 1
                 if scale:
                     # this is a hack that will include the scaling
                     value = float(self.render(
@@ -1932,12 +1937,6 @@ class Quantity(float):
                     ))
                 else:
                     value = float(self)
-                if prec is None:
-                    prec = self.prec
-                if prec == 'full':
-                    prec = self.full_prec
-                if ftype == 'g':
-                    prec += 1
                 value = '{0:{1}.{2}{3}}'.format(value, comma, prec, ftype)
                 width = '' if width == '0' else ''
                 if self.strip_zeros:
@@ -2069,7 +2068,7 @@ class Quantity(float):
                 name = name.strip()
                 try:
                     quantity = cls(value, name=qname, desc=desc)
-                except ValueError:
+                except (ValueError, TypeError):
                     # extract the units if given (they are embedded in "")
                     components = value.split()
                     if components[-1][0] == '"' and components[-1][-1] == '"':
@@ -2083,7 +2082,7 @@ class Quantity(float):
                     value = eval(value, None, symbols)
                     try:
                         quantity = cls(value, units=units, name=qname, desc=desc)
-                    except ValueError:
+                    except (ValueError, TypeError):
                         # not suitable to be a quantity, so just save value
                         quantity = value
                 quantities[name] = quantity

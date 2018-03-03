@@ -95,6 +95,32 @@ def test_currency():
     q=Quantity('2ns')
     assert float(q) == 2e-9
 
+def test_exceptional():
+    Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None, show_desc=False)
+    Quantity.set_prefs(prec='full')
+    q=Quantity('light = inf Hz -- a high frequency')
+    assert '{}'.format(q) == 'inf Hz'
+    assert '{:.8}'.format(q) == 'inf Hz'
+    assert '{:.8s}'.format(q) == 'inf Hz'
+    assert '{:.8S}'.format(q) == 'light = inf Hz'
+    assert '{:.8q}'.format(q) == 'inf Hz'
+    assert '{:.8Q}'.format(q) == 'light = inf Hz'
+    assert '{:r}'.format(q) == 'inf'
+    assert '{:R}'.format(q) == 'light = inf'
+    assert '{:u}'.format(q) == 'Hz'
+    assert '{:.4f}'.format(q) == 'inf'
+    assert '{:.4F}'.format(q) == 'light = inf'
+    assert '{:e}'.format(q) == 'inf'
+    assert '{:E}'.format(q) == 'light = inf'
+    assert '{:g}'.format(q) == 'inf'
+    assert '{:G}'.format(q) == 'light = inf'
+    assert '{:n}'.format(q) == 'light'
+    assert '{:d}'.format(q) == 'a high frequency'
+    assert '{:.2p}'.format(q) == 'inf Hz'
+    assert '{:,.2p}'.format(q) == 'inf Hz'
+    assert '{:.2P}'.format(q) == 'light = inf Hz'
+    assert '{:,.2P}'.format(q) == 'light = inf Hz'
+
 def test_scaled_format():
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None, show_desc=False)
     Quantity.set_prefs(prec=None)
