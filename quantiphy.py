@@ -1842,7 +1842,7 @@ class Quantity(float):
         )
 
     # format() {{{2
-    def format(self, template):
+    def format(self, template=''):
         """Convert quantity to string under the guidance of a template.
 
         Supports the normal floating point and string format types as well some

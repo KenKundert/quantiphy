@@ -67,8 +67,14 @@ def test_full_format():
     assert float(q) == 2e-9
 
 def test_currency():
-    Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None, show_desc=False)
-    Quantity.set_prefs(prec='full')
+    Quantity.set_prefs(
+        spacer = None,
+        show_label = None,
+        label_fmt = None,
+        label_fmt_full = None,
+        show_desc = False,
+        prec = 4,
+    )
     q=Quantity('Total = $1000k -- a large amount of money')
     assert '{}'.format(q) == '$1M'
     assert '{:.8}'.format(q) == '$1M'
@@ -83,12 +89,14 @@ def test_currency():
     assert '{:.4F}'.format(q) == 'Total = 1000000'
     assert '{:e}'.format(q) == '1e+06'
     assert '{:E}'.format(q) == 'Total = 1e+06'
-    assert '{:g}'.format(q) == '1000000'
-    assert '{:G}'.format(q) == 'Total = 1000000'
+    assert '{:g}'.format(q) == '1e+06'
+    assert '{:G}'.format(q) == 'Total = 1e+06'
     assert '{:n}'.format(q) == 'Total'
     assert '{:d}'.format(q) == 'a large amount of money'
+    assert '{:p}'.format(q) == '$1000000.0000'
     assert '{:.2p}'.format(q) == '$1000000.00'
     assert '{:,.2p}'.format(q) == '$1,000,000.00'
+    assert '{:,P}'.format(q) == 'Total = $1,000,000.0000'
     assert '{:.2P}'.format(q) == 'Total = $1000000.00'
     assert '{:,.2P}'.format(q) == 'Total = $1,000,000.00'
 
@@ -217,3 +225,76 @@ def test_alignment():
     assert '<{:<17s}>'.format(Quantity('h')) == '<662.61e-36 J-s   >'
     assert '<{:^17s}>'.format(Quantity('h')) == '< 662.61e-36 J-s  >'
     assert '<{:>17s}>'.format(Quantity('h')) == '<   662.61e-36 J-s>'
+
+def test_format_method():
+    Quantity.set_prefs(
+        spacer = None,
+        show_label = None,
+        label_fmt = None,
+        label_fmt_full = None,
+        show_desc = False,
+        prec = 4,
+        strip_zeros = True,
+    )
+    q=Quantity('f = 1420.405751786 MHz -- frequency of hydrogen line')
+    assert q.format() == '1.4204 GHz'
+    assert q.format('') == '1.4204 GHz'
+    assert q.format('.8') == '1.42040575 GHz'
+    assert q.format('.8s') == '1.42040575 GHz'
+    assert q.format('.8S') == 'f = 1.42040575 GHz'
+    assert q.format('.8q') == '1.42040575 GHz'
+    assert q.format('.8Q') == 'f = 1.42040575 GHz'
+    assert q.format('r') == '1.4204G'
+    assert q.format('R') == 'f = 1.4204G'
+    assert q.format('u') == 'Hz'
+    assert q.format('f') == '1420405751.786'
+    assert q.format('F') == 'f = 1420405751.786'
+    assert q.format('e') == '1.4204e+09'
+    assert q.format('E') == 'f = 1.4204e+09'
+    assert q.format('g') == '1.4204e+09'
+    assert q.format('G') == 'f = 1.4204e+09'
+    assert q.format('n') == 'f'
+    assert q.format('d') == 'frequency of hydrogen line'
+    assert q.format('p') == '1420405751.7860 Hz'
+    assert q.format(',p') == '1,420,405,751.7860 Hz'
+    assert q.format('P') == 'f = 1420405751.7860 Hz'
+    assert q.format(',P') == 'f = 1,420,405,751.7860 Hz'
+
+def test_render():
+    Quantity.set_prefs(
+        spacer = None,
+        show_label = None,
+        label_fmt = None,
+        label_fmt_full = None,
+        show_desc = False,
+        prec = 4,
+        strip_zeros = True,
+    )
+    q=Quantity('f = 1420.405751786 MHz -- frequency of hydrogen line')
+    assert q.render() == '1.4204 GHz'
+    assert q.render(prec=8) == '1.42040575 GHz'
+    assert q.render(prec=8, show_label=True) == 'f = 1.42040575 GHz'
+    assert q.render(show_units=False) == '1.4204G'
+    assert q.render(show_units=False, show_label=True) == 'f = 1.4204G'
+    assert q.render(show_si=False) == '1.4204e9 Hz'
+    assert q.render(show_si=False, show_label=True) == 'f = 1.4204e9 Hz'
+    assert q.render(prec=15, strip_zeros=False) == '1.420405751786000 GHz'
+    assert q.render(prec=15, strip_zeros=True) == '1.420405751786 GHz'
+    assert q.units == 'Hz'
+    assert q.name == 'f'
+    assert q.desc == 'frequency of hydrogen line'
+    assert q.fixed() == '1420405751.786 Hz'
+    assert q.fixed(show_commas=True) == '1,420,405,751.786 Hz'
+    assert q.fixed(show_units=False) == '1420405751.786'
+    assert q.fixed(strip_zeros=True) == '1420405751.786 Hz'
+    assert q.fixed(strip_zeros=False) == '1420405751.7860 Hz'
+    assert q.fixed(show_label=True) == 'f = 1420405751.786 Hz'
+    assert q.fixed(show_label=True, show_commas=True) == 'f = 1,420,405,751.786 Hz'
+
+    q=Quantity('$1M')
+    assert q.render(strip_zeros=True) == '$1M'
+    assert q.render(strip_zeros=False) == '$1.0000M'
+    assert q.render(strip_zeros=True, strip_radix=False) == '$1M'
+    assert q.fixed(strip_zeros=True) == '$1000000'
+    assert q.fixed(strip_zeros=False) == '$1000000.0000'
+    assert q.fixed(strip_zeros=True, strip_radix=False) == '$1000000.'
