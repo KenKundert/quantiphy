@@ -62,13 +62,11 @@ Releases
     - added *strip_zeros*
     - added no-op conversions (units change but value stays the same, ex: $ → USD)
 
-**Latest development release**:
-    | Version: 2.2.13
-    | Released: 2018-03-02
+**2.3 (2018-03-11)**:
 
     - enhanced :meth:`quantiphy.Quantity.extract()`
 
-      * non-conforming lines can now be ignored
+      * non-conforming lines are now ignored
       * values may be expressions
       * values need not be quantities
       * can specify a quantity name distinct from dictionary name
@@ -82,3 +80,8 @@ Releases
       * added :meth:`quantiphy.Quantity.fixed()` method
       * added :meth:`quantiphy.Quantity.format()` method
       * support any format specifier supported by Python for floats
+
+**Latest development release**:
+    | Version: 2.3.0
+    | Released: 2018-03-11
+
