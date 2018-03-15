@@ -63,7 +63,6 @@ Releases
     - added no-op conversions (units change but value stays the same, ex: $ → USD)
 
 **2.3 (2018-03-11)**:
-
     - enhanced :meth:`quantiphy.Quantity.extract()`
 
       * non-conforming lines are now ignored
@@ -76,7 +75,7 @@ Releases
       * added center alignment
       * added *p* format
       * added *show_commas* preference.
-      * added *strip_zeros*, *strip_radix* to * :meth:`quantiphy.Quantity.render()`
+      * added *strip_zeros*, *strip_radix* to :meth:`quantiphy.Quantity.render()`
       * added :meth:`quantiphy.Quantity.fixed()` method
       * added :meth:`quantiphy.Quantity.format()` method
       * support any format specifier supported by Python for floats
