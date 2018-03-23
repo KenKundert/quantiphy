@@ -722,7 +722,8 @@ You can override the precision as part of the format specification
     >>> print('{:.6}'.format(h_line))
     1.420406 GHz
 
-You can also specify the width and alignment.
+You can also specify the width and alignment.  *Quantiphy* follows the Python 
+convention of right justifying numbers by default.
 
 .. code-block:: python
 
@@ -738,20 +739,9 @@ You can also specify the width and alignment.
     >>> print('|{:^16.6}|'.format(h_line))
     |  1.420406 GHz  |
 
-*Quantiphy* follows the Python convention of right justifying numbers and left 
-justifying strings by default.
-
-.. code-block:: python
-
-    >>> print('|{:16.6s}|'.format(h_line))
-    |1.420406 GHz    |
-
-    >>> print('|{:16.6q}|'.format(h_line))
-    |    1.420406 GHz|
-
 The general form of the format specifiers supported by quantities is::
 
-   format_spec ::=  [align][width][,][.precision][type]
+   format_spec ::=  [align][width][,][.precision][type][scale]
 
 *align* specifies the alignment using one of the following characters:
 
@@ -846,12 +836,17 @@ scale factors is desired, and the units should not be included.
     >>> print('{:r}'.format(h_line))
     1.4204G
 
-You can also use the floating point format type specifiers:
+The opposite can be achieve using 'p', which includes the units but not use SI 
+scale factors:
 
 .. code-block:: python
 
     >>> print('{:p}'.format(h_line))
     1420405751.7860 Hz
+
+You can also use the traditional floating point format type specifiers:
+
+.. code-block:: python
 
     >>> print('{:f}'.format(h_line))
     1420405751.786
@@ -887,7 +882,7 @@ preferences (described further in :ref:`preferences` and
 :meth:`quantiphy.Quantity.set_prefs()`).
 
 If *show_desc* is False or the quantity does not have a description, then 
-*label_fmtl* use used to add the labeling.
+*label_fmt* is used to add the labeling.
 
 .. code-block:: python
 
@@ -933,6 +928,7 @@ is used if the quantity has a description.
 
 Finally, you can add units after the format code, which causes the number to be 
 scaled to those units if the transformation represents a known unit conversion.
+In this case the format code must be specified (use 's' rather than '').
 
 .. code-block:: python
 
@@ -1116,7 +1112,7 @@ naturally want different precisions:
     ...     frequencies.append((Temperature(temp, 'C'),  Frequency(freq, 'Hz')))
 
     >>> for temp, freq in frequencies:
-    ...     print(f'{temp:>4s}  {freq}')
+    ...     print(f'{temp:4}  {freq}')
     -25C  999.988kHz
      25C  1.00021MHz
      75C  1.00178MHz
@@ -1331,7 +1327,7 @@ like this:
     ...     for l in '1mm, 10mm, 100mm, 1.234mm, 12.34mm, 123.4mm'.split(',')
     ... ]
 
-    >>> with Quantity.prefs(number_fmt='{whole:>3s}{frac:<4s} {units}'):
+    >>> with Quantity.prefs(number_fmt='{whole:>3}{frac:<4} {units}'):
     ...     for l in lengths:
     ...         print(l)
       1     mm
@@ -1349,7 +1345,7 @@ example:
 .. code-block:: python
 
     >>> def fmt_num(whole, frac, units):
-    ...     return '{mantissa:<5s} {units}'.format(mantissa=whole+frac, units=units)
+    ...     return '{mantissa:<5} {units}'.format(mantissa=whole+frac, units=units)
 
     >>> with Quantity.prefs(number_fmt=fmt_num):
     ...     for l in lengths:
@@ -1368,7 +1364,7 @@ Quantity for each column that requires distinct formatting:
 .. code-block:: python
 
     >>> def format_temperature(whole, frac, units):
-    ...     return '{:>5s} {:<5s}'.format(whole+frac, units)
+    ...     return '{:>5} {:<5}'.format(whole+frac, units)
 
     >>> class Temperature(Quantity):
     ...     pass
@@ -1378,7 +1374,7 @@ Quantity for each column that requires distinct formatting:
 
     >>> class Frequency(Quantity):
     ...     pass
-    >>> Frequency.set_prefs(prec=5, number_fmt = '{whole:>3s}{frac:<6s} {units}')
+    >>> Frequency.set_prefs(prec=5, number_fmt = '{whole:>3}{frac:<6} {units}')
 
     >>> frequencies = []
     >>> for each in '-25.3 999987.7, 25.1 1000207.1, 74.9 1001782.3'.split(','):

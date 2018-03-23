@@ -467,7 +467,7 @@ presenting the results.
         files.sort(key=lambda x: x[0])
 
         for each in files:
-            display('{:>7.2s}  {}'.format(*each))
+            display('{:7.2}  {}'.format(*each))
 
     except OSError as err:
         fatal(os_error(err))

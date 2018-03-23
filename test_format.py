@@ -72,6 +72,7 @@ def test_width():
     q=Quantity('f = 1420.405751786 MHz -- frequency of hydrogen line')
     assert '{:25}'.format(q) == '       1.420405751786 GHz'
     assert '{:>25.8}'.format(q) == '           1.42040575 GHz'
+    assert '{:25.8s}'.format(q) == '           1.42040575 GHz'
     assert '{:<25.8s}'.format(q) == '1.42040575 GHz           '
     assert '{:^25.8S}'.format(q) == '   f = 1.42040575 GHz    '
     assert '{:25.8q}'.format(q) == '           1.42040575 GHz'

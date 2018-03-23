@@ -1852,7 +1852,7 @@ class Quantity(float):
         :arg str template: the format string.
         :raises ValueError: unknown format code.
 
-        The format is specified using AW,.PT where::
+        The format is specified using AW,.PTS where::
 
            A   is a character and gives the alignment: either '', '>', '<', or '^'
            W   is an integer and gives the width of the final string
@@ -1861,6 +1861,7 @@ class Quantity(float):
                separated by commas
            .P  is a literal period followed by an integer that gives the precision
            T   is a character and gives the type: choose from p, q, r, s, e, f, g, u, n, d, ...
+           S   is a string that must match a known unit, it invokes scaling
 
         If::
 
@@ -1872,20 +1873,20 @@ class Quantity(float):
            Q: quantity [si=y, units=y, label=y] (ex: f = 1.4204GHz)
            r: real [si=y, units=n, label=n] (ex: 1.4204G)
            R: real [si=y, units=n, label=y] (ex: f = 1.4204G)
-            : string [] (ex: 1.4204GHz)
+            : [label=n] (ex: 1.4204GHz)
            p: fixed-point [fixed=y, units=y, label=n] (ex: 1420405751.7860 Hz)
            P: fixed-point [fixed=y, units=y, label=y] (ex: f = 1420405751.7860 Hz)
            s: string [label=n] (ex: 1.4204GHz)
            S: string [label=y] (ex: f = 1.4204GHz)
            e: exponential form [si=n, units=n, label=n] (ex: 1.4204e9)
            E: exponential form [si=n, units=n, label=y] (ex: f = 1.4204e9)
-           f: float [na] (ex: 1420400000.0000)
-           F: float [na] (ex: f = 1420400000.0000)
-           g: float [na] (ex: 1.4204e+09)
-           G: float [na] (ex: f = 1.4204e+09)
-           u: units [na] (ex: Hz)
-           n: name [na] (ex: f)
-           d: description [na] (ex: hydrogen line)
+           f: float [label=n] (ex: 1420400000.0000)
+           F: float [label=y] (ex: f = 1420400000.0000)
+           g: generalized float [label=n] (ex: 1.4204e+09)
+           G: generalized float [label=y] (ex: f = 1.4204e+09)
+           u: units only (ex: Hz)
+           n: name only (ex: f)
+           d: description only (ex: hydrogen line)
 
         """
         match = FORMAT_SPEC.match(template)
@@ -1951,8 +1952,7 @@ class Quantity(float):
                 if label:
                     value = self._label(value, True)
             if not align:
-                align = '<' if ftype == 's' else '>'
-                    # in python numbers are right-aligned
+                align = '>' # in python numbers are right-aligned
             return '{0:{1}{2}s}'.format(value, align, width)
         else:
             # Not a valid Quantiphy format specifier, so pass it on to float
