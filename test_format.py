@@ -70,11 +70,11 @@ def test_width():
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None, show_desc=False)
     Quantity.set_prefs(prec='full')
     q=Quantity('f = 1420.405751786 MHz -- frequency of hydrogen line')
-    assert '{:25}'.format(q) == '1.420405751786 GHz       '
+    assert '{:25}'.format(q) == '       1.420405751786 GHz'
     assert '{:>25.8}'.format(q) == '           1.42040575 GHz'
     assert '{:<25.8s}'.format(q) == '1.42040575 GHz           '
     assert '{:^25.8S}'.format(q) == '   f = 1.42040575 GHz    '
-    assert '{:25.8q}'.format(q) == '1.42040575 GHz           '
+    assert '{:25.8q}'.format(q) == '           1.42040575 GHz'
     assert '{:>25.8Q}'.format(q) == '       f = 1.42040575 GHz'
     assert '{:<25r}'.format(q) == '1.420405751786G          '
     assert '{:^25R}'.format(q) == '   f = 1.420405751786G   '
@@ -82,7 +82,7 @@ def test_width():
     assert '{:>25.4f}'.format(q) == '           1420405751.786'
     assert '{:<25.4F}'.format(q) == 'f = 1420405751.786       '
     assert '{:^25e}'.format(q) == '   1.420405751786e+09    '
-    assert '{:25E}'.format(q) == 'f = 1.420405751786e+09   '
+    assert '{:25E}'.format(q) == '   f = 1.420405751786e+09'
     assert '{:>25g}'.format(q) == '           1420405751.786'
     assert '{:<25G}'.format(q) == 'f = 1420405751.786       '
     assert '{:^25n}'.format(q) == '            f            '
@@ -90,7 +90,7 @@ def test_width():
     assert '{:>25.2p}'.format(q) == '         1420405751.79 Hz'
     assert '{:<25,.2p}'.format(q) == '1,420,405,751.79 Hz      '
     assert '{:^25.2P}'.format(q) == '  f = 1420405751.79 Hz   '
-    assert '{:25,.2P}'.format(q) == 'f = 1,420,405,751.79 Hz  '
+    assert '{:25,.2P}'.format(q) == '  f = 1,420,405,751.79 Hz'
 
 def test_currency():
     Quantity.set_prefs(

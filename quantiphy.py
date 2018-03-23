@@ -1938,9 +1938,8 @@ class Quantity(float):
                 else:
                     value = float(self)
                 value = '{0:{1}.{2}{3}}'.format(value, comma, prec, ftype)
-                width = '' if width == '0' else width
-                    # above line overcomes a flaw that results in
-                    # '{:0s}'.format(...) generating an ValueError
+                width = width.lstrip('0')
+                    # format function treats 0 as a padding rather than a width
                 if self.strip_zeros:
                     if 'e' in value:
                         mantissa, exponent = value.split('e')
@@ -1951,6 +1950,9 @@ class Quantity(float):
                         value = value.rstrip('0').rstrip('.')
                 if label:
                     value = self._label(value, True)
+            if not align:
+                align = '<' if ftype == 's' else '>'
+                    # in python numbers are right-aligned
             return '{0:{1}{2}s}'.format(value, align, width)
         else:
             # Not a valid Quantiphy format specifier, so pass it on to float

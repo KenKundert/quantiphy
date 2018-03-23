@@ -85,4 +85,5 @@ Releases
     | Released: 2018-03-22
 
     - fixed bug in format that resulted in several format codes ignoring width
+    - follow Python convention of right-justifying numbers by default.
 

@@ -450,10 +450,10 @@ seconds:
     ...     data += [(time, temp)]
 
     >>> for time, temp in data:
-    ...     print(f'{time:7s} {temp}')
-    0 s     505.37 K
-    600 s   477.59 K
-    1.2 ks  455.37 K
+    ...     print(f'{time:9q} {temp:9q}')
+          0 s  505.37 K
+        600 s  477.59 K
+       1.2 ks  455.37 K
 
 
 Creating a Quantity by Scaling an Existing Quantity
@@ -727,7 +727,7 @@ You can also specify the width and alignment.
 .. code-block:: python
 
     >>> print('|{:16.6}|'.format(h_line))
-    |1.420406 GHz    |
+    |    1.420406 GHz|
 
     >>> print('|{:<16.6}|'.format(h_line))
     |1.420406 GHz    |
@@ -737,6 +737,17 @@ You can also specify the width and alignment.
 
     >>> print('|{:^16.6}|'.format(h_line))
     |  1.420406 GHz  |
+
+*Quantiphy* follows the Python convention of right justifying numbers and left 
+justifying strings by default.
+
+.. code-block:: python
+
+    >>> print('|{:16.6s}|'.format(h_line))
+    |1.420406 GHz    |
+
+    >>> print('|{:16.6q}|'.format(h_line))
+    |    1.420406 GHz|
 
 The general form of the format specifiers supported by quantities is::
 

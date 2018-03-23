@@ -1,3 +1,31 @@
+..  Reset Quantity preferences to their original defaults.
+
+    >>> from quantiphy import Quantity
+    >>> Quantity.set_prefs(
+    ...     abstol=None,
+    ...     assign_rec=None,
+    ...     full_prec=None,
+    ...     ignore_sf=None,
+    ...     input_sf=None,
+    ...     keep_components=None,
+    ...     known_units=None,
+    ...     label_fmt=None,
+    ...     label_fmt_full=None,
+    ...     map_sf=None,
+    ...     number_fmt=None,
+    ...     output_sf=None,
+    ...     prec=None,
+    ...     reltol=None,
+    ...     show_commas=None,
+    ...     show_desc=None,
+    ...     show_label=None,
+    ...     show_si=None,
+    ...     spacer=None,
+    ...     strip_radix=None,
+    ...     strip_zeros=None,
+    ...     unity_sf=None,
+    ... )
+
 .. _examples:
 
 Examples
@@ -47,7 +75,7 @@ this:
     ...     STM-4   | 6.2208e8      | 1e3     | 2.5e3    | 2.5e5   | 5e6
     ...     STM-16  | 2.48832e9     | 5e3     | 1e5      | 1e6     | 2e7
     ...     STM-64  | 9.95328e9     | 2e4     | 4e5      | 4e6     | 8e7
-    ...     STM-256 | 3.981312e10   | 8e4     | 1.92e6   | 1.6e7   | 3.20e8
+    ...     STM-256 | 3.981312e10   | 8e4     | 1.92e6   | 1.6e7   | 3.2e8
     ... """
 
 This contains the same information, but it is much harder for humans to read and 
@@ -111,35 +139,35 @@ tweaked somewhat to handle tables 2 and 3):
 
     >>> # print the table in a form suitable for humans
     >>> for name, rate, freqs in sdh:
-    ...     print('{:8s}: {:12s} {:9s} {:9s} {:9s} {}'.format(name, rate, *freqs))
-    STM-1   : 155.52 Mb/s  500 Hz    6.5 kHz   65 kHz    1.3 MHz
-    STM-4   : 622.08 Mb/s  1 kHz     25 kHz    250 kHz   5 MHz
-    STM-16  : 2.4883 Gb/s  5 kHz     100 kHz   1 MHz     20 MHz
-    STM-64  : 9.9533 Gb/s  20 kHz    400 kHz   4 MHz     80 MHz
-    STM-256 : 39.813 Gb/s  80 kHz    1.92 MHz  16 MHz    320 MHz
+    ...     print('{:8s}: {:12q} {:9q} {:9q} {:9q} {:9q}'.format(name, rate, *freqs))
+    STM-1   :  155.52 Mb/s    500 Hz   6.5 kHz    65 kHz   1.3 MHz
+    STM-4   :  622.08 Mb/s     1 kHz    25 kHz   250 kHz     5 MHz
+    STM-16  :  2.4883 Gb/s     5 kHz   100 kHz     1 MHz    20 MHz
+    STM-64  :  9.9533 Gb/s    20 kHz   400 kHz     4 MHz    80 MHz
+    STM-256 :  39.813 Gb/s    80 kHz  1.92 MHz    16 MHz   320 MHz
 
     >>> # print the table in a form suitable for machines
     >>> for name, rate, freqs in sdh:
-    ...     print('{:8s}: {:.4e} {:.4e} {:.4e} {:.4e} {:.4e}'.format(name, rate, *(1*f for f in freqs)))
-    STM-1   : 1.5552e+08 5.0000e+02 6.5000e+03 6.5000e+04 1.3000e+06
-    STM-4   : 6.2208e+08 1.0000e+03 2.5000e+04 2.5000e+05 5.0000e+06
-    STM-16  : 2.4883e+09 5.0000e+03 1.0000e+05 1.0000e+06 2.0000e+07
-    STM-64  : 9.9533e+09 2.0000e+04 4.0000e+05 4.0000e+06 8.0000e+07
-    STM-256 : 3.9813e+10 8.0000e+04 1.9200e+06 1.6000e+07 3.2000e+08
+    ...     print('{:8s}: {:12.4e} {:9.2e} {:9.2e} {:9.2e} {:9.2e}'.format(name, rate, *(1*f for f in freqs)))
+    STM-1   :   1.5552e+08  5.00e+02  6.50e+03  6.50e+04  1.30e+06
+    STM-4   :   6.2208e+08  1.00e+03  2.50e+04  2.50e+05  5.00e+06
+    STM-16  :   2.4883e+09  5.00e+03  1.00e+05  1.00e+06  2.00e+07
+    STM-64  :   9.9533e+09  2.00e+04  4.00e+05  4.00e+06  8.00e+07
+    STM-256 :   3.9813e+10  8.00e+04  1.92e+06  1.60e+07  3.20e+08
 
     >>> # print the table in a compromise form
     >>> for name, rate, freqs in sdh:
     ...     print(
-    ...         '{:8s}: {:12.2f} {:9.1f} {:9.1f} {:9.1f} {:.1f}'.format(
+    ...         '{:8s}: {:12.2f} {:9.1f} {:9.1f} {:9.1f} {:9.1f}'.format(
     ...             name, rate.scale(1e-6), freqs[0].scale(1e-3),
     ...             freqs[1].scale(1e-3), freqs[2].scale(1e-3), freqs[3].scale(1e-6)
     ...         )
     ...     )
-    STM-1   : 155.52       0.5       6.5       65        1.3
-    STM-4   : 622.08       1         25        250       5
-    STM-16  : 2488.32      5         100       1000      20
-    STM-64  : 9953.28      20        400       4000      80
-    STM-256 : 39813.12     80        1920      16000     320
+    STM-1   :       155.52       0.5       6.5        65       1.3
+    STM-4   :       622.08         1        25       250         5
+    STM-16  :      2488.32         5       100      1000        20
+    STM-64  :      9953.28        20       400      4000        80
+    STM-256 :     39813.12        80      1920     16000       320
 
 The code reads the data and then produces three outputs.  The first output shows 
 that quantities can be displayed in easily readable forms with their units 
@@ -190,17 +218,17 @@ those bits or bytes?  Reformatting with *QuantiPhy* makes it much more readable:
     >>> for line in bits_per_dollar.strip().split('\n'):
     ...     year, bits = line.split()
     ...     bits = Quantity(bits, 'b')
-    ...     print(f'{year}    {bits:7q}    {bits:qB}')
-    1973    490 b      61.25 B
-    1978    2.78 kb    347.5 B
-    1983    16.4 kb    2.05 kB
-    1988    91.8 kb    11.475 kB
-    1993    368 kb     46 kB
-    1998    4.9 Mb     612.5 kB
-    2003    26.3 Mb    3.2875 MB
-    2008    143 Mb     17.875 MB
-    2013    833 Mb     104.12 MB
-    2018    5 Gb       625 MB
+    ...     print(f'{year}  {bits:9q}   {bits:9qB}')
+    1973      490 b     61.25 B
+    1978    2.78 kb     347.5 B
+    1983    16.4 kb     2.05 kB
+    1988    91.8 kb   11.475 kB
+    1993     368 kb       46 kB
+    1998     4.9 Mb    612.5 kB
+    2003    26.3 Mb   3.2875 MB
+    2008     143 Mb   17.875 MB
+    2013     833 Mb   104.12 MB
+    2018       5 Gb      625 MB
 
 Notice that *bits* was printed twice. The first time the formatting code 
 included a width specification, but in the second the desired unit of measure 
