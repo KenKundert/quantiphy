@@ -1938,7 +1938,9 @@ class Quantity(float):
                 else:
                     value = float(self)
                 value = '{0:{1}.{2}{3}}'.format(value, comma, prec, ftype)
-                width = '' if width == '0' else ''
+                width = '' if width == '0' else width
+                    # above line overcomes a flaw that results in
+                    # '{:0s}'.format(...) generating an ValueError
                 if self.strip_zeros:
                     if 'e' in value:
                         mantissa, exponent = value.split('e')

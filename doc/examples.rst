@@ -127,12 +127,28 @@ tweaked somewhat to handle tables 2 and 3):
     STM-64  : 9.9533e+09 2.0000e+04 4.0000e+05 4.0000e+06 8.0000e+07
     STM-256 : 3.9813e+10 8.0000e+04 1.9200e+06 1.6000e+07 3.2000e+08
 
-The code first reads the data and then produces two outputs.  The first output 
-shows that quantities can be displayed in easily readable forms with their units 
-and the second output shows that the values are easily accessible for 
-computation (the use of ``1*f`` is not necessary to be able to see the results 
-in exponential notation, rather it is there to demonstrate that it is easy to do 
-calculations on Quantities).
+    >>> # print the table in a compromise form
+    >>> for name, rate, freqs in sdh:
+    ...     print(
+    ...         '{:8s}: {:12.2f} {:9.1f} {:9.1f} {:9.1f} {:.1f}'.format(
+    ...             name, rate.scale(1e-6), freqs[0].scale(1e-3),
+    ...             freqs[1].scale(1e-3), freqs[2].scale(1e-3), freqs[3].scale(1e-6)
+    ...         )
+    ...     )
+    STM-1   : 155.52       0.5       6.5       65        1.3
+    STM-4   : 622.08       1         25        250       5
+    STM-16  : 2488.32      5         100       1000      20
+    STM-64  : 9953.28      20        400       4000      80
+    STM-256 : 39813.12     80        1920      16000     320
+
+The code reads the data and then produces three outputs.  The first output shows 
+that quantities can be displayed in easily readable forms with their units 
+(approximates table1).  The second output shows that the values are easily 
+accessible for computation (approximates table2).  The use of ``1*f`` is not 
+necessary to be able to see the results in exponential notation, rather it is 
+there to demonstrate that it is easy to do calculations on Quantities. Finally, 
+the third output represents a compromise between being human and machine 
+readable (approximates table3).
 
 :class:`quantiphy.Quantity` is used to convert a number string, such as '155.52 
 Mb/s' into an internal representation that includes the value and the units: 

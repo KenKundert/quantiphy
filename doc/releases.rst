@@ -84,3 +84,5 @@ Releases
     | Version: 2.3.0
     | Released: 2018-03-11
 
+    - fixed bug in format that resulted in several format codes ignoring width
+
