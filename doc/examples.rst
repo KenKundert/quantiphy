@@ -501,20 +501,20 @@ to date.
     r"""
     Simulates a second-order ΔΣ modulator with the following parameter values:
 
-        Fclk = 50MHz           -- clock frequency
-        Fin = 200kHz           -- input frequency
-        Vin = 950mV            -- input voltage amplitude (peak)
-        gain1 = 0.5            -- gain of first integrator
-        gain2 = 0.5            -- gain of second integrator
-        Vmax = 1               -- quantizer maximum input voltage
-        Vmin = -1              -- quantizer minimum input voltage
-        # levels = 16            -- quantizer output levels
-        levels = 4             -- quantizer output levels
-        Tstop = 1/Fin "s"      -- simulation stop time
-        Tstart = -0.5/Fin "s"  -- initial transient interval (discarded)
-        vin_file = 'vin.data'   -- output data file
-        vout_file = 'vout.wave' -- output data file
-        data_file = 'dout.wave' -- output data file
+        Fclk = 50MHz            -- clock frequency
+        Fin = 200kHz            -- input frequency
+        Vin = 950mV             -- input voltage amplitude (peak)
+        gain1 = 0.5             -- gain of first integrator
+        gain2 = 0.5             -- gain of second integrator
+        Vmax = 1V               -- quantizer maximum input voltage
+        Vmin = -1V              -- quantizer minimum input voltage
+        # levels = 16             -- quantizer output levels
+        levels = 4              -- quantizer output levels
+        Tstop = 1/Fin "s"       -- simulation stop time
+        Tstart = -0.5/Fin "s"   -- simulation start time (points with t<0 are discarded)
+        vin_file = 'vin.data'   -- output data file for vin
+        vout_file = 'vout.wave' -- output data file for vout
+        dout_file = 'dout.wave' -- output data file for dout
 
     The values given above are used in the simulation, no further modification 
     of the code given below is required when changing these parameters.
@@ -580,9 +580,9 @@ to date.
     v_out = 0
     t_stop = Tstop
     try:
-        fvin = open('vin', 'w')
-        fvout = open('vout', 'w')
-        fdout = open('dout', 'w')
+        fvin = open(vin_file, 'w')
+        fvout = open(vout_file, 'w')
+        fdout = open(dout_file, 'w')
         while t < t_stop:
             v_in = sine.update(t)
             v_int1 = integrator1.update(v_in - v_out)
@@ -807,10 +807,10 @@ this code with:
             1 ZEC = {zec2usd.convert():.10,.2p}
 
         Holdings:
-            {btc:>7qBTC} = {btc:>13,.2p$} {100*btc.scale('$')/total:.0f}%
-            {eth:>7qETH} = {eth:>13,.2p$} {100*eth.scale('$')/total:.0f}%
-            {bch:>7qBCH} = {bch:>13,.2p$} {100*bch.scale('$')/total:.0f}%
-            {zec:>7qZEC} = {zec:>13,.2p$} {100*zec.scale('$')/total:.0f}%
+            {btc:>7qBTC} = {btc:>13,.2p$} {100*btc.scale('$')/total:2.0f}%
+            {eth:>7qETH} = {eth:>13,.2p$} {100*eth.scale('$')/total:2.0f}%
+            {bch:>7qBCH} = {bch:>13,.2p$} {100*bch.scale('$')/total:2.0f}%
+            {zec:>7qZEC} = {zec:>13,.2p$} {100*zec.scale('$')/total:2.0f}%
               Total = {total:>13,.2p}
     ''').strip())
 
@@ -824,7 +824,7 @@ If you do, the output of the script looks like this::
 
     Holdings:
         100 BTC = $1,091,334.00 81%
-        100 ETH =    $87,527.00 6%
+        100 ETH =    $87,527.00  6%
         100 BCH =   $129,040.00 10%
-        100 ZEC =    $39,939.00 3%
+        100 ZEC =    $39,939.00  3%
           Total = $1,347,840.00
