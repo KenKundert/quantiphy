@@ -831,7 +831,7 @@ class Quantity(float):
 
             It is also possible to specify a function as *number_fmt*, in which
             case it is passed the three values in order (*whole*, *frac* and
-            *units*) and it expected to return the number as a string.
+            *units*) and is expected to return the number as a string.
         :type number_fmt: dictionary or function
 
         :arg str output_sf:
