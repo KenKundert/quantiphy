@@ -232,6 +232,12 @@ def test_scale():
     assert secs.render() == '86.4 ks'
     assert days.render() == '1 day'
 
+def test_add():
+    total = Quantity(0, '$')
+    for contribution in [1.23, 4.56, 7.89]:
+        total = total.add(contribution)
+    assert total.render() == '$13.68'
+
 def test_coversion():
     conversion = UnitConversion('USD', 'BTC', 100000)
     assert str(conversion) == 'USD = 100000*BTC'

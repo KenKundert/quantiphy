@@ -488,6 +488,23 @@ to the *scale* method.
     100 C
 
 
+Creating a Quantity by Adding to an Existing Quantity
+.....................................................
+
+The :meth:`quantiphy.Quantity.add` method adds a contribution to the  value of 
+a quantity and then uses the sum to create a new Quantity. For example:
+
+.. code-block:: python
+
+    >>> import math
+
+    >>> total = Quantity(0, '$')
+    >>> for contribution in [1.23, 4.56, 7.89]:
+    ...     total = total.add(contribution)
+    >>> print(total)
+    $13.68
+
+
 Accessing Quantity Values
 .........................
 

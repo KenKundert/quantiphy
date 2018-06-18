@@ -577,7 +577,7 @@ class Quantity(float):
         - If a string, it is taken to the be desired units. This value along
           with the units of the given value are used to select a known unit
           conversion, which is applied to create the quantity.
-    :type scale: float, tuple, func, or string:
+    :type scale: float, tuple, func, or string
 
     :arg str name:
         Overrides the name taken from *value* or *model*.
@@ -1415,7 +1415,7 @@ class Quantity(float):
             - If a string, it is taken to the be desired units. This value along
               with the units of the quantity are used to select a known unit
               conversion, which is applied to create the displayed value.
-        :type scale: real, pair, function, or string:
+        :type scale: real, pair, function, or string
 
         :raises KeyError:
             A unit conversion was requested and there is no corresponding unit
@@ -1432,6 +1432,34 @@ class Quantity(float):
         """
         number, units = _scale(scale, self.real, self.units)
         return self.__class__(number, units)
+
+    # add() {{{2
+    def add(self, addend, check_units = False):
+        """Create a new quantity that is the sum of the original and a contribution.
+
+        :arg addend:
+            The amount to add to the quantity.
+        :type addend: real, quantity
+
+        :raises TypeError:
+            Units of contribution do not match those of underlying quantity.
+            converter.
+
+        Example::
+
+            >>> total = Quantity(0, '$')
+            >>> for contribution in [1.23, 4.56, 7.89]:
+            ...     total = total.add(contribution)
+            >>> print(total)
+            $13.68
+
+        """
+        try:
+            if check_units and self.units != addend.units:
+                raise TypeError
+        except AttributeError:
+            pass
+        return self.__class__(self.real + addend, self.units)
 
     # render() {{{2
     def render(
@@ -1489,7 +1517,7 @@ class Quantity(float):
             - If a string, it is taken to the be desired units. This value along
               with the units of the quantity are used to select a known unit
               conversion, which is applied to create the displayed value.
-        :type scale: real, pair, function, or string:
+        :type scale: real, pair, function, or string
 
         :raises KeyError:
             A unit conversion was requested and there is no corresponding unit
@@ -1694,7 +1722,7 @@ class Quantity(float):
             - If a string, it is taken to the be desired units. This value along
               with the units of the quantity are used to select a known unit
               conversion, which is applied to create the displayed value.
-        :type scale: real, pair, function, or string:
+        :type scale: real, pair, function, or string
 
         :raises KeyError:
             A unit conversion was requested and there is no corresponding unit
