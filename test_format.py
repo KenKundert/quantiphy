@@ -24,10 +24,16 @@ def test_format():
     assert '{:G}'.format(q) == 'f = 1.4204e+09'
     assert '{:n}'.format(q) == 'f'
     assert '{:d}'.format(q) == 'frequency of hydrogen line'
-    assert '{:p}'.format(q) == '1420405751.7860 Hz'
-    assert '{:,p}'.format(q) == '1,420,405,751.7860 Hz'
-    assert '{:P}'.format(q) == 'f = 1420405751.7860 Hz'
-    assert '{:,P}'.format(q) == 'f = 1,420,405,751.7860 Hz'
+    assert '{:p}'.format(q) == '1420405751.786 Hz'
+    assert '{:,p}'.format(q) == '1,420,405,751.786 Hz'
+    assert '{:P}'.format(q) == 'f = 1420405751.786 Hz'
+    assert '{:,P}'.format(q) == 'f = 1,420,405,751.786 Hz'
+    assert '{:#.3q}'.format(q) == '1.420 GHz'
+    assert '{:#p}'.format(q) == '1420405751.7860 Hz'
+    assert '{:.0q}'.format(q) == '1 GHz'
+    assert '{:.0p}'.format(q) == '1420405752 Hz'
+    assert '{:#.0q}'.format(q) == '1 GHz'
+    assert '{:#.0p}'.format(q) == '1420405752. Hz'
 
     q=Quantity('2ns')
     assert float(q) == 2e-9
@@ -62,6 +68,12 @@ def test_full_format():
     assert '{:,.2p}'.format(q) == '1,420,405,751.79 Hz'
     assert '{:.2P}'.format(q) == 'f = 1420405751.79 Hz'
     assert '{:,.2P}'.format(q) == 'f = 1,420,405,751.79 Hz'
+    assert '{:#.3q}'.format(q) == '1.420 GHz'
+    assert '{:#.6p}'.format(q) == '1420405751.786000 Hz'
+    assert '{:.0q}'.format(q) == '1 GHz'
+    assert '{:.0p}'.format(q) == '1420405752 Hz'
+    assert '{:#.0q}'.format(q) == '1 GHz'
+    assert '{:#.0p}'.format(q) == '1420405752. Hz'
 
     q=Quantity('2ns')
     assert float(q) == 2e-9
@@ -92,6 +104,12 @@ def test_width():
     assert '{:<25,.2p}'.format(q) == '1,420,405,751.79 Hz      '
     assert '{:^25.2P}'.format(q) == '  f = 1420405751.79 Hz   '
     assert '{:25,.2P}'.format(q) == '  f = 1,420,405,751.79 Hz'
+    assert '{:#25.3q}'.format(q) == '                1.420 GHz'
+    assert '{:#25.6p}'.format(q) == '     1420405751.786000 Hz'
+    assert '{:25.0q}'.format(q) == '                    1 GHz'
+    assert '{:25.0p}'.format(q) == '            1420405752 Hz'
+    assert '{:#25.0q}'.format(q) == '                    1 GHz'
+    assert '{:#25.0p}'.format(q) == '           1420405752. Hz'
 
 def test_currency():
     Quantity.set_prefs(
@@ -120,12 +138,18 @@ def test_currency():
     assert '{:G}'.format(q) == 'Total = 1e+06'
     assert '{:n}'.format(q) == 'Total'
     assert '{:d}'.format(q) == 'a large amount of money'
-    assert '{:p}'.format(q) == '$1000000.0000'
-    assert '{:.2p}'.format(q) == '$1000000.00'
-    assert '{:,.2p}'.format(q) == '$1,000,000.00'
-    assert '{:,P}'.format(q) == 'Total = $1,000,000.0000'
-    assert '{:.2P}'.format(q) == 'Total = $1000000.00'
-    assert '{:,.2P}'.format(q) == 'Total = $1,000,000.00'
+    assert '{:#p}'.format(q) == '$1000000.0000'
+    assert '{:#.2p}'.format(q) == '$1000000.00'
+    assert '{:#,.2p}'.format(q) == '$1,000,000.00'
+    assert '{:#,P}'.format(q) == 'Total = $1,000,000.0000'
+    assert '{:#.2P}'.format(q) == 'Total = $1000000.00'
+    assert '{:#,.2P}'.format(q) == 'Total = $1,000,000.00'
+    assert '{:p}'.format(q) == '$1000000'
+    assert '{:.2p}'.format(q) == '$1000000'
+    assert '{:,.2p}'.format(q) == '$1,000,000'
+    assert '{:,P}'.format(q) == 'Total = $1,000,000'
+    assert '{:.2P}'.format(q) == 'Total = $1000000'
+    assert '{:,.2P}'.format(q) == 'Total = $1,000,000'
 
     q=Quantity('2ns')
     assert float(q) == 2e-9
@@ -180,10 +204,14 @@ def test_scaled_format():
         assert '{:d°F}'.format(q) == 'boiling point of water'
         assert '{!r}'.format(q) == "Quantity('100 °C')"
         assert '{:.8s°C}'.format(q) == '100 °C'
-        assert '{:p°F}'.format(q) == '212.0000 °F'
-        assert '{:,.2p°F}'.format(q) == '212.00 °F'
-        assert '{:P°F}'.format(q) == 'Tboil = 212.0000 °F'
-        assert '{:,.2P°F}'.format(q) == 'Tboil = 212.00 °F'
+        assert '{:p°F}'.format(q) == '212 °F'
+        assert '{:,.2p°F}'.format(q) == '212 °F'
+        assert '{:P°F}'.format(q) == 'Tboil = 212 °F'
+        assert '{:,.2P°F}'.format(q) == 'Tboil = 212 °F'
+        assert '{:#p°F}'.format(q) == '212.0000 °F'
+        assert '{:#,.2p°F}'.format(q) == '212.00 °F'
+        assert '{:#P°F}'.format(q) == 'Tboil = 212.0000 °F'
+        assert '{:#,.2P°F}'.format(q) == 'Tboil = 212.00 °F'
 
 def test_number_fmt():
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None, show_desc=False)
@@ -282,10 +310,14 @@ def test_format_method():
     assert q.format('G') == 'f = 1.4204e+09'
     assert q.format('n') == 'f'
     assert q.format('d') == 'frequency of hydrogen line'
-    assert q.format('p') == '1420405751.7860 Hz'
-    assert q.format(',p') == '1,420,405,751.7860 Hz'
-    assert q.format('P') == 'f = 1420405751.7860 Hz'
-    assert q.format(',P') == 'f = 1,420,405,751.7860 Hz'
+    assert q.format('p') == '1420405751.786 Hz'
+    assert q.format(',p') == '1,420,405,751.786 Hz'
+    assert q.format('P') == 'f = 1420405751.786 Hz'
+    assert q.format(',P') == 'f = 1,420,405,751.786 Hz'
+    assert q.format('#p') == '1420405751.7860 Hz'
+    assert q.format('#,p') == '1,420,405,751.7860 Hz'
+    assert q.format('#P') == 'f = 1420405751.7860 Hz'
+    assert q.format('#,P') == 'f = 1,420,405,751.7860 Hz'
 
 def test_render():
     Quantity.set_prefs(

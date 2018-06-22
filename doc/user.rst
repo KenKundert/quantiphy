@@ -758,7 +758,7 @@ convention of right justifying numbers by default.
 
 The general form of the format specifiers supported by quantities is::
 
-   format_spec ::=  [align][width][,][.precision][type][scale]
+   format_spec ::=  [align][#][width][,][.precision][type][scale]
 
 *align* specifies the alignment using one of the following characters:
 
@@ -770,10 +770,13 @@ The general form of the format specifiers supported by quantities is::
    ^     Center justification.
    ===== =======================================================================
 
+The hash (#) is a literal hash that when present indicates that trailing zeros 
+and radix should not be stripped from the fractional part of the number.
+
 *width* is a literal integer that specifies the minimum width of the string.
 
-The comma is a literal comma that when present indicates that commas should be 
-added to the whole part of the mantissa, every three digits.
+The comma (,) is a literal comma that when present indicates that commas should 
+be added to the whole part of the mantissa, every three digits.
 
 *precision* is a literal integer that specifies the precision.
 
@@ -820,8 +823,8 @@ Here is an example of these format types:
     ...     print(f + ':', h_line.format(f))
     s: 1.4204 GHz
     S: f = 1.4204 GHz -- hydrogen line
-    p: 1420405751.7860 Hz
-    P: f = 1420405751.7860 Hz -- hydrogen line
+    p: 1420405751.786 Hz
+    P: f = 1420405751.786 Hz -- hydrogen line
     q: 1.4204 GHz
     Q: f = 1.4204 GHz -- hydrogen line
     r: 1.4204G
@@ -859,7 +862,17 @@ scale factors:
 .. code-block:: python
 
     >>> print('{:p}'.format(h_line))
-    1420405751.7860 Hz
+    1420405751.786 Hz
+
+The 'p' format is often used with '#' to format currency values:
+
+.. code-block:: python
+
+    >>> print('{:#.2p}'.format(total))
+    $11200000.00
+
+    >>> print('{:#,.2p}'.format(total))
+    $11,200,000.00
 
 You can also use the traditional floating point format type specifiers:
 

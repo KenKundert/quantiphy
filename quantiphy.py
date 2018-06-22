@@ -477,6 +477,7 @@ UNIT_SYMBOLS = '°ÅΩ℧'
 # Regular expression for recognizing and decomposing string .format method codes
 FORMAT_SPEC = re.compile(r'''\A
     ([<^>]?)                            # alignment
+    ([#]?)                              # alternate form
     (\d*)                               # width
     (,?)                                # comma
     (?:\.(\d+))?                        # precision
@@ -1792,6 +1793,9 @@ class Quantity(float):
             mantissa = mantissa.rstrip('0')
         if strip_radix:
             mantissa = mantissa.rstrip('.')
+        else:
+            if '.' not in mantissa:
+                mantissa += '.'
         value = self._combine(mantissa, '', units, self.spacer)
         return self._label(value, show_label)
 
@@ -1880,16 +1884,20 @@ class Quantity(float):
         :arg str template: the format string.
         :raises ValueError: unknown format code.
 
-        The format is specified using AW,.PTS where::
+        The format is specified using A#W,.PTU where::
 
            A   is a character and gives the alignment: either '', '>', '<', or '^'
+           #   is a literal hash that if present indicates that
+               trailing zeros and radix should not be suppressed from fractional part.
            W   is an integer and gives the width of the final string
            ,   is a literal comma, it indicates that the whole part of the
                mantissa should be partitioned into groups of three digits
                separated by commas
            .P  is a literal period followed by an integer that gives the precision
            T   is a character and gives the type: choose from p, q, r, s, e, f, g, u, n, d, ...
-           S   is a string that must match a known unit, it invokes scaling
+           U   is a string that must match a known unit, it invokes scaling
+
+        Each of these component pieces is optional.
 
         If::
 
@@ -1919,7 +1927,7 @@ class Quantity(float):
         """
         match = FORMAT_SPEC.match(template)
         if match:
-            align, width, comma, prec, ftype, units = match.groups()
+            align, alt_form, width, comma, prec, ftype, units = match.groups()
             scale = units if units else None
             prec = int(prec) if prec else None
             ftype = ftype if ftype else ''
@@ -1939,17 +1947,18 @@ class Quantity(float):
             elif ftype == 'q':
                 value = self.render(
                     prec=prec, show_si=True, show_units=True, show_label=label,
-                    scale=scale
+                    strip_zeros=not alt_form, strip_radix=not alt_form, scale=scale
                 )
             elif ftype == 'r':
                 value = self.render(
                     prec=prec, show_si=True, show_units=False, show_label=label,
-                    scale=scale
+                    strip_zeros=not alt_form, strip_radix=not alt_form, scale=scale
                 )
             elif ftype == 'p':
                 value = self.fixed(
                     prec=prec, show_units=True, show_label=label,
-                    show_commas=comma, strip_zeros=False, scale=scale
+                    show_commas=comma, strip_zeros=not alt_form,
+                    strip_radix=not alt_form, scale=scale
                 )
             else:
                 if prec is None:
