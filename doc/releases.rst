@@ -87,4 +87,5 @@ Releases
     - fixed bug in format that resulted in several format codes ignoring width
     - follow Python convention of right-justifying numbers by default.
     - add Quantity.add() (adds a number to a quantity returning a new quantity)
+    - added # alternate form of string formatting.
 
