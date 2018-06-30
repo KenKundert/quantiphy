@@ -125,8 +125,8 @@ class UnitConversion(object):
         *new_value* = (*given_value* - *intercept*)/*slope*
 
     **No-Op Conversion**:
-    The following conversion is applied if the given units are among 
-    the *to_units* and the desired units are among the *from_units*:
+    The following conversion is applied if the given and desired units are both
+    found among the from-units or are both found amoung the to-units.
 
         *new_value* = *given_value*
 
@@ -145,15 +145,15 @@ class UnitConversion(object):
     meters (m) and parsecs (parsec, pc) that is accessible when creating or
     rendering quantities and can go both ways::
 
-        >>> d_sol = Quantity('5 μpc', scale='m')
+        >>> d_sol = Quantity('5 μpc', scale='m')  # forward conversion
         >>> print(d_sol)
         154.28 Gm
 
-        >>> d_ac = Quantity(1.339848, units='pc')
+        >>> d_ac = Quantity(1.339848, units='pc') # reverse conversion
         >>> print(d_ac.render(scale='m'))
         41.344e15 m
 
-        >>> d_ac = Quantity(1.339848, units='pc')
+        >>> d_ac = Quantity(1.339848, units='pc') # no-op conversion
         >>> print(f'{d_ac:qparsec}')
         1.3398 parsec
 

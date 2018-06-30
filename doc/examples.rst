@@ -291,6 +291,57 @@ since all the quantities have descriptions, *label_fmt_full* is used to format
 the output.
 
 
+.. _casual time units example:
+
+Casual Time Units
+-----------------
+
+This example shows how one could allow users to enter time durations using 
+a variety of casual units of time.  *QuantiPhy* only predefines conversions for 
+time units that are unambiguous and commonly used in scientific computation, so 
+that leaves out units like months and years. However, in many situations the 
+goal is simplicity rather than precision. In such a situation, it is convenient 
+to support any units a user may reasonable expect to use. In a casual setting it 
+would be very unusual to use SI scale factors, so there use will be prohibited 
+to allow a greater range of units (ex. m for minutes).
+
+This example assumes that a collection of time units are contained in 
+a configuration file, in this example represented by *configuration*. Normally 
+these values would be contained in a separate file that is opened and read, but 
+for the sake of simplicity in the example, the 'contents' of the file is just 
+given as a multiline string.
+
+.. code-block:: python
+
+    >>> from quantiphy import Quantity, UnitConversion
+    >>> seconds = UnitConversion('s', 'sec second seconds')
+    >>> minutes = UnitConversion('s', 'm min minute minutes', 60)
+    >>> hours = UnitConversion('s', 'h hr hour hours', 60*60)
+    >>> days = UnitConversion('s', 'd day days', 24*60*60)
+    >>> weeks = UnitConversion('s', 'w week weeks', 7*24*60*60)
+    >>> months = UnitConversion('s', 'M month months', 30*24*60*60)
+    >>> years = UnitConversion('s', 'y year years', 365*24*60*60)
+    >>> Quantity.set_prefs(ignore_sf=True)
+
+    >>> configuration = '''
+    ...     time_to_live = 3 months
+    ...     time_limit = 1 day
+    ...     time_out = 10m
+    ... '''
+    >>> limits = Quantity.extract(configuration)
+
+    >>> for k, v in limits.items():
+    ...     print(f'{k} = {v:ps}')
+    time_to_live = 7776000 s
+    time_limit = 86400 s
+    time_out = 600 s
+
+Notice that the return values from *UnitConversion* are captured in variables in 
+code above.  This is not necessary. It is done in this case to satisfy the 
+testing framework that tests the code found in this documentation; normally the 
+return value is discarded.
+
+
 .. _unicode example:
 
 Unicode Text Example
