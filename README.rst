@@ -83,7 +83,7 @@ You can find the documentation on `ReadTheDocs
 
    pip3 install --user quantiphy
 
-Requires Python3.3 or better.  Python2.7 is also supported, however support for 
+Requires Python3.4 or better.  Python2.7 is also supported, however support for 
 unicode is weak.
 
 You can find the full documentation `here <https://quantiphy.readthedocs.io>`_.
