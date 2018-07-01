@@ -305,11 +305,12 @@ to support any units a user may reasonable expect to use. In a casual setting it
 would be very unusual to use SI scale factors, so there use will be prohibited 
 to allow a greater range of units (ex. m for minutes).
 
-This example assumes that a collection of time units are contained in 
+This example assumes that a collection of time duration values are contained in 
 a configuration file, in this example represented by *configuration*. Normally 
 these values would be contained in a separate file that is opened and read, but 
 for the sake of simplicity in the example, the 'contents' of the file is just 
-given as a multiline string.
+given as a multiline string. The user can given the durations using any units 
+they like, but internally they are all converted to seconds.
 
 .. code-block:: python
 
@@ -647,7 +648,7 @@ to date.
     except OSError as e:
         error(os_error(e))
 
-Notice that *level* was specified twice, but the first proceeded by `--` causing 
+Notice that *level* was specified twice, but the first proceeded by `#` causing 
 it to be ignored.
 
 The output of this example can be used as the input to the next. With these 
