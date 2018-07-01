@@ -337,10 +337,10 @@ they like, but internally they are all converted to seconds.
     time_limit = 86400 s
     time_out = 600 s
 
-Notice that the return values from *UnitConversion* are captured in variables in 
-code above.  This is not necessary. It is done in this case to satisfy the 
-testing framework that tests the code found in this documentation; normally the 
-return value is discarded.
+Notice that the return values from *UnitConversion* are captured in a variable 
+(`_`) in the code above.  This is not necessary. It is done in this case to 
+satisfy the testing framework that tests the code found in this documentation; 
+normally the return value is discarded.
 
 
 .. _unicode example:
