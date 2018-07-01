@@ -315,13 +315,13 @@ they like, but internally they are all converted to seconds.
 .. code-block:: python
 
     >>> from quantiphy import Quantity, UnitConversion
-    >>> seconds = UnitConversion('s', 'sec second seconds')
-    >>> minutes = UnitConversion('s', 'm min minute minutes', 60)
-    >>> hours = UnitConversion('s', 'h hr hour hours', 60*60)
-    >>> days = UnitConversion('s', 'd day days', 24*60*60)
-    >>> weeks = UnitConversion('s', 'w week weeks', 7*24*60*60)
-    >>> months = UnitConversion('s', 'M month months', 30*24*60*60)
-    >>> years = UnitConversion('s', 'y year years', 365*24*60*60)
+    >>> _ = UnitConversion('s', 'sec second seconds')
+    >>> _ = UnitConversion('s', 'm min minute minutes', 60)
+    >>> _ = UnitConversion('s', 'h hr hour hours', 60*60)
+    >>> _ = UnitConversion('s', 'd day days', 24*60*60)
+    >>> _ = UnitConversion('s', 'w week weeks', 7*24*60*60)
+    >>> _ = UnitConversion('s', 'M month months', 30*24*60*60)
+    >>> _ = UnitConversion('s', 'y year years', 365*24*60*60)
     >>> Quantity.set_prefs(ignore_sf=True)
 
     >>> configuration = '''
