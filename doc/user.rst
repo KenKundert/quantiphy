@@ -368,11 +368,10 @@ provide them for this mechanism to work.
     373.15 K
 
 To do this conversion, *QuantiPhy* examines the given units (°F) and the desired 
-units (K) and chooses the appropriate converter.
-
-You can combine the model and scale arguments to convert numbers with or without 
-units to Quantities with particular units. In this case the model contains the 
-default units for the given values. For example:
+units (K) and chooses the appropriate converter.  No scaling is done if the 
+given units are the same as the desired units. Thus you can use the scaling 
+mechanism to convert a collection of data with mixed units to values with 
+consistent units.  For example:
 
 .. code-block:: python
 
