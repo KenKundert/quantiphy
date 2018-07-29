@@ -739,6 +739,12 @@ class Quantity(float):
             In this example, the value for *Tstop* is given as an expression
             involving *Fin*.
 
+        :arg str form:
+            Specifies the form to use for representing numbers by default.
+            Choose from 'si', 'eng' and 'fixed. As an example 0.25 A is
+            represented with 250 mA when form is 'si', as 250e-3 A when form is
+            'eng', and with 0.25 A when from is 'fixed'.
+
         :arg int full_prec:
             Default full precision in digits where 0 corresponds to 1 digit.
             Must be nonnegative.  This precision is used when the full precision
@@ -872,12 +878,6 @@ class Quantity(float):
             - otherwise *label_fmt_full* is used if *show_desc* is True or
               *show_label* is 'f' (short for full).
         :type show_label: 'f', 'a', or bool
-
-        :arg str form:
-            Specifies the form to use for representing numbers by default.
-            Choose from 'si', 'eng' and 'fixed. As an example 0.25 A is
-            represented with 250 mA when form is 'si', as 250e-3 A when form is
-            'eng', and with 0.25 A when from is 'fixed'.
 
         :arg str spacer:
             The spacer text to be inserted in a string between the numeric value
