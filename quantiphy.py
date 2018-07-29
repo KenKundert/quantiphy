@@ -741,7 +741,7 @@ class Quantity(float):
 
         :arg str form:
             Specifies the form to use for representing numbers by default.
-            Choose from 'si', 'eng' and 'fixed. As an example 0.25 A is
+            Choose from 'si', 'eng' and 'fixed'. As an example 0.25 A is
             represented with 250 mA when form is 'si', as 250e-3 A when form is
             'eng', and with 0.25 A when from is 'fixed'.
 
