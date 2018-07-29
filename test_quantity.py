@@ -316,7 +316,7 @@ def test_number_recognition():
             if case.prefs:
                 Quantity.set_prefs(**case.prefs)
             q = Quantity(case.text)
-            assert ((q.render(show_si=False, show_units=False), q.units) == case.raw), case.name
+            assert ((q.render(form='eng', show_units=False), q.units) == case.raw), case.name
             assert (str(q) == case.formatted), case.name
             # assure that the output value can be read as an input
             Quantity(str(q))

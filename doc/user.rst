@@ -368,18 +368,50 @@ provide them for this mechanism to work.
     373.15 K
 
 To do this conversion, *QuantiPhy* examines the given units (°F) and the desired 
-units (K) and chooses the appropriate converter.  *QuantiPhy* provides 
-a collection of pre-defined converters for common units:
+units (K) and chooses the appropriate converter.
+
+You can combine the model and scale arguments to convert numbers with or without 
+units to Quantities with particular units. In this case the model contains the 
+default units for the given values. For example:
+
+.. code-block:: python
+
+    >>> weights = '''
+    ...     240 lbs
+    ...     230 lb
+    ...     100 kg
+    ...     210
+    ... '''.strip().split('\n')
+    >>> for weight in weights:
+    ...     w = Quantity(weight, 'lb', scale='lb')
+    ...     print(w)
+    240 lb
+    230 lb
+    220.46 lb
+    210 lb
+
+QuantiPhy* provides a collection of pre-defined converters for common units:
 
 ====== ================================================================
-K:     K, F, °F, R, °R
-C, °C: K, C, °C, F, °F, R, °R
-m:     km, m, cm, mm, um, μm, micron, nm, Å, angstrom, mi, mile, miles,
-       in, inch, inches
-g:     oz, lb, lbs
-s:     s, sec, min, hour, hr, day
+K:     K, F °F, R °R
+C, °C: K, C °C, F °F, R °R
+m:     km, m, cm, mm, um μm micron, nm, Å angstrom, mi mile miles,
+       in inch inches
+g:     oz, lb lbs
+s:     sec second seconds, min minute minutes, hour hours hr, day days
 b:     B
 ====== ================================================================
+
+The conversions can occur between a pair of units, one from the first column and 
+one from the second. They do not occur when both units are only in the second 
+column. So for example, it is possible to convert between *g* and *lbs*, but not 
+between *oz* and *lb*.  However, if you notice, the units in the second column 
+are grouped using commas.  A set of units within commas are considered 
+equivalent, meaning that there are multiple names for the same underlying unit.  
+For example, *in*, *inch*, and *inches* are all considered equivalent. You can 
+convert between equivalent units even though both are found in the second 
+column. This feature was used in the above example where *lbs* was converted to 
+*lb*.
 
 You can also create your own converters using :class:`quantiphy.UnitConversion`:
 
@@ -596,13 +628,13 @@ of converting a quantity to a string. For example:
     >>> h_line.render()
     '1.4204 GHz'
 
-    >>> h_line.render(show_si=False)
+    >>> h_line.render(form='eng')
     '1.4204e9 Hz'
 
     >>> h_line.render(show_units=False)
     '1.4204G'
 
-    >>> h_line.render(show_si=False, show_units=False)
+    >>> h_line.render(form='eng', show_units=False)
     '1.4204e9'
 
     >>> h_line.render(prec=6)
@@ -642,7 +674,7 @@ You can also access the full precision of the quantity:
     >>> h_line.render(prec='full')
     '1.420405751786 GHz'
 
-    >>> h_line.render(show_si=False, prec='full')
+    >>> h_line.render(form='eng',  prec='full')
     '1.420405751786e9 Hz'
 
 Full precision implies whatever precision was used when specifying the quantity 
@@ -676,7 +708,7 @@ in grams and wanting to present it in either kilograms or in pounds:
     >>> print('mass (kg): %s' % m.render(show_units=False, scale=0.001))
     mass (kg): 2.529
 
-    >>> print(m.render(scale=(0.0022046, 'lb'), show_si=False))
+    >>> print(m.render(scale=(0.0022046, 'lb'), form='eng'))
     5.5754 lb
 
 As before, functions can also be used to do the conversion. Here is an example 
@@ -1096,7 +1128,7 @@ Preferences
 
 *QuantiPhy* supports a wide variety of preferences that control its behavior.  
 For example, when rendering quantities you can control the number of digits used 
-(*prec*), whether SI scale factors are used (*show_si*), whether the units are 
+(*prec*), whether SI scale factors are used (*form*), whether the units are 
 included (*show_units*), etc.  Similar preferences also control the conversion 
 of strings into quantities, which can help disambiguate whether a suffix 
 represents a scale factor or a unit. The list of available preferences and their 
@@ -1194,7 +1226,7 @@ undesired.
     >>> print(gain)
     250 mdB
 
-    >>> gain.show_si = False
+    >>> gain.form = 'eng'
     >>> print(gain)
     250e-3 dB
 
@@ -1213,12 +1245,12 @@ preferences:
 
 .. code-block:: python
 
-    >>> with Quantity.prefs(show_si=False, show_units=False):
+    >>> with Quantity.prefs(form='fixed', show_units=False, prec=2):
     ...     for time, temp in data:
     ...         print('%-7s %s' % (time, temp))
     0       505.37
     600     477.59
-    1.2e3   455.37
+    1200    455.37
 
     >>> print('Final temperature = %s @ %s.' % data[-1][::-1])
     Final temperature = 455.37 K @ 1.2 ks.
@@ -1308,14 +1340,14 @@ existing known units.
 
     >>> d1 = Quantity('1 au')
     >>> d2 = Quantity('1000 pc')
-    >>> print(d1.render(show_si=False), d2, sep='\n')
+    >>> print(d1.render(form='eng'), d2, sep='\n')
     1e-18 u
     1 nc
 
     >>> Quantity.set_prefs(known_units='au pc')
     >>> d1 = Quantity('1 au')
     >>> d2 = Quantity('1000 pc')
-    >>> print(d1.render(show_si=False), d2, sep='\n')
+    >>> print(d1.render(form='eng'), d2, sep='\n')
     1 au
     1 kpc
 
@@ -1620,7 +1652,7 @@ number.
 .. code-block:: python
 
     >>> Quantity.set_prefs(spacer='')
-    >>> translated_back = Quantity.all_from_si_fmt(translated, show_si=False)
+    >>> translated_back = Quantity.all_from_si_fmt(translated, form='eng')
     >>> print(translated_back)
     Applying stimulus @ 200.5e-6s: V(in) = 500e-3V.
     Pass @ 300.5e-6s: V(out): expected=2V, measured=2V, diff=346.12e-9V.

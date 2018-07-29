@@ -114,14 +114,14 @@ def test_distance():
     Quantity.set_prefs(ignore_sf=False)
     q=Quantity('1_m')
     assert q.render() == '1 m'
-    assert q.render(scale='cm', show_si=False) == '100 cm'
-    assert q.render(scale='mm', show_si=False) == '1e3 mm'
-    assert q.render(scale='um', show_si=False) == '1e6 um'
-    assert q.render(scale='μm', show_si=False) == '1e6 μm'
-    assert q.render(scale='nm', show_si=False) == '1e9 nm'
+    assert q.render(scale='cm', form='eng') == '100 cm'
+    assert q.render(scale='mm', form='eng') == '1e3 mm'
+    assert q.render(scale='um', form='eng') == '1e6 um'
+    assert q.render(scale='μm', form='eng') == '1e6 μm'
+    assert q.render(scale='nm', form='eng') == '1e9 nm'
     if sys.version_info.major == 3:
-        assert q.render(scale='Å', show_si=False) == '10e9 Å'
-    assert q.render(scale='angstrom', show_si=False) == '10e9 angstrom'
+        assert q.render(scale='Å', form='eng') == '10e9 Å'
+    assert q.render(scale='angstrom', form='eng') == '10e9 angstrom'
     assert q.render(scale='mi') == '621.37 umi'
     assert q.render(scale='mile') == '621.37 umile'
     assert q.render(scale='miles') == '621.37 umiles'

@@ -4,6 +4,7 @@
     >>> Quantity.set_prefs(
     ...     abstol=None,
     ...     assign_rec=None,
+    ...     form=None,
     ...     full_prec=None,
     ...     ignore_sf=None,
     ...     input_sf=None,
@@ -19,7 +20,6 @@
     ...     show_commas=None,
     ...     show_desc=None,
     ...     show_label=None,
-    ...     show_si=None,
     ...     spacer=None,
     ...     strip_radix=None,
     ...     strip_zeros=None,

@@ -313,10 +313,10 @@ UnitConversion('g', 'lb lbs', 453.59237)
 UnitConversion('g', 'oz', 28.34952)
 
 # Time conversions {{{2
-UnitConversion('s', 'sec')
-UnitConversion('s', 'min', 60)
-UnitConversion('s', 'hr hour', 3600)
-UnitConversion('s', 'day', 86400)
+UnitConversion('s', 'sec second seconds')
+UnitConversion('s', 'min minute minutes', 60)
+UnitConversion('s', 'hr hour hours', 3600)
+UnitConversion('s', 'day days', 86400)
 
 # Bit conversions {{{2
 UnitConversion('b', 'B', 8)
@@ -503,6 +503,7 @@ DEFAULTS = dict(
             (\s*(\#|--|//)\s*(?P<desc>.*?))?         # description: (--|//|#) .*
         ))\Z
     ''',
+    form = 'si',
     full_prec = 12,
     ignore_sf = False,
     input_sf = ''.join(MAPPINGS.keys()),
@@ -518,7 +519,6 @@ DEFAULTS = dict(
     show_commas = False,
     show_desc = False,
     show_label = False,
-    show_si = True,  # deprecated
     show_units = True,
     spacer = ' ',
     strip_radix = True,
@@ -873,10 +873,11 @@ class Quantity(float):
               *show_label* is 'f' (short for full).
         :type show_label: 'f', 'a', or bool
 
-        :arg bool show_si:
-            Use SI scale factors by default. If this is not set, engineering
-            format is used.  Engineering format is normal E-notation except that
-            the exponents are constrained to be a multiple of 3.
+        :arg str form:
+            Specifies the form to use for representing numbers by default.
+            Choose from 'si', 'eng' and 'fixed. As an example 0.25 A is
+            represented with 250 mA when form is 'si', as 250e-3 A when form is
+            'eng', and with 0.25 A when from is 'fixed'.
 
         :arg str spacer:
             The spacer text to be inserted in a string between the numeric value
@@ -1464,20 +1465,19 @@ class Quantity(float):
 
     # render() {{{2
     def render(
-        self, show_units=None, show_si=None, prec=None, show_label=None,
+        self, form=None, show_units=None, prec=None, show_label=None,
         strip_zeros=None, strip_radix=None, scale=None,
     ):
         """Convert quantity to a string.
 
+        :arg str form:
+            Specifies the form to use for representing numbers by default.
+            Choose from 'si', 'eng' and 'fixed. As an example 0.25 A is
+            represented with 250 mA when form is 'si', as 250e-3 A when form is
+            'eng', and with 0.25 A when from is 'fixed'.
+
         :arg bool show_units:
             Whether the units should be included in the string.
-
-        :arg bool show_si:
-            Whether SI scale factors should be used.  If true, SI scale factors
-            are used if the appropriate scale factor is available, otherwise
-            engineering format is used. If false, engineering format is used for
-            all numbers.  Engineering format is normal E-notation except that
-            the exponents are constrained to be a multiple of 3.
 
         :arg prec:
             The desired precision (one plus this value is the desired number of
@@ -1529,8 +1529,10 @@ class Quantity(float):
             >>> c = Quantity('c')
             >>> print(
             ...     c.render(),
+            ...     c.render(form='si'),
+            ...     c.render(form='eng'),
+            ...     c.render(form='fixed'),
             ...     c.render(show_units=False),
-            ...     c.render(show_si=False),
             ...     c.render(prec=6),
             ...     c.render(prec='full'),
             ...     c.render(show_label=True),
@@ -1538,8 +1540,10 @@ class Quantity(float):
             ...     sep=newline
             ... )
             299.79 Mm/s
-            299.79M
+            299.79 Mm/s
             299.79e6 m/s
+            299792458 m/s
+            299.79M
             299.7925 Mm/s
             299.792458 Mm/s
             c = 299.79 Mm/s
@@ -1555,13 +1559,19 @@ class Quantity(float):
 
         """
         # initialize various options
-        show_si = self.show_si if show_si is None else show_si
+        form = self.form if form is None else form
         show_units = self.show_units if show_units is None else show_units
         strip_zeros = self.strip_zeros if strip_zeros is None else strip_zeros
         strip_radix = self.strip_radix if strip_radix is None else strip_radix
         units = self.units if show_units else ''
         if prec is None:
             prec = self.prec
+
+        if form == 'fixed':
+            return self.fixed(
+                show_units=show_units, prec=prec, strip_zeros=strip_zeros,
+                strip_radix=strip_radix, scale=scale
+            )
 
         # check for infinities or NaN
         if self.is_infinite() or self.is_nan():
@@ -1629,7 +1639,7 @@ class Quantity(float):
                 sf = self.unity_sf
             else:
                 sf = ''
-        elif show_si:
+        elif form == 'si':
             if (index > 0):
                 if index <= len(BIG_SCALE_FACTORS):
                     if BIG_SCALE_FACTORS[index-1] in self.output_sf:
@@ -1639,6 +1649,8 @@ class Quantity(float):
                 if index <= len(SMALL_SCALE_FACTORS):
                     if SMALL_SCALE_FACTORS[index-1] in self.output_sf:
                         sf = SMALL_SCALE_FACTORS[index-1]
+        else:
+            assert form == 'eng', '{}: unknown form.'.format(form)
 
         # render the scale factor if appropriate
         if self.map_sf:
@@ -1868,9 +1880,9 @@ class Quantity(float):
 
     # __repr__() {{{2
     def __repr__(self):
-        show_si = False if self.ignore_sf else None
+        form = 'eng' if self.ignore_sf else 'si'
         return 'Quantity({!r})'.format(
-            self.render(show_units=True, show_si=show_si, prec='full')
+            self.render(form=form, show_units=True, prec='full')
         )
 
     # format() {{{2
@@ -1946,12 +1958,12 @@ class Quantity(float):
                 value = self.render(prec=prec, show_label=label, scale=scale)
             elif ftype == 'q':
                 value = self.render(
-                    prec=prec, show_si=True, show_units=True, show_label=label,
+                    form='si', prec=prec, show_units=True, show_label=label,
                     strip_zeros=not alt_form, strip_radix=not alt_form, scale=scale
                 )
             elif ftype == 'r':
                 value = self.render(
-                    prec=prec, show_si=True, show_units=False, show_label=label,
+                    form='si', prec=prec, show_units=False, show_label=label,
                     strip_zeros=not alt_form, strip_radix=not alt_form, scale=scale
                 )
             elif ftype == 'p':
@@ -1970,7 +1982,7 @@ class Quantity(float):
                 if scale:
                     # this is a hack that will include the scaling
                     value = float(self.render(
-                        prec='full', show_si=False, show_units=False,
+                        form='eng', prec='full', show_units=False,
                         show_label=False, scale=scale
                     ))
                 else:
@@ -2155,7 +2167,7 @@ class Quantity(float):
 
         Pass this function to *map_sf* preference if you prefer your large and
         small numbers in classic scientific notation. It also causes 'u' to be
-        converted to 'μ'. Set *show_si* False to format all numbers in
+        converted to 'μ'. Set *form* to 'eng'  to format all numbers in
         scientific notation.
 
         Example::
@@ -2261,7 +2273,7 @@ class Quantity(float):
             >>> print(Quantity.all_from_si_fmt(xlated))
             Applying stimulus @ 20.5 us: V(in) = 500 mV.
 
-            >>> print(Quantity.all_from_si_fmt(xlated, show_si=False))
+            >>> print(Quantity.all_from_si_fmt(xlated, form='eng'))
             Applying stimulus @ 20.5e-6 s: V(in) = 500e-3 V.
 
         """

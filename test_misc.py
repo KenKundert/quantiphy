@@ -8,30 +8,30 @@ from textwrap import dedent
 def test_misc():
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None)
     q = Quantity(1420405751.786, 'Hz')
-    assert q.render(show_si=False, show_units=False) == '1.4204e9'
+    assert q.render(form='eng', show_units=False) == '1.4204e9'
 
     t = Quantity('1420405751.786 Hz').as_tuple()
     assert t == (1420405751.786, 'Hz')
 
-    t = Quantity('1420405751.786 Hz').render(show_si=True, show_units=True, prec='full')
+    t = Quantity('1420405751.786 Hz').render(form='si', show_units=True, prec='full')
     assert t == '1.420405751786 GHz'
 
-    s = Quantity('1420405751.786 Hz').render(show_si=False, show_units=True, prec='full')
+    s = Quantity('1420405751.786 Hz').render(form='eng', show_units=True, prec='full')
     assert s == '1.420405751786e9 Hz'
 
     f=float(Quantity('1420405751.786 Hz'))
     assert f == 1420405751.786
 
-    t = Quantity('1420405751.786 Hz').render(show_si=True, show_units=False)
+    t = Quantity('1420405751.786 Hz').render(form='si', show_units=False)
     assert t == '1.4204G'
 
-    s = Quantity('1420405751.786 Hz').render(show_si=False, show_units=False)
+    s = Quantity('1420405751.786 Hz').render(form='eng', show_units=False)
     assert s == '1.4204e9'
 
-    s = Quantity(1420405751.786, 'Hz').render(show_si=False, show_units=False, prec='full')
+    s = Quantity(1420405751.786, 'Hz').render(form='eng', show_units=False, prec='full')
     assert s == '1.420405751786e9'
 
-    f = Quantity('14204.05751786MHz').render(show_si=True, show_units=False, prec='full')
+    f = Quantity('14204.05751786MHz').render(form='si', show_units=False, prec='full')
     assert f == '14.20405751786G'
 
     q = Quantity('1420405751.786 Hz', units='HZ').render()
@@ -196,7 +196,7 @@ def test_misc():
     Quantity.set_prefs(known_units='au pc')
     d1 = Quantity('1 au')
     d2 = Quantity('1000 pc')
-    assert d1.render(show_si=False) == '1 au'
+    assert d1.render(form='eng') == '1 au'
     assert d2.render() == '1 kpc'
 
     p = Quantity.get_pref(name='known_units')
@@ -216,7 +216,7 @@ def test_misc():
         assert Quantity.get_pref('map_sf') == {}
 
         Foo.set_prefs(map_sf=Quantity.map_sf_to_sci_notation)
-        assert t.render(show_si=False) == '1×10⁻⁶ s'
+        assert t.render(form='eng') == '1×10⁻⁶ s'
         assert Foo.get_pref('map_sf') == Foo.map_sf_to_sci_notation
         assert Quantity.get_pref('map_sf') == {}
 
@@ -253,18 +253,18 @@ def test_misc():
     """).strip()
     assert result == expected
 
-    processed = Quantity.all_from_conv_fmt('1420405751.786Hz', show_si=True)
+    processed = Quantity.all_from_conv_fmt('1420405751.786Hz', form='si')
     assert processed == '1.4204 GHz'
-    processed = Quantity.all_from_conv_fmt('1.420405751786e9Hz', show_si=True)
+    processed = Quantity.all_from_conv_fmt('1.420405751786e9Hz', form='si')
     assert processed == '1.4204 GHz'
-    processed = Quantity.all_from_si_fmt('1420.405751786MHz', show_si=False)
+    processed = Quantity.all_from_si_fmt('1420.405751786MHz', form='eng')
     assert processed == '1.4204e9 Hz'
-    processed = Quantity.all_from_si_fmt('1420405751.786_Hz', show_si=False)
+    processed = Quantity.all_from_si_fmt('1420405751.786_Hz', form='eng')
     assert processed == '1.4204e9 Hz'
 
     if sys.version_info.major == 3:
         # spacer is non-breaking space
-        processed = Quantity.all_from_conv_fmt('1420405751.786 Hz', show_si=True)
+        processed = Quantity.all_from_conv_fmt('1420405751.786 Hz', form='si')
         assert processed == '1.4204 GHz'
 
         q = Quantity('3.45e6 m·s⁻²')
@@ -272,14 +272,14 @@ def test_misc():
         q = Quantity('accel = 3.45e6 m·s⁻² -- acceleration')
         assert q.render() == '3.45 Mm·s⁻²'
 
-    processed = Quantity.all_from_si_fmt('0s', show_si=True)
+    processed = Quantity.all_from_si_fmt('0s', form='si')
     assert processed == '0 s'
 
     # test input_sf
     Quantity.set_prefs(input_sf='GMk', unity_sf='_', spacer='')
-    assert Quantity('10m').render(show_si=False) == '10_m'
+    assert Quantity('10m').render(form='eng') == '10_m'
     Quantity.set_prefs(input_sf=None, unity_sf='_')
-    assert Quantity('10m').render(show_si=False) == '10e-3'
+    assert Quantity('10m').render(form='eng') == '10e-3'
     with pytest.raises(ValueError) as exception:
         Quantity.set_prefs(input_sf='GMkwq', unity_sf='_', spacer='')
     assert exception.value.args[0] == 'q, w: unknown scale factors.'
@@ -291,7 +291,7 @@ def test_misc():
         assert Quantity('10e-6 m').render() == '10 μm'
         Quantity.set_prefs(map_sf=Quantity.map_sf_to_sci_notation)
         assert Quantity('10e-6 m').render() == '10 μm'
-        assert Quantity('10e-6 m').render(show_si=False) == '10×10⁻⁶ m'
+        assert Quantity('10e-6 m').render(form='eng') == '10×10⁻⁶ m'
         Quantity.set_prefs(map_sf=None)
     sf_map = {
         'u': ' PPM',
@@ -528,31 +528,31 @@ Status @ 800.5 us: in_val = 2.
 Summary @ 900.51 us: 7 tests run, 1 failures detected, 0 faults detected, 0 test sequences skipped.
     '''
 
-    processed = Quantity.all_from_conv_fmt(mvi_raw_conv, show_si=True)
+    processed = Quantity.all_from_conv_fmt(mvi_raw_conv, form='si')
     assert processed == mvi_si
-    processed = Quantity.all_from_conv_fmt(mvi_raw_conv, show_si=False)
+    processed = Quantity.all_from_conv_fmt(mvi_raw_conv, form='eng')
     assert processed == mvi_conv
-    processed = Quantity.all_from_conv_fmt(mvi_raw_conv, show_si=True, prec='full')
+    processed = Quantity.all_from_conv_fmt(mvi_raw_conv, form='si', prec='full')
     assert processed == mvi_si_full
-    processed = Quantity.all_from_conv_fmt(mvi_raw_conv, show_si=False, prec='full')
+    processed = Quantity.all_from_conv_fmt(mvi_raw_conv, form='eng', prec='full')
     assert processed == mvi_conv_full
 
-    processed = Quantity.all_from_si_fmt(mvi_raw_si, show_si=True)
+    processed = Quantity.all_from_si_fmt(mvi_raw_si, form='si')
     assert processed == mvi_si
-    processed = Quantity.all_from_si_fmt(mvi_raw_si, show_si=False)
+    processed = Quantity.all_from_si_fmt(mvi_raw_si, form='eng')
     assert processed == mvi_conv
-    processed = Quantity.all_from_si_fmt(mvi_raw_si, show_si=True, prec='full')
+    processed = Quantity.all_from_si_fmt(mvi_raw_si, form='si', prec='full')
     assert processed == mvi_si_full
-    processed = Quantity.all_from_si_fmt(mvi_raw_si, show_si=False, prec='full')
+    processed = Quantity.all_from_si_fmt(mvi_raw_si, form='eng', prec='full')
     assert processed == mvi_conv_full
 
-    processed = Quantity.all_from_si_fmt('1420.40575MHz+1420.40575MHz+1420.40575MHz', show_si=True)
+    processed = Quantity.all_from_si_fmt('1420.40575MHz+1420.40575MHz+1420.40575MHz', form='si')
     assert processed == '1.4204 GHz+1.4204 GHz+1.4204 GHz'
 
-    processed = Quantity.all_from_si_fmt('1420.40575MHz+abc+1420.40575MHz+abc+1420.40575MHz', show_si=True)
+    processed = Quantity.all_from_si_fmt('1420.40575MHz+abc+1420.40575MHz+abc+1420.40575MHz', form='si')
     assert processed == '1.4204 GHz+abc+1.4204 GHz+abc+1.4204 GHz'
 
-    processed = Quantity.all_from_si_fmt('1420.40575e+6+1420.40575e+6', show_si=True)
+    processed = Quantity.all_from_si_fmt('1420.40575e+6+1420.40575e+6', form='si')
     assert processed == '1420.40575e+6+1420.40575e+6'
 
 

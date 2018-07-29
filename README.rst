@@ -144,7 +144,7 @@ You can use the render method to flexibly convert the quantity to a string:
    >>> Tclk.render(show_units=False)
    '10n'
 
-   >>> Tclk.render(show_units=False, show_si=False)
+   >>> Tclk.render(form='eng', show_units=False)
    '10e-9'
 
    >>> Fhy.render(prec=8)
