@@ -88,7 +88,8 @@ Releases
     - follow Python convention of right-justifying numbers by default.
     - add Quantity.add() (adds a number to a quantity returning a new quantity)
     - added # alternate form of string formatting.
-    - Change *show_si* to *form* (argument on :meth:`quantiphy.set_prefs()` and 
-      :meth:`quantiphy.render()`.
+    - Change *show_si* to *form* (argument on 
+      :meth:`quantiphy.Quantity.set_prefs()` and 
+      :meth:`quantiphy.Quantity.render()`.
     - Added concept of equivalent units for unit conversion to documentation.
 
