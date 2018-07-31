@@ -107,10 +107,14 @@ class UnitConversion(object):
     :type from_units: string or list of strings
 
     :arg float slope:
-        Scale factor for conversion.
+        Scale factor for conversion.  You may also pass a function as an
+        argument, in which case it is treated is used to perform forward
+        conversions.  In this case, *intercept* should also be passed a callable.
 
     :arg float intercept:
-        Conversion offset.
+        Conversion offset.  You may also pass a function as an argument, in
+        which case it is treated is used to perform reverse conversions.  In
+        this case, *slope* should also be passed a callable.
 
     **Forward Conversion**:
     The following conversion is applied if the given units are among the
@@ -118,11 +122,23 @@ class UnitConversion(object):
 
         *new_value* = *given_value* * *slope* + *intercept*
 
+    Or, if *slope* is callable:
+
+        *new_value* = *slope*(*given_value*)
+
+    In this case the name *slope* is misleading.
+
     **Reverse Conversion**:
     The following conversion is applied if the given units are among 
     the *to_units* and the desired units are among the *from_units*:
 
         *new_value* = (*given_value* - *intercept*)/*slope*
+
+    Or, if *intercept* is callable:
+
+        *new_value* = *intercept*(*given_value*)
+
+    In this case the name *intercept* is misleading.
 
     **No-Op Conversion**:
     The following conversion is applied if the given and desired units are both
@@ -197,14 +213,14 @@ class UnitConversion(object):
     def __init__(self, to_units, from_units, slope=1, intercept=0):
         self.to_units = to_units.split() if is_str(to_units) else to_units
         self.from_units = from_units.split() if is_str(from_units) else from_units
+        self.slope = slope
+        self.intercept = intercept
         if callable(slope) or callable(intercept):
             # the slope and intercept arguments are actually the forward and
             # reverse conversion functions.
             _forward = slope
             _reverse = intercept
         else:
-            self.slope = slope
-            self.intercept = intercept
             _forward = self._forward
             _reverse = self._reverse
 
@@ -300,34 +316,46 @@ class UnitConversion(object):
                 from_units = value.units
             except AttributeError:
                 pass
+
+        if callable(self.slope) or callable(self.intercept):
+            # the slope and intercept arguments are actually the forward and
+            # reverse conversion functions.
+            _forward = self.slope
+            _reverse = self.intercept
+        else:
+            _forward = self._forward
+            _reverse = self._reverse
+
         if to_units in self.to_units:
-            return Quantity(self._forward(value), to_units)
+            return Quantity(_forward(value), to_units)
         if to_units in self.from_units:
-            return Quantity(self._reverse(value), to_units)
+            return Quantity(_reverse(value), to_units)
         if not from_units:
-            return Quantity(self._forward(value), self.to_units[0])
+            return Quantity(_forward(value), self.to_units[0])
         if from_units in self.from_units:
-            return Quantity(self._forward(value), self.to_units[0])
+            return Quantity(_forward(value), self.to_units[0])
         if from_units in self.to_units:
-            return Quantity(self._reverse(value), self.from_units[0])
+            return Quantity(_reverse(value), self.from_units[0])
         if to_units:
             raise KeyError('{}: unknown to_units.'.format(to_units))
         raise KeyError('{}: unknown from_units.'.format(from_units))
 
     def __str__(self):
-        try:
-            if self.intercept:
-                return '{} = {}*{} + {}'.format(
-                    self.to_units[0], self.slope, self.from_units[0],
-                    Quantity(self.intercept, self.to_units[0])
-                )
-            else:
-                return '{} = {}*{}'.format(
-                    self.to_units[0], self.slope, self.from_units[0]
-                )
-        except AttributeError:
+        if callable(self.slope) or callable(self.intercept):
             # using functions to do the conversion, have no good description
-            return '{} = f({})'.format(self.to_units[0], self.from_units[0])
+            return '{} = {}({}), {} = {}({})'.format(
+                self.to_units[0], self.slope.__name__, self.from_units[0],
+                self.from_units[0], self.intercept.__name__, self.to_units[0]
+            )
+        if self.intercept:
+            return '{} = {}*{} + {}'.format(
+                self.to_units[0], self.slope, self.from_units[0],
+                Quantity(self.intercept, self.to_units[0])
+            )
+        else:
+            return '{} = {}*{}'.format(
+                self.to_units[0], self.slope, self.from_units[0]
+            )
 
 # Temperature conversions {{{2
 UnitConversion('C °C', 'C °C')

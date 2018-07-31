@@ -300,7 +300,7 @@ Casual Time Units
 -----------------
 
 This example shows how one could allow users to enter time durations using 
-a variety of casual units of time.  *QuantiPhy* only predefines conversions for 
+a variety of casual units of time.  *QuantiPhy* only pre-defines conversions for 
 time units that are unambiguous and commonly used in scientific computation, so 
 that leaves out units like months and years. However, in many situations the 
 goal is simplicity rather than precision. In such a situation, it is convenient 
