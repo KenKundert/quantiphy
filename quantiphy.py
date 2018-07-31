@@ -161,22 +161,58 @@ class UnitConversion(object):
     the converter object to a string, it summarizes the conversion, which can
     help you avoid mistakes::
 
-        conversion = UnitConversion('F', 'C', 1.8, 32)
-        print(str(conversion))
+        >>> conversion = UnitConversion('F', 'C', 1.8, 32)
+        >>> print(str(conversion))
         F = 1.8*C + 32 F
+
+    You can also use functions to perform the conversions, which is appropriate
+    when the conversion is nonlinear (cannot be described with a slope and
+    intercept).  For example::
+
+        >>> from quantiphy import UnitConversion, Quantity
+        >>> from math import log10
+
+        >>> def from_dB(value):
+        ...     return 10**(value/20)
+
+        >>> def to_dB(value):
+        ...     return 20*log10(value)
+
+        >>> converter = UnitConversion('V', 'dBV', from_dB, to_dB)
+        >>> converter = UnitConversion('A', 'dBA', from_dB, to_dB)
+
+        >>> print('{:pdBV}, {:pdBV}'.format(Quantity('100mV'), Quantity('10V')))
+        -20 dBV, 20 dBV
+
+        >>> print('{:qV}, {:qV}'.format(Quantity('-20 dBV'), Quantity('20 dBV')))
+        100 mV, 10 V
+
+        >>> print('{:pdBA}, {:pdBA}'.format(Quantity('100mA'), Quantity('10A')))
+        -20 dBA, 20 dBA
+
+        >>> print('{:qA}, {:qA}'.format(Quantity('-20 dBA'), Quantity('20 dBA')))
+        100 mA, 10 A
 
     """
     def __init__(self, to_units, from_units, slope=1, intercept=0):
         self.to_units = to_units.split() if is_str(to_units) else to_units
         self.from_units = from_units.split() if is_str(from_units) else from_units
-        self.slope = slope
-        self.intercept = intercept
+        if callable(slope) or callable(intercept):
+            # the slope and intercept arguments are actually the forward and
+            # reverse conversion functions.
+            _forward = slope
+            _reverse = intercept
+        else:
+            self.slope = slope
+            self.intercept = intercept
+            _forward = self._forward
+            _reverse = self._reverse
 
         # add to known unit conversion
         for to in self.to_units:
             for frm in self.from_units:
-                _unit_conversions[(to, frm)] = self._forward
-                _unit_conversions[(frm, to)] = self._reverse
+                _unit_conversions[(to, frm)] = _forward
+                _unit_conversions[(frm, to)] = _reverse
 
         # add no-op converters to allow a from-units to be converted to another
         for u1 in self.from_units:
@@ -279,15 +315,19 @@ class UnitConversion(object):
         raise KeyError('{}: unknown from_units.'.format(from_units))
 
     def __str__(self):
-        if self.intercept:
-            return '{} = {}*{} + {}'.format(
-                self.to_units[0], self.slope, self.from_units[0],
-                Quantity(self.intercept, self.to_units[0])
-            )
-        else:
-            return '{} = {}*{}'.format(
-                self.to_units[0], self.slope, self.from_units[0]
-            )
+        try:
+            if self.intercept:
+                return '{} = {}*{} + {}'.format(
+                    self.to_units[0], self.slope, self.from_units[0],
+                    Quantity(self.intercept, self.to_units[0])
+                )
+            else:
+                return '{} = {}*{}'.format(
+                    self.to_units[0], self.slope, self.from_units[0]
+                )
+        except AttributeError:
+            # using functions to do the conversion, have no good description
+            return '{} = f({})'.format(self.to_units[0], self.from_units[0])
 
 # Temperature conversions {{{2
 UnitConversion('C °C', 'C °C')

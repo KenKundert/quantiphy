@@ -92,4 +92,4 @@ Releases
       :meth:`quantiphy.Quantity.set_prefs()` and 
       :meth:`quantiphy.Quantity.render()`.
     - Added concept of equivalent units for unit conversion to documentation.
-
+    - Enhance UnitConversion so that it support nonlinear conversions.

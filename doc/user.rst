@@ -431,6 +431,9 @@ This unit conversion says, when converting units of 'm' to either 'pc' or
     >>> print(d_sol)
     5 upc
 
+:class:`quantiphy.UnitConversion`: supports linear conversions (slope only), 
+affine conversions (slope and intercept) and nonlinear conversions.
+
 Notice that the return value of *UnitConversion* was not used. It is enough to 
 simply create the *UnitConversion* for it to be available to *Quantity*. So, it 
 is normal to not capture the return value of *UnitConversion*. However, there 
