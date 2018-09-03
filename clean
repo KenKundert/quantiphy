@@ -1,11 +1,13 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 set nonomatch
-rm -f fvi.1 fvi.1.rst fvi.1.pdf MANIFEST
 rm -rf generated_settings
-rm -rf doc/.build
 rm -rf .cache
 
 # the rest is common to all python directories
-rm -f *.pyc *.pyo .test*.sum expected result install.out
-rm -rf build *.egg-info dist __pycache__ .coverage .coverage-html htmlcov .eggs
+rm -f .test*.sum expected result install.out .*.log
+rm -rf build *.egg-info dist __pycache__ .eggs **/{__pycache__,*.pyc,*.pyo}
+rm -rf .coverage .coverage-html htmlcov
+rm -rf .pytest_cache .cache dist .build quantiphy.egg.info
+rm -rf tests/{htmlcov,.cache,.coverage,.pytest_cache}
+rm -rf doc/.build

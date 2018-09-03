@@ -17,6 +17,8 @@ provides direct support for reading or writing quantities with SI scale factors,
 making it difficult to write software that communicates effectively with humans.  
 *QuantiPhy* addresses this deficiency, making it natural and simple to both 
 input and output physical quantities.
+
+Documentation can be found at quantiphy.readthedocs.io.
 """
 
 # License {{{1
@@ -37,14 +39,15 @@ input and output physical quantities.
 
 # Imports {{{1
 from __future__ import division
+import re
+import math
+import sys
 try:
     from collections import ChainMap
 except ImportError:  # pragma: no cover
     from chainmap import ChainMap
 from six import string_types, python_2_unicode_compatible
-import re
-import math
-import sys
+
 
 # Utilities {{{1
 # is_str {{{2
@@ -52,9 +55,11 @@ def is_str(obj):
     # Identifies strings in all their various guises.
     return isinstance(obj, string_types)
 
+
 # _named_regex {{{2
 def named_regex(name, regex):
     return '(?P<%s>%s)' % (name, regex)
+
 
 def _scale(scale, number, units):
     if is_str(scale):
@@ -75,17 +80,19 @@ def _scale(scale, number, units):
             number *= multiplier
     return number, units
 
+
 # Unit Conversions {{{1
 _unit_conversions = {}
 def _convert_units(to_units, from_units, value):
     if to_units == from_units:
         return value
     try:
-        return _unit_conversions[(to_units,from_units)](value)
+        return _unit_conversions[(to_units, from_units)](value)
     except KeyError:
         raise KeyError(
             "Unable to convert between '%s' and '%s'." % (to_units, from_units)
         )
+
 
 class UnitConversion(object):
     """
@@ -352,10 +359,10 @@ class UnitConversion(object):
                 self.to_units[0], self.slope, self.from_units[0],
                 Quantity(self.intercept, self.to_units[0])
             )
-        else:
-            return '{} = {}*{}'.format(
-                self.to_units[0], self.slope, self.from_units[0]
-            )
+        return '{} = {}*{}'.format(
+            self.to_units[0], self.slope, self.from_units[0]
+        )
+
 
 # Temperature conversions {{{2
 UnitConversion('C °C', 'C °C')
@@ -388,6 +395,7 @@ UnitConversion('s', 'day days', 86400)
 
 # Bit conversions {{{2
 UnitConversion('b', 'B', 8)
+
 
 # Constants {{{1
 # set_unit_system {{{2
@@ -425,6 +433,7 @@ def set_unit_system(unit_system):
 _default_unit_system = 'mks'
 _constants = {None: {}, _default_unit_system: {}}
 set_unit_system(_default_unit_system)
+
 
 # add_constant {{{2
 def add_constant(value, alias=None, unit_systems=None):
@@ -496,6 +505,7 @@ def add_constant(value, alias=None, unit_systems=None):
             _constants[None][alias] = value
         if value.name:
             _constants[None][value.name] = value
+
 
 # Globals {{{1
 __version__ = '2.3.5'
@@ -1140,8 +1150,7 @@ class Quantity(float):
                 else:
                     # has an exponent
                     return mantissa + sf + spacer + units
-        else:
-            return mantissa + sf
+        return mantissa + sf
 
     # recognizers {{{2
     @classmethod
@@ -1343,8 +1352,7 @@ class Quantity(float):
                     mantissa = mantissa.replace('_', '')
                     number = float(mantissa + MAPPINGS.get(sf, sf))
                     return number, units, mantissa, sf
-            else:
-                raise ValueError('%s: not a valid number.' % value)
+            raise ValueError('%s: not a valid number.' % value)
 
         def recognize_all(value):
             try:
@@ -1504,7 +1512,7 @@ class Quantity(float):
         return self.__class__(number, units)
 
     # add() {{{2
-    def add(self, addend, check_units = False):
+    def add(self, addend, check_units=False):
         """Create a new quantity that is the sum of the original and a contribution.
 
         :arg addend:
@@ -1684,7 +1692,7 @@ class Quantity(float):
             # determine precision
             if prec == 'full':
                 prec = self.full_prec
-            assert (prec >= 0)
+            assert prec >= 0
 
             # scale if desired
             number = self.real
@@ -1708,7 +1716,7 @@ class Quantity(float):
             else:
                 sf = ''
         elif form == 'si':
-            if (index > 0):
+            if index > 0:
                 if index <= len(BIG_SCALE_FACTORS):
                     if BIG_SCALE_FACTORS[index-1] in self.output_sf:
                         sf = BIG_SCALE_FACTORS[index-1]
