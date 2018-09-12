@@ -90,6 +90,7 @@ Releases
     - added # alternate form of string formatting.
     - Change *show_si* to *form* (argument on 
       :meth:`quantiphy.Quantity.set_prefs()` and 
-      :meth:`quantiphy.Quantity.render()`.
+      :meth:`quantiphy.Quantity.render()` (*show_si* is now obsolete, use 
+      *form='si'* instead).
     - Added concept of equivalent units for unit conversion to documentation.
     - Enhance UnitConversion so that it support nonlinear conversions.
