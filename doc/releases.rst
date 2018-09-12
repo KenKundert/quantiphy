@@ -81,8 +81,8 @@ Releases
       * support any format specifier supported by Python for floats
 
 **Latest development release**:
-    | Version: 2.3.5
-    | Released: 2018-06-29
+    | Version: 2.3.6
+    | Released: 2018-09-12
 
     - fixed bug in format that resulted in several format codes ignoring width
     - follow Python convention of right-justifying numbers by default.
