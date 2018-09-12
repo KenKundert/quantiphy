@@ -80,10 +80,7 @@ Releases
       * added :meth:`quantiphy.Quantity.format()` method
       * support any format specifier supported by Python for floats
 
-**Latest development release**:
-    | Version: 2.3.6
-    | Released: 2018-09-12
-
+**2.4 (2018-09-12)**:
     - fixed bug in format that resulted in several format codes ignoring width
     - follow Python convention of right-justifying numbers by default.
     - add Quantity.add() (adds a number to a quantity returning a new quantity)
@@ -93,4 +90,8 @@ Releases
       :meth:`quantiphy.Quantity.render()` (*show_si* is now obsolete, use 
       *form='si'* instead).
     - Added concept of equivalent units for unit conversion to documentation.
-    - Enhance UnitConversion so that it support nonlinear conversions.
+    - Enhance UnitConversion so that it supports nonlinear conversions.
+
+**Latest development release**:
+    | Version: 2.3.6
+    | Released: 2018-09-12
