@@ -1141,15 +1141,13 @@ class Quantity(float):
                 if mantissa[0] == '-':
                     # if negative, the sign goes before the currency symbol
                     return '-' + units + mantissa[1:] + sf
-                else:
-                    return units + mantissa + sf
+                return units + mantissa + sf
             else:
                 if sf in MAPPINGS:
                     # has a scale factor
                     return mantissa + spacer + sf + units
-                else:
-                    # has an exponent
-                    return mantissa + sf + spacer + units
+                # has an exponent
+                return mantissa + sf + spacer + units
         return mantissa + sf
 
     # recognizers {{{2
@@ -1266,7 +1264,7 @@ class Quantity(float):
 
         # all_number_converters {{{3
         cls.all_number_converters = [
-            (re.compile('\A\s*{}\s*\Z'.format(pattern)), get_mant, get_sf, get_units)
+            (re.compile(r'\A\s*{}\s*\Z'.format(pattern)), get_mant, get_sf, get_units)
             for pattern, get_mant, get_sf, get_units in [
                 number_with_exponent, number_with_scale_factor, simple_number,
                 currency_with_exponent, currency_with_scale_factor, simple_currency,
@@ -1276,7 +1274,7 @@ class Quantity(float):
 
         # sf_free_number_converters {{{3
         cls.sf_free_number_converters = [
-            (re.compile('\A\s*{}\s*\Z'.format(pattern)), get_mant, get_sf, get_units)
+            (re.compile(r'\A\s*{}\s*\Z'.format(pattern)), get_mant, get_sf, get_units)
             for pattern, get_mant, get_sf, get_units in [
                 number_with_exponent, simple_number,
                 currency_with_exponent, simple_currency,
@@ -2056,7 +2054,7 @@ class Quantity(float):
                 if ftype == 'g':
                     prec += 1
                 if scale:
-                    # this is a hack that will include the scaling
+                    # a hack that includes the scaling
                     value = float(self.render(
                         form='eng', prec='full', show_units=False,
                         show_label=False, scale=scale
