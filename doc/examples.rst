@@ -911,24 +911,26 @@ large values are resistances and small values are capacitances. The *rkm_codes*
 package provides a more general version of RKM codes by default, but it can be 
 configured to conform to the standard by setting *rkm_maps* as follows:
 
+.. rkm_code examples are commented out because they don't work in python2
+
 .. code-block:: python
 
-    >>> from rkm_codes import from_rkm, to_rkm
-    >>> from rkm_codes import set_prefs, IEC60062_MAPS
-    >>> set_prefs(rkm_maps=IEC60062_MAPS)
+    >> from rkm_codes import from_rkm, to_rkm
+    >> from rkm_codes import set_prefs, IEC60062_MAPS
+    >> set_prefs(rkm_maps=IEC60062_MAPS)
 
-    >>> r = from_rkm('6k8')
-    >>> r
+    >> r = from_rkm('6k8')
+    >> r
     Quantity('6.8 kΩ')
 
-    >>> c = from_rkm('4u7')
-    >>> c
+    >> c = from_rkm('4u7')
+    >> c
     Quantity('4.7 μF')
 
-    >>> to_rkm(r)
+    >> to_rkm(r)
     '6k8'
 
-    >>> to_rkm(c)
+    >> to_rkm(c)
     '4u7'
 
 You can also use RKM codes for values other than just resistances and 
@@ -937,26 +939,26 @@ you can specify the units along with the RKM code.
 
 .. code-block:: python
 
-    >>> from rkm_codes import from_rkm, to_rkm
-    >>> from rkm_codes import set_prefs, UNITLESS_MAPS
-    >>> set_prefs(rkm_maps=UNITLESS_MAPS)
+    >> from rkm_codes import from_rkm, to_rkm
+    >> from rkm_codes import set_prefs, UNITLESS_MAPS
+    >> set_prefs(rkm_maps=UNITLESS_MAPS)
 
-    >>> r = from_rkm('6k8')
-    >>> r
+    >> r = from_rkm('6k8')
+    >> r
     Quantity('6.8k')
 
-    >>> r = from_rkm('6k8Ω')
-    >>> r
+    >> r = from_rkm('6k8Ω')
+    >> r
     Quantity('6.8 kΩ')
 
-    >>> i = from_rkm('2n5A')
-    >>> i
+    >> i = from_rkm('2n5A')
+    >> i
     Quantity('2.5 nA')
 
-    >>> to_rkm(i)
+    >> to_rkm(i)
     '2n5'
 
-    >>> to_rkm(i, show_units=True)
+    >> to_rkm(i, show_units=True)
     '2u5A'
 
 This is the default mode of *rkm_codes*, so it is not necessary to use 
@@ -969,25 +971,25 @@ would take a table of pin characteristics that are used to create the names.
 
 For example::
 
-    >>> from quantiphy import Quantity
-    >>> from rkm_codes import to_rkm, set_prefs as set_rkm_prefs
+    >> from quantiphy import Quantity
+    >> from rkm_codes import to_rkm, set_prefs as set_rkm_prefs
 
-    >>> pins = [
-    ...     dict(kind='ibias', direction='out', polarity='sink', dest='dac', value='250nA'),
-    ...     dict(kind='ibias', direction='out', polarity='src', dest='rampgen', value='2.5μA'),
-    ...     dict(kind='vref', direction='out', dest='dac', value='1.25V'),
-    ...     dict(kind='vdda', direction='in', value='2.5V'),
-    ... ]
-    >>> set_rkm_prefs(map_sf={}, units_to_rkm_base_code=None)
+    >> pins = [
+    ..     dict(kind='ibias', direction='out', polarity='sink', dest='dac', value='250nA'),
+    ..     dict(kind='ibias', direction='out', polarity='src', dest='rampgen', value='2.5μA'),
+    ..     dict(kind='vref', direction='out', dest='dac', value='1.25V'),
+    ..     dict(kind='vdda', direction='in', value='2.5V'),
+    .. ]
+    >> set_rkm_prefs(map_sf={}, units_to_rkm_base_code=None)
 
-    >>> for pin in pins:
-    ...     components = []
-    ...     if 'value' in pin:
-    ...         pin['VALUE'] = to_rkm(Quantity(pin['value']))
-    ...     for name in ['dest', 'kind', 'direction', 'VALUE', 'polarity']:
-    ...         if name in pin:
-    ...             components.append(pin[name])
-    ...     print('_'.join(components))
+    >> for pin in pins:
+    ..     components = []
+    ..     if 'value' in pin:
+    ..         pin['VALUE'] = to_rkm(Quantity(pin['value']))
+    ..     for name in ['dest', 'kind', 'direction', 'VALUE', 'polarity']:
+    ..         if name in pin:
+    ..             components.append(pin[name])
+    ..     print('_'.join(components))
     dac_ibias_out_250n_sink
     rampgen_ibias_out_2u5_src
     dac_vref_out_1v2
