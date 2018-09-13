@@ -95,3 +95,5 @@ Releases
 **Latest development release**:
     | Version: 2.4.0
     | Released: 2018-09-12
+
+    - added RKM codes example.

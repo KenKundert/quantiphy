@@ -883,3 +883,112 @@ If you do, the output of the script looks like this::
         100 BCH =   $129,040.00 10%
         100 ZEC =    $39,939.00  3%
           Total = $1,347,840.00
+
+
+.. _rkm codes example:
+
+RKM Codes Example
+-----------------
+
+RKM codes are a way of writing numbers that is often used for specifying the 
+sizes of resistors and capacitors on schematics and on the components 
+themselves.  In RKM codes the radix is replaced by the scale factor and the 
+units are suppressed.  Doing so results in a compact representation that is less 
+likely to be misinterpreted if the number is poorly rendered.  For example, 
+a 6.8KΩ could be read as 68KΩ if the decimal point is somehow lost.  The RKM 
+version of 6.8KΩ is 6K8.  RKM codes are described on `Wikipedia 
+<https://en.wikipedia.org/wiki/RKM_code>`_.
+
+*QuantiPhy* does not support RKM codes directly, but you can download 
+a companion package `rkm_codes <https://github.com/KenKundert/rkm_codes>`_ from 
+GitHub, or you can download and install it with pip::
+
+    pip3 install --user rkm_codes
+
+Originally RKM codes were limited to resistors and capacitors. IEC60062 is an 
+international standard that codifies RKM codes for this use. It assumes that 
+large values are resistances and small values are capacitances. The *rkm_codes* 
+package provides a more general version of RKM codes by default, but it can be 
+configured to conform to the standard by setting *rkm_maps* as follows:
+
+.. code-block:: python
+
+    >>> from rkm_codes import from_rkm, to_rkm
+    >>> from rkm_codes import set_prefs, IEC60062_MAPS
+    >>> set_prefs(rkm_maps=IEC60062_MAPS)
+
+    >>> r = from_rkm('6k8')
+    >>> r
+    Quantity('6.8 kΩ')
+
+    >>> c = from_rkm('4u7')
+    >>> c
+    Quantity('4.7 μF')
+
+    >>> to_rkm(r)
+    '6k8'
+
+    >>> to_rkm(c)
+    '4u7'
+
+You can also use RKM codes for values other than just resistances and 
+capacitances.  In this case, the RKM codes are treated as being unitless, but 
+you can specify the units along with the RKM code.
+
+.. code-block:: python
+
+    >>> from rkm_codes import from_rkm, to_rkm
+    >>> from rkm_codes import set_prefs, UNITLESS_MAPS
+    >>> set_prefs(rkm_maps=UNITLESS_MAPS)
+
+    >>> r = from_rkm('6k8')
+    >>> r
+    Quantity('6.8k')
+
+    >>> r = from_rkm('6k8Ω')
+    >>> r
+    Quantity('6.8 kΩ')
+
+    >>> i = from_rkm('2n5A')
+    >>> i
+    Quantity('2.5 nA')
+
+    >>> to_rkm(i)
+    '2n5'
+
+    >>> to_rkm(i, show_units=True)
+    '2u5A'
+
+This is the default mode of *rkm_codes*, so it is not necessary to use 
+*set_prefs* to explicitly set *rkm_maps* to *UNITLESS_MAPS* if you prefer this 
+mode.
+
+As a practical example of the use of RKM codes, imagine wanting a program that 
+creates pin names for an electrical circuit based on a naming convention.  It 
+would take a table of pin characteristics that are used to create the names.
+
+For example::
+
+    >>> from quantiphy import Quantity
+    >>> from rkm_codes import to_rkm, set_prefs as set_rkm_prefs
+
+    >>> pins = [
+    ...     dict(kind='ibias', direction='out', polarity='sink', dest='dac', value='250nA'),
+    ...     dict(kind='ibias', direction='out', polarity='src', dest='rampgen', value='2.5μA'),
+    ...     dict(kind='vref', direction='out', dest='dac', value='1.25V'),
+    ...     dict(kind='vdda', direction='in', value='2.5V'),
+    ... ]
+    >>> set_rkm_prefs(map_sf={}, units_to_rkm_base_code=None)
+
+    >>> for pin in pins:
+    ...     components = []
+    ...     if 'value' in pin:
+    ...         pin['VALUE'] = to_rkm(Quantity(pin['value']))
+    ...     for name in ['dest', 'kind', 'direction', 'VALUE', 'polarity']:
+    ...         if name in pin:
+    ...             components.append(pin[name])
+    ...     print('_'.join(components))
+    dac_ibias_out_250n_sink
+    rampgen_ibias_out_2u5_src
+    dac_vref_out_1v2
+    vdda_in_2v5
