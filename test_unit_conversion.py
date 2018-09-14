@@ -247,6 +247,17 @@ def test_add():
     for contribution in [1.23, 4.56, 7.89]:
         total = total.add(contribution)
     assert total.render() == '$13.68'
+    for contribution in [1.23, 4.56, 8.89]:
+        total = total.add(contribution, check_units=True)
+    assert total.render() == '$28.36'
+    for contribution in [1.23, 4.56, 9.89]:
+        total = total.add(Quantity(contribution, '$'), check_units=True)
+    assert total.render() == '$44.04'
+    try:
+        total = total.add(Quantity(contribution, 'lbs'), check_units=True)
+        assert False
+    except TypeError:
+        assert True
 
 def test_coversion():
     conversion = UnitConversion('USD', 'BTC', 100000)

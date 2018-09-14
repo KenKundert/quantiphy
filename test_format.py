@@ -349,6 +349,7 @@ def test_render():
     assert q.fixed(strip_zeros=False) == '1420405751.7860 Hz'
     assert q.fixed(show_label=True) == 'f = 1420405751.786 Hz'
     assert q.fixed(show_label=True, show_commas=True) == 'f = 1,420,405,751.786 Hz'
+    assert q.render(form='fixed') == '1420405751.786 Hz'
 
     q=Quantity('$1M')
     assert q.render(strip_zeros=True) == '$1M'
@@ -360,3 +361,4 @@ def test_render():
     assert q.fixed(strip_zeros=True, strip_radix=False) == '$1000000.'
     assert q.fixed(prec='full') == '$1000000'
     assert q.fixed(prec='full', strip_zeros=False) == '$1000000.000000000000'
+    assert q.render(form='fixed') == '$1000000'
