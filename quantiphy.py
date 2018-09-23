@@ -1713,7 +1713,7 @@ class Quantity(float):
                 sf = self.unity_sf
             else:
                 sf = ''
-        elif form == 'si':
+        elif form in ['si', True]:  # True is included for backward compatibility
             if index > 0:
                 if index <= len(BIG_SCALE_FACTORS):
                     if BIG_SCALE_FACTORS[index-1] in self.output_sf:
@@ -1724,7 +1724,8 @@ class Quantity(float):
                     if SMALL_SCALE_FACTORS[index-1] in self.output_sf:
                         sf = SMALL_SCALE_FACTORS[index-1]
         else:
-            assert form == 'eng', '{}: unknown form.'.format(form)
+            assert form in ['eng', False], '{}: unknown form.'.format(form)
+                # False is included for backward compatibility
 
         # render the scale factor if appropriate
         if self.map_sf:
