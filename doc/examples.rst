@@ -312,7 +312,7 @@ This example assumes that a collection of time duration values are contained in
 a configuration file, in this example represented by *configuration*. Normally 
 these values would be contained in a separate file that is opened and read, but 
 for the sake of simplicity in the example, the 'contents' of the file is just 
-given as a multiline string. The user can given the durations using any units 
+given as a multiline string. The user can give the durations using any units 
 they like, but internally they are all converted to seconds.
 
 .. code-block:: python
@@ -799,13 +799,13 @@ It demonstrates some of the features of *UnitConversion*.
     conversions = r.json()
 
     # define unit conversions
-    units = {
-        'USD': ('$', 'USD'),
-        'BTC': ('Ƀ', 'BTC'),
-        'ETH': ('Ξ', 'ETH'),
-        'BCH': ('BCH',    ),
-        'ZEC': ('ZEC',    ),
-    }
+    units = dict(
+        USD = ('$', 'USD'),
+        BTC = ('Ƀ', 'BTC'),
+        ETH = ('Ξ', 'ETH'),
+        BCH = ('BCH',    ),
+        ZEC = ('ZEC',    ),
+    )
     def get_converter(fm, to):
         return UnitConversion(units[to], units[fm], conversions[fm][to])
     btc2usd = get_converter('BTC', 'USD')
