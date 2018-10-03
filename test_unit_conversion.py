@@ -9,16 +9,28 @@ def test_simple_scaling():
     with Quantity.prefs(
         spacer=None, show_label=None, label_fmt=None, label_fmt_full=None
     ):
-        q=Quantity('1kg')
-        assert q.render() == '1 kg'
-        assert q.render(scale=0.001, show_units=False) == '1'
+        q=Quantity('1kg', scale=2)
+        qs=Quantity('2ms')
+        assert q.render() == '2 kg'
+        assert qs.render() == '2 ms'
+        assert q.render(scale=0.001) == '2 g'
+        assert str(q.scale(0.001)) == '2 g'
+        assert q.render(scale=qs) == '4 g'
+        assert str(q.scale(qs)) == '4 g'
         with pytest.raises(KeyError) as exception:
             q.render(scale='fuzz')
+        assert exception.value.args[0] == "Unable to convert between 'fuzz' and 'g'."
+        with pytest.raises(KeyError) as exception:
+            q.scale('fuzz')
         assert exception.value.args[0] == "Unable to convert between 'fuzz' and 'g'."
 
         q=Quantity('1', units='g', scale=1000)
         assert q.render() == '1 kg'
         assert q.render(scale=(0.0022046, 'lbs')) == '2.2046 lbs'
+        assert str(q.scale((0.0022046, 'lbs'))) == '2.2046 lbs'
+
+        q=Quantity('1', units='g', scale=qs)
+        assert q.render() == '2 mg'
 
         q=Quantity('1', scale=(1000, 'g'))
         assert q.render() == '1 kg'
@@ -33,6 +45,7 @@ def test_simple_scaling():
         q=Quantity('-40 dBV', scale=adB)
         assert q.render() == '10 mV'
         assert q.render(scale=dB) == '-40 dBV'
+        assert str(q.scale(dB)) == '-40 dBV'
 
 def test_temperature():
     with Quantity.prefs(

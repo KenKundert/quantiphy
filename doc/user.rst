@@ -139,18 +139,24 @@ provides many of the most common conversions for you:
     93.206 Mmiles
 
 
-Specifying a Quantity Value
-...........................
+Specifying Quantities
+.....................
 
-Normally, creating a quantity takes one or two arguments.  The first is taken to 
-be the value, and the second, if given, is taken to be the model, which is 
-a source of default values.  The value may be given as a float, as a string, or 
-as a quantity.  The string may be the name of a known constant or it may 
-represent a number. If the string represents a number, it may be in floating 
-point notation, in E-notation (ex: 1.2e+3), or use SI scale factors. It may also 
-include the units.  And like Python in general, the numbers may include 
-underscores to make them easier to read (they are ignored).  For example, any of 
-the following ways can be used to specify 1ns:
+Normally, creating a :class:`quantiphy.Quantity` takes one or two arguments.  
+The first is taken to be the value, and the second, if given, is taken to be the 
+model, which is a source of default values.
+
+
+The First Argument: The Value
+"""""""""""""""""""""""""""""
+
+The value may be given as a float, as a string, or as a quantity.  The string 
+may be the name of a known constant or it may represent a number. If the string 
+represents a number, it may be in floating point notation, in E-notation (ex: 
+1.2e+3), or use SI scale factors. It may also include the units.  And like 
+Python in general, the numbers may include underscores to make them easier to 
+read (they are ignored).  For example, any of the following ways can be used to 
+specify 1ns:
 
 .. code-block:: python
 
@@ -185,7 +191,7 @@ If given as a string, the value may also be the name of a known :ref:`constant
     13.806e-24 J/K
     160.22e-21 C
 
-The following constants are pre-defined: *h*, *ħ*, *k*, *q*, *c*, *0°C'*, *ε₀*, 
+The following constants are pre-defined: *h*, *ħ*, *k*, *q*, *c*, *0°C*, *ε₀*, 
 *μ₀*, and *Z₀*. You may add your own constants.
 
 Currency units ($£€ɃΞ) are a bit different than other units, they are placed 
@@ -258,8 +264,12 @@ For example:
     >>> print(f'{period.name} = {period}  # {period.desc}')
     Tclk = 10 ns  # clock period
 
+
+The Second Argument: The Model
+""""""""""""""""""""""""""""""
+
 If you only specify a real number for the value, then the units, name, and 
-description do not get values. Even if given as a string or quantity the value 
+description do not get values. Even if given as a string or quantity, the value 
 may not contain these extra attributes. This is where the second argument, the 
 model, helps.  It may be another quantity or it may be a string.  Any attributes 
 that are not provided by the first argument are taken from the second if 
@@ -287,9 +297,23 @@ units are inherited. For example:
     >>> print(f'{freq.name} = {freq} -- {freq.desc}')
     Fin = 100 MHz -- input frequency
 
-In addition, you can explicitly specify the units, the name, and the description 
-using named arguments. These values override anything specified in the value or 
-the model.
+If the model contains units, those units are only used if the value does not 
+have units. The same is true for the description. For example:
+
+    >>> h = Quantity('18in', 'm')
+    >>> print(h)
+    18 in
+
+
+The Remaining Arguments
+"""""""""""""""""""""""
+
+Any arguments beyond the first two should be given as named arguments (though 
+not a requirement at the moment, it eventually will be).
+
+If you need to override the name, units or the description given in either the 
+value or the model, you can do so by specifying them with corresponding named 
+arguments.  For example:
 
 .. code-block:: python
 
@@ -300,8 +324,40 @@ the model.
     >>> print(f'{out_period.name} = {out_period} -- {out_period.desc}')
     output period = 100 ns -- period at output of frequency divider
 
-Finally, you can overwrite the quantity's attributes to override the units, 
-name, or description.
+In this the value is ``10*period``, which is a float and so has no name, units, 
+or description attributes, but the model is ``period`` that has all three 
+attributes, but the name name and description, coming from a quantity, are 
+ignored. As such, they specified explicitly using the *name* and *desc* named 
+arguments.
+
+Finally, you can also specify *scale* and *ignore_sf* as named arguments.  
+*scale* allows you to scale the value or convert it to different units. It is 
+described :ref:`in a bit <scaling upon creation>`. *ignore_sf* indicates that 
+any scale factors should be ignored. This is one way of handling units whose 
+name starts with a scale factor character. For example:
+
+    >>> l = Quantity('1meter')                              # length in milli-eters
+    >>> print(l, l.real, l.units, sep=', ')
+    1 meter, 0.001, eter
+
+    >>> l = Quantity('1m', ignore_sf=True)                  # length in meters
+    >>> print(l, l.real, l.units, sep=', ')
+    1 m, 1.0, m
+
+    >>> d = Quantity('1m', units = 'mile', ignore_sf=True)  # distance in miles
+    >>> print(d, d.real, d.units, sep=', ')
+    1 mile, 1.0, mile
+
+    >>> t = Quantity('1m', units = 'min', ignore_sf=True)   # duration in minutes
+    >>> print(t, t.real, t.units, sep=', ')
+    1 min, 1.0, min
+
+
+Quantity Attributes
+"""""""""""""""""""
+
+Finally, you can overwrite :class:`quantiphy.Quantity` attributes to override 
+the units, name, or description.
 
 .. code-block:: python
 
@@ -312,6 +368,14 @@ name, or description.
     >>> print(f'{out_period.name} = {out_period} -- {out_period.desc}')
     output period = 100 ns -- period at output of frequency divider
 
+In addition, you can also override the preferences with attributes:
+
+    >>> out_period.spacer = ''
+    >>> print(out_period)
+    100ns
+
+
+.. _scaling upon creation:
 
 Scaling When Creating a Quantity
 ................................
@@ -513,13 +577,33 @@ then uses the new value to create a new Quantity. For example:
 
 Any value that can be passed to the *scale* argument for 
 :class:`quantiphy.Quantity` or :meth:`quantiphy.Quantity.render` can be passed 
-to the *scale* method.
+to the *scale* method. Specifically, the following types are accepted:
 
-.. code-block:: python
+float or Quantity:
+    The argument scales the existing value (a new quantity is returned whose 
+    value equals the existing quantity multiplied by scale). In this case the 
+    scale is assumed unitless (any units are ignored) and so the units of the 
+    new quantity are the same as those of the underlying quantity.
 
-    >>> Tboil_C = Tboil.scale('C')
-    >>> print(Tboil_C)
-    100 C
+tuple:
+    The argument consists of two values. Tthe first value, a float, is treated 
+    as a scale factor. The the second value, a string, is taken to be the units 
+    of the new quantity.
+
+function:
+    The function takes two arguments, the value and the units of the quantity 
+    and it returns two values, the value and units of the new value.
+
+string:
+    The argument is taken to the be desired units. This value along with the 
+    units of the underlying quantity are used to select a known unit conversion, 
+    which is applied to create the new value.
+
+    .. code-block:: python
+
+        >>> Tboil_C = Tboil.scale('C')
+        >>> print(Tboil_C)
+        100 C
 
 
 Creating a Quantity by Adding to an Existing Quantity

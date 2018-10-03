@@ -646,8 +646,8 @@ class Quantity(float):
         Overrides the units taken from *value* or *model*.
 
     :arg scale:
-        - If a float, it multiplies by the given value to compute the value of
-          the quantity.
+        - If a float or quantity, it multiplies by the given value to compute
+          the value of the quantity.  If a quantity, the units are ignored.
         - If a tuple, the first value, a float, is treated as a scale factor
           and the second value, a string, is take to be the units of the
           quantity.
@@ -656,7 +656,7 @@ class Quantity(float):
         - If a string, it is taken to the be desired units. This value along
           with the units of the given value are used to select a known unit
           conversion, which is applied to create the quantity.
-    :type scale: float, tuple, func, or string
+    :type scale: float, tuple, func, string, or quantity
 
     :arg str name:
         Overrides the name taken from *value* or *model*.
@@ -1480,18 +1480,23 @@ class Quantity(float):
         """Scale a quantity to create a new quantity.
 
         :arg scale:
-            - If a float, it scales the displayed value (the quantity is
-              multiplied by scale before being converted to the string).
+            - If a float, it scales the existing value (a new quantity is
+              returned whose value equals the existing quantity multiplied by
+              scale. In this case the scale is assumed unitless and so the units
+              of the new quantity are the same as those of the existing
+              quantity).
             - If a tuple, the first value, a float, is treated as a scale factor
-              and the second value, a string, is take to be the units of the
-              displayed value.
+              and the second value, a string, is taken to be the units of the
+              new quantity.
             - If a function, it takes two arguments, the value and the units of
               the quantity and it returns two values, the value and units of
-              the displayed value.
+              the new value.
             - If a string, it is taken to the be desired units. This value along
               with the units of the quantity are used to select a known unit
-              conversion, which is applied to create the displayed value.
-        :type scale: real, pair, function, or string
+              conversion, which is applied to create the new value.
+            - If a quantity, the units are ignored and the scale is treated as
+              if were specified as a unitless float.
+        :type scale: real, pair, function, string, or quantity
 
         :raises KeyError:
             A unit conversion was requested and there is no corresponding unit
@@ -1517,9 +1522,14 @@ class Quantity(float):
             The amount to add to the quantity.
         :type addend: real, quantity
 
+        :arg check_units:
+            If True, raise a TypeError if the units of the *addend* are not
+            compatible with the underlying quantity. If the *addend* does not have units, then it is considered compatible
+            unless *check_units* is 'strict'.
+        :type addend: boolean or 'strict'
+
         :raises TypeError:
             Units of contribution do not match those of underlying quantity.
-            converter.
 
         Example::
 
@@ -1534,7 +1544,8 @@ class Quantity(float):
             if check_units and self.units != addend.units:
                 raise TypeError
         except AttributeError:
-            pass
+            if check_units == 'strict':
+                raise TypeError
         return self.__class__(self.real + addend, self.units)
 
     # render() {{{2
@@ -1581,8 +1592,9 @@ class Quantity(float):
         :type strip_radix: boolean
 
         :arg scale:
-            - If a float, it scales the displayed value (the quantity is
-              multiplied by scale before being converted to the string).
+            - If a float or a quantity, it scales the displayed value (the
+              quantity is multiplied by scale before being converted to the
+              string).  If a quantity, the units are ignored.
             - If a tuple, the first value, a float, is treated as a scale factor
               and the second value, a string, is take to be the units of the
               displayed value.
@@ -1592,7 +1604,7 @@ class Quantity(float):
             - If a string, it is taken to the be desired units. This value along
               with the units of the quantity are used to select a known unit
               conversion, which is applied to create the displayed value.
-        :type scale: real, pair, function, or string
+        :type scale: real, pair, function, string, or quantity
 
         :raises KeyError:
             A unit conversion was requested and there is no corresponding unit

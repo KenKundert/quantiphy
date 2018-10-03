@@ -87,7 +87,7 @@ def test_misc():
     assert q.desc == ''
 
 
-
+def test_misc2():
     class Foo(Quantity):
         pass
     Foo.set_prefs(assign_rec=r'(?P<name>\w+)\s*=\s*(?P<val>.*)')
@@ -402,6 +402,7 @@ def test_misc():
     assert c.render(show_label='a') == 'c: 299.79 Mm/s'
 
 
+def test_converters():
     mvi_raw_conv = '''
 Status @ 0.00000000e+00s: Tests started for mylib.sh:MiM.
     Assertion successfully detects expected fault @ 1.00013334e-04s in sh_tb.REF (sh): 'V(cm)' out of range.
@@ -556,5 +557,23 @@ Summary @ 900.51 us: 7 tests run, 1 failures detected, 0 faults detected, 0 test
     assert processed == '1420.40575e+6+1420.40575e+6'
 
 
+def test_add():
+    q1 = Quantity('1ns')
+    q2 = Quantity('2ns')
+    assert str(q1.add(q2)) == '3 ns'
+    assert str(q2.add(q1)) == '3 ns'
+    assert str(q1.add(q2, check_units=False)) == '3 ns'
+    assert str(q1.add(q2, check_units=True)) == '3 ns'
+    assert str(q1.add(q2, check_units='strict')) == '3 ns'
+    assert str(q1.add(2e-9, check_units=False)) == '3 ns'
+    assert str(q1.add(2e-9, check_units=True)) == '3 ns'
+    with pytest.raises(TypeError) as exception:
+        q1.add(2e-9, check_units='strict')
+    q3 = Quantity('2nm')
+    assert str(q1.add(q3, check_units=False)) == '3 ns'
+    with pytest.raises(TypeError) as exception:
+        q1.add(q3, check_units=True)
+    with pytest.raises(TypeError) as exception:
+        q1.add(q3, check_units='strict')
 
 
