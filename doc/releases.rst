@@ -93,7 +93,7 @@ Releases
     - Enhance UnitConversion so that it supports nonlinear conversions.
 
 **Latest development release**:
-    | Version: 2.4.0
-    | Released: 2018-09-12
+    | Version: 2.5.0
+    | Released: 2018-10-03
 
     - added RKM codes example.
