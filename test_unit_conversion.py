@@ -305,7 +305,7 @@ def test_coversion():
     assert str(dollar) == '200 kUSD'
 
     conversion = UnitConversion('F', 'C', 1.8, 32)
-    assert str(conversion) == 'F = 1.8*C + 32 F'
+    assert str(conversion) == 'F = 1.8*C + 32'
 
     result = conversion.convert(0, 'C', 'F')
     assert str(result) == '32 F'

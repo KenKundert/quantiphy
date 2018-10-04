@@ -131,7 +131,7 @@ class UnitConversion(object):
 
     Or, if *slope* is callable:
 
-        *new_value* = *slope*(*given_value*)
+        *new_value* = *slope* (*given_value*)
 
     In this case the name *slope* is misleading.
 
@@ -143,7 +143,7 @@ class UnitConversion(object):
 
     Or, if *intercept* is callable:
 
-        *new_value* = *intercept*(*given_value*)
+        *new_value* = *intercept* (*given_value*)
 
     In this case the name *intercept* is misleading.
 
@@ -186,7 +186,7 @@ class UnitConversion(object):
 
         >>> conversion = UnitConversion('F', 'C', 1.8, 32)
         >>> print(str(conversion))
-        F = 1.8*C + 32 F
+        F = 1.8*C + 32
 
     You can also use functions to perform the conversions, which is appropriate
     when the conversion is nonlinear (cannot be described with a slope and
@@ -357,7 +357,7 @@ class UnitConversion(object):
         if self.intercept:
             return '{} = {}*{} + {}'.format(
                 self.to_units[0], self.slope, self.from_units[0],
-                Quantity(self.intercept, self.to_units[0])
+                Quantity(self.intercept, self.to_units[0]).render(show_units=False)
             )
         return '{} = {}*{}'.format(
             self.to_units[0], self.slope, self.from_units[0]
