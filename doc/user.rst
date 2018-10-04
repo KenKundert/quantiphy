@@ -87,9 +87,9 @@ example, to create a quantity from a string you can use:
     >>> print(distance_to_sun)
     150 Gm
 
-Now *distance_to_sun* contains two items, the number 150000000000.0 and the 
-units 'm'.  The 'G' was interpreted as the *giga* scale factor, which scales by 
-10\ :sup:`9`.
+Now *distance_to_sun* contains an object with two values, the number 
+150000000000.0 and the units 'm'.  The 'G' was interpreted as the *giga* scale 
+factor, which scales 150 by 10\ :sup:`9`.
 
 It is worth considering the alternative for a moment:
 
@@ -336,9 +336,9 @@ described :ref:`in a bit <scaling upon creation>`. *ignore_sf* indicates that
 any scale factors should be ignored. This is one way of handling units whose 
 name starts with a scale factor character. For example:
 
-    >>> l = Quantity('1meter')                              # length in milli-eters
-    >>> print(l, l.real, l.units, sep=', ')
-    1 meter, 0.001, eter
+    >>> x = Quantity('1m')                                  # unitless value
+    >>> print(x, x.real, x.units, sep=', ')
+    1m, 0.001, 
 
     >>> l = Quantity('1m', ignore_sf=True)                  # length in meters
     >>> print(l, l.real, l.units, sep=', ')
@@ -495,7 +495,7 @@ This unit conversion says, when converting units of 'm' to either 'pc' or
     >>> print(d_sol)
     5 upc
 
-:class:`quantiphy.UnitConversion`: supports linear conversions (slope only), 
+:class:`quantiphy.UnitConversion` supports linear conversions (slope only), 
 affine conversions (slope and intercept) and nonlinear conversions.
 
 Notice that the return value of *UnitConversion* was not used. It is enough to 
@@ -566,8 +566,10 @@ then uses the new value to create a new Quantity. For example:
 
     >>> h_line = Quantity('1420.405751786 MHz')
     >>> sagan = h_line.scale(math.pi)
-    >>> print(sagan)
+    >>> sagan2 = sagan.scale(2)
+    >>> print(sagan, sagan2, sep='\n')
     4.4623 GHz
+    8.9247 GHz
 
     >>> type(h_line)
     <class 'quantiphy.Quantity'>
@@ -580,8 +582,8 @@ Any value that can be passed to the *scale* argument for
 to the *scale* method. Specifically, the following types are accepted:
 
 float or Quantity:
-    The argument scales the existing value (a new quantity is returned whose 
-    value equals the existing quantity multiplied by scale). In this case the 
+    The argument scales the underlying value (a new quantity is returned whose 
+    value equals the underlying quantity multiplied by scale). In this case the 
     scale is assumed unitless (any units are ignored) and so the units of the 
     new quantity are the same as those of the underlying quantity.
 
@@ -637,9 +639,9 @@ just interested in its numeric value, you access it with:
     >>> float(h_line)
     1420405751.786
 
-Or you can use a quantity in the same way that you would use any real number, 
-meaning that you can use it in expressions and it will evaluate to its numeric 
-value:
+Or you can simply use a quantity in the same way that you would use any real 
+number, meaning that you can use it in expressions and it evaluates to its 
+numeric value:
 
 .. code-block:: python
 
@@ -726,6 +728,10 @@ of converting a quantity to a string. For example:
     >>> h_line.render(prec=6)
     '1.420406 GHz'
 
+    >>> h_line.render(form='fixed', prec=2)
+    '1420405751.79 Hz'
+
+
 *show_label* allows you to display the name and description of the quantity when 
 rendering. If *show_label* is *False*, the quantity is not labeled with the name 
 or description. Otherwise the quantity is labeled under the control of the 
@@ -760,14 +766,14 @@ You can also access the full precision of the quantity:
     >>> h_line.render(prec='full')
     '1.420405751786 GHz'
 
-    >>> h_line.render(form='eng',  prec='full')
+    >>> h_line.render(form='eng', prec='full')
     '1.420405751786e9 Hz'
 
 Full precision implies whatever precision was used when specifying the quantity 
 if it was specified as a string and if the *keep_components* preference is True.  
 Otherwise a fixed number of digits, specified in the *full_prec* preference, is 
 used (default=12).  Generally one uses 'full' when generating output that is 
-intended to be read by a machine.
+intended to be read by a machine without loss of precision.
 
 An alternative to *render* is :meth:`quantiphy.Quantity.fixed`. It converts the 
 quantity to a string in fixed-point format:
@@ -778,6 +784,11 @@ quantity to a string in fixed-point format:
     >>> print(total.fixed(prec=2, show_commas=True, strip_zeros=False))
     $11,200,000.00
 
+You can also use *render* to produce a fixed format, but it does not support all 
+of the options available with *fixed*:
+
+    >>> print(total.render(form='fixed', prec=2))
+    $11200000
 
 Scaling When Rendering a Quantity
 .................................
@@ -794,7 +805,7 @@ in grams and wanting to present it in either kilograms or in pounds:
     >>> print('mass (kg): %s' % m.render(show_units=False, scale=0.001))
     mass (kg): 2.529
 
-    >>> print(m.render(scale=(0.0022046, 'lb'), form='eng'))
+    >>> print(m.render(scale=(0.0022046, 'lb'), form='fixed'))
     5.5754 lb
 
 As before, functions can also be used to do the conversion. Here is an example 
@@ -1576,9 +1587,9 @@ substrings are also used to introduce comments, so you could start a line with
 '#' and it would be treated as a comment.
 If the line is not recognized, then it is ignored.
 
-In this example, the first line is nonconforming and so is ignored. The last is 
-a comment, the comment character any anything beyond is ignored. Finally, empty 
-lines are ignored.
+In this example, the first line is nonconforming and so is ignored. The second 
+*Kvdo* line is a comment, the comment character and anything beyond is ignored.  
+Finally, empty lines are ignored.
 
 .. code-block:: python
 

@@ -53,13 +53,21 @@ quantities (`alternatives <https://kdavies4.github.io/natu/seealso.html>`_).
 However, as a rule, they focus on the units rather than the scale factors. In 
 particular, they build a system of units that you are expected to use throughout 
 your calculations.  These packages demand a high level of commitment from their 
-users and in turn provide unit consistency and built-in unit conversions.  In 
-contrast, *QuantiPhy* treats units basically as documentation.  They are simply 
-strings that are attached to quantities largely so they can be presented to the 
-user when the values are printed. As such, *QuantiPhy* is a light-weight package 
-that demands little from the user. It is used when inputting and outputting 
-values, and then only when it provides value. As a result, it provides 
-a simplicity in use that cannot be matched by the other packages.
+users and in turn provide unit consistency and built-in unit conversions.
+
+In contrast, *QuantiPhy* treats units basically as documentation.  They are 
+simply strings that are attached to quantities largely so they can be presented 
+to the user when the values are printed. As such, *QuantiPhy* is a light-weight 
+package that demands little from the user.  It is used when inputting and 
+outputting values, and then only when it provides value.  As a result, it 
+provides a simplicity in use that cannot be matched by the other packages.
+
+In addition, these alternative packages generally build their unit systems upon 
+the `SI base units <https://en.wikipedia.org/wiki/SI_base_unit>`, which tends to 
+restrict usage to physical quantities with static conversion factors.  They are 
+less suited to non-physical quantities or conversion factors that change 
+dynamically, such as with currencies.  *QuantiPhy* gracefully handles all of 
+these cases.
 
 
 Quick Start
@@ -69,7 +77,7 @@ Install with::
 
    pip3 install quantiphy
 
-Requires Python3.3 or better.  Python2.7 is also supported, however support for 
+Requires Python3.4 or better.  Python2.7 is also supported, however support for 
 unicode is weak.
 
 You use *Quantity* to convert numbers and units in various forms to quantities:
