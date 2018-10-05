@@ -2188,6 +2188,9 @@ class Quantity(float):
             8.9247 GHz
 
         """
+        def is_quoted(s):
+            return (s[0] == '"' and s[-1] == '"') or (s[0] == "'" and s[-1] == "'")
+
         if not predefined:
             predefined = {}
         quantities = {}
@@ -2211,7 +2214,7 @@ class Quantity(float):
                 except (ValueError, TypeError):
                     # extract the units if given (they are embedded in "")
                     components = value.split()
-                    if components[-1][0] == '"' and components[-1][-1] == '"':
+                    if len(components) >= 2 and is_quoted(components[-1]):
                         units = components[-1][1:-1]
                         value = ' '.join(components[:-1])
                     else:

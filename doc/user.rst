@@ -1161,11 +1161,11 @@ You can create your own constants and unit systems using
 .. code-block:: python
 
     >>> from quantiphy import Quantity, add_constant
-    >>> add_constant(Quantity("λh: 211.061140539mm // wavelength of hydrogen line"))
+    >>> add_constant(Quantity("λₕ: 211.061140539mm // wavelength of hydrogen line"))
 
-    >>> hy_wavelength = Quantity('λh')
+    >>> hy_wavelength = Quantity('λₕ')
     >>> print(hy_wavelength.render(show_label=True))
-    λh = 211.06 mm -- wavelength of hydrogen line
+    λₕ = 211.06 mm -- wavelength of hydrogen line
 
 In this case is the name given in the quantity is used when creating the 
 constant.  You can also specify an alias as an argument to *add_constant*.
@@ -1173,13 +1173,13 @@ constant.  You can also specify an alias as an argument to *add_constant*.
 .. code-block:: python
 
     >>> add_constant(
-    ...     Quantity("λh = 211.061140539mm # wavelength of hydrogen line"),
+    ...     Quantity("λₕ = 211.061140539mm # wavelength of hydrogen line"),
     ...     alias='lambda h'
     ... )
 
     >>> hy_wavelength = Quantity('lambda h')
     >>> print(hy_wavelength.render(show_label=True))
-    λh = 211.06 mm -- wavelength of hydrogen line
+    λₕ = 211.06 mm -- wavelength of hydrogen line
 
 It is not necessary to specify both the name and the alias, one is sufficient, 
 but the constant is accessible using either.  Notice that the alias does not 
@@ -1310,7 +1310,7 @@ quantity.
 
     >>> hy_wavelength.show_label = True
     >>> print(hy_wavelength)
-    λh = 211.06 mm -- wavelength of hydrogen line
+    λₕ = 211.06 mm -- wavelength of hydrogen line
 
 This is often the way to go with quantities that have :index:`logarithmic units`
 such as decibels (:index:`dB`) or shannons (Sh) (or the related bit, digits, 
@@ -1654,61 +1654,73 @@ a version that displays the name and description by default.
     N = 128            -- Divide ratio
     Fout = 19.968 GHz  -- Output Frequency
 
-With :meth:`quantiphy.Quantity.extract()`  the values of quantities can be given 
+With :meth:`quantiphy.Quantity.extract()` the values of quantities can be given 
 as a expression that contains previously defined quantities (or :ref:`physical 
-constants <constants>` or select mathematical constants (pi, tau, π, or τ).  For 
-example:
+constants <constants>` or select mathematical constants (pi, tau, π, or τ).  You 
+can follow an expression with a string to give the units. Finally, you can use 
+the *predefined* argument to pass in a dictionary of named values that can be 
+used in your expressions.  For example:
 
 .. code-block:: python
 
     #!/usr/bin/env python3
-    """
-    Simulates a second-order ΔΣ modulator with the following parameter values:
-
-        Fclk = 50MHz        -- clock frequency
-        Fin = 200kHz        -- input frequency
-        Vin = 950mV         -- input voltage amplitude (peak)
-        gain1 = 0.5V/V      -- gain of first integrator
-        gain2 = 0.5V/V      -- gain of second integrator
-        Vmax = 1V           -- quantizer maximum input voltage
-        Vmin = -1V          -- quantizer minimum input voltage
-        levels = 5          -- quantizer output levels
-        Tstop = 2/Fin "s"   -- simulation stop time
-        Tstart = -1/Fin "s" -- initial transient interval (discarded)
-
-    The values given above are used in the simulation, no further
-    modification of the code given below is required when changing
-    these parameters.
-    """
-
-    from quantiphy import Quantity
-
-    parameters = Quantity.extract(__doc__)
-    globals().update(parameters)
-
-    print('Simulation parameters:')
-    for v in parameters.values():
-        print('   ', v.render(show_label='f'))
-
+    >>> __doc__ = """
+    ... Simulates a second-order ΔΣ modulator with the following parameter values:
     ...
+    ...     Fclk = Fxtal/4 "Hz"                  -- clock frequency
+    ...     Fin = 200kHz                         -- input frequency
+    ...     Vin = 950mV                          -- input voltage amplitude (peak)
+    ...     gain1 = 0.5V/V                       -- gain of first integrator
+    ...     gain2 = 0.5V/V                       -- gain of second integrator
+    ...     Vmax = 1V                            -- quantizer maximum input voltage
+    ...     Vmin = -1V                           -- quantizer minimum input voltage
+    ...     levels = 5                           -- quantizer output levels
+    ...     Tstop = 2/Fin "s"                    -- simulation stop time
+    ...     Tstart = -1/Fin 's'                  -- initial transient interval (discarded)
+    ...     file_name = 'out.wave'               -- output filename
+    ...     sim_name = f'{Fclk:q} ΔΣ Modulator'  -- simulation name
+    ...
+    ... The values given above are used in the simulation, no further
+    ... modification of the code given below is required when changing
+    ... these parameters.
+    ... """
 
-This example produces::
+    >>> from quantiphy import Quantity
 
+    >>> Fxtal = Quantity('200 MHz')
+    >>> parameters = Quantity.extract(__doc__, predefined=dict(Fxtal=Fxtal))
+    >>> globals().update(parameters)
+
+    >>> with Quantity.prefs(
+    ...         label_fmt='{n} = {v}',
+    ...         label_fmt_full='{V:<18}  -- {d}',
+    ...         show_label='f',
+    ... ):
+    ...     print('Simulation parameters:')
+    ...     for k, v in parameters.items():
+    ...         try:
+    ...             print(f'    {v:Q}')
+    ...         except ValueError:
+    ...             print(f'    {k} = {v!s}')
     Simulation parameters:
-        Fclk = 50 MHz -- clock frequency
-        Fin = 200 kHz -- input frequency
-        Vin = 950 mV -- input voltage amplitude (peak)
-        gain1 = 500 mV/V -- gain of first integrator
-        gain2 = 500 mV/V -- gain of second integrator
-        Vmax = 1 V -- quantizer maximum input voltage
-        Vmin = -1 V -- quantizer minimum input voltage
-        levels = 5 -- quantizer output levels
-        Tstop = 5 us -- simulation stop time
-        Tstart = -5 us -- initial transient interval (discarded)
+        Fclk = 50 MHz       -- clock frequency
+        Fin = 200 kHz       -- input frequency
+        Vin = 950 mV        -- input voltage amplitude (peak)
+        gain1 = 500 mV/V    -- gain of first integrator
+        gain2 = 500 mV/V    -- gain of second integrator
+        Vmax = 1 V          -- quantizer maximum input voltage
+        Vmin = -1 V         -- quantizer minimum input voltage
+        levels = 5          -- quantizer output levels
+        Tstop = 10 us       -- simulation stop time
+        Tstart = -5 us      -- initial transient interval (discarded)
+        file_name = out.wave
+        sim_name = 50 MHz ΔΣ Modulator
 
 Notice in this case the parameters were specified and read out of the docstring 
 at the top of the file. In this way, the parameters become very easy to set and 
-the documentation is always up to date.
+the documentation is always up to date. Ignore the fact that the docstring is 
+assigned to *__doc__*. That was a hack that was needed to make the example 
+executable from within the documentation.
 
 
 .. _translate:

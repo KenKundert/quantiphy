@@ -38,18 +38,17 @@ Motivating Example
 ------------------
 
 *QuantiPhy* is a light-weight package that allows numbers to be combined with 
-units into physical quantities.  Physical quantities are very commonly 
-encountered when working with real-world systems when numbers are involved. And 
-when encountered, the numbers often use SI scale factors to make them easier to 
-read and write.  Surprisingly, most computer languages do not support numbers in 
-this form. This is even more surprising when you realize that this form is 
-a very well established international standard and has been for more than 50 
-years.
+units into quantities.  Quantities are very commonly encountered when working 
+with real-world systems when numbers are involved. And when encountered, the 
+numbers often use SI scale factors to make them easier to read and write.  
+Surprisingly, most computer languages do not support numbers in this form. This 
+is even more surprising when you realize that this form is a very well 
+established international standard and has been for more than 50 years.
 
-When working with physical quantities, one often has to choose between using 
-a form that is easy for computers to read or one that is easy for humans to 
-read. For example, consider this table of critical frequencies needed in jitter 
-tolerance measurements in optical communication:
+When working with quantities, one often has to choose between using a form that 
+is easy for computers to read or one that is easy for humans to read. For 
+example, consider this table of critical frequencies needed in jitter tolerance 
+measurements in optical communication:
 
 .. code-block:: python
 
@@ -96,21 +95,21 @@ make the table easier to interpret:
     ...     STM-256 | 39813.12      | 80      | 1920     | 16000   | 320
     ... """
 
-This looks cleaner, but it is still involves some effort to interpret because 
-the values are distant from their corresponding scaling and units, because the 
-large and small values are oddly scaled (0.5 kHz is more naturally given as 
-500Hz and 39813 MHz is more naturally given as 39.8 GHz), and because each 
-column may have a different scaling factor. While these might seem like minor 
-inconveniences on this table, they can become quite annoying as tables become 
-larger or more numerous.  This problem exists with both tables and graphs.  
-Fundamentally the issue is that your eyes are naturally drawn to the number, but 
-the numbers are not complete.  Your eyes need to hunt further and it is not 
-obvious where to hunt.  If not next to the number, the scaling and units for the 
-numbers may be found in the column headings, the axes, the labels, the title, 
-the caption, or in the body of the text.  The sheer number of places to look can 
-dramatically slow the interpretation of the data.  This problem does not exist 
-in the first table where each number is complete as it includes both its scaling 
-and its units. The eye gets the full picture on the first glance.
+This looks cleaner, but it involves perhaps even more effort to interpret 
+because the values are distant from their corresponding scaling and units, 
+because the large and small values are oddly scaled (0.5 kHz is more naturally 
+given as 500Hz and 39813 MHz is more naturally given as 39.8 GHz), and because 
+each column may have a different scaling factor. While these might seem like 
+minor inconveniences on this table, they can become quite annoying as tables 
+become larger or more numerous.  This problem exists with both tables and 
+graphs.  Fundamentally the issue is that your eyes are naturally drawn to the 
+number, but the numbers are not complete.  Your eyes need to hunt further and it 
+is not obvious where to hunt.  If not next to the number, the scaling and units 
+for the numbers may be found in the column headings, the axes, the labels, the 
+title, the caption, or in the body of the text.  The sheer number of places to 
+look can dramatically slow the interpretation of the data.  This problem does 
+not exist in the first table where each number is complete as it includes both 
+its scaling and its units. The eye gets the full picture on the first glance.
 
 This last version of the table represents a very common mistake people make when 
 presenting data. They feel that adding units and scale factors to each number 
