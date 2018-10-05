@@ -650,7 +650,7 @@ to date.
     except OSError as e:
         error(os_error(e))
 
-Notice that *level* was specified twice, but the first proceeded by `#` causing 
+Notice that *levels* was specified twice, but the first proceeded by `#` causing 
 it to be ignored.
 
 The output of this example can be used as the input to the next. With these 
@@ -760,7 +760,7 @@ the line:
 Cryptocurrency Example
 ----------------------
 
-This example is displays the current price of various cryptocurrencies and the 
+This example displays the current price of various cryptocurrencies and the 
 total value of a hypothetical portfolio of currencies. *QuantiPhy* performs 
 conversions from the prices of various currencies to dollars.  The latest prices 
 are downloaded from cryptocompare.com.  A summary of the prices is printed and 
@@ -774,22 +774,27 @@ It demonstrates some of the features of *UnitConversion*.
     #!/usr/bin/env python3
 
     import requests
-    from textwrap import dedent
+    from inform import display, fatal, os_error
     from quantiphy import Quantity, UnitConversion
-
     Quantity.set_prefs(prec=2)
 
     # holdings
-    btc = Quantity(100, 'Ƀ')
-    bch = Quantity(100, 'BCH')
-    eth = Quantity(100, 'Ξ')
-    zec = Quantity(100, 'ZEC')
-    holdings = [btc, eth, bch, zec]
+    try:
+        with open('holdings') as f:
+            lines = f.read().splitlines()
+        holdings = {
+            q.units: q
+            for q in [Quantity(l, ignore_sf=True) for l in lines if l]
+        }
+    except OSError as e:
+        fatal(os_error(e))
+    except ValueError as e:
+        fatal(e)
 
     # download latest asset prices from cryptocompare.com
     currencies = dict(
-        fsyms = 'BTC,ETH,BCH,ZEC',  # from symbols
-        tsyms = 'ETH,USD',          # to symbols
+        fsyms = ','.join(holdings.keys()),  # from symbols
+        tsyms = 'USD',                      # to symbols
     )
     url_args = '&'.join(f'{k}={v}' for k, v in currencies.items())
     base_url = f'https://min-api.cryptocompare.com/data/pricemulti'
@@ -798,90 +803,63 @@ It demonstrates some of the features of *UnitConversion*.
     conversions = r.json()
 
     # define unit conversions
-    units = dict(
-        USD = ('$', 'USD'),
-        BTC = ('Ƀ', 'BTC'),
-        ETH = ('Ξ', 'ETH'),
-        BCH = ('BCH',    ),
-        ZEC = ('ZEC',    ),
-    )
-    def get_converter(fm, to):
-        return UnitConversion(units[to], units[fm], conversions[fm][to])
-    btc2usd = get_converter('BTC', 'USD')
-    eth2usd = get_converter('ETH', 'USD')
-    bch2usd = get_converter('BCH', 'USD')
-    zec2usd = get_converter('ZEC', 'USD')
-    btc2eth = get_converter('BTC', 'ETH')
+    converters = {
+        sym: UnitConversion(('$', 'USD'), sym, conversions[sym]['USD'])
+        for sym in holdings
+    }
 
     # sum total holdings
-    total = Quantity(sum(q.scale('$') for q in holdings), '$')
+    total = Quantity(sum(q.scale('$') for q in holdings.values()), '$')
 
-    # show summary of conversions and holdings
-    print(dedent(f'''
-        Current Prices:
-              1 BTC = {btc2usd.convert()} or {btc2eth.convert()}
-              1 ETH = {eth2usd.convert()} or {btc2eth.convert(1, 'Ξ')}
-              1 BCH = {bch2usd.convert()}
-              1 ZEC = {zec2usd.convert()}
+    # show summary of holdings and conversions
+    for sym, q in holdings.items():
+        value = f'{q:>9q} = {q:<7q$} {100*q.scale("$")/total:.0f}%'
+        price = f'1 {sym} = {converters[sym].convert()}'
+        display(f'{value:<25s} ({price})')
+    display(f'    Total = {total:q}')
 
-        Holdings:
-            {btc:>7qBTC} = {btc:q$} {100*btc.scale('$')/total:.0f}%
-            {eth:>7qETH} = {eth:q$} {100*eth.scale('$')/total:.0f}%
-            {bch:>7qBCH} = {bch:q$} {100*bch.scale('$')/total:.0f}%
-            {zec:>7qZEC} = {zec:q$} {100*zec.scale('$')/total:.0f}%
-              Total = {total:q}
-    ''').strip())
+This script reads a file 'holdings' that contains the number of tokens you hold 
+of each of your cryptocurrencies.  That file would contain one currency per line 
+and look like this::
+
+    10 BTC
+    100 ETH
+    100 BCH
+    100 ZEC
+    10,000 EOS
+    100,000 ADA
 
 The output of the script looks like this::
 
-    Current Prices:
-        1 BTC = $8.22k or Ξ22.4
-        1 ETH = $366 or Ƀ44.6m
-        1 BCH = $1.26k
-        1 ZEC = $310
-
-    Holdings:
-        100 BTC = $822k   81%
-        100 ETH = $36.6k  4%
-        100 BCH = $126k   12%
-        100 ZEC = $31k    3%
-          Total = $1.02M
+      10 BTC = $65.8k  30%   (1 BTC = $6.58k)
+     100 ETH = $22.4k  10%   (1 ETH = $224)
+     100 BCH = $51.5k  24%   (1 BCH = $515)
+     100 ZEC = $12.7k  6%    (1 ZEC = $127)
+     10 kEOS = $57.6k  26%   (1 EOS = $5.76)
+    100 kADA = $8.16k  4%    (1 ADA = $81.6m)
+       Total = $218k
 
 If you prefer the output in fixed-point format, you can replace the last part of 
 this code with:
 
 .. code-block:: python
 
-    # show summary of conversions and holdings
-    print(dedent(f'''
-        Current Prices:
-            1 BTC = {btc2usd.convert():.10,.2p} or {btc2eth.convert():>8,.4p}
-            1 ETH = {eth2usd.convert():.10,.2p} or {btc2eth.convert(1, 'Ξ'):>8,.4p}
-            1 BCH = {bch2usd.convert():.10,.2p}
-            1 ZEC = {zec2usd.convert():.10,.2p}
-
-        Holdings:
-            {btc:>7qBTC} = {btc:>13,.2p$} {100*btc.scale('$')/total:2.0f}%
-            {eth:>7qETH} = {eth:>13,.2p$} {100*eth.scale('$')/total:2.0f}%
-            {bch:>7qBCH} = {bch:>13,.2p$} {100*bch.scale('$')/total:2.0f}%
-            {zec:>7qZEC} = {zec:>13,.2p$} {100*zec.scale('$')/total:2.0f}%
-              Total = {total:>13,.2p}
-    ''').strip())
+    # show summary of holdings and conversions
+    for sym, q in holdings.items():
+        value = f'{q:>10.2p} = {q:>#11,.2p$}  {100*q.scale("$")/total:,.0f}%'
+        price = f'1 {sym} = {converters[sym].convert():>#9,.2p}'
+        display(f'{value:<30s} ({price})')
+    display(f'     Total = {total:>#11,.2p}')
 
 If you do, the output of the script looks like this::
 
-    Current Prices:
-        1 BTC = $10,913.34 or Ξ12.4400
-        1 ETH =    $875.27 or  Ƀ0.0804
-        1 BCH =  $1,290.40
-        1 ZEC =    $399.39
-
-    Holdings:
-        100 BTC = $1,091,334.00 81%
-        100 ETH =    $87,527.00  6%
-        100 BCH =   $129,040.00 10%
-        100 ZEC =    $39,939.00  3%
-          Total = $1,347,840.00
+        10 BTC =  $65,847.10  30%  (1 BTC = $6,584.71)
+       100 ETH =  $22,401.00  10%  (1 ETH =   $224.01)
+       100 BCH =  $51,450.00  24%  (1 BCH =   $514.50)
+       100 ZEC =  $12,726.00  6%   (1 ZEC =   $127.26)
+     10000 EOS =  $57,600.00  26%  (1 EOS =     $5.76)
+    100000 ADA =   $8,203.00  4%   (1 ADA =     $0.08)
+         Total = $218,227.10
 
 
 .. _rkm codes example:
@@ -967,6 +945,8 @@ mode.
 As a practical example of the use of RKM codes, imagine wanting a program that 
 creates pin names for an electrical circuit based on a naming convention.  It 
 would take a table of pin characteristics that are used to create the names.
+
+..  This example is not being tested because it fails in python2
 
 For example::
 
