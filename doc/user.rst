@@ -1559,9 +1559,9 @@ return them in a dictionary.  For example:
 .. code-block:: python
 
     >>> design_parameters = '''
-    ...     Fref = 156 MHz     -- Reference frequency
-    ...     Kdet = 88.3 uA     -- Gain of phase detector
-    ...     Kvco = 9.07 GHz/V  -- Gain of VCO
+    ...     Fref (fₒ) = 156 MHz  -- Reference frequency
+    ...     Kdet = 88.3 uA       -- Gain of phase detector
+    ...     Kvco = 9.07 GHz/V    -- Gain of VCO
     ... '''
     >>> quantities = Quantity.extract(design_parameters)
 
@@ -1570,11 +1570,11 @@ return them in a dictionary.  For example:
     ...     label_fmt_full='{V:<18}  # {d}',
     ...     show_label='f',
     ... )
-    >>> for q in quantities.values():
-    ...     print(q)
-    Fref = 156 MHz      # Reference frequency
-    Kdet = 88.3 uA      # Gain of phase detector
-    Kvco = 9.07 GHz/V   # Gain of VCO
+    >>> for k, q in quantities.items():
+    ...     print(f'{k}: {q}')
+    Fref: fₒ = 156 MHz        # Reference frequency
+    Kdet: Kdet = 88.3 uA      # Gain of phase detector
+    Kvco: Kvco = 9.07 GHz/V   # Gain of VCO
 
 The string is processed one line at a time and may contain any number of 
 quantity definitions.  Blank lines are ignored.  Each non-blank line is passed 

@@ -97,6 +97,7 @@ Releases
     | Released: 2018-10-03
 
     - added RKM codes example.
-    - added *check_value*='strict' to :meth:`quantiphy.Quantity.add()`.
+    - added *check_value* = 'strict' to :meth:`quantiphy.Quantity.add()`.
     - added backward compatibility for *form* argument of 
       :meth:`quantiphy.Quantity.render()` if it is passed as unnamed argument.
+    - made :meth:`quantiphy.Quantity.extract()` a bit more general.
