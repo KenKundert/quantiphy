@@ -778,13 +778,14 @@ It demonstrates some of the features of *UnitConversion*.
     from quantiphy import Quantity, UnitConversion
     Quantity.set_prefs(prec=2)
 
-    # holdings
+    # read holdings
     try:
         with open('holdings') as f:
             lines = f.read().splitlines()
         holdings = {
-            q.units: q
-            for q in [Quantity(l, ignore_sf=True) for l in lines if l]
+            q.units: q for q in [
+                Quantity(l, ignore_sf=True) for l in lines if l
+            ]
         }
     except OSError as e:
         fatal(os_error(e))
@@ -799,8 +800,11 @@ It demonstrates some of the features of *UnitConversion*.
     url_args = '&'.join(f'{k}={v}' for k, v in currencies.items())
     base_url = f'https://min-api.cryptocompare.com/data/pricemulti'
     url = '?'.join([base_url, url_args])
-    r = requests.get(url)
-    conversions = r.json()
+    try:
+        response = requests.get(url)
+    except Exception as e:
+        fatal('cannot connect to cryptocompare.com.')
+    conversions = response.json()
 
     # define unit conversions
     converters = {
