@@ -1,6 +1,11 @@
 # encoding: utf8
 
-from quantiphy import Quantity, add_constant, set_unit_system
+from quantiphy import (
+    Quantity, add_constant, set_unit_system,
+    QuantiPhyError, IncompatibleUnits, UnknownPreference, UnknownConversion,
+    UnknownUnitSystem, InvalidRecognizer, UnknownScaleFactor, InvalidNumber,
+    ExpectedQuantity, MissingName,
+)
 import pytest
 
 def test_constants():
@@ -58,7 +63,27 @@ def test_constants():
 
     with pytest.raises(ValueError) as exception:
         str(Quantity('fuzz'))
-    assert exception.value.args[0] == 'fuzz: not a valid number.'
+    assert str(exception.value) == 'fuzz: not a valid number.'
+    assert isinstance(exception.value, InvalidNumber)
+    assert isinstance(exception.value, QuantiPhyError)
+    assert isinstance(exception.value, ValueError)
+    assert exception.value.args == ('fuzz',)
+
+    with pytest.raises(ValueError) as exception:
+        str(Quantity(None))
+    assert str(exception.value) == 'None: not a valid number.'
+    assert isinstance(exception.value, InvalidNumber)
+    assert isinstance(exception.value, QuantiPhyError)
+    assert isinstance(exception.value, TypeError)
+    assert exception.value.args == (None,)
+
+    with pytest.raises(ValueError) as exception:
+        str(Quantity(None, 'm', scale='in'))
+    assert str(exception.value) == 'None: not a valid number.'
+    assert isinstance(exception.value, InvalidNumber)
+    assert isinstance(exception.value, QuantiPhyError)
+    assert isinstance(exception.value, TypeError)
+    assert exception.value.args == (None,)
 
     assert '{:S}'.format(Quantity('h')) == "h = 6.6261e-27 erg-s -- Plank's constant"
     assert '{:S}'.format(Quantity('hbar')) == "ħ = 1.0546e-27 erg-s -- reduced Plank's constant"
@@ -122,8 +147,16 @@ def test_constants():
 
     with pytest.raises(NameError) as exception:
         add_constant(Quantity(4.80320427e-10, 'Fr'), unit_systems='esu gaussian')
-    assert exception.value.args[0] == 'No name specified.'
+    assert str(exception.value) == 'no name specified.'
+    assert isinstance(exception.value, MissingName)
+    assert isinstance(exception.value, QuantiPhyError)
+    assert isinstance(exception.value, NameError)
+    assert exception.value.args == ()
 
     with pytest.raises(ValueError) as exception:
         add_constant(1)
-    assert exception.value.args[0] == 'Expected a quantity for value.'
+    assert str(exception.value) == 'expected a quantity for value.'
+    assert isinstance(exception.value, ExpectedQuantity)
+    assert isinstance(exception.value, QuantiPhyError)
+    assert isinstance(exception.value, ValueError)
+    assert exception.value.args == ()

@@ -624,6 +624,19 @@ a quantity and then uses the sum to create a new Quantity. For example:
     >>> print(total)
     $13.68
 
+When adding quantities, the units of the quantity should match. You can enforce 
+this by adding *check_units=True*. If the dimension of your quantities match but 
+not the units, you can often use :meth:`quantiphy.Quantity.scale` to get the 
+units right::
+
+.. code-block:: python
+
+    >>> m1 = Quantity('1kg')
+    >>> m2 = Quantity('1lb')
+    >>> m3 = m1.add(m2.scale('g'), check_units=True)
+    >>> print(m3)
+    1.4536 kg
+
 
 Accessing Quantity Values
 .........................
@@ -1859,43 +1872,127 @@ using :meth:`quantiphy.Quantity.is_infinite()` or
 Exceptions
 ----------
 
-A *ValueError* is raised if :class:`quantiphy.Quantity` is passed a string it 
-cannot convert into a number:
+The way exceptions are defined in *QuantiPhy* has changed. Initially, the 
+standard Python exceptions were used to indicate errors. For example, 
+a *ValueError* was raised by :class:`quantiphy.Quantity` if it were passed 
+a string it cannot convert into a number.  Now, a variety of *QuantiPhy* 
+specific exceptions are used to indicate specific errors. However, these 
+exceptions subclass the corresponding Python error for compatibility with 
+existing code.  It is recommended that new code catch the *QuantiPhy* specific 
+exceptions rather than the generic Python exceptions as their use may be 
+deprecated in the future.
+
+*QuantiPhy* employs the following exceptions:
+
+:class:`quantiphy.ExpectedQuantity`:
+    Subclass of :class:`quantiphy.QuantiPhyError` and *ValueError*.  Used by 
+    :func:`quantiphy.add_constant()`.
+
+    Raised when the value is either not an instance of 
+    :class:`quantiphy.Quantity` or a string that can be converted to a quantity.
+
+:class:`quantiphy.IncompatibleUnits`:
+    Subclass of :class:`quantiphy.QuantiPhyError` and *TypeError*.  Used by 
+    :meth:`quantiphy.Quantity.add()`.
+
+    Raised when the units of contribution do not match those of underlying 
+    quantity.
+
+:class:`quantiphy.InvalidNumber`:
+    Subclass of :class:`quantiphy.QuantiPhyError`, *ValueError*, and 
+    *TypeError*.  Used by :class:`quantiphy.Quantity()`.
+
+    Raised if the value given could not be converted to a number.
+
+:class:`quantiphy.InvalidRecognizer`:
+    Subclass of :class:`quantiphy.QuantiPhyError` and *KeyError*.  Used by 
+    :class:`quantiphy.Quantity()`.
+
+    The *assign_rec* preference is expected to be a regular expression that 
+    defines one or more named fields, one of which must be *val*. This exception 
+    is raised when the current value of *assign_rec* does not satisfy this 
+    requirement.
+
+:class:`quantiphy.MissingName`:
+    Subclass of :class:`quantiphy.QuantiPhyError` and *NameError*.  Used by 
+    :func:`quantiphy.add_constant()`.
+
+    Raised when *alias* was not specified and no name was available from 
+    *value*.
+
+:class:`quantiphy.UnknownConversion`:
+    Subclass of :class:`quantiphy.QuantiPhyError` and *KeyError*.
+
+    Used by :meth:`quantiphy.UnitConversion.convert()`.
+
+    Raised when the given units are not supported by the underlying class.
+
+    Used by :class:`quantiphy.Quantity()`,
+    :meth:`quantiphy.Quantity.scale()`,
+    :meth:`quantiphy.Quantity.render()`,
+    :meth:`quantiphy.Quantity.fixed()`, and
+    :meth:`quantiphy.Quantity.format()`.
+
+    Raised when a unit conversion was requested and there is no corresponding 
+    unit converter.
+
+:class:`quantiphy.UnknownFormatKey`:
+    Subclass of :class:`quantiphy.QuantiPhyError` and *KeyError*.  Used by 
+    :meth:`quantiphy.Quantity.render()`, :meth:`quantiphy.Quantity.fixed()`, and 
+    :meth:`quantiphy.Quantity.format()`.
+
+    The *label_fmt* and *label_fmt_full* are expected to be format strings that 
+    may interpolate certain named arguments. The valid named arguments are *n* 
+    for name, *v* for value, and *d* for description. This exception is raised 
+    when some other name is used for an interpolated argument.
+
+:class:`quantiphy.UnknownPreference`:
+    Subclass of :class:`quantiphy.QuantiPhyError` and *KeyError*.  Used by 
+    :meth:`quantiphy.Quantity.set_prefs()`, 
+    :meth:`quantiphy.Quantity.get_pref()`, and 
+    :meth:`quantiphy.Quantity.prefs()`.
+
+    Raised when the name given for a preference is unknown.
+
+:class:`quantiphy.UnknownScaleFactor`:
+    Subclass of :class:`quantiphy.QuantiPhyError` and *ValueError*.  Used by 
+    :class:`quantiphy.Quantity()`, :meth:`quantiphy.Quantity.set_prefs()`, or 
+    :meth:`quantiphy.Quantity.prefs()`.
+
+    The *input_sf* preference gives the list of scale factors that should be 
+    accepted. This exception is raised if *input_sf* contains an unknown scale 
+    factor.
+
+:class:`quantiphy.UnknownUnitSystem`:
+    Subclass of :class:`quantiphy.QuantiPhyError` and *KeyError*.  Used by 
+    :func:`quantiphy.set_unit_system()`.
+
+    Raised when the name given does not correspond to a known unit system.
+
+*QuantiPhy* defines a common base exception, :class:`quantiphy.QuantiPhyError`, 
+that all specific exceptions derive from.  This allows you to simplify your 
+exception handling if you are not interested in distinguishing between the 
+specific errors:
 
 .. code-block:: python
 
-   >>> try:
-   ...     q = Quantity('g')
-   ... except ValueError as e:
-   ...     print(e)
-   g: not a valid number.
+    >>> from quantiphy import Quantity, QuantiPhyError
 
-A *KeyError* is raised if a unit conversion is requested but no suitable unit
-converter is available.
+    >>> try:
+    ...     q = Quantity('tweed')
+    ... except QuantiPhyError as e:
+    ...     print(str(e))
+    tweed: not a valid number.
 
-.. code-block:: python
+The alternative would be to catch each error individually:
 
-   >>> q = Quantity('93 Mmi', scale='pc')
-   Traceback (most recent call last):
-   ...
-   KeyError: "Unable to convert between 'pc' and 'mi'."
+    >>> from quantiphy import (
+    ...     Quantity, InvalidNumber, UnknownScaleFactor,
+    ...     UnknownConversion, InvalidRecognizer
+    ... )
 
-A *KeyError* is also raised if you specify an unknown preference.
-
-.. code-block:: python
-
-   >>> Quantity.set_prefs(precision=6)
-   Traceback (most recent call last):
-   ...
-   KeyError: 'precision'
-
-
-A *NameError* is raised if a constant is created without a name or if you try to 
-set or get a preference that is not supported.
-
-.. code-block:: python
-
-   >>> q = add_constant(Quantity('1ns'))
-   Traceback (most recent call last):
-   ...
-   NameError: No name specified.
+    >>> try:
+    ...     q = Quantity('tweed')
+    ... except (InvalidNumber, UnknownScaleFactor, UnknownConversion, InvalidRecognizer) as e:
+    ...     print(str(e))
+    tweed: not a valid number.

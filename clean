@@ -5,6 +5,7 @@ rm -rf generated_settings
 rm -rf .cache
 
 # the rest is common to all python directories
+rm -f *.pyc *.pyo
 rm -f .test*.sum expected result install.out .*.log
 rm -rf build *.egg-info dist __pycache__ .eggs **/{__pycache__,*.pyc,*.pyo}
 rm -rf .coverage .coverage-html htmlcov

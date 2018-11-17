@@ -1,6 +1,11 @@
 # encoding: utf8
 
-from quantiphy import Quantity, UnitConversion
+from quantiphy import (
+    Quantity, UnitConversion,
+    QuantiPhyError, IncompatibleUnits, UnknownPreference, UnknownConversion,
+    UnknownUnitSystem, InvalidRecognizer, UnknownFormatKey, UnknownScaleFactor,
+    InvalidNumber, ExpectedQuantity, MissingName,
+)
 import math
 import sys
 import pytest
@@ -19,10 +24,18 @@ def test_simple_scaling():
         assert str(q.scale(qs)) == '4 g'
         with pytest.raises(KeyError) as exception:
             q.render(scale='fuzz')
-        assert exception.value.args[0] == "Unable to convert between 'fuzz' and 'g'."
+        assert str(exception.value) == "unable to convert between 'fuzz' and 'g'."
+        assert isinstance(exception.value, UnknownConversion)
+        assert isinstance(exception.value, QuantiPhyError)
+        assert isinstance(exception.value, KeyError)
+        assert exception.value.args == ('fuzz', 'g')
         with pytest.raises(KeyError) as exception:
             q.scale('fuzz')
-        assert exception.value.args[0] == "Unable to convert between 'fuzz' and 'g'."
+        assert str(exception.value) == "unable to convert between 'fuzz' and 'g'."
+        assert isinstance(exception.value, UnknownConversion)
+        assert isinstance(exception.value, QuantiPhyError)
+        assert isinstance(exception.value, KeyError)
+        assert exception.value.args == ('fuzz', 'g')
 
         q=Quantity('1', units='g', scale=1000)
         assert q.render() == '1 kg'
@@ -318,14 +331,22 @@ def test_coversion():
 
     with pytest.raises(KeyError) as exception:
         result = conversion.convert(0, from_units='X', to_units='X')
-    assert exception.value.args[0] == 'X: unknown to_units.'
+    assert str(exception.value) == "unable to convert to 'X'."
+    assert isinstance(exception.value, UnknownConversion)
+    assert isinstance(exception.value, QuantiPhyError)
+    assert isinstance(exception.value, KeyError)
+    assert exception.value.args == ('X',)
 
     result = conversion.convert(0, to_units='X')
     assert str(result) == '32 F'
 
     with pytest.raises(KeyError) as exception:
         result = conversion.convert(0, from_units='X')
-    assert exception.value.args[0] == 'X: unknown from_units.'
+    assert str(exception.value) == "unable to convert from 'X'."
+    assert isinstance(exception.value, UnknownConversion)
+    assert isinstance(exception.value, QuantiPhyError)
+    assert isinstance(exception.value, KeyError)
+    assert exception.value.args == ('X',)
 
 def test_func():
 

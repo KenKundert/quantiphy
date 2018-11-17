@@ -52,15 +52,15 @@ from six import string_types, python_2_unicode_compatible
 # Utilities {{{1
 # is_str {{{2
 def is_str(obj):
-    # Identifies strings in all their various guises.
+    "Identifies strings in all their various guises."
     return isinstance(obj, string_types)
 
 
 # _named_regex {{{2
-def named_regex(name, regex):
+def _named_regex(name, regex):
     return '(?P<%s>%s)' % (name, regex)
 
-
+# _scale {{{2
 def _scale(scale, number, units):
     if is_str(scale):
         # if scale is string, it contains the units to convert from
@@ -81,6 +81,135 @@ def _scale(scale, number, units):
     return number, units
 
 
+# Exceptions {{{1
+class QuantiPhyError(Exception):
+    """QuantiPhy base exception.
+
+    All of the specific QuantiPhy exceptions subclass this exception.
+    """
+
+    def __str__(self):
+        msgs = self.msg
+        if is_str(msgs):
+            msgs = [msgs]
+        for msg in msgs:
+            # return first msg for which all arguments are available.
+            try:
+                return msg.format(*self.args, self=self)
+            except IndexError:
+                pass
+        return ' '.join(str(a) for a in self.args)
+
+    def __repr__(self):
+        name = self.__class__.__name__
+        args = ', '.join(str(a) for a in self.args)
+        return '{}({})'.format(name, args)
+
+class ExpectedQuantity(QuantiPhyError, ValueError):
+    """
+    The value is required to be a Quantity or a string that can be converted to
+    a Quantity.
+    """
+    def __init__(self, *args):
+        self.args = args
+        self.msg = 'expected a quantity for value.'
+
+
+class IncompatibleUnits(QuantiPhyError, TypeError):
+    """
+    The units of the contribution do not match those of the underlying quantity.
+    """
+    def __init__(self, *args):
+        self.args = args
+        self.msg = '{}: incompatible units.'
+
+
+class InvalidNumber(QuantiPhyError, ValueError, TypeError):
+    """
+    The value given could not be converted to a number.
+    """
+    def __init__(self, *args):
+        self.args = args
+        self.msg = "{}: not a valid number."
+
+
+class InvalidRecognizer(QuantiPhyError, KeyError):
+    """
+    The *assign_rec* preference is expected to be a regular expression that
+    defines one or more named fields, one of which must be *val*. This exception
+    is raised when the current value of *assign_rec* does not satisfy this
+    requirement.
+    """
+    def __init__(self, *args):
+        self.args = args
+        self.msg = "recognizer does not contain 'val' key."
+
+
+class MissingName(QuantiPhyError, NameError):
+    """
+    *alias* was not specified and no name was available from *value*.
+    """
+    def __init__(self, *args):
+        self.args = args
+        self.msg = 'no name specified.'
+
+
+class UnknownConversion(QuantiPhyError, KeyError):
+    """
+    The given units are not supported by the underlying class, or a unit
+    conversion was requested and there is no corresponding unit converter.
+    """
+    def __init__(self, *args, **kwargs):
+        self.args = args
+        self.direction = kwargs.get('direction')
+        self.msg = (
+            "unable to convert between '{}' and '{}'.",
+            "unable to convert {self.direction} '{}'.",
+        )
+
+
+class UnknownFormatKey(QuantiPhyError, KeyError):
+    """
+    The *label_fmt* and *label_fmt_full* are expected to be format strings that
+    may interpolate certain named arguments. The valid named arguments are *n*
+    for name, *v* for value, and *d* for description. This exception is raised
+    when some other name is used for an interpolated argument.
+    """
+    def __init__(self, *args):
+        self.args = args
+        self.msg = '{}: unknown format key.'
+
+
+class UnknownPreference(QuantiPhyError, KeyError):
+    """
+    The name given for a preference is unknown.
+    """
+    def __init__(self, *args):
+        self.args = args
+        self.msg = '{}: unknown preference.'
+
+
+class UnknownScaleFactor(QuantiPhyError, ValueError):
+    """
+    The *input_sf* preference gives the list of scale factors that should be
+    accepted. This exception is raised if *input_sf* contains an unknown scale
+    factor.
+    """
+    def __init__(self, *args):
+        self.args = args
+        self.culprit = ', '.join(args)
+        self.msg = "{self.culprit}: unknown scale factors."
+
+
+class UnknownUnitSystem(QuantiPhyError, KeyError):
+    """
+    The name given does not correspond to a known unit system.
+    """
+    def __init__(self, *args):
+        self.args = args
+        self.msg = "{}: unknown unit system."
+
+
 # Unit Conversions {{{1
 _unit_conversions = {}
 def _convert_units(to_units, from_units, value):
@@ -89,9 +218,7 @@ def _convert_units(to_units, from_units, value):
     try:
         return _unit_conversions[(to_units, from_units)](value)
     except KeyError:
-        raise KeyError(
-            "Unable to convert between '%s' and '%s'." % (to_units, from_units)
-        )
+        raise UnknownConversion(to_units, from_units)
 
 
 class UnitConversion(object):
@@ -287,7 +414,7 @@ class UnitConversion(object):
         to_units were found among the class's from_units, then a reverse
         conversion is performed.
 
-        :raises KeyError:
+        :raises UnknownConversion(QuantiPhyError, KeyError):
             The given units are not supported by the underlying class.
 
         Example::
@@ -344,8 +471,8 @@ class UnitConversion(object):
         if from_units in self.to_units:
             return Quantity(_reverse(value), self.from_units[0])
         if to_units:
-            raise KeyError('{}: unknown to_units.'.format(to_units))
-        raise KeyError('{}: unknown from_units.'.format(from_units))
+            raise UnknownConversion(to_units, direction='to')
+        raise UnknownConversion(from_units, direction='from')
 
     def __str__(self):
         if callable(self.slope) or callable(self.intercept):
@@ -410,8 +537,8 @@ def set_unit_system(unit_system):
     :arg str unit_system:
         Name of the desired unit system.
 
-    A *KeyError* is raised if *unit_system* does not correspond to a known unit
-    system.
+    :raises UnknownUnitSystem(QuantiPhyError, KeyError):
+        *unit_system* does not correspond to a known unit system.
 
     Example::
 
@@ -426,12 +553,17 @@ def set_unit_system(unit_system):
 
     """
     global _active_constants
-    _active_constants = ChainMap(
-        _constants[None],
-        _constants[unit_system]
-    )
+    try:
+        _active_constants = ChainMap(
+            _constants[None],
+            _constants[unit_system]
+        )
+    except KeyError:
+        raise UnknownUnitSystem(unit_system)
+
 _default_unit_system = 'mks'
 _constants = {None: {}, _default_unit_system: {}}
+_active_constants = {}
 set_unit_system(_default_unit_system)
 
 
@@ -463,11 +595,11 @@ def add_constant(value, alias=None, unit_systems=None):
         system is active.
     :type unit_systems: list or str
 
-    :raises ValueError:
-        *value* must be an instance of :class:`Quantity` or it must be a string
-        that can be converted to a quantity.
+    :raises ExpectedQuantity(QuantiPhyError, ValueError):
+        *value* must be an instance of :class:`quantiphy.Quantity` or it must be
+        a string that can be converted to a quantity.
 
-    :raises NameError:
+    :raises MissingName(QuantiPhyError, NameError):
         *alias* was not specified and no name was available from *value*.
 
     The constant is saved under *name* if given, and under the name contained
@@ -485,9 +617,9 @@ def add_constant(value, alias=None, unit_systems=None):
     if is_str(value):
         value = Quantity(value)
     if not isinstance(value, Quantity):
-        raise ValueError('Expected a quantity for value.')
+        raise ExpectedQuantity()
     if not alias and not value.name:
-        raise NameError('No name specified.')
+        raise MissingName()
     if is_str(unit_systems):
         unit_systems = unit_systems.split()
 
@@ -668,16 +800,19 @@ class Quantity(float):
         Assume the value given within a string does not employ a scale factors.
         In this way, '1m' is interpreted as 1 meter rather than 1 milli.
 
-    :raises KeyError:
+    :raises UnknownConversion(QuantiPhyError, KeyError):
         A unit conversion was requested and there is no corresponding unit
-        converter or assignment recognizer (*assign_rec*) does not match at least
+        converter.
+
+    :raises InvalidRecognizer(QuantiPhyError, KeyError):
+        Assignment recognizer (*assign_rec*) does not match at least
         the value (*val*).
 
-    :raises ValueError:
-        A string was passed that cannot be converted to a quantity.
+    :raises UnknownScaleFactor(QuantiPhyError, ValueError):
+        Unknown scale factor.
 
-    :raises TypeError:
-        A value of unsupported type was passed in.
+    :raises InvalidNumber(QuantiPhyError, ValueError, TypeError):
+        Not a valid number.
 
     You can use *Quantity* to create quantities from floats, strings, or other
     quantities.  If a float is given, *model* or *units* would be used to
@@ -990,7 +1125,11 @@ class Quantity(float):
             units and scale factors. For example, 0.3 would be rendered as
             '300m', and 300 m would be rendered as '300_m'.
 
-        :raises KeyError: unknown preference.
+        :raises UnknownPreference(QuantiPhyError, KeyError):
+            Unknown preference.
+
+        :raises UnknownScaleFactor(QuantiPhyError, ValueError):
+            Unknown scale factor.
 
         Example::
 
@@ -1012,7 +1151,7 @@ class Quantity(float):
             kwargs['known_units'] = kwargs['known_units'].split()
         for k, v in kwargs.items():
             if k not in DEFAULTS.keys():
-                raise KeyError(k)
+                raise UnknownPreference(k)
             if v is None:
                 try:
                     del cls._preferences[k]
@@ -1036,7 +1175,7 @@ class Quantity(float):
             Name of the desired preference. See
             :meth:`Quantity.set_prefs()` for list of preferences.
 
-        :raises KeyError: unknown preference.
+        :raises UnknownPreference(KeyError): unknown preference.
 
         Example::
 
@@ -1049,11 +1188,14 @@ class Quantity(float):
 
         """
         cls._initialize_preferences()
-        return cls._preferences[name]
+        try:
+            return cls._preferences[name]
+        except KeyError:
+            raise UnknownPreference(name)
 
     # preferences {{{3
     # first create a context manager
-    class ContextManager:
+    class _ContextManager:
         def __init__(self, cls, kwargs):
             self.cls = cls
             self.kwargs = kwargs
@@ -1087,9 +1229,13 @@ class Quantity(float):
 
         See :meth:`Quantity.set_prefs()` for list of available arguments.
 
-        :raises KeyError: unknown preference.
+        :raises UnknownPreference(QuantiPhyError,KeyError):
+            Unknown preference.
+
+        :raises UnknownScaleFactor(QuantiPhyError, ValueError):
+            Unknown scale factor.
         """
-        return cls.ContextManager(cls, kwargs)
+        return cls._ContextManager(cls, kwargs)
 
     # get attribute {{{3
     def __getattr__(self, name):
@@ -1104,12 +1250,15 @@ class Quantity(float):
         if not show_label or not self.name:
             return value
         Value = value
-        if self.desc and show_label != 'a' and (show_label == 'f' or self.show_desc):
-            Value = self.label_fmt.format(n=self.name, v=value)
-            label_fmt = self.label_fmt_full
-        else:
-            label_fmt = self.label_fmt
-        return label_fmt.format(n=self.name, v=value, d=self.desc, V=Value)
+        try:
+            if self.desc and show_label != 'a' and (show_label == 'f' or self.show_desc):
+                Value = self.label_fmt.format(n=self.name, v=value)
+                label_fmt = self.label_fmt_full
+            else:
+                label_fmt = self.label_fmt
+            return label_fmt.format(n=self.name, v=value, d=self.desc, V=Value)
+        except KeyError as e:
+            raise UnknownFormatKey(e.args[0])
 
     # _combine {{{2
     def _combine(self, mantissa, sf, units, spacer):
@@ -1163,31 +1312,31 @@ class Quantity(float):
             input_sf = cls.get_pref('input_sf')
             unknown_sf = set(input_sf) - set(known_sf)
             if unknown_sf:
-                unknown_sf = ', '.join(sorted(unknown_sf))
-                raise ValueError('%s: unknown scale factors.' % unknown_sf)
+                raise UnknownScaleFactor(*sorted(unknown_sf))
+
 
         # components {{{3
-        sign = named_regex('sign', '[-+]?')
+        sign = _named_regex('sign', '[-+]?')
         space = r'[\s ]'  # the space in this regex is a non-breaking space
         required_digits = r'(?:[0-9][0-9_]*[0-9]|[0-9]+)'  # allow interior underscores
         optional_digits = r'(?:[0-9][0-9_]*[0-9]|[0-9]*)'
-        mantissa = named_regex(
+        mantissa = _named_regex(
             'mant',
             r'(?:{od}\.?{rd})|(?:{rd}\.?{od})'.format(
                 rd=required_digits, od=optional_digits
             ),  # leading or trailing digits are optional, but not both
         )
-        exponent = named_regex('exp', '[eE][-+]?[0-9]+')
-        scale_factor = named_regex('sf', '[%s]' % input_sf)
-        units = named_regex(
-            'units', r'(?:[a-zA-Z%{us}][-^/()\w·⁻⁰¹²³⁴⁵⁶⁷⁸⁹]*)?'.format(
+        exponent = _named_regex('exp', '[eE][-+]?[0-9]+')
+        scale_factor = _named_regex('sf', '[%s]' % input_sf)
+        units = _named_regex(
+            r'units', r'(?:[a-zA-Z%{us}][-^/()\w·⁻⁰¹²³⁴⁵⁶⁷⁸⁹]*)?'.format(
                 us=UNIT_SYMBOLS
             )
             # examples: Ohms, V/A, J-s, m/s^2, H/(m-s), Ω, %, m·s⁻²
             # leading char must be letter to avoid 1.0E-9s -> (1e18, '-9s')
         )
-        currency = named_regex('currency', '[%s]' % CURRENCY_SYMBOLS)
-        nan = named_regex('nan', '(?i)inf|nan')
+        currency = _named_regex('currency', '[%s]' % CURRENCY_SYMBOLS)
+        nan = _named_regex('nan', '(?:[iI][nN][fF])|(?:[nN][aA][nN])')
 
         # number_with_scale_factor {{{3
         number_with_scale_factor = (
@@ -1261,6 +1410,13 @@ class Quantity(float):
             lambda match: '',
             lambda match: ''
         )
+
+        cls.all_number_converters = [
+            (r'\A\s*{}\s*\Z'.format(pattern), get_mant, get_sf, get_units)
+            for pattern, get_mant, get_sf, get_units in [
+                nan_with_units,
+            ]
+        ]
 
         # all_number_converters {{{3
         cls.all_number_converters = [
@@ -1350,7 +1506,7 @@ class Quantity(float):
                     mantissa = mantissa.replace('_', '')
                     number = float(mantissa + MAPPINGS.get(sf, sf))
                     return number, units, mantissa, sf
-            raise ValueError('%s: not a valid number.' % value)
+            raise InvalidNumber(value)
 
         def recognize_all(value):
             try:
@@ -1361,7 +1517,10 @@ class Quantity(float):
                 if match:
                     args = match.groupdict()
                     n = args.get('name', '')
-                    val = args['val']
+                    try:
+                        val = args['val']
+                    except KeyError:
+                        raise InvalidRecognizer()
                     d = args.get('desc', '')
                     number, u, mantissa, sf = recognize_number(val, ignore_sf)
                     if n:
@@ -1403,13 +1562,19 @@ class Quantity(float):
         # perform specified conversion if requested
         if scale:
             original = number
-            number, units = _scale(scale, number, units)
+            try:
+                number, units = _scale(scale, number, units)
+            except TypeError:
+                raise InvalidNumber(number)
             if original != number:
                 # must erase mantissa which is not out of date
                 mantissa = None
 
         # create the underlying data structure and add attributes as appropriate
-        self = float.__new__(cls, number)
+        try:
+            self = float.__new__(cls, number)
+        except TypeError:
+            raise InvalidNumber(number)
         if units:
             self.units = units
         if name:
@@ -1498,7 +1663,7 @@ class Quantity(float):
               if were specified as a unitless float.
         :type scale: real, pair, function, string, or quantity
 
-        :raises KeyError:
+        :raises UnknownConversion(QuantiPhyError, KeyError):
             A unit conversion was requested and there is no corresponding unit
             converter.
 
@@ -1524,11 +1689,12 @@ class Quantity(float):
 
         :arg check_units:
             If True, raise a TypeError if the units of the *addend* are not
-            compatible with the underlying quantity. If the *addend* does not have units, then it is considered compatible
-            unless *check_units* is 'strict'.
+            compatible with the underlying quantity. If the *addend* does not
+            have units, then it is considered compatible unless *check_units* is
+            'strict'.
         :type addend: boolean or 'strict'
 
-        :raises TypeError:
+        :raises IncompatibleUnits(TypeError):
             Units of contribution do not match those of underlying quantity.
 
         Example::
@@ -1542,11 +1708,26 @@ class Quantity(float):
         """
         try:
             if check_units and self.units != addend.units:
-                raise TypeError
+                raise IncompatibleUnits(self.units, addend.units)
         except AttributeError:
             if check_units == 'strict':
-                raise TypeError
-        return self.__class__(self.real + addend, self.units)
+                raise IncompatibleUnits(
+                    getattr(self, 'units', None),
+                    getattr(addend, 'units', None)
+                )
+        new = self.__class__(self.real + addend)
+
+        # copy important attributes
+        units = getattr(self, 'units', None)
+        if units:
+            new.units = units
+        name = getattr(self, 'name', None)
+        if name:
+            new.name = name
+        desc = getattr(self, 'desc', None)
+        if desc:
+            new.desc = desc
+        return new
 
     # render() {{{2
     def render(
@@ -1606,9 +1787,12 @@ class Quantity(float):
               conversion, which is applied to create the displayed value.
         :type scale: real, pair, function, string, or quantity
 
-        :raises KeyError:
+        :raises UnknownConversion(QuantiPhyError, KeyError):
             A unit conversion was requested and there is no corresponding unit
             converter.
+
+        :raises UnknownFormatKey(QuantiPhyError, KeyError):
+            'label_fmt' or 'label_fmt_full' contains an unknown format key.
 
         Example::
 
@@ -1824,9 +2008,12 @@ class Quantity(float):
               conversion, which is applied to create the displayed value.
         :type scale: real, pair, function, or string
 
-        :raises KeyError:
+        :raises UnknownConversion(QuantiPhyError, KeyError):
             A unit conversion was requested and there is no corresponding unit
             converter.
+
+        :raises UnknownFormatKey(QuantiPhyError, KeyError):
+            'label_fmt' or 'label_fmt_full' contains an unknown format key.
 
         Example::
 
@@ -1981,7 +2168,14 @@ class Quantity(float):
         to add the name and perhaps description to the result.
 
         :arg str template: the format string.
-        :raises ValueError: unknown format code.
+
+        :raises UnknownFormatKey(QuantiPhyError, KeyError):
+            'label_fmt' or 'label_fmt_full' contains an unknown format key.
+
+        :raises UnknownConversion(QuantiPhyError, KeyError):
+            A unit conversion was requested and there is no corresponding unit
+            converter.
+
 
         The format is specified using A#W,.PTU where::
 
@@ -2162,9 +2356,6 @@ class Quantity(float):
             a dictionary of quantities for the values specified in the argument.
         :rtype: dict
 
-        :raises ValueError:
-            Value is not a valid number or was not given a name.
-
         Example::
 
             >>> sagan_frequencies = r'''
@@ -2188,7 +2379,7 @@ class Quantity(float):
             8.9247 GHz
 
         """
-        def is_quoted(s):
+        def _is_quoted(s):
             return (s[0] == '"' and s[-1] == '"') or (s[0] == "'" and s[-1] == "'")
 
         if not predefined:
@@ -2211,10 +2402,10 @@ class Quantity(float):
                 name = name.strip()
                 try:
                     quantity = cls(value, name=qname, desc=desc)
-                except (ValueError, TypeError):
+                except InvalidNumber:
                     # extract the units if given (they are embedded in "")
                     components = value.split()
-                    if len(components) >= 2 and is_quoted(components[-1]):
+                    if len(components) >= 2 and _is_quoted(components[-1]):
                         units = components[-1][1:-1]
                         value = ' '.join(components[:-1])
                     else:
@@ -2225,7 +2416,7 @@ class Quantity(float):
                     value = eval(value, None, symbols)
                     try:
                         quantity = cls(value, units=units, name=qname, desc=desc)
-                    except (ValueError, TypeError):
+                    except InvalidNumber:
                         # not suitable to be a quantity, so just save value
                         quantity = value
                 quantities[name] = quantity
@@ -2295,7 +2486,7 @@ class Quantity(float):
     # all_from_conv_fmt {{{2
     @classmethod
     def all_from_conv_fmt(cls, text, **kwargs):
-        """Convert all numbers and quantities from conventional notation.
+        r"""Convert all numbers and quantities from conventional notation.
 
         :arg str text:
             A search and replace is performed on this text. The search looks for
@@ -2340,7 +2531,7 @@ class Quantity(float):
     # all_from_si_fmt {{{2
     @classmethod
     def all_from_si_fmt(cls, text, **kwargs):
-        """Convert all numbers and quantities from SI notation.
+        r"""Convert all numbers and quantities from SI notation.
 
         :arg str text:
             A search and replace is performed on this text. The search looks for

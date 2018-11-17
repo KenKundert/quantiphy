@@ -566,7 +566,7 @@ to date.
         levels = 4              -- quantizer output levels
         Tstop = 1/Fin "s"       -- simulation stop time
         Tstart = -0.5/Fin "s"   -- simulation start time (points with t<0 are discarded)
-        vin_file = 'vin.data'   -- output data file for vin
+        vin_file = 'vin.wave'   -- output data file for vin
         vout_file = 'vout.wave' -- output data file for vout
         dout_file = 'dout.wave' -- output data file for dout
 
@@ -584,7 +584,7 @@ to date.
             self.gain = gain
 
         def update(self, vin):
-            self.state += vin
+            self.state += self.gain*vin
             return self.state
 
 
