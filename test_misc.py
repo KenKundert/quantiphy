@@ -106,6 +106,8 @@ def test_misc2():
     assert isinstance(exception.value, QuantiPhyError)
     assert isinstance(exception.value, ValueError)
     assert exception.value.args == ('%',)
+    exception.value.msg = '{}{}'
+    assert str(exception.value) == '%'
 
     with pytest.raises(KeyError) as exception:
         Foo.set_prefs(assign_rec=r'(\w+)\s*=\s*(.*)') # no named groups
@@ -313,6 +315,10 @@ def test_misc2():
     assert isinstance(exception.value, QuantiPhyError)
     assert isinstance(exception.value, ValueError)
     assert exception.value.args == ('q', 'w')
+    assert repr(exception.value) == 'UnknownScaleFactor(q, w)'
+    exception.value.msg = '{}{}{}'
+    assert str(exception.value) == 'q w'
+
     Quantity.set_prefs(input_sf=None, unity_sf=None, spacer=None)
 
     # test map_sf
@@ -610,4 +616,9 @@ def test_add():
     with pytest.raises(TypeError) as exception:
         q1.add(q3, check_units='strict')
 
+    q1.name = 'period'
+    assert q1.add(q2).name == 'period'
+    q1.desc = 'duration of one cycle'
+    assert q1.add(q2).name == 'period'
+    assert q1.add(q2).desc == 'duration of one cycle'
 

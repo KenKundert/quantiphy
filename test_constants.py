@@ -160,3 +160,11 @@ def test_constants():
     assert isinstance(exception.value, QuantiPhyError)
     assert isinstance(exception.value, ValueError)
     assert exception.value.args == ()
+
+    with pytest.raises(KeyError) as exception:
+        set_unit_system('nuts')
+    assert str(exception.value) == 'nuts: unknown unit system.'
+    assert isinstance(exception.value, UnknownUnitSystem)
+    assert isinstance(exception.value, QuantiPhyError)
+    assert isinstance(exception.value, KeyError)
+    assert exception.value.args == ('nuts',)
