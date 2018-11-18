@@ -101,3 +101,4 @@ Releases
     - added backward compatibility for *form* argument of 
       :meth:`quantiphy.Quantity.render()` if it is passed as unnamed argument.
     - made :meth:`quantiphy.Quantity.extract()` a bit more general.
+    - reformulated exceptions.

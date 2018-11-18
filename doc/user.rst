@@ -1643,7 +1643,7 @@ a version that displays the name and description by default.
 
 .. code-block:: python
 
-    >>> from quantiphy import Quantity
+    >>> from quantiphy import Quantity, InvalidNumber
     >>> from inform import os_error, fatal, display
 
     >>> class VerboseQuantity(Quantity):
@@ -1657,7 +1657,7 @@ a version that displays the name and description by default.
     ...         globals().update(VerboseQuantity.extract(f.read()))
     ... except OSError as e:
     ...     fatal(os_error(e))
-    ... except ValueError as e:
+    ... except InvalidNumber as e:
     ...     fatal(e, culprit=filename)
 
     >>> display(Fref, Kdet, Kvco, N, Fout, sep='\n')

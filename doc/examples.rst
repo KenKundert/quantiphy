@@ -774,8 +774,8 @@ It demonstrates some of the features of *UnitConversion*.
     #!/usr/bin/env python3
 
     import requests
-    from inform import display, fatal, os_error
-    from quantiphy import Quantity, UnitConversion
+    from inform import display, fatal, os_error, terminate
+    from quantiphy import Quantity, UnitConversion, InvalidNumber
     Quantity.set_prefs(prec=2)
 
     # read holdings
@@ -789,7 +789,7 @@ It demonstrates some of the features of *UnitConversion*.
         }
     except OSError as e:
         fatal(os_error(e))
-    except ValueError as e:
+    except InvalidNumber as e:
         fatal(e)
 
     # download latest asset prices from cryptocompare.com
@@ -802,6 +802,8 @@ It demonstrates some of the features of *UnitConversion*.
     url = '?'.join([base_url, url_args])
     try:
         response = requests.get(url)
+    except KeyboardInterrupt:
+        terminate('Killed by user.)
     except Exception as e:
         fatal('cannot connect to cryptocompare.com.')
     conversions = response.json()
