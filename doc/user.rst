@@ -330,6 +330,16 @@ attributes, but the name name and description, coming from a quantity, are
 ignored. As such, they specified explicitly using the *name* and *desc* named 
 arguments.
 
+Specifying *binary* as *True* allows you to use the binary scale factors. The 
+binary scale factors are *Ki*, *Mi*, *Gi*, *Ti*, *Pi*, *Ei*, *Zi*, and *Yi*.  
+Unlike the normal scale factors, you cannot use a lower case *k* in *Ki*. Also, 
+*input_sf* is ignored. The normal recognizers are used if none of the binary 
+scale factors are found.
+
+    >>> bytes = Quantity('1 KiB', binary=True)
+    >>> print(bytes)
+    1.024 kB
+
 Finally, you can also specify *scale* and *ignore_sf* as named arguments.  
 *scale* allows you to scale the value or convert it to different units. It is 
 described :ref:`in a bit <scaling upon creation>`. *ignore_sf* indicates that 
@@ -744,6 +754,9 @@ of converting a quantity to a string. For example:
     >>> h_line.render(form='fixed', prec=2)
     '1420405751.79 Hz'
 
+    >>> bytes.render(form='binary')
+    '1 KiB'
+
 
 *show_label* allows you to display the name and description of the quantity when 
 rendering. If *show_label* is *False*, the quantity is not labeled with the name 
@@ -797,11 +810,30 @@ quantity to a string in fixed-point format:
     >>> print(total.fixed(prec=2, show_commas=True, strip_zeros=False))
     $11,200,000.00
 
-You can also use *render* to produce a fixed format, but it does not support all 
-of the options available with *fixed*:
+You can also use :meth:`quantiphy.Quantity.render` to produce a fixed format, 
+but it does not support all of the options available with *fixed*:
+
+.. code-block:: python
 
     >>> print(total.render(form='fixed', prec=2))
     $11200000
+
+Another alternative to *render* is :meth:`quantiphy.Quantity.binary`. It 
+converts the quantity to a string that uses binary scale factors:
+
+.. code-block:: python
+
+    >>> mem = Quantity(17_179_869_184, 'B', name='physical memory')
+    >>> print(mem.binary())
+    16 GiB
+
+Alternatively you can also use *render* to render strings with binary prefixes:
+
+.. code-block:: python
+
+    >>> print(mem.render(form='binary'))
+    16 GiB
+
 
 Scaling When Rendering a Quantity
 .................................
@@ -935,6 +967,7 @@ value. The choices include:
    p    Format using fixed-point notation and show the units.
    e    Format using exponent notation but do not show the units.
    f    Format using fixed-point notation but do not show the units.
+   b    Format using binary prefixes while showing the units.
    g    Format using fixed-point or exponential notation, whichever is shorter, 
         but do not show the units.
    u    Only include the units.
@@ -961,7 +994,7 @@ Here is an example of these format types:
 .. code-block:: python
 
     >>> h_line = Quantity('f = 1420.405751786 MHz -- hydrogen line')
-    >>> for f in 'sSpPqQrReEfFgGund':
+    >>> for f in 'sSpPqQrRbBeEfFgGund':
     ...     print(f + ':', h_line.format(f))
     s: 1.4204 GHz
     S: f = 1.4204 GHz -- hydrogen line
@@ -971,6 +1004,8 @@ Here is an example of these format types:
     Q: f = 1.4204 GHz -- hydrogen line
     r: 1.4204G
     R: f = 1.4204G -- hydrogen line
+    b: 1.3229 GiHz
+    B: f = 1.3229 GiHz -- hydrogen line
     e: 1.4204e+09
     E: f = 1.4204e+09 -- hydrogen line
     f: 1420405751.786
@@ -1015,6 +1050,16 @@ The 'p' format is often used with '#' to format currency values:
 
     >>> print('{:#,.2p}'.format(total))
     $11,200,000.00
+
+The 'b' format is used to render number with binary scale factors:
+
+.. code-block:: python
+
+    >>> print('{:b}'.format(mem))
+    16 GiB
+
+    >>> print('{:B}'.format(mem))
+    physical memory = 16 GiB
 
 You can also use the traditional floating point format type specifiers:
 
@@ -1111,6 +1156,9 @@ In this case the format code must be specified (use 's' rather than '').
     >>> eff_channel_length = Quantity('leff = 14nm')
     >>> print(f'{eff_channel_length:SÅ}')
     leff = 140 Å
+
+    >>> print(f'{mem:bb}')
+    128 Gib
 
 This feature can be used to simplify the conversion of the time and temperature 
 information back into the original units:

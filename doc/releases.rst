@@ -102,3 +102,4 @@ Releases
       :meth:`quantiphy.Quantity.render()` if it is passed as unnamed argument.
     - made :meth:`quantiphy.Quantity.extract()` a bit more general.
     - reformulated exceptions.
+    - added support for binary scale factors and :meth:`quantiphy.Quantity.binary()`.

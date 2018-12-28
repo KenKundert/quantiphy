@@ -56,6 +56,8 @@ Features
 - Flexible unit conversion and scaling is supported to make it easy to convert 
   to or from any required form.
 - Provides a small but extensible collection of physical constants.
+- Supports the binary scale factors (*Ki*, *Mi*, etc.) along with the normal SI 
+  scale factors (*k*, *M*, etc.).
 
 
 Alternatives

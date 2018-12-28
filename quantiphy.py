@@ -667,6 +667,17 @@ MAPPINGS = {
     'z': 'e-21',
     'y': 'e-24',
 }
+BINARY_MAPPINGS = {
+    'Yi': 1024*1024*1024*1024*1024*1024*1024*1024,
+    'Zi': 1024*1024*1024*1024*1024*1024*1024,
+    'Ei': 1024*1024*1024*1024*1024*1024,
+    'Pi': 1024*1024*1024*1024*1024,
+    'Ti': 1024*1024*1024*1024,
+    'Gi': 1024*1024*1024,
+    'Mi': 1024*1024,
+    'Ki': 1024,
+    '_' : 1,
+}
 
 # These mappings are only used when writing numbers
 BIG_SCALE_FACTORS = 'kMGTPEZY'
@@ -692,7 +703,7 @@ FORMAT_SPEC = re.compile(r'''\A
     (,?)                                # comma
     (?:\.(\d+))?                        # precision
     (?:
-        ([qpPQrRusSeEfFgGdn])           # format
+        ([qpPQrRbBusSeEfFgGdn])         # format
         ([a-zA-Z%{us}{cs}][-^/()\w]*)?  # units
     )?
 \Z'''.format(cs=CURRENCY_SYMBOLS, us=UNIT_SYMBOLS), re.VERBOSE)
@@ -799,6 +810,9 @@ class Quantity(float):
     :arg bool ignore_sf:
         Assume the value given within a string does not employ a scale factors.
         In this way, '1m' is interpreted as 1 meter rather than 1 milli.
+
+    :arg bool binary:
+        Allow use of binary scale factors (Ki, Mi, Gi, Ti, Pi, Ei, Zi, Yi).
 
     :raises UnknownConversion(QuantiPhyError, KeyError):
         A unit conversion was requested and there is no corresponding unit
@@ -1022,10 +1036,15 @@ class Quantity(float):
         :arg map_sf:
             Use this to change the way individual scale factors are rendered,
             ex: map_sf={'u': 'μ'} to render micro using mu. If a function is
-            given, it takes a single string argument, the nominal scale factor,
-            and returns a string, the desired scale factor. *QuantiPhy* provides
-            two predefined functions intended for use with *maps_sf*:
-            :meth:`Quantity.map_sf_to_greek` and
+            given, it takes a single string argument, the nominal scale factor
+            (which would be the exponent if no scale factor fits), and returns
+            either a string or a tuple. The string is the desired scale factor.
+            The tuple consists of the string and a flag. If the flag is True the
+            string is treated as an exponent, otherwise it is treated as a scale
+            factors. The difference between an exponent and a scale factor is
+            that the spacer goes after an exponent and before a scale factor.
+            *QuantiPhy* provides two predefined functions intended for use with
+            *maps_sf*: :meth:`Quantity.map_sf_to_greek` and
             :meth:`Quantity.map_sf_to_sci_notation`.
         :type map_sf: dictionary or function
 
@@ -1261,7 +1280,7 @@ class Quantity(float):
             raise UnknownFormatKey(e.args[0])
 
     # _combine {{{2
-    def _combine(self, mantissa, sf, units, spacer):
+    def _combine(self, mantissa, sf, units, spacer, sf_is_exp=False):
         if self.number_fmt:
             parts = mantissa.split('.')
             whole_part = parts[0]
@@ -1274,7 +1293,7 @@ class Quantity(float):
                 else:
                     whole_part = units + whole_part
                 units = ''
-            if sf not in MAPPINGS:
+            if sf_is_exp:
                 frac_part += sf
                 sf = ''
             if callable(self.number_fmt):
@@ -1292,11 +1311,11 @@ class Quantity(float):
                     return '-' + units + mantissa[1:] + sf
                 return units + mantissa + sf
             else:
-                if sf in MAPPINGS:
-                    # has a scale factor
-                    return mantissa + spacer + sf + units
-                # has an exponent
-                return mantissa + sf + spacer + units
+                if sf_is_exp:
+                    # has an exponent
+                    return mantissa + sf + spacer + units
+                # has a scale factor
+                return mantissa + spacer + sf + units
         return mantissa + sf
 
     # recognizers {{{2
@@ -1328,6 +1347,7 @@ class Quantity(float):
         )
         exponent = _named_regex('exp', '[eE][-+]?[0-9]+')
         scale_factor = _named_regex('sf', '[%s]' % input_sf)
+        binary_scale_factor = _named_regex('sf', '%s' % '|'.join(BINARY_MAPPINGS))
         units = _named_regex(
             r'units', r'(?:[a-zA-Z%{us}][-^/()\w·⁻⁰¹²³⁴⁵⁶⁷⁸⁹]*)?'.format(
                 us=UNIT_SYMBOLS
@@ -1418,6 +1438,14 @@ class Quantity(float):
             ]
         ]
 
+        # number_with_binary_scale_factor {{{3
+        number_with_binary_scale_factor = (
+            r'{sign}{mantissa}{space}*{binary_scale_factor}{units}'.format(**locals()),
+            lambda match: match.group('sign') + match.group('mant'),
+            lambda match: match.group('sf'),
+            lambda match: match.group('units')
+        )
+
         # all_number_converters {{{3
         cls.all_number_converters = [
             (re.compile(r'\A\s*{}\s*\Z'.format(pattern)), get_mant, get_sf, get_units)
@@ -1435,6 +1463,14 @@ class Quantity(float):
                 number_with_exponent, simple_number,
                 currency_with_exponent, simple_currency,
                 nan_with_units, currency_nan, simple_nan,
+            ]
+        ]
+
+        # binary_number_converters {{{3
+        cls.binary_number_converters = [
+            (re.compile(r'\A\s*{}\s*\Z'.format(pattern)), get_mant, get_sf, get_units)
+            for pattern, get_mant, get_sf, get_units in [
+                number_with_binary_scale_factor,
             ]
         ]
 
@@ -1464,7 +1500,7 @@ class Quantity(float):
     # constructor {{{2
     def __new__(
         cls, value, model=None, units=None, scale=None,
-        name=None, desc=None, ignore_sf=None
+        name=None, desc=None, ignore_sf=None, binary=False
     ):
         if ignore_sf is None:
             ignore_sf = cls.get_pref('ignore_sf')
@@ -1491,6 +1527,19 @@ class Quantity(float):
                 #data['desc'] = getattr(model, 'desc', '')
 
         def recognize_number(value, ignore_sf):
+            if binary and not ignore_sf:
+                number_converters = cls.binary_number_converters
+                for pattern, get_mant, get_sf, get_units in number_converters:
+                    match = pattern.match(value.replace(',', ''))
+                    if match:
+                        mantissa = get_mant(match)
+                        sf = get_sf(match)
+                        units = get_units(match)
+                        if sf+units in cls.get_pref('known_units'):
+                            sf, units = '', sf+units
+                        mantissa = mantissa.replace('_', '')
+                        number = float(mantissa) * BINARY_MAPPINGS.get(sf, 1)
+                        return number, units, mantissa, ''
             if ignore_sf:
                 number_converters = cls.sf_free_number_converters
             else:
@@ -1842,6 +1891,11 @@ class Quantity(float):
                 show_units=show_units, prec=prec, strip_zeros=strip_zeros,
                 strip_radix=strip_radix, scale=scale
             )
+        if form == 'binary':
+            return self.binary(
+                show_units=show_units, prec=prec, strip_zeros=strip_zeros,
+                strip_radix=strip_radix, scale=scale
+            )
 
         # check for infinities or NaN
         if self.is_infinite() or self.is_nan():
@@ -1903,7 +1957,9 @@ class Quantity(float):
         #  scale factor
         index = exp // 3
         shift = exp % 3
-        sf = "e%d" % (exp - shift)
+        eexp = "e%d" % (exp - shift)
+        sf = eexp
+        sf_is_exp = 'unk'
         if index == 0:
             if units and units not in CURRENCY_SYMBOLS:
                 sf = self.unity_sf
@@ -1929,6 +1985,8 @@ class Quantity(float):
                 sf = self.map_sf.get(sf, sf)
             except AttributeError:
                 sf = self.map_sf(sf)
+                if type(sf) == tuple:
+                    sf, sf_is_exp = sf
 
         # shift the decimal place as needed
         sign = '-' if mantissa[0] == '-' else ''
@@ -1949,7 +2007,9 @@ class Quantity(float):
             if mantissa[-1] == '.':
                 mantissa += '0'
 
-        value = self._combine(mantissa, sf, units, self.spacer)
+        if sf_is_exp == 'unk':
+            sf_is_exp = (sf == eexp)
+        value = self._combine(mantissa, sf, units, self.spacer, sf_is_exp)
         return self._label(value, show_label)
 
     # fixed() {{{2
@@ -1957,7 +2017,7 @@ class Quantity(float):
         self, show_units=None, prec=None, show_label=None, show_commas=False,
         strip_zeros=None, strip_radix=None, scale=None,
     ):
-        """Convert quantity to fixed-point.
+        """Convert quantity to fixed-point string.
 
         :arg bool show_units:
             Whether the units should be included in the string.
@@ -2084,6 +2144,155 @@ class Quantity(float):
                 mantissa += '.'
         value = self._combine(mantissa, '', units, self.spacer)
         return self._label(value, show_label)
+
+    # binary() {{{2
+    def binary(
+        self, show_units=None, prec=None, show_label=None,
+        strip_zeros=None, strip_radix=None, scale=None,
+    ):
+        """Convert quantity to string using binary scale factors.
+
+        When in range the number is divided by some integer power of 1024 and
+        the appropriate scale factor is added to the quotient, where the scale
+        factors are '' for 0 powers of 1024, 'Ki' for 1, 'Mi' for 2, 'Gi' for 3,
+        'Ti' for 4, 'Pi' for 5, 'Ei' for 6, 'Zi' for 7 and 'Yi for 8.  Outside
+        this range, the number is converted to a string using a simple floating
+        point format.
+
+        Within the range the number of significant figures used is equal to
+        prec+1.  Outside the range, prec give the number of figures to the right
+        of the decimal point.
+
+        :arg bool show_units:
+            Whether the units should be included in the string.
+
+        :arg prec:
+            The desired precision (number of digits to the right or the radix).
+            If specified as 'full', the full original precision is used.
+        :type prec: integer or 'full'
+
+        :arg show_label:
+            Add the name and possibly the description when rendering a quantity
+            to a string.  Either *label_fmt* or *label_fmt_full* is used to
+            label the quantity.
+
+            - neither is used if *show_label* is False,
+            - otherwise *label_fmt* is used if quantity does not have a
+              description or if *show_label* is 'a' (short for abbreviated),
+            - otherwise *label_fmt_full* is used if *show_desc* is True or
+              *show_label* is 'f' (short for full).
+        :type show_label: 'f', 'a', or boolean
+
+        :arg strip_zeros:
+            Remove contiguous zeros from end of fractional part. If not
+            specified, the global *strip_zeros* setting is used.
+        :type strip_zeros: boolean
+
+        :arg strip_radix:
+            Remove radix if there is nothing to the right of it.  If not
+            specified, the global *strip_radix* setting is used.
+        :type strip_radix: boolean
+
+        :arg scale:
+            - If a float, it scales the displayed value (the quantity is
+              multiplied by scale before being converted to the string).
+            - If a tuple, the first value, a float, is treated as a scale factor
+              and the second value, a string, is take to be the units of the
+              displayed value.
+            - If a function, it takes two arguments, the value and the units of
+              the quantity and it returns two values, the value and units of
+              the displayed value.
+            - If a string, it is taken to the be desired units. This value along
+              with the units of the quantity are used to select a known unit
+              conversion, which is applied to create the displayed value.
+        :type scale: real, pair, function, or string
+
+        :raises UnknownConversion(QuantiPhyError, KeyError):
+            A unit conversion was requested and there is no corresponding unit
+            converter.
+
+        :raises UnknownFormatKey(QuantiPhyError, KeyError):
+            'label_fmt' or 'label_fmt_full' contains an unknown format key.
+
+        Example::
+
+            >>> t = Quantity('mem = 16 GiB -- amount of physical memory', binary=True)
+            >>> print(
+            ...     t.binary(),
+            ...     t.binary(prec=3, strip_zeros=False),
+            ...     t.binary(show_label=True, scale='b'), sep=newline)
+            16 GiB
+            16.00 GiB
+            mem = 128 Gib
+
+        """
+        # initialize various options
+        show_units = self.show_units if show_units is None else show_units
+        strip_zeros = self.strip_zeros if strip_zeros is None else strip_zeros
+        strip_radix = self.strip_radix if strip_radix is None else strip_radix
+        units = self.units if show_units else ''
+        if prec is None:
+            prec = self.prec
+        elif prec == 'full':
+            prec = self.full_prec
+
+        # check for infinities or NaN
+        if self.is_infinite() or self.is_nan():
+            value = self._combine(str(self.real), '', units, ' ')
+            return self._label(value, show_label)
+
+        # handle scaling
+        if scale:
+            number, units = _scale(scale, float(self), self.units)
+            units = units if show_units else ''
+        else:
+            number = float(self)
+
+        # format the number with binary scale factors if appropriate
+        try:
+            from math import log
+            base = log(abs(number), 2)//10
+            if base < 0:
+                raise IndexError
+            sf = ('_KMGTPEZY'[int(base)] + 'i')
+            sf = sf.replace('_i', self.unity_sf)
+            num = '{number:0.{prec}e}'.format(
+                number=(number / (2**(10*base))), prec=prec
+            )
+            # this occasionally rounds up to 1024
+            # this can result in 1024 MiB rather than 1 GiB
+            mantissa, exp = num.split('e')
+            exp = int(exp)
+            mantissa += '.'
+            whole, frac = mantissa.split('.')[0:2]
+            frac += (exp - prec)*'0'
+            mantissa = whole + frac[0:exp] + '.' + frac[exp:]
+            sf_is_exp = False
+
+        # cannot use binary scale factors, just use float format
+        except (IndexError, ValueError):
+            num = '{number:0.{prec}f}'.format(number=number, prec=prec)
+            if 'e' in num:
+                mantissa, exp = num.split('e')
+                sf = 'e' + exp
+                sf_is_exp = True
+            else:
+                mantissa = num
+                sf = ''
+                sf_is_exp = False
+
+        # strip excess digits and radix
+        if '.' not in mantissa:
+            mantissa += '.'
+        if strip_zeros:
+            mantissa = mantissa.rstrip('0')
+            if not mantissa:
+                mantissa = '0'
+        if strip_radix or (sf and sf_is_exp):
+            mantissa = mantissa.rstrip('.')
+        value = self._combine(mantissa, sf, units, self.spacer, sf_is_exp)
+        return self._label(value, show_label)
+
 
     # is_close() {{{2
     def is_close(self, other, reltol=None, abstol=None, check_units=True):
@@ -2252,6 +2461,12 @@ class Quantity(float):
                     prec=prec, show_units=True, show_label=label,
                     show_commas=comma, strip_zeros=not alt_form,
                     strip_radix=not alt_form, scale=scale
+                )
+            elif ftype == 'b':
+                value = self.binary(
+                    prec=prec, show_units=True, show_label=label,
+                    strip_zeros=not alt_form, strip_radix=not alt_form,
+                    scale=scale
                 )
             else:
                 if prec is None:
@@ -2448,22 +2663,25 @@ class Quantity(float):
 
         Pass this function to *map_sf* preference if you prefer your large and
         small numbers in classic scientific notation. It also causes 'u' to be
-        converted to 'μ'. Set *form* to 'eng'  to format all numbers in
+        converted to 'μ'. Set *form* to 'eng' to format all numbers in
         scientific notation.
 
         Example::
 
-            >>> with Quantity.prefs(map_sf=Quantity.map_sf_to_sci_notation):
+            >>> with Quantity.prefs(map_sf=Quantity.map_sf_to_sci_notation, show_label='f'):
             ...     print(
-            ...         Quantity('k').render(show_label='f'),
-            ...         Quantity('mu0').render(show_label='f'),
+            ...         Quantity('k').render(),
+            ...         Quantity('mu0').render(),
+            ...         Quantity('mu0').render(form='eng'),
             ...         sep=newline,
             ...     )
             k = 13.806×10⁻²⁴ J/K -- Boltzmann's constant
             μ₀ = 1.2566 μH/m -- permeability of free space
+            μ₀ = 1.2566×10⁻⁶ H/m -- permeability of free space
 
         """
-        return sf.translate(Quantity._SCI_NOTATION_MAPPER)
+        mapped = sf.translate(Quantity._SCI_NOTATION_MAPPER)
+        return mapped, u'×' in mapped
 
     # map_sf_to_greek() {{{2
     @staticmethod

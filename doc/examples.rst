@@ -220,17 +220,17 @@ those bits or bytes?  Reformatting with *QuantiPhy* makes it much more readable:
     >>> for line in bits_per_dollar.strip().split('\n'):
     ...     year, bits = line.split()
     ...     bits = Quantity(bits, 'b')
-    ...     print(f'{year}  {bits:9q}   {bits:9qB}')
-    1973      490 b     61.25 B
-    1978    2.78 kb     347.5 B
-    1983    16.4 kb     2.05 kB
-    1988    91.8 kb   11.475 kB
-    1993     368 kb       46 kB
-    1998     4.9 Mb    612.5 kB
-    2003    26.3 Mb   3.2875 MB
-    2008     143 Mb   17.875 MB
-    2013     833 Mb   104.12 MB
-    2018       5 Gb      625 MB
+    ...     print(f'{year}  {bits:11q}   {bits:11qB}')
+    1973        490 b       61.25 B
+    1978      2.78 kb       347.5 B
+    1983      16.4 kb       2.05 kB
+    1988      91.8 kb     11.475 kB
+    1993       368 kb         46 kB
+    1998       4.9 Mb      612.5 kB
+    2003      26.3 Mb     3.2875 MB
+    2008       143 Mb     17.875 MB
+    2013       833 Mb     104.12 MB
+    2018         5 Gb        625 MB
 
 Notice that *bits* was printed twice. The first time the formatting code 
 included a width specification, but in the second the desired unit of measure 
@@ -239,7 +239,25 @@ to bytes.
 
 It is important to recognize that *QuantiPhy* is using decimal rather than 
 binary scale factors. So 5 GB is 5 gigabyte and not 5 gibibyte.  In other words 
-5 GB represents 5×10⁹ B and not 5×2³⁰ B.
+5 GB represents 5×10⁹ B and not 5×2³⁰ B. This table can be reformulated to use 
+the binary scale factors by changing the *q* format characters to *b*:
+
+.. code-block:: python
+
+    >>> for line in bits_per_dollar.strip().split('\n'):
+    ...     year, bits = line.split()
+    ...     bits = Quantity(bits, 'b')
+    ...     print(f'{year}  {bits:11b}   {bits:11bB}')
+    1973        490 b       61.25 B
+    1978   2.7148 Kib       347.5 B
+    1983   16.016 Kib     2.002 KiB
+    1988   89.648 Kib    11.206 KiB
+    1993   359.38 Kib    44.922 KiB
+    1998    4.673 Mib    598.14 KiB
+    2003   25.082 Mib    3.1352 MiB
+    2008   136.38 Mib    17.047 MiB
+    2013   794.41 Mib    99.301 MiB
+    2018   4.6566 Gib    596.05 MiB
 
 
 .. _thermal voltage example:
@@ -516,12 +534,12 @@ presenting the results.
         for line in du.stdout.split('\n'):
             if line:
                 size, filename = line.split('\t', 1)
-                files += [(Quantity(size, scale=(1000, 'B')), filename)]
+                files += [(Quantity(size, scale=(1024, 'B')), filename)]
 
         files.sort(key=lambda x: x[0])
 
-        for each in files:
-            display('{:7.2}  {}'.format(*each))
+        for size, name in files:
+            display('{:7.2b}  {}'.format(size, name))
 
     except OSError as err:
         fatal(os_error(err))
@@ -890,9 +908,11 @@ GitHub, or you can download and install it with pip::
 
 Originally RKM codes were limited to resistors and capacitors. IEC60062 is an 
 international standard that codifies RKM codes for this use. It assumes that 
-large values are resistances and small values are capacitances. The *rkm_codes* 
-package provides a more general version of RKM codes by default, but it can be 
-configured to conform to the standard by setting *rkm_maps* as follows:
+large values are resistances and small values are capacitances, thus it is not 
+really necessary to include the units with the number.  The *rkm_codes* package 
+provides a more general version of RKM codes which includes the units by 
+default, but it can be configured to conform to the standard by setting 
+*rkm_maps* as follows:
 
 .. rkm_code examples are commented out because they don't work in python2
 
