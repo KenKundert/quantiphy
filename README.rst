@@ -1,8 +1,8 @@
 QuantiPhy - Physical Quantities
 ===============================
 
-| Version: 2.4.2
-| Released: 2018-11-16
+| Version: 2.4.3
+| Released: 2018-12-28
 |
 
 .. image:: https://img.shields.io/travis/KenKundert/quantiphy/master.svg
