@@ -194,8 +194,8 @@ If given as a string, the value may also be the name of a known :ref:`constant
 The following constants are pre-defined: *h*, *ħ*, *k*, *q*, *c*, *0°C*, *ε₀*, 
 *μ₀*, and *Z₀*. You may add your own constants.
 
-Currency units ($£€ɃΞ) are a bit different than other units, they are placed 
-at the front of the quantity.
+Currency units ($€¥£₩₺₽₹ɃΞ) are a bit different than other units, they are 
+placed at the front of the quantity.
 
 .. code-block:: python
 

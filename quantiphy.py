@@ -688,7 +688,7 @@ SMALL_SCALE_FACTORS = 'munpfazy'
     # These must be given in order, one for every three decades.
 
 # Supported currency symbols (these go on left side of number)
-CURRENCY_SYMBOLS = '$£€¥₹ɃΞ' if sys.version_info.major == 3 else '$'
+CURRENCY_SYMBOLS = '$€¥£₩₺₽₹ɃΞ' if sys.version_info.major == 3 else '$'
 
 # Unit symbols that are not simple letters.
 # Do not include % as it will be picked up when converting text to numbers,
