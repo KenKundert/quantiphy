@@ -1,10 +1,6 @@
 QuantiPhy - Physical Quantities
 ===============================
 
-| Version: 2.4.4
-| Released: 2019-01-07
-|
-
 .. image:: https://img.shields.io/travis/KenKundert/quantiphy/master.svg
     :target: https://travis-ci.org/KenKundert/quantiphy
 
@@ -20,6 +16,10 @@ QuantiPhy - Physical Quantities
 .. IGNORE: pypi statistics are broken and unlikely to be fixed
     .. image:: https://img.shields.io/pypi/dm/quantiphy.svg
         :target: https://pypi.python.org/pypi/quantiphy/
+
+:Author: Ken Kundert
+:Version: 2.4.4
+:Released: 2019-01-07
 
 
 What?
