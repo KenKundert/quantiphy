@@ -404,7 +404,7 @@ making the quantity easier to read.
     105.46×10⁻³⁶ J-s.  Boltzmann's constant is 13.806×10⁻²⁴ J/K.
     Elementary charge is 160.22×10⁻²¹ C.  Speed of light is 299.79 Mm/s.
     Zero degrees celsius in kelvin is 273.15 K.  Permittivity of free
-    space is 8.8542 pF/m.  Permeability of free space is 1.2566 μH/m.
+    space is 8.8542 pF/m.  Permeability of free space is 1.2566 µH/m.
 
 When rendered in your browser with a variable width font, the result looks like 
 this:
@@ -413,7 +413,7 @@ this:
     105.46×10⁻³⁶ J-s.  Boltzmann's constant is 13.806×10⁻²⁴ J/K.
     Elementary charge is 160.22×10⁻²¹ C.  Speed of light is 299.79 Mm/s.
     Zero degrees Celsius in Kelvin is 273.15 K.  Permittivity of free
-    space is 8.8542 pF/m.  Permeability of free space is 1.2566 μH/m.
+    space is 8.8542 pF/m.  Permeability of free space is 1.2566 µH/m.
 
 .. _timeit example:
 
@@ -484,9 +484,9 @@ The results are::
 
     For 100k iterations ...
                [float(v) for v in s_numbers]: 638 ns/op
-         [Quantity(v) for v in s_quantities]: 15.3 μs/op
-                   [str(v) for v in numbers]: 1.03 μs/op
-                [str(v) for v in quantities]: 28.1 μs/op
+         [Quantity(v) for v in s_quantities]: 15.3 µs/op
+                   [str(v) for v in numbers]: 1.03 µs/op
+                [str(v) for v in quantities]: 28.1 µs/op
 
 You can see that *QuantiPhy* is considerably slower than the float class, which 
 you should be aware of if you are processing large quantities of numbers.
@@ -743,7 +743,7 @@ This script produces the following textual output::
     Time step = 20 ns
     Nonperiodicity = 2.3 pV
     Time points = 28k
-    Period = 560 μs
+    Period = 560 µs
     Frequency resolution = 1.79 kHz
 
 And the following is one of the two graphs produced:
@@ -928,7 +928,7 @@ default, but it can be configured to conform to the standard by setting
 
     >> c = from_rkm('4u7')
     >> c
-    Quantity('4.7 μF')
+    Quantity('4.7 µF')
 
     >> to_rkm(r)
     '6k8'
@@ -981,7 +981,7 @@ For example::
 
     >> pins = [
     ..     dict(kind='ibias', direction='out', polarity='sink', dest='dac', value='250nA'),
-    ..     dict(kind='ibias', direction='out', polarity='src', dest='rampgen', value='2.5μA'),
+    ..     dict(kind='ibias', direction='out', polarity='src', dest='rampgen', value='2.5µA'),
     ..     dict(kind='vref', direction='out', dest='dac', value='1.25V'),
     ..     dict(kind='vdda', direction='in', value='2.5V'),
     .. ]

@@ -20,6 +20,8 @@ def test_constants():
     assert '{:.12q}'.format(Quantity('0C')) == '273.15 K'
     assert '{:.12q}'.format(Quantity('eps0')) == '8.854187817 pF/m'
     assert '{:.12q}'.format(Quantity('mu0')) == '1.256637061436 uH/m'
+    assert '{:.12q}'.format(Quantity('µ₀')) == '1.256637061436 uH/m' # uses micro
+    assert '{:.12q}'.format(Quantity('μ₀')) == '1.256637061436 uH/m' # uses mu
     assert '{:.12q}'.format(Quantity('Z0')) == '376.730313461 Ohms'
 
     assert str(Quantity('h')) == '662.61e-36 J-s'
@@ -31,6 +33,8 @@ def test_constants():
     assert str(Quantity('0C')) == '273.15 K'
     assert str(Quantity('eps0')) == '8.8542 pF/m'
     assert str(Quantity('mu0')) == '1.2566 uH/m'
+    assert str(Quantity('µ₀')) == '1.2566 uH/m'  # uses micro
+    assert str(Quantity('μ₀')) == '1.2566 uH/m'  # uses mu
     assert str(Quantity('Z0')) == '376.73 Ohms'
 
     assert '{:S}'.format(Quantity('h')) == "h = 662.61e-36 J-s -- Plank's constant"
@@ -41,7 +45,9 @@ def test_constants():
     assert '{:S}'.format(Quantity('c')) == 'c = 299.79 Mm/s -- speed of light'
     assert '{:S}'.format(Quantity('0C')) == '0°C = 273.15 K -- zero degrees Celsius in Kelvin'
     assert '{:S}'.format(Quantity('eps0')) == 'ε₀ = 8.8542 pF/m -- permittivity of free space'
-    assert '{:S}'.format(Quantity('mu0')) == 'μ₀ = 1.2566 uH/m -- permeability of free space'
+    assert '{:S}'.format(Quantity('mu0')) == 'µ₀ = 1.2566 uH/m -- permeability of free space'
+    assert '{:S}'.format(Quantity('µ₀')) == 'µ₀ = 1.2566 uH/m -- permeability of free space'  # uses micro
+    assert '{:S}'.format(Quantity('μ₀')) == 'µ₀ = 1.2566 uH/m -- permeability of free space'  # uses mu
     assert '{:S}'.format(Quantity('Z0')) == 'Z₀ = 376.73 Ohms -- characteristic impedance of free space'
 
     set_unit_system('cgs')
@@ -103,6 +109,8 @@ def test_constants():
     assert '{:.12q}'.format(Quantity('0C')) == '273.15 K'
     assert '{:.12q}'.format(Quantity('eps0')) == '8.854187817 pF/m'
     assert '{:.12q}'.format(Quantity('mu0')) == '1.256637061436 uH/m'
+    assert '{:.12q}'.format(Quantity('µ₀')) == '1.256637061436 uH/m'  # uses micro
+    assert '{:.12q}'.format(Quantity('μ₀')) == '1.256637061436 uH/m'  # uses mu
     assert '{:.12q}'.format(Quantity('Z0')) == '376.730313461 Ohms'
 
     assert str(Quantity('h')) == '662.61e-36 J-s'
@@ -114,6 +122,8 @@ def test_constants():
     assert str(Quantity('0C')) == '273.15 K'
     assert str(Quantity('eps0')) == '8.8542 pF/m'
     assert str(Quantity('mu0')) == '1.2566 uH/m'
+    assert str(Quantity('µ₀')) == '1.2566 uH/m'  # uses micro
+    assert str(Quantity('μ₀')) == '1.2566 uH/m'  # uses mu
     assert str(Quantity('Z0')) == '376.73 Ohms'
 
     assert '{:S}'.format(Quantity('h')) == "h = 662.61e-36 J-s -- Plank's constant"
@@ -124,7 +134,9 @@ def test_constants():
     assert '{:S}'.format(Quantity('c')) == 'c = 299.79 Mm/s -- speed of light'
     assert '{:S}'.format(Quantity('0C')) == '0°C = 273.15 K -- zero degrees Celsius in Kelvin'
     assert '{:S}'.format(Quantity('eps0')) == 'ε₀ = 8.8542 pF/m -- permittivity of free space'
-    assert '{:S}'.format(Quantity('mu0')) == 'μ₀ = 1.2566 uH/m -- permeability of free space'
+    assert '{:S}'.format(Quantity('mu0')) == 'µ₀ = 1.2566 uH/m -- permeability of free space'
+    assert '{:S}'.format(Quantity('µ₀')) == 'µ₀ = 1.2566 uH/m -- permeability of free space'  # uses micro
+    assert '{:S}'.format(Quantity('μ₀')) == 'µ₀ = 1.2566 uH/m -- permeability of free space'  # uses mu
     assert '{:S}'.format(Quantity('Z0')) == 'Z₀ = 376.73 Ohms -- characteristic impedance of free space'
 
     add_constant('f_hy = 1420.405751786 MHz -- Frequency of hydrogen line')

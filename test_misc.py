@@ -239,12 +239,13 @@ def test_misc2():
         assert Quantity.get_pref('map_sf') == {}
 
         Foo.set_prefs(map_sf=Foo.map_sf_to_greek)
-        assert t.render() == '1 μs'
+        assert t.render() == '1 µs'
         assert Foo.get_pref('map_sf') == Foo.map_sf_to_greek
         assert Quantity.get_pref('map_sf') == {}
 
         Foo.set_prefs(map_sf=Quantity.map_sf_to_sci_notation)
         assert t.render(form='eng') == '1×10⁻⁶ s'
+        assert t.render(form='si') == '1 µs'
         assert Foo.get_pref('map_sf') == Foo.map_sf_to_sci_notation
         assert Quantity.get_pref('map_sf') == {}
 
@@ -324,9 +325,9 @@ def test_misc2():
     # test map_sf
     if sys.version_info.major == 3:
         Quantity.set_prefs(map_sf=Quantity.map_sf_to_greek)
-        assert Quantity('10e-6 m').render() == '10 μm'
+        assert Quantity('10e-6 m').render() == '10 µm'
         Quantity.set_prefs(map_sf=Quantity.map_sf_to_sci_notation)
-        assert Quantity('10e-6 m').render() == '10 μm'
+        assert Quantity('10e-6 m').render() == '10 µm'
         assert Quantity('10e-6 m').render(form='eng') == '10×10⁻⁶ m'
         Quantity.set_prefs(map_sf=None)
     sf_map = {

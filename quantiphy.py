@@ -504,7 +504,7 @@ UnitConversion('K', 'R °R', 5/9, 0)
 UnitConversion('m', 'km', 1000)
 UnitConversion('m', 'cm', 1/100)
 UnitConversion('m', 'mm', 1/1000)
-UnitConversion('m', 'um μm micron', 1/1000000)
+UnitConversion('m', 'um µm μm micron', 1/1000000)
 UnitConversion('m', 'nm', 1/1000000000)
 UnitConversion('m', 'Å angstrom', 1/10000000000)
 UnitConversion('m', 'mi mile miles', 1609.344)
@@ -581,7 +581,8 @@ def add_constant(value, alias=None, unit_systems=None):
         An alias for the constant. Can be used to access the constant from as an
         alternative to the name given in the value, which itself is optional.
         If the value has a name, specifying this name is optional. If both are
-        given, the constant is accessible using either name.
+        given, the constant is accessible using either name.  *alias* may also
+        be a list of aliases.
 
     :arg unit_systems:
         Name or names of the unit systems to which the constant should be added.
@@ -622,17 +623,23 @@ def add_constant(value, alias=None, unit_systems=None):
         raise MissingName()
     if is_str(unit_systems):
         unit_systems = unit_systems.split()
+    if alias:
+        aliases = [alias] if is_str(alias) else alias
+    else:
+        aliases = []
 
     # add value to the collection of constants under both names
     if unit_systems:
         for system in unit_systems:
             constants = _constants.get(system, {})
-            if alias:
+            for alias in aliases:
                 constants[alias] = value
             if value.name:
                 constants[value.name] = value
             _constants[system] = constants
     else:
+        for alias in aliases:
+            _constants[None][alias] = value
         if alias:
             _constants[None][alias] = value
         if value.name:
@@ -659,7 +666,8 @@ MAPPINGS = {
     'c': 'e-2',  # only available for input, not used in output
     'm': 'e-3',
     'u': 'e-6',
-    'μ': 'e-6',
+    'µ': 'e-6',  # micro
+    'μ': 'e-6',  # greek mu
     'n': 'e-9',
     'p': 'e-12',
     'f': 'e-15',
@@ -983,7 +991,7 @@ class Quantity(float):
 
         :arg str input_sf:
             Which scale factors to recognize when reading numbers.  The default
-            is 'YZEPTGMKk_cmuμnpfazy'.  You can use this to ignore the scale
+            is 'YZEPTGMKk_cmuµμnpfazy'.  You can use this to ignore the scale
             factors you never expect to reduce the chance of a scale factor/unit
             ambiguity.  For example, if you expect to encounter temperatures in
             Kelvin and can do without 'K' as a scale factor, you might use
@@ -1478,8 +1486,8 @@ class Quantity(float):
         smpl_units = '[a-zA-Z_{us}]*'.format(us=UNIT_SYMBOLS)
             # may only contain alphabetic characters, ex: V, A, _Ohms, etc.
             # or obvious unicode units, ex: °ÅΩ℧
-        sf_or_units = '[a-zA-Z_μ{us}]+'.format(us=UNIT_SYMBOLS)
-            # must match units or scale factors: add μ, make non-optional
+        sf_or_units = '[a-zA-Z_µ{us}]+'.format(us=UNIT_SYMBOLS)
+            # must match units or scale factors: add µ, make non-optional
         space = '[ ]?'  # optional non-breaking space (do not use a normal space)
         left_delimit = r'(?:\A|(?<=[^a-zA-Z0-9_.]))'
         right_delimit = r'(?=[^-+0-9]|\Z)'
@@ -2654,7 +2662,7 @@ class Quantity(float):
         ord(u'7'): u'⁷',
         ord(u'8'): u'⁸',
         ord(u'9'): u'⁹',
-        ord(u'u'): u'μ',
+        ord(u'u'): u'µ',
     }
 
     @staticmethod
@@ -2663,7 +2671,7 @@ class Quantity(float):
 
         Pass this function to *map_sf* preference if you prefer your large and
         small numbers in classic scientific notation. It also causes 'u' to be
-        converted to 'μ'. Set *form* to 'eng' to format all numbers in
+        converted to 'µ'. Set *form* to 'eng' to format all numbers in
         scientific notation.
 
         Example::
@@ -2676,8 +2684,8 @@ class Quantity(float):
             ...         sep=newline,
             ...     )
             k = 13.806×10⁻²⁴ J/K -- Boltzmann's constant
-            μ₀ = 1.2566 μH/m -- permeability of free space
-            μ₀ = 1.2566×10⁻⁶ H/m -- permeability of free space
+            µ₀ = 1.2566 µH/m -- permeability of free space
+            µ₀ = 1.2566×10⁻⁶ H/m -- permeability of free space
 
         """
         mapped = sf.translate(Quantity._SCI_NOTATION_MAPPER)
@@ -2688,18 +2696,18 @@ class Quantity(float):
     def map_sf_to_greek(sf):
         '''Render scale factors in Greek alphabet if appropriate.
 
-        Pass this dictionary to *map_sf* preference if you prefer μ rather than u.
+        Pass this dictionary to *map_sf* preference if you prefer µ rather than u.
 
         Example::
 
             >>> with Quantity.prefs(map_sf=Quantity.map_sf_to_greek):
             ...     print(Quantity('mu0').render(show_label='f'))
-            μ₀ = 1.2566 μH/m -- permeability of free space
+            µ₀ = 1.2566 µH/m -- permeability of free space
 
         '''
         # this could just as easily be a simple dictionary, but implement it as
         # a function so that it supports a docstring.
-        return {'u': 'μ'}.get(sf, sf)
+        return {'u': 'µ'}.get(sf, sf)
 
     # all_from_conv_fmt {{{2
     @classmethod
@@ -2915,10 +2923,10 @@ add_constant(
     Quantity(
         4e-7*math.pi,
         units='H/m',
-        name='μ₀',
+        name='µ₀',
         desc="permeability of free space"
     ),
-    alias='mu0',
+    alias=['mu0', 'μ₀'],
     unit_systems='mks'
 )
 
