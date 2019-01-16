@@ -93,8 +93,8 @@ Releases
     - Enhance UnitConversion so that it supports nonlinear conversions.
 
 **Latest development release**:
-    | Version: 2.4.4
-    | Released: 2019-01-07
+    | Version: 2.4.5
+    | Released: 2019-01-16
 
     - added RKM codes example.
     - added *check_value* = 'strict' to :meth:`quantiphy.Quantity.add()`.

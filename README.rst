@@ -18,8 +18,8 @@ QuantiPhy - Physical Quantities
         :target: https://pypi.python.org/pypi/quantiphy/
 
 :Author: Ken Kundert
-:Version: 2.4.4
-:Released: 2019-01-07
+:Version: 2.4.5
+:Released: 2019-01-16
 
 
 What?
