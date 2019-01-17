@@ -885,6 +885,9 @@ If you do, the output of the script looks like this::
     100000 ADA =   $8,203.00  4%   (1 ADA =     $0.08)
          Total = $218,227.10
 
+A more sophisticated version of this example can be found on `Github 
+<https://github.com/KenKundert/cryptocurrency/blob/master/cryptocurrency>`_.
+
 
 .. _rkm codes example:
 

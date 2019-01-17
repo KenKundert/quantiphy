@@ -92,10 +92,7 @@ Releases
     - Added concept of equivalent units for unit conversion to documentation.
     - Enhance UnitConversion so that it supports nonlinear conversions.
 
-**Latest development release**:
-    | Version: 2.4.5
-    | Released: 2019-01-16
-
+**2.5 (2019-01-16)**:
     - added RKM codes example.
     - added *check_value* = 'strict' to :meth:`quantiphy.Quantity.add()`.
     - added backward compatibility for *form* argument of 
@@ -103,3 +100,8 @@ Releases
     - made :meth:`quantiphy.Quantity.extract()` a bit more general.
     - reformulated exceptions.
     - added support for binary scale factors and :meth:`quantiphy.Quantity.binary()`.
+
+**Latest development release**:
+    | Version: 2.4.5
+    | Released: 2019-01-16
+
