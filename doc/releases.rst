@@ -102,6 +102,6 @@ Releases
     - added support for binary scale factors and :meth:`quantiphy.Quantity.binary()`.
 
 **Latest development release**:
-    | Version: 2.4.5
+    | Version: 2.5.0
     | Released: 2019-01-16
 
