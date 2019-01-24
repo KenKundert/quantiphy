@@ -247,17 +247,17 @@ the binary scale factors by changing the *q* format characters to *b*:
     >>> for line in bits_per_dollar.strip().split('\n'):
     ...     year, bits = line.split()
     ...     bits = Quantity(bits, 'b')
-    ...     print(f'{year}  {bits:11b}   {bits:11bB}')
-    1973        490 b       61.25 B
-    1978   2.7148 Kib       347.5 B
-    1983   16.016 Kib     2.002 KiB
-    1988   89.648 Kib    11.206 KiB
-    1993   359.38 Kib    44.922 KiB
-    1998    4.673 Mib    598.14 KiB
-    2003   25.082 Mib    3.1352 MiB
-    2008   136.38 Mib    17.047 MiB
-    2013   794.41 Mib    99.301 MiB
-    2018   4.6566 Gib    596.05 MiB
+    ...     print(f'{year}  {bits:11.2b}   {bits:11.2bB}')
+    1973        490 b        61.2 B
+    1978     2.71 Kib         348 B
+    1983       16 Kib         2 KiB
+    1988     89.6 Kib      11.2 KiB
+    1993      359 Kib      44.9 KiB
+    1998     4.67 Mib       598 KiB
+    2003     25.1 Mib      3.14 MiB
+    2008      136 Mib        17 MiB
+    2013      794 Mib      99.3 MiB
+    2018     4.66 Gib       596 MiB
 
 
 .. _thermal voltage example:
