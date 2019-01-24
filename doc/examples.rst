@@ -220,16 +220,16 @@ those bits or bytes?  Reformatting with *QuantiPhy* makes it much more readable:
     >>> for line in bits_per_dollar.strip().split('\n'):
     ...     year, bits = line.split()
     ...     bits = Quantity(bits, 'b')
-    ...     print(f'{year}  {bits:11q}   {bits:11qB}')
-    1973        490 b       61.25 B
-    1978      2.78 kb       347.5 B
+    ...     print(f'{year}  {bits:11.2q}   {bits:11.2qB}')
+    1973        490 b        61.2 B
+    1978      2.78 kb         348 B
     1983      16.4 kb       2.05 kB
-    1988      91.8 kb     11.475 kB
+    1988      91.8 kb       11.5 kB
     1993       368 kb         46 kB
-    1998       4.9 Mb      612.5 kB
-    2003      26.3 Mb     3.2875 MB
-    2008       143 Mb     17.875 MB
-    2013       833 Mb     104.12 MB
+    1998       4.9 Mb        612 kB
+    2003      26.3 Mb       3.29 MB
+    2008       143 Mb       17.9 MB
+    2013       833 Mb        104 MB
     2018         5 Gb        625 MB
 
 Notice that *bits* was printed twice. The first time the formatting code 
