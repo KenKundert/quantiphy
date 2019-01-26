@@ -150,12 +150,12 @@ tweaked somewhat to handle tables 2 and 3):
 
     >>> # print the table in a form suitable for machines
     >>> for name, rate, freqs in sdh:
-    ...     print('{:8s}: {:12.4e} {:9.2e} {:9.2e} {:9.2e} {:9.2e}'.format(name, rate, *(1*f for f in freqs)))
-    STM-1   :   1.5552e+08  5.00e+02  6.50e+03  6.50e+04  1.30e+06
-    STM-4   :   6.2208e+08  1.00e+03  2.50e+04  2.50e+05  5.00e+06
-    STM-16  :   2.4883e+09  5.00e+03  1.00e+05  1.00e+06  2.00e+07
-    STM-64  :   9.9533e+09  2.00e+04  4.00e+05  4.00e+06  8.00e+07
-    STM-256 :   3.9813e+10  8.00e+04  1.92e+06  1.60e+07  3.20e+08
+    ...     print('{:8s}: {:12.4e} {:9.2e} {:9.2e} {:9.2e} {:9.2e}'.format(name, rate, *freqs))
+    STM-1   :   1.5552e+08     5e+02   6.5e+03   6.5e+04   1.3e+06
+    STM-4   :   6.2208e+08     1e+03   2.5e+04   2.5e+05     5e+06
+    STM-16  :   2.4883e+09     5e+03     1e+05     1e+06     2e+07
+    STM-64  :   9.9533e+09     2e+04     4e+05     4e+06     8e+07
+    STM-256 :   3.9813e+10     8e+04  1.92e+06   1.6e+07   3.2e+08
 
     >>> # print the table in a compromise form
     >>> for name, rate, freqs in sdh:
@@ -174,11 +174,9 @@ tweaked somewhat to handle tables 2 and 3):
 The code reads the data and then produces three outputs.  The first output shows 
 that quantities can be displayed in easily readable forms with their units 
 (approximates table1).  The second output shows that the values are easily 
-accessible for computation (approximates table2).  The use of ``1*f`` is not 
-necessary to be able to see the results in exponential notation, rather it is 
-there to demonstrate that it is easy to do calculations on Quantities. Finally, 
-the third output represents a compromise between being human and machine 
-readable (approximates table3).
+accessible for computation (approximates table2).  Finally, the third output 
+represents a compromise between being human and machine readable (approximates 
+table3).
 
 :class:`quantiphy.Quantity` is used to convert a number string, such as '155.52 
 Mb/s' into an internal representation that includes the value and the units: 
