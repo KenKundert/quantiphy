@@ -90,6 +90,18 @@ def test_wager():
     assert f_clk.desc == 'clock frequency'
     assert not qs
 
+def test_disallow():
+    qs = Quantity.extract(
+        r"""
+            rate = 64GiB/s -- bit rate
+        """,
+        binary = True,
+    )
+    rate = qs.pop('rate')
+    assert float(rate) == 68719476736
+    assert rate.units == 'B/s'
+    assert not qs
+
 def test_invention():
     qs = Quantity.extract(
         r"""

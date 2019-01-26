@@ -2280,7 +2280,7 @@ class Quantity(float):
         # cannot use binary scale factors, just use float format
         except (IndexError, ValueError):
             num = '{number:0.{prec}f}'.format(number=number, prec=prec)
-            if 'e' in num:
+            if 'e' in num: # pragma: no cover
                 mantissa, exp = num.split('e')
                 sf = 'e' + exp
                 sf_is_exp = True
@@ -2294,8 +2294,6 @@ class Quantity(float):
             mantissa += '.'
         if strip_zeros:
             mantissa = mantissa.rstrip('0')
-            if not mantissa:
-                mantissa = '0'
         if strip_radix or (sf and sf_is_exp):
             mantissa = mantissa.rstrip('.')
         value = self._combine(mantissa, sf, units, self.spacer, sf_is_exp)
@@ -2514,7 +2512,7 @@ class Quantity(float):
 
     # extract() {{{2
     @classmethod
-    def extract(cls, text, predefined=None):
+    def extract(cls, text, predefined=None, **kwargs):
         """Extract quantities
 
         Takes a string that contains quantity definitions, one per line, and 
@@ -2575,6 +2573,12 @@ class Quantity(float):
             the values being defined.  You can use *locals()* as this argument
             to make all local variables available.
 
+        :arg **kwargs:
+            Any argument that can be passed to Quantity can be passed to this
+            function, and are in turn passed to Quantity as the quantities are
+            created.  This can be used, for example, to allow the binary scale
+            factors.
+
         :returns:
             a dictionary of quantities for the values specified in the argument.
         :rtype: dict
@@ -2624,7 +2628,7 @@ class Quantity(float):
                     continue
                 name = name.strip()
                 try:
-                    quantity = cls(value, name=qname, desc=desc)
+                    quantity = cls(value, name=qname, desc=desc, **kwargs)
                 except InvalidNumber:
                     # extract the units if given (they are embedded in "")
                     components = value.split()

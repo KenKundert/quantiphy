@@ -234,6 +234,10 @@ def test_writer():
     exp = '1 GiB'
     assert res == exp, res
 
+    res = q.render(form='binary')
+    exp = '1 GiB'
+    assert res == exp, res
+
     res = '{q:b}'.format(**locals())
     exp = '1 GiB'
     assert res == exp, res
