@@ -677,6 +677,9 @@ parameters, it produces this waveform:
 
 .. _matplotlib example:
 
+.. index::
+   single: matplotlib
+
 MatPlotLib Example
 ------------------
 
@@ -888,6 +891,9 @@ A more sophisticated version of this example can be found on `Github
 
 
 .. _rkm codes example:
+
+.. index::
+   single: RKM codes
 
 RKM Codes Example
 -----------------

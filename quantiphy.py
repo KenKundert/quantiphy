@@ -2573,7 +2573,7 @@ class Quantity(float):
             the values being defined.  You can use *locals()* as this argument
             to make all local variables available.
 
-        :arg **kwargs:
+        :arg \**kwargs:
             Any argument that can be passed to Quantity can be passed to this
             function, and are in turn passed to Quantity as the quantities are
             created.  This can be used, for example, to allow the binary scale

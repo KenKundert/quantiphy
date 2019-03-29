@@ -152,11 +152,11 @@ The First Argument: The Value
 
 The value may be given as a float, as a string, or as a quantity.  The string 
 may be the name of a known constant or it may represent a number. If the string 
-represents a number, it may be in floating point notation, in E-notation (ex: 
-1.2e+3), or use SI scale factors. It may also include the units.  And like 
-Python in general, the numbers may include underscores to make them easier to 
-read (they are ignored).  For example, any of the following ways can be used to 
-specify 1ns:
+represents a number, it may be in floating point notation (1200.0), in 
+E-notation (ex: 1.2e+3), or use SI scale factors (1.2k). It may also include the 
+units.  And like Python in general, the numbers may include underscores to make 
+them easier to read (they are ignored).  For example, any of the following ways 
+can be used to specify 1ns:
 
 .. code-block:: python
 
@@ -192,10 +192,10 @@ If given as a string, the value may also be the name of a known :ref:`constant
     160.22e-21 C
 
 The following constants are pre-defined: *h*, *ħ*, *k*, *q*, *c*, *0°C*, *ε₀*, 
-*μ₀*, and *Z₀*. You may add your own constants.
+*μ₀*, and *Z₀*. You may add your own :ref:`constants <constants>`.
 
-Currency units ($€¥£₩₺₽₹ɃΞ) are a bit different than other units, they are 
-placed at the front of the quantity.
+Currency units ($€¥£₩₺₽₹ɃΞ) are a bit different than other units in that they 
+are placed at the front of the quantity.
 
 .. code-block:: python
 
@@ -1181,6 +1181,21 @@ on to the underlying float. For example:
     TOTAL: 1,976,794.98
 
 
+.. index::
+   single: constants
+   single: physical constants
+   single: h (Plank's constant)
+   single: ħ (Plank's constant)
+   single: k (Boltzmann's constant)
+   single: q (elementary charge)
+   single: c (speed of light)
+   single: 0C (0 Celsius)
+   single: eps0 (permittivity of free space)
+   single: ε₀ (permittivity of free space)
+   single: mu0 (permeability of free space)
+   single: μ₀ (permeability of free space)
+   single: Z0 (characteristic impedance of free space)
+
 .. _constants:
 
 Physical Constants
@@ -1278,6 +1293,9 @@ that would contain more than one name once split.
     480.32 pFr
     16.022e-21 abC
 
+
+.. index::
+   single: preferences
 
 .. _preferences:
 
@@ -1417,13 +1435,13 @@ Notice that the specified preferences only affected the table, not the final
 printed values, which were rendered outside the *with* statement.
 
 
+.. index::
+   single: Kelvin/kilo ambiguity
+
 .. _ambiguity:
 
 Ambiguity of Scale Factors and Units
 ------------------------------------
-
-.. index::
-   single: meter/milli ambiguity
 
 By default, *QuantiPhy* treats both the scale factor and the units as being 
 optional.  With the scale factor being optional, the meaning of some 
@@ -1509,9 +1527,6 @@ existing known units.
     1 au
     1 kpc
 
-.. index::
-   single: Kelvin/kilo ambiguity
-
 This same issue comes up for temperature quantities when given in Kelvin. There 
 are again several ways to handle this. First you can specify the acceptable 
 input scale factors leaving out 'K', ex. *input_sf* = 'TGMkmunpfa'.  
@@ -1520,6 +1535,9 @@ know exactly when you will be converting a temperature to a quantity, you can
 specify *ignore_sf* for that specific conversion. The effect is the same either 
 way, 'K' is interpreted as a unit rather than a scale factor.
 
+
+.. index::
+   single: tabular data
 
 .. _tabular data:
 
@@ -1607,6 +1625,9 @@ Quantity for each column that requires distinct formatting:
        25 C       1.00021 MHz
        75 C       1.00178 MHz
 
+
+.. index::
+   single: extracting quantities from text
 
 .. _extract:
 
@@ -1784,6 +1805,9 @@ assigned to *__doc__*. That was a hack that was needed to make the example
 executable from within the documentation.
 
 
+.. index::
+   single: translating quantities in text
+
 .. _translate:
 
 Translating Quantities
@@ -1838,6 +1862,9 @@ you use 'full' precision:
     Pass @ 300.5us: V(out): expected=2V, measured=1.99999965V, diff=346.11713nV.
 
 
+.. index::
+   single: equivalence
+
 .. _equivalence:
 
 Equivalence
@@ -1881,6 +1908,10 @@ behavior can be overridden by specifying *check_units*.
    True
 
 
+.. index::
+   single: infinity
+   single: not a number
+
 .. _exceptional values:
 
 Exceptional Values
@@ -1914,6 +1945,9 @@ using :meth:`quantiphy.Quantity.is_infinite()` or
    >>> nan.is_nan()
    True
 
+
+.. index::
+   single: exceptions
 
 .. _exceptions:
 

@@ -1,5 +1,0 @@
-[
-  "test_binary.py::test_reader",
-  "test_binary.py::test_writer",
-  "test_binary.py::test_writer_prec"
-]
