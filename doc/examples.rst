@@ -360,6 +360,10 @@ Notice that the return values from *UnitConversion* are captured in a variable
 satisfy the testing framework that tests the code found in this documentation; 
 normally the return value is discarded.
 
+Another example of using *QuantiPhy* to implement casual time units is the 
+*alarm* script, which notifies you as reminder after the specified amount of 
+time has past. You can find it `on Github <https://github.com/KenKundert/alarm>`_.
+
 
 .. _unicode example:
 
