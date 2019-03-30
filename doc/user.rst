@@ -1648,9 +1648,9 @@ return them in a dictionary.  For example:
     >>> quantities = Quantity.extract(design_parameters)
 
     >>> Quantity.set_prefs(
-    ...     label_fmt='{n} = {v}',
-    ...     label_fmt_full='{V:<18}  # {d}',
-    ...     show_label='f',
+    ...     label_fmt = '{n} = {v}',
+    ...     label_fmt_full = '{V:<18}  # {d}',
+    ...     show_label = 'f',
     ... )
     >>> for k, q in quantities.items():
     ...     print(f'{k}: {q}')
@@ -1774,9 +1774,9 @@ used in your expressions.  For example:
     >>> globals().update(parameters)
 
     >>> with Quantity.prefs(
-    ...         label_fmt='{n} = {v}',
-    ...         label_fmt_full='{V:<18}  -- {d}',
-    ...         show_label='f',
+    ...     label_fmt = '{n} = {v}',
+    ...     label_fmt_full = '{V:<18}  -- {d}',
+    ...     show_label = 'f',
     ... ):
     ...     print('Simulation parameters:')
     ...     for k, v in parameters.items():
