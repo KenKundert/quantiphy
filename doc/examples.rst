@@ -1020,13 +1020,14 @@ For example::
 Time-Value of Money
 -------------------
 
-The TVM program benefits from *QuantiPhy* in that it allows values to be given 
-quite flexibly and concisely. The goal of the program is to allow you to quickly 
-run what-if experiments involving financial calculations. So the fact that 
-*QuantiPhy* allows user to type 1.2M rather than 1200000 or 250k rather than 
-250000 helps the program reach it user-interface goals.  For example, when 
-running the program, this is what you would type to calculate the monthly 
-payments for a mortgage::
+*Time-Value of Money* (*TVM*) is a command line program that is used to perform 
+calculations involving interest rates.  It benefits from *QuantiPhy* in that it 
+allows values to be given quite flexibly and concisely. The goal of the program 
+is to allow you to quickly run what-if experiments involving financial 
+calculations. So the fact that *QuantiPhy* allows the user to type 1.2M rather 
+than 1200000 or 250k rather than 250000 helps the program reach it 
+user-interface goals.  For example, when running the program, this is what you 
+would type to calculate the monthly payments for a mortgage::
 
     tvm  -p -250k -r 4.5 pmt
 
@@ -1038,12 +1039,15 @@ The program would respond with::
     r = 4.5%
     N = 360
 
-The act of flexibly converting strings to numbers on the way in and converting 
-numbers to strings on the way out is performed by *QuantiPhy*.
+The act of converting strings to numbers on the way in and converting numbers to 
+strings on the way out is performed by *QuantiPhy*.
 
 *QuantiPhy* is quite flexible when it comes to converting a string to a number, 
 so the present value can be given in any of the following ways: -$250k, 
--$250,000, $2.5e5.  You can also specify the value without the currency symbol.
+-$250,000, $2.5e5.  You can also specify the value without the currency symbol, 
+which is desirable as it generally confuses the shell.
 
 The source code is a bit long to include here, but you can find it on
-`GitHub <https://github.com/KenKundert/tvm>`_.
+`GitHub <https://github.com/KenKundert/tvm>`_, or you can install it with::
+
+    pip3 install --user tvm
