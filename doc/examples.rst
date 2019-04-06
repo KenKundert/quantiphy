@@ -362,7 +362,7 @@ normally the return value is discarded.
 
 Another example of using *QuantiPhy* to implement casual time units is the 
 *alarm* script, which notifies you as reminder after the specified amount of 
-time has past. You can find it `on Github <https://github.com/KenKundert/alarm>`_.
+time has past. You can find it on `Github <https://github.com/KenKundert/alarm>`_.
 
 
 .. _unicode example:
@@ -1010,3 +1010,40 @@ For example::
     rampgen_ibias_out_2u5_src
     dac_vref_out_1v2
     vdda_in_2v5
+
+
+.. time-value of money example:
+
+.. index::
+   single: Time-Value of Money
+
+Time-Value of Money
+-------------------
+
+The TVM program benefits from *QuantiPhy* in that it allows values to be given 
+quite flexibly and concisely. The goal of the program is to allow you to quickly 
+run what-if experiments involving financial calculations. So the fact that 
+*QuantiPhy* allows user to type 1.2M rather than 1200000 or 250k rather than 
+250000 helps the program reach it user-interface goals.  For example, when 
+running the program, this is what you would type to calculate the monthly 
+payments for a mortgage::
+
+    tvm  -p -250k -r 4.5 pmt
+
+The program would respond with::
+
+    pmt = $1,266.71
+    pv = -$250,000.00
+    fv = $0.00
+    r = 4.5%
+    N = 360
+
+The act of flexibly converting strings to numbers on the way in and converting 
+numbers to strings on the way out is performed by *QuantiPhy*.
+
+*QuantiPhy* is quite flexible when it comes to converting a string to a number, 
+so the present value can be given in any of the following ways: -$250k, 
+-$250,000, $2.5e5.  You can also specify the value without the currency symbol.
+
+The source code is a bit long to include here, but you can find it on
+`GitHub <https://github.com/KenKundert/tvm>`_.
