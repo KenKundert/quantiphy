@@ -1025,9 +1025,9 @@ calculations involving interest rates.  It benefits from *QuantiPhy* in that it
 allows values to be given quite flexibly and concisely. The goal of the program 
 is to allow you to quickly run what-if experiments involving financial 
 calculations. So the fact that *QuantiPhy* allows the user to type 1.2M rather 
-than 1200000 or 250k rather than 250000 helps the program reach it 
-user-interface goals.  For example, when running the program, this is what you 
-would type to calculate the monthly payments for a mortgage::
+than 1200000 or 1.2e6 helps considerably to reach that goal.  For example, when 
+running the program, this is what you would type to calculate the monthly 
+payments for a mortgage::
 
     tvm  -p -250k -r 4.5 pmt
 
