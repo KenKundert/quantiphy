@@ -169,6 +169,13 @@ incorporate quantity values into strings:
    'Boiling point of water: 212 °F'
 
 
+Issues
+------
+
+Please ask questions or report problems on `Github 
+<https://github.com/KenKundert/quantiphy/issues>`_.
+
+
 Documentation
 -------------
 

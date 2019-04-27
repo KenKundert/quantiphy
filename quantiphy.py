@@ -882,6 +882,8 @@ class Quantity(float):
         # These must be initialized to None, but will be set the first time
         # Quantity is instantiated.
     non_breaking_space = ' '
+    narrow_non_breaking_space = ' '
+    thin_space = ' '
 
     # preferences {{{2
     _initialized = set()
@@ -1127,7 +1129,8 @@ class Quantity(float):
             read, particularly with complex units, and using '' is easier to
             parse.  You could also use a Unicode non-breaking space ' '. For
             your convenience, you can access a non-breaking space using
-            Quantity.non_breaking_space.
+            Quantity.non_breaking_space, Quantity.narrow_non_breaking_space, or
+            Quantity.thin_space.
 
         :arg bool strip_radix:
             When rendering, strip the radix (decimal point) if not needed from
@@ -2413,15 +2416,15 @@ class Quantity(float):
 
         then::
 
-           q: quantity [si=y, units=y, label=n] (ex: 1.4204GHz)
-           Q: quantity [si=y, units=y, label=y] (ex: f = 1.4204GHz)
+           q: quantity [si=y, units=y, label=n] (ex: 1.4204 GHz)
+           Q: quantity [si=y, units=y, label=y] (ex: f = 1.4204 GHz)
            r: real [si=y, units=n, label=n] (ex: 1.4204G)
            R: real [si=y, units=n, label=y] (ex: f = 1.4204G)
-            : [label=n] (ex: 1.4204GHz)
+            : [label=n] (ex: 1.4204 GHz)
            p: fixed-point [fixed=y, units=y, label=n] (ex: 1420405751.7860 Hz)
            P: fixed-point [fixed=y, units=y, label=y] (ex: f = 1420405751.7860 Hz)
-           s: string [label=n] (ex: 1.4204GHz)
-           S: string [label=y] (ex: f = 1.4204GHz)
+           s: string [label=n] (ex: 1.4204 GHz)
+           S: string [label=y] (ex: f = 1.4204 GHz)
            e: exponential form [si=n, units=n, label=n] (ex: 1.4204e9)
            E: exponential form [si=n, units=n, label=y] (ex: f = 1.4204e9)
            f: float [label=n] (ex: 1420400000.0000)

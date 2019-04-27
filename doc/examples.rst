@@ -383,7 +383,7 @@ making the quantity easier to read.
 
     >>> Quantity.set_prefs(
     ...     map_sf = Quantity.map_sf_to_sci_notation,
-    ...     spacer = Quantity.non_breaking_space
+    ...     spacer = Quantity.narrow_non_breaking_space
     ... )
 
     >>> constants = [
@@ -402,11 +402,11 @@ making the quantity easier to read.
 
     >>> # combine the sentences into a left justified paragraph
     >>> print(textwrap.fill('  '.join(sentences)))
-    Plank's constant is 662.61×10⁻³⁶ J-s.  Reduced plank's constant is
-    105.46×10⁻³⁶ J-s.  Boltzmann's constant is 13.806×10⁻²⁴ J/K.
-    Elementary charge is 160.22×10⁻²¹ C.  Speed of light is 299.79 Mm/s.
-    Zero degrees celsius in kelvin is 273.15 K.  Permittivity of free
-    space is 8.8542 pF/m.  Permeability of free space is 1.2566 µH/m.
+    Plank's constant is 662.61×10⁻³⁶ J-s.  Reduced plank's constant is
+    105.46×10⁻³⁶ J-s.  Boltzmann's constant is 13.806×10⁻²⁴ J/K.
+    Elementary charge is 160.22×10⁻²¹ C.  Speed of light is 299.79 Mm/s.
+    Zero degrees celsius in kelvin is 273.15 K.  Permittivity of free
+    space is 8.8542 pF/m.  Permeability of free space is 1.2566 µH/m.
 
 When rendered in your browser with a variable width font, the result looks like 
 this:
