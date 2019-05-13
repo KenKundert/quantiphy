@@ -1,4 +1,4 @@
-QuantiPhy - Physical Quantities
+QuantiPhy — Physical Quantities
 ===============================
 
 .. image:: https://img.shields.io/travis/KenKundert/quantiphy/master.svg
