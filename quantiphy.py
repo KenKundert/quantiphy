@@ -696,7 +696,7 @@ SMALL_SCALE_FACTORS = 'munpfazy'
     # These must be given in order, one for every three decades.
 
 # Supported currency symbols (these go on left side of number)
-CURRENCY_SYMBOLS = '$€¥£₩₺₽₹ɃΞ' if sys.version_info.major == 3 else '$'
+CURRENCY_SYMBOLS = '$€¥£₩₺₽₹ɃΞȄ' if sys.version_info.major == 3 else '$'
 
 # Unit symbols that are not simple letters.
 # Do not include % as it will be picked up when converting text to numbers,
@@ -750,6 +750,8 @@ DEFAULTS = dict(
     show_label = False,
     show_units = True,
     spacer = ' ',
+    plus = '+',
+    minus = '-',
     strip_radix = True,
     strip_zeros = True,
     unity_sf = '',
@@ -884,6 +886,8 @@ class Quantity(float):
     non_breaking_space = ' '
     narrow_non_breaking_space = ' '
     thin_space = ' '
+    plus_sign = '＋'
+    minus_sign = '−'
 
     # preferences {{{2
     _initialized = set()
@@ -1132,6 +1136,17 @@ class Quantity(float):
             Quantity.non_breaking_space, Quantity.narrow_non_breaking_space, or
             Quantity.thin_space.
 
+        :arg str plus:
+            The text to be used as the plus sign.  By default it is '+', 
+            but is sometimes '＋' (the unicode full width plus sign) or '' to
+            simply eliminate plus signs from numbers.  You can access the
+            Unicode full width plus sign using Quantity.plus_sign.
+
+        :arg str minus:
+            The text to be used as the plus sign.  By default its value is '-',
+            but is sometimes '−' (the unicode minus sign).  You can
+            access the Unicode minus sign using Quantity.minus_sign.
+
         :arg bool strip_radix:
             When rendering, strip the radix (decimal point) if not needed from
             numbers even if they could then be mistaken for integers. If this
@@ -1290,6 +1305,24 @@ class Quantity(float):
         except KeyError as e:
             raise UnknownFormatKey(e.args[0])
 
+    # _map_leading_sign {{{2
+    def _map_leading_sign(self, value, leading_units=''):
+        # only maps a leading sign, if no sign is present, it is assumed to be +
+        if value[0] == '-':
+            return self.minus + leading_units + value[1:]
+        elif value[0] == '+':
+            return self.plus + leading_units + value[1:]
+        return leading_units + value
+
+    # _map_sign {{{2
+    def _map_sign(self, value):
+        # maps + and - anywhere in the value
+        if self.minus != '-':
+            value = value.replace('-', self.minus)
+        if self.plus != '+':
+            value = value.replace('+', self.plus)
+        return value
+
     # _combine {{{2
     def _combine(self, mantissa, sf, units, spacer, sf_is_exp=False):
         if self.number_fmt:
@@ -1299,10 +1332,7 @@ class Quantity(float):
             if frac_part:
                 frac_part = '.' + frac_part
             if units in CURRENCY_SYMBOLS:
-                if whole_part[0] == '-':
-                    whole_part = '-' + units + whole_part[1:]
-                else:
-                    whole_part = units + whole_part
+                whole_part = self._map_leading_sign(whole_part, units)
                 units = ''
             if sf_is_exp:
                 frac_part += sf
@@ -1317,16 +1347,15 @@ class Quantity(float):
         if units:
             if units in CURRENCY_SYMBOLS:
                 # prefix the value with the units
-                if mantissa[0] == '-':
-                    # if negative, the sign goes before the currency symbol
-                    return '-' + units + mantissa[1:] + sf
-                return units + mantissa + sf
+                return self._map_leading_sign(mantissa + sf, units)
             else:
+                mantissa = self._map_leading_sign(mantissa)
                 if sf_is_exp:
                     # has an exponent
                     return mantissa + sf + spacer + units
                 # has a scale factor
                 return mantissa + spacer + sf + units
+        mantissa = self._map_leading_sign(mantissa)
         return mantissa + sf
 
     # recognizers {{{2
@@ -1916,6 +1945,11 @@ class Quantity(float):
         # convert into scientific notation with proper precision
         if prec == 'full' and hasattr(self, '_mantissa') and not scale:
             mantissa = self._mantissa
+            if mantissa[0] in '+-':
+                sign = '-' if mantissa[0] == '-' else ''
+                mantissa = mantissa[1:]
+            else:
+                sign = ''
             sf = self._scale_factor
 
             # convert scale factor to integer exponent
@@ -1930,7 +1964,7 @@ class Quantity(float):
             # add decimal point to mantissa if missing
             mantissa += '' if '.' in mantissa else '.'
             # strip off leading zeros and break into components
-            whole, frac = mantissa.strip('0').split('.')
+            whole, frac = mantissa.lstrip('0').split('.')
             if whole == '':
                 # no whole part, remove leading zeros from fractional part
                 orig_len = len(frac)
@@ -1963,12 +1997,14 @@ class Quantity(float):
             # get components of number
             number = "%.*e" % (prec, number)
             mantissa, exp = number.split("e")
+            sign = '-' if mantissa[0] == '-' else ''
+            mantissa = mantissa.lstrip('-')
             exp = int(exp)
 
         #  scale factor
         index = exp // 3
         shift = exp % 3
-        eexp = "e%d" % (exp - shift)
+        eexp = "e" + self._map_leading_sign(str(exp - shift))
         sf = eexp
         sf_is_exp = 'unk'
         if index == 0:
@@ -2000,8 +2036,7 @@ class Quantity(float):
                     sf, sf_is_exp = sf
 
         # shift the decimal place as needed
-        sign = '-' if mantissa[0] == '-' else ''
-        mantissa = mantissa.lstrip('-').replace('.', '')
+        mantissa = mantissa.replace('.', '')
         if strip_zeros:
             mantissa = mantissa.rstrip('0')
         mantissa += (shift + 1 - len(mantissa))*'0'
@@ -2035,7 +2070,9 @@ class Quantity(float):
 
         :arg prec:
             The desired precision (one plus this value is the desired number of
-            digits). If specified as 'full', the full original precision is used.
+            digits). If specified as 'full', *full_prec* is used as the number
+            of digits (and not the originally specified precision as with
+            *render()*).
         :type prec: integer or 'full'
 
         :arg show_label:
@@ -2178,8 +2215,10 @@ class Quantity(float):
             Whether the units should be included in the string.
 
         :arg prec:
-            The desired precision (number of digits to the right or the radix).
-            If specified as 'full', the full original precision is used.
+            The desired precision (number of digits to the right of the radix
+            when normalized).  If specified as 'full', *full_prec* is used as
+            the number of digits (and not the originally specified precision as
+            with render).
         :type prec: integer or 'full'
 
         :arg show_label:
@@ -2493,6 +2532,8 @@ class Quantity(float):
                 else:
                     value = float(self)
                 value = '{0:{1}.{2}{3}}'.format(value, comma, prec, ftype)
+                value = self._map_leading_sign(value)
+                value = self._map_sign(value)
                 width = width.lstrip('0')
                     # format function treats 0 as a padding rather than a width
                 if self.strip_zeros:
@@ -2516,7 +2557,7 @@ class Quantity(float):
     # extract() {{{2
     @classmethod
     def extract(cls, text, predefined=None, **kwargs):
-        """Extract quantities
+        r"""Extract quantities
 
         Takes a string that contains quantity definitions, one per line, and 
         returns those quantities in a dictionary.
@@ -2653,12 +2694,14 @@ class Quantity(float):
         return quantities
 
     # map_sf_to_sci_notation() {{{2
-    # The explicit references to unicode here is for backward compatibility with
-    # python2. It can be removed when python2 support is dropped.
+    # The explicit references to unicode here are for backward compatibility
+    # with python2. It can be removed when python2 support is dropped.
     _SCI_NOTATION_MAPPER = {
         ord(u'e'): u'×10',
         ord(u'+'): u'',
+        ord(u'＋'): u'',
         ord(u'-'): u'⁻',
+        ord(u'−'): u'⁻',
         ord(u'0'): u'⁰',
         ord(u'1'): u'¹',
         ord(u'2'): u'²',

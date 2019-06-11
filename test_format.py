@@ -74,6 +74,18 @@ def test_full_format():
     assert '{:.0p}'.format(q) == '1420405752 Hz'
     assert '{:#.0q}'.format(q) == '1 GHz'
     assert '{:#.0p}'.format(q) == '1420405752. Hz'
+    values = '''
+        1.000000 +1.000000 -1.000000
+        $1.000000 +$1.000000 -$1.000000
+        1.000000_V +1.000000_V -1.000000_V
+        1.234567 +1.234567 -1.234567
+        $1.234567 +$1.234567 -$1.234567
+        1.234567_V +1.234567_V -1.234567_V
+    '''
+    for given in values.split():
+        expected = given.lstrip('+').replace('_', ' ')
+        q = Quantity(given)
+        assert q.render(form='si', prec='full', strip_zeros=False) == expected
 
     q=Quantity('2ns')
     assert float(q) == 2e-9
@@ -362,3 +374,256 @@ def test_render():
     assert q.fixed(prec='full') == '$1000000'
     assert q.fixed(prec='full', strip_zeros=False) == '$1000000.000000000000'
     assert q.render(form='fixed') == '$1000000'
+
+
+def test_sign():
+    Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None, show_desc=False)
+
+    # Positive numbers
+    q=Quantity('f = 1420.405751786 MHz -- frequency of hydrogen line')
+    assert '{}'.format(q) == '1.4204 GHz'
+    assert '{:q}'.format(q) == '1.4204 GHz'
+    assert '{:r}'.format(q) == '1.4204G'
+    assert '{:f}'.format(q) == '1420405751.786'
+    assert '{:e}'.format(q) == '1.4204e+09'
+    assert '{:g}'.format(q) == '1.4204e+09'
+    assert '{:p}'.format(q) == '1420405751.786 Hz'
+    assert '{:,p}'.format(q) == '1,420,405,751.786 Hz'
+    assert '{:#.3q}'.format(q) == '1.420 GHz'
+    assert '{:#p}'.format(q) == '1420405751.7860 Hz'
+
+    q=Quantity('Total = $1000k -- a large amount of money')
+    assert '{}'.format(q) == '$1M'
+    assert '{:q}'.format(q) == '$1M'
+    assert '{:r}'.format(q) == '1M'
+    assert '{:f}'.format(q) == '1000000'
+    assert '{:e}'.format(q) == '1e+06'
+    assert '{:g}'.format(q) == '1e+06'
+    assert '{:p}'.format(q) == '$1000000'
+    assert '{:#p}'.format(q) == '$1000000.0000'
+
+    q=Quantity('f = 1e100 atoms')
+    assert '{}'.format(q) == '10e99 atoms'
+    assert '{:q}'.format(q) == '10e99 atoms'
+    assert '{:r}'.format(q) == '10e99'
+    assert '{:e}'.format(q) == '1e+100'
+    assert '{:g}'.format(q) == '1e+100'
+
+    q=Quantity('light = inf Hz -- a high frequency')
+    assert '{}'.format(q) == 'inf Hz'
+    assert '{:q}'.format(q) == 'inf Hz'
+    assert '{:r}'.format(q) == 'inf'
+    assert '{:f}'.format(q) == 'inf'
+    assert '{:e}'.format(q) == 'inf'
+    assert '{:g}'.format(q) == 'inf'
+    assert '{:p}'.format(q) == 'inf Hz'
+
+    q=Quantity('f = -1420.405751786 MHz -- frequency of hydrogen line')
+    assert '{}'.format(q) == '-1.4204 GHz'
+    assert '{:f}'.format(q) == '-1420405751.786'
+    assert '{:e}'.format(q) == '-1.4204e+09'
+    assert '{:g}'.format(q) == '-1.4204e+09'
+    assert '{:p}'.format(q) == '-1420405751.786 Hz'
+    assert '{:,p}'.format(q) == '-1,420,405,751.786 Hz'
+    assert '{:#.3q}'.format(q) == '-1.420 GHz'
+    assert '{:#p}'.format(q) == '-1420405751.7860 Hz'
+
+    # Negative numbers
+    q=Quantity('f = -1420.405751786 MHz -- frequency of hydrogen line')
+    assert '{}'.format(q) == '-1.4204 GHz'
+    assert '{:q}'.format(q) == '-1.4204 GHz'
+    assert '{:r}'.format(q) == '-1.4204G'
+    assert '{:f}'.format(q) == '-1420405751.786'
+    assert '{:e}'.format(q) == '-1.4204e+09'
+    assert '{:g}'.format(q) == '-1.4204e+09'
+    assert '{:p}'.format(q) == '-1420405751.786 Hz'
+    assert '{:,p}'.format(q) == '-1,420,405,751.786 Hz'
+    assert '{:#.3q}'.format(q) == '-1.420 GHz'
+    assert '{:#p}'.format(q) == '-1420405751.7860 Hz'
+
+    q=Quantity('Total = -$1000k -- a large amount of money')
+    assert '{}'.format(q) == '-$1M'
+    assert '{:q}'.format(q) == '-$1M'
+    assert '{:r}'.format(q) == '-1M'
+    assert '{:f}'.format(q) == '-1000000'
+    assert '{:e}'.format(q) == '-1e+06'
+    assert '{:g}'.format(q) == '-1e+06'
+    assert '{:p}'.format(q) == '-$1000000'
+    assert '{:#p}'.format(q) == '-$1000000.0000'
+
+    q=Quantity('f = -1e-100 atoms')
+    assert '{}'.format(q) == '-100e-102 atoms'
+    assert '{:q}'.format(q) == '-100e-102 atoms'
+    assert '{:r}'.format(q) == '-100e-102'
+    assert '{:e}'.format(q) == '-1e-100'
+    assert '{:g}'.format(q) == '-1e-100'
+
+    q=Quantity('light = -inf Hz -- a high frequency')
+    assert '{}'.format(q) == '-inf Hz'
+    assert '{:q}'.format(q) == '-inf Hz'
+    assert '{:r}'.format(q) == '-inf'
+    assert '{:f}'.format(q) == '-inf'
+    assert '{:e}'.format(q) == '-inf'
+    assert '{:g}'.format(q) == '-inf'
+    assert '{:p}'.format(q) == '-inf Hz'
+
+    with Quantity.prefs(plus=Quantity.plus_sign, minus=Quantity.minus_sign):
+
+        # Positive numbers
+        q=Quantity('f = 1420.405751786 MHz -- frequency of hydrogen line')
+        assert '{}'.format(q) == '1.4204 GHz'
+        assert '{:q}'.format(q) == '1.4204 GHz'
+        assert '{:r}'.format(q) == '1.4204G'
+        assert '{:f}'.format(q) == '1420405751.786'
+        assert '{:e}'.format(q) == '1.4204e＋09'
+        assert '{:g}'.format(q) == '1.4204e＋09'
+        assert '{:p}'.format(q) == '1420405751.786 Hz'
+        assert '{:,p}'.format(q) == '1,420,405,751.786 Hz'
+        assert '{:#.3q}'.format(q) == '1.420 GHz'
+        assert '{:#p}'.format(q) == '1420405751.7860 Hz'
+
+        q=Quantity('Total = $1000k -- a large amount of money')
+        assert '{}'.format(q) == '$1M'
+        assert '{:q}'.format(q) == '$1M'
+        assert '{:r}'.format(q) == '1M'
+        assert '{:f}'.format(q) == '1000000'
+        assert '{:e}'.format(q) == '1e＋06'
+        assert '{:g}'.format(q) == '1e＋06'
+        assert '{:p}'.format(q) == '$1000000'
+        assert '{:#p}'.format(q) == '$1000000.0000'
+
+        q=Quantity('f = 1e100 atoms')
+        assert '{}'.format(q) == '10e99 atoms'
+        assert '{:q}'.format(q) == '10e99 atoms'
+        assert '{:r}'.format(q) == '10e99'
+        assert '{:e}'.format(q) == '1e＋100'
+        assert '{:g}'.format(q) == '1e＋100'
+
+        q=Quantity('light = inf Hz -- a high frequency')
+        assert '{}'.format(q) == 'inf Hz'
+        assert '{:q}'.format(q) == 'inf Hz'
+        assert '{:r}'.format(q) == 'inf'
+        assert '{:f}'.format(q) == 'inf'
+        assert '{:e}'.format(q) == 'inf'
+        assert '{:g}'.format(q) == 'inf'
+        assert '{:p}'.format(q) == 'inf Hz'
+
+        # Negative numbers
+        q=Quantity('f = -1420.405751786 MHz -- frequency of hydrogen line')
+        assert '{}'.format(q) == '−1.4204 GHz'
+        assert '{:q}'.format(q) == '−1.4204 GHz'
+        assert '{:r}'.format(q) == '−1.4204G'
+        assert '{:f}'.format(q) == '−1420405751.786'
+        assert '{:e}'.format(q) == '−1.4204e＋09'
+        assert '{:g}'.format(q) == '−1.4204e＋09'
+        assert '{:p}'.format(q) == '−1420405751.786 Hz'
+        assert '{:,p}'.format(q) == '−1,420,405,751.786 Hz'
+        assert '{:#.3q}'.format(q) == '−1.420 GHz'
+        assert '{:#p}'.format(q) == '−1420405751.7860 Hz'
+
+        q=Quantity('Total = -$1000k -- a large amount of money')
+        assert '{}'.format(q) == '−$1M'
+        assert '{:q}'.format(q) == '−$1M'
+        assert '{:r}'.format(q) == '−1M'
+        assert '{:f}'.format(q) == '−1000000'
+        assert '{:e}'.format(q) == '−1e＋06'
+        assert '{:g}'.format(q) == '−1e＋06'
+        assert '{:p}'.format(q) == '−$1000000'
+        assert '{:#p}'.format(q) == '−$1000000.0000'
+
+        q=Quantity('f = -1e-100 atoms')
+        assert '{}'.format(q) == '−100e−102 atoms'
+        assert '{:q}'.format(q) == '−100e−102 atoms'
+        assert '{:r}'.format(q) == '−100e−102'
+        assert '{:e}'.format(q) == '−1e−100'
+        assert '{:g}'.format(q) == '−1e−100'
+
+        q=Quantity('light = -inf Hz -- a high frequency')
+        assert '{}'.format(q) == '−inf Hz'
+        assert '{:q}'.format(q) == '−inf Hz'
+        assert '{:r}'.format(q) == '−inf'
+        assert '{:f}'.format(q) == '−inf'
+        assert '{:e}'.format(q) == '−inf'
+        assert '{:g}'.format(q) == '−inf'
+        assert '{:p}'.format(q) == '−inf Hz'
+
+    with Quantity.prefs(plus='', minus=Quantity.minus_sign):
+
+        # Positive numbers
+        q=Quantity('f = 1420.405751786 MHz -- frequency of hydrogen line')
+        assert '{}'.format(q) == '1.4204 GHz'
+        assert '{:q}'.format(q) == '1.4204 GHz'
+        assert '{:r}'.format(q) == '1.4204G'
+        assert '{:f}'.format(q) == '1420405751.786'
+        assert '{:e}'.format(q) == '1.4204e09'
+        assert '{:g}'.format(q) == '1.4204e09'
+        assert '{:p}'.format(q) == '1420405751.786 Hz'
+        assert '{:,p}'.format(q) == '1,420,405,751.786 Hz'
+        assert '{:#.3q}'.format(q) == '1.420 GHz'
+        assert '{:#p}'.format(q) == '1420405751.7860 Hz'
+
+        q=Quantity('Total = $1000k -- a large amount of money')
+        assert '{}'.format(q) == '$1M'
+        assert '{:q}'.format(q) == '$1M'
+        assert '{:r}'.format(q) == '1M'
+        assert '{:f}'.format(q) == '1000000'
+        assert '{:e}'.format(q) == '1e06'
+        assert '{:g}'.format(q) == '1e06'
+        assert '{:p}'.format(q) == '$1000000'
+        assert '{:#p}'.format(q) == '$1000000.0000'
+
+        q=Quantity('f = 1e100 atoms')
+        assert '{}'.format(q) == '10e99 atoms'
+        assert '{:q}'.format(q) == '10e99 atoms'
+        assert '{:r}'.format(q) == '10e99'
+        assert '{:e}'.format(q) == '1e100'
+        assert '{:g}'.format(q) == '1e100'
+
+        q=Quantity('light = inf Hz -- a high frequency')
+        assert '{}'.format(q) == 'inf Hz'
+        assert '{:q}'.format(q) == 'inf Hz'
+        assert '{:r}'.format(q) == 'inf'
+        assert '{:f}'.format(q) == 'inf'
+        assert '{:e}'.format(q) == 'inf'
+        assert '{:g}'.format(q) == 'inf'
+        assert '{:p}'.format(q) == 'inf Hz'
+
+        # Negative numbers
+        q=Quantity('f = -1420.405751786 MHz -- frequency of hydrogen line')
+        assert '{}'.format(q) == '−1.4204 GHz'
+        assert '{:q}'.format(q) == '−1.4204 GHz'
+        assert '{:r}'.format(q) == '−1.4204G'
+        assert '{:f}'.format(q) == '−1420405751.786'
+        assert '{:e}'.format(q) == '−1.4204e09'
+        assert '{:g}'.format(q) == '−1.4204e09'
+        assert '{:p}'.format(q) == '−1420405751.786 Hz'
+        assert '{:,p}'.format(q) == '−1,420,405,751.786 Hz'
+        assert '{:#.3q}'.format(q) == '−1.420 GHz'
+        assert '{:#p}'.format(q) == '−1420405751.7860 Hz'
+
+        q=Quantity('Total = -$1000k -- a large amount of money')
+        assert '{}'.format(q) == '−$1M'
+        assert '{:q}'.format(q) == '−$1M'
+        assert '{:r}'.format(q) == '−1M'
+        assert '{:f}'.format(q) == '−1000000'
+        assert '{:e}'.format(q) == '−1e06'
+        assert '{:g}'.format(q) == '−1e06'
+        assert '{:p}'.format(q) == '−$1000000'
+        assert '{:#p}'.format(q) == '−$1000000.0000'
+
+        q=Quantity('f = -1e-100 atoms')
+        assert '{}'.format(q) == '−100e−102 atoms'
+        assert '{:q}'.format(q) == '−100e−102 atoms'
+        assert '{:r}'.format(q) == '−100e−102'
+        assert '{:e}'.format(q) == '−1e−100'
+        assert '{:g}'.format(q) == '−1e−100'
+
+        q=Quantity('light = -inf Hz -- a high frequency')
+        assert '{}'.format(q) == '−inf Hz'
+        assert '{:q}'.format(q) == '−inf Hz'
+        assert '{:r}'.format(q) == '−inf'
+        assert '{:f}'.format(q) == '−inf'
+        assert '{:e}'.format(q) == '−inf'
+        assert '{:g}'.format(q) == '−inf'
+        assert '{:p}'.format(q) == '−inf Hz'
+

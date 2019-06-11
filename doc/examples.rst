@@ -372,9 +372,10 @@ Unicode Text Example
 
 In this example *QuantiPhy* formats quantities to be embedded in text.  To make 
 the text as clean as possible, *QuantiPhy* is configured to use Unicode scale 
-factors and the Unicode non-breaking space as the spacer.  The non-breaking 
-space prevents units from being placed on a separate line from their number, 
-making the quantity easier to read.
+factors and the Unicode narrow non-breaking space as the spacer.  The 
+non-breaking space prevents units from being placed on a separate line from 
+their number, making the quantity easier to read. The plus and minus signs are 
+also replaced by their Unicode forms.
 
 .. code-block:: python
 
@@ -383,7 +384,9 @@ making the quantity easier to read.
 
     >>> Quantity.set_prefs(
     ...     map_sf = Quantity.map_sf_to_sci_notation,
-    ...     spacer = Quantity.narrow_non_breaking_space
+    ...     spacer = Quantity.narrow_non_breaking_space,
+    ...     plus = Quantity.plus_sign,
+    ...     minus = Quantity.minus_sign
     ... )
 
     >>> constants = [
@@ -395,6 +398,7 @@ making the quantity easier to read.
     ...     Quantity('0C'),
     ...     Quantity('eps0'),
     ...     Quantity('mu0'),
+    ...     Quantity('0', 'K', scale='°C', desc='Absolute zero'),
     ... ]
 
     >>> # generate some sentences that contain quantities
@@ -407,6 +411,7 @@ making the quantity easier to read.
     Elementary charge is 160.22×10⁻²¹ C.  Speed of light is 299.79 Mm/s.
     Zero degrees celsius in kelvin is 273.15 K.  Permittivity of free
     space is 8.8542 pF/m.  Permeability of free space is 1.2566 µH/m.
+    Absolute zero is −273.15 °C.
 
 When rendered in your browser with a variable width font, the result looks like 
 this:
