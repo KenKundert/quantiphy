@@ -2,8 +2,8 @@ Releases
 ========
 
 **Latest development release**:
-    | Version: 2.5.0
-    | Released: 2019-01-16
+    | Version: 2.5.1
+    | Released: 2019-06-10
 
     - now support Quantity arguments with :meth:`quantiphy.Quantity.extract()`.
     - allow plus and minus signs to be replaced with Unicode equivalents.
