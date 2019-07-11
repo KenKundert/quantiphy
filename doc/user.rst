@@ -1337,17 +1337,17 @@ naturally want different precisions:
 .. code-block:: python
 
     >>> class Temperature(Quantity):
-    ...     pass
+    ...     units = 'C'
     >>> Temperature.set_prefs(prec=1, known_units='K', spacer='')
 
     >>> class Frequency(Quantity):
-    ...     pass
+    ...     units = 'Hz'
     >>> Frequency.set_prefs(prec=5, spacer='')
 
     >>> frequencies = []
     >>> for each in '-25.3 999987.7, 25.1  1000207.1, 74.9  1001782.3'.split(','):
     ...     temp, freq = each.split()
-    ...     frequencies.append((Temperature(temp, 'C'),  Frequency(freq, 'Hz')))
+    ...     frequencies.append((Temperature(temp),  Frequency(freq)))
 
     >>> for temp, freq in frequencies:
     ...     print(f'{temp:4}  {freq}')
@@ -1605,19 +1605,19 @@ Quantity for each column that requires distinct formatting:
     ...     return '{:>5} {:<5}'.format(whole+frac, units)
 
     >>> class Temperature(Quantity):
-    ...     pass
+    ...     units = 'C'
     >>> Temperature.set_prefs(
     ...     prec = 1, known_units = 'K', number_fmt = format_temperature
     ... )
 
     >>> class Frequency(Quantity):
-    ...     pass
+    ...     units = 'Hz'
     >>> Frequency.set_prefs(prec=5, number_fmt = '{whole:>3}{frac:<6} {units}')
 
     >>> frequencies = []
     >>> for each in '-25.3 999987.7, 25.1 1000207.1, 74.9 1001782.3'.split(','):
     ...     temp, freq = each.split()
-    ...     frequencies.append((Temperature(temp, 'C'),  Frequency(freq, 'Hz')))
+    ...     frequencies.append((Temperature(temp),  Frequency(freq)))
 
     >>> for temp, freq in frequencies:
     ...     print(temp, freq)

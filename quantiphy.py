@@ -1730,7 +1730,7 @@ class Quantity(float):
         return self.real, self.units
 
     # scale() {{{2
-    def scale(self, scale):
+    def scale(self, scale, cls=None):
         """Scale a quantity to create a new quantity.
 
         :arg scale:
@@ -1750,6 +1750,9 @@ class Quantity(float):
               conversion, which is applied to create the new value.
             - If a quantity, the units are ignored and the scale is treated as
               if were specified as a unitless float.
+        :arg class cls:
+            Class to use for return value. If not given, the class of self is
+            used.
         :type scale: real, pair, function, string, or quantity
 
         :raises UnknownConversion(QuantiPhyError, KeyError):
@@ -1766,7 +1769,9 @@ class Quantity(float):
 
         """
         number, units = _scale(scale, self.real, self.units)
-        return self.__class__(number, units)
+        if not cls:
+            cls = self.__class__
+        return cls(number, units)
 
     # add() {{{2
     def add(self, addend, check_units=False):
@@ -2060,7 +2065,7 @@ class Quantity(float):
 
     # fixed() {{{2
     def fixed(
-        self, show_units=None, prec=None, show_label=None, show_commas=False,
+        self, show_units=None, prec=None, show_label=None, show_commas=None,
         strip_zeros=None, strip_radix=None, scale=None,
     ):
         """Convert quantity to fixed-point string.
