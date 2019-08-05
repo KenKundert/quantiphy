@@ -242,13 +242,13 @@ class UnitConversion(object):
 
     :arg float slope:
         Scale factor for conversion.  You may also pass a function as an
-        argument, in which case it is treated is used to perform forward
-        conversions.  In this case, *intercept* should also be passed a callable.
+        argument, in which case it is used to perform forward conversions.
+        In this case, *intercept* should also be passed a callable.
 
     :arg float intercept:
         Conversion offset.  You may also pass a function as an argument, in
-        which case it is treated is used to perform reverse conversions.  In
-        this case, *slope* should also be passed a callable.
+        which case it is used to perform reverse conversions.  In this case,
+        *slope* should also be passed a callable.
 
     **Forward Conversion**:
     The following conversion is applied if the given units are among the
@@ -276,7 +276,7 @@ class UnitConversion(object):
 
     **No-Op Conversion**:
     The following conversion is applied if the given and desired units are both
-    found among the from-units or are both found amoung the to-units.
+    found among the from-units or are both found among the to-units.
 
         *new_value* = *given_value*
 
@@ -647,8 +647,8 @@ def add_constant(value, alias=None, unit_systems=None):
 
 
 # Globals {{{1
-__version__ = '2.6.0'
-__released__ = '2019-07-11'
+__version__ = '2.5.1'
+__released__ = '2019-06-10'
 
 # These mappings are only used when reading numbers
 # The key for these mappings must be a single character
