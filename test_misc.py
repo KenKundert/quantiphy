@@ -106,8 +106,11 @@ def test_misc2():
     assert isinstance(exception.value, QuantiPhyError)
     assert isinstance(exception.value, ValueError)
     assert exception.value.args == ('%',)
-    exception.value.msg = '{}{}'
-    assert str(exception.value) == '%'
+    assert exception.value.render(template='bad number given ({!r})') == "bad number given ('%')"
+    # the following is not kosher, but it should work
+    exception.value._template = 'bad number ({!r})'
+    assert str(exception.value) == "bad number ('%')"
+    assert repr(exception.value) == "InvalidNumber('%')"
 
     with pytest.raises(KeyError) as exception:
         Foo.set_prefs(assign_rec=r'(\w+)\s*=\s*(.*)') # no named groups
@@ -316,9 +319,8 @@ def test_misc2():
     assert isinstance(exception.value, QuantiPhyError)
     assert isinstance(exception.value, ValueError)
     assert exception.value.args == ('q', 'w')
-    assert repr(exception.value) == 'UnknownScaleFactor(q, w)'
-    exception.value.msg = '{}{}{}'
-    assert str(exception.value) == 'q w'
+    assert repr(exception.value) == "UnknownScaleFactor('q', 'w')"
+    exception.value.render('{}, {}: unknown') == 'q, w: unknown'
 
     Quantity.set_prefs(input_sf=None, unity_sf=None, spacer=None)
 

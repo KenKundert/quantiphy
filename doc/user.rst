@@ -2068,6 +2068,8 @@ specific errors:
 
 The alternative would be to catch each error individually:
 
+.. code-block:: python
+
     >>> from quantiphy import (
     ...     Quantity, InvalidNumber, UnknownScaleFactor,
     ...     UnknownConversion, InvalidRecognizer
@@ -2078,3 +2080,18 @@ The alternative would be to catch each error individually:
     ... except (InvalidNumber, UnknownScaleFactor, UnknownConversion, InvalidRecognizer) as e:
     ...     print(str(e))
     tweed: not a valid number.
+
+*QuantiPhy* provides uniform access methods for its exceptions. You can access 
+all the unnamed arguments passed to the exception using the *args* attribute, 
+you can access the named arguments using *kwargs*, and you can create 
+a customized message that incorporates the arguments using 
+:meth:`quantiphy.QuantiPhyError.render()` method. The argument to *render* is 
+a format string that can access both the unnamed and named arguments:
+
+.. code-block:: python
+
+    >>> try:
+    ...     q = Quantity('tweed')
+    ... except InvalidNumber as e:
+    ...     print(e.render('{}: no es un número valido.'))
+    tweed: no es un número valido.

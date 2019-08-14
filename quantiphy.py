@@ -87,22 +87,36 @@ class QuantiPhyError(Exception):
 
     All of the specific QuantiPhy exceptions subclass this exception.
     """
+    def __init__(self, *args, **kwargs):
+        self.args = args
+        self.kwargs = kwargs
+
+    def render(self, template=None):
+        if not template:
+            template = self._template
+        if is_str(template):
+            templates = [template]
+        else:
+            templates = template
+        for template in templates:
+            # use first template for which all arguments are available.
+            try:
+                msg = template.format(*self.args, **self.kwargs)
+                if msg == template and self.args:
+                    break
+                return msg
+            except IndexError:
+                continue
+        culprits = ', '.join(str(a) for a in self.args)
+        return '{}: {}'.format(culprits, template)
 
     def __str__(self):
-        msgs = self.msg
-        if is_str(msgs):
-            msgs = [msgs]
-        for msg in msgs:
-            # return first msg for which all arguments are available.
-            try:
-                return msg.format(*self.args, self=self)
-            except IndexError:
-                pass
-        return ' '.join(str(a) for a in self.args)
+        return self.render()
 
     def __repr__(self):
         name = self.__class__.__name__
-        args = ', '.join(str(a) for a in self.args)
+        kwargs = ['{!s}={!r}'.format(k, v) for k, v in self.kwargs.items()]
+        args = ', '.join(repr(a) for a in list(self.args) + kwargs)
         return '{}({})'.format(name, args)
 
 class ExpectedQuantity(QuantiPhyError, ValueError):
@@ -110,27 +124,21 @@ class ExpectedQuantity(QuantiPhyError, ValueError):
     The value is required to be a Quantity or a string that can be converted to
     a Quantity.
     """
-    def __init__(self, *args):
-        self.args = args
-        self.msg = 'expected a quantity for value.'
+    _template = 'expected a quantity for value.'
 
 
 class IncompatibleUnits(QuantiPhyError, TypeError):
     """
     The units of the contribution do not match those of the underlying quantity.
     """
-    def __init__(self, *args):
-        self.args = args
-        self.msg = '{}: incompatible units.'
+    _template = '{}: incompatible units.'
 
 
 class InvalidNumber(QuantiPhyError, ValueError, TypeError):
     """
     The value given could not be converted to a number.
     """
-    def __init__(self, *args):
-        self.args = args
-        self.msg = "{}: not a valid number."
+    _template = "{}: not a valid number."
 
 
 class InvalidRecognizer(QuantiPhyError, KeyError):
@@ -140,18 +148,14 @@ class InvalidRecognizer(QuantiPhyError, KeyError):
     is raised when the current value of *assign_rec* does not satisfy this
     requirement.
     """
-    def __init__(self, *args):
-        self.args = args
-        self.msg = "recognizer does not contain 'val' key."
+    _template = "recognizer does not contain 'val' key."
 
 
 class MissingName(QuantiPhyError, NameError):
     """
     *alias* was not specified and no name was available from *value*.
     """
-    def __init__(self, *args):
-        self.args = args
-        self.msg = 'no name specified.'
+    _template = 'no name specified.'
 
 
 class UnknownConversion(QuantiPhyError, KeyError):
@@ -159,13 +163,10 @@ class UnknownConversion(QuantiPhyError, KeyError):
     The given units are not supported by the underlying class, or a unit
     conversion was requested and there is no corresponding unit converter.
     """
-    def __init__(self, *args, **kwargs):
-        self.args = args
-        self.direction = kwargs.get('direction')
-        self.msg = (
-            "unable to convert between '{}' and '{}'.",
-            "unable to convert {self.direction} '{}'.",
-        )
+    _template = (
+        "unable to convert between '{}' and '{}'.",
+        "unable to convert {direction} '{}'.",
+    )
 
 
 class UnknownFormatKey(QuantiPhyError, KeyError):
@@ -175,18 +176,14 @@ class UnknownFormatKey(QuantiPhyError, KeyError):
     for name, *v* for value, and *d* for description. This exception is raised
     when some other name is used for an interpolated argument.
     """
-    def __init__(self, *args):
-        self.args = args
-        self.msg = '{}: unknown format key.'
+    _template = '{}: unknown format key.'
 
 
 class UnknownPreference(QuantiPhyError, KeyError):
     """
     The name given for a preference is unknown.
     """
-    def __init__(self, *args):
-        self.args = args
-        self.msg = '{}: unknown preference.'
+    _template = '{}: unknown preference.'
 
 
 class UnknownScaleFactor(QuantiPhyError, ValueError):
@@ -195,19 +192,14 @@ class UnknownScaleFactor(QuantiPhyError, ValueError):
     accepted. This exception is raised if *input_sf* contains an unknown scale
     factor.
     """
-    def __init__(self, *args):
-        self.args = args
-        self.culprit = ', '.join(args)
-        self.msg = "{self.culprit}: unknown scale factors."
+    _template = "unknown scale factors."
 
 
 class UnknownUnitSystem(QuantiPhyError, KeyError):
     """
     The name given does not correspond to a known unit system.
     """
-    def __init__(self, *args):
-        self.args = args
-        self.msg = "{}: unknown unit system."
+    _template = "{}: unknown unit system."
 
 
 # Unit Conversions {{{1
@@ -1610,6 +1602,8 @@ class Quantity(float):
                         val = args['val']
                     except KeyError:
                         raise InvalidRecognizer()
+                    if not val:
+                        raise
                     d = args.get('desc', '')
                     number, u, mantissa, sf = recognize_number(val, ignore_sf)
                     if n:
