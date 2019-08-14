@@ -21,21 +21,22 @@ Constants and Unit Systems
 ==========================
 
 .. autofunction:: quantiphy.add_constant
-
 .. autofunction:: quantiphy.set_unit_system
 
 
 Exceptions
 ==========
 
-.. autoclass:: quantiphy.QuantiPhyError
-.. autoclass:: quantiphy.ExpectedQuantity
-.. autoclass:: quantiphy.IncompatibleUnits
-.. autoclass:: quantiphy.InvalidNumber
-.. autoclass:: quantiphy.InvalidRecognizer
-.. autoclass:: quantiphy.MissingName
-.. autoclass:: quantiphy.UnknownConversion
-.. autoclass:: quantiphy.UnknownFormatKey
-.. autoclass:: quantiphy.UnknownPreference
-.. autoclass:: quantiphy.UnknownScaleFactor
-.. autoclass:: quantiphy.UnknownUnitSystem
+.. autoexception:: quantiphy.QuantiPhyError
+    :members:
+
+.. autoexception:: quantiphy.ExpectedQuantity
+.. autoexception:: quantiphy.IncompatibleUnits
+.. autoexception:: quantiphy.InvalidNumber
+.. autoexception:: quantiphy.InvalidRecognizer
+.. autoexception:: quantiphy.MissingName
+.. autoexception:: quantiphy.UnknownConversion
+.. autoexception:: quantiphy.UnknownFormatKey
+.. autoexception:: quantiphy.UnknownPreference
+.. autoexception:: quantiphy.UnknownScaleFactor
+.. autoexception:: quantiphy.UnknownUnitSystem

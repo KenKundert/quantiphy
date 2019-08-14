@@ -92,6 +92,16 @@ class QuantiPhyError(Exception):
         self.kwargs = kwargs
 
     def render(self, template=None):
+        """Convert exception to a string under guidance of format string.
+
+        :arg str template:
+            This string, along with the positional and keyword arguments of
+            the exception are passed to the Python format() function and the
+            result is returned. *template* may also be a list of strings. In
+            this case the first string found that renders without error is used.
+            If *template* is not given, the exception is rendered with the
+            built-in template.
+        """
         if not template:
             template = self._template
         if is_str(template):
