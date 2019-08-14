@@ -2094,4 +2094,18 @@ a format string that can access both the unnamed and named arguments:
     ...     q = Quantity('tweed')
     ... except InvalidNumber as e:
     ...     print(e.render('{}: no es un número valido.'))
+    ... except UnknownScaleFactor as e:
+    ...     print(e.render('factor de escala desconocido.'))
+    ... except UnknownConversion as e:
+    ...     if 'direction' in e.kwargs:
+    ...         direction = e.kwargs['direction']
+    ...         if direction == 'to':
+    ...             template = 'incapaz de convertir a {}'
+    ...         else:  # direction must be 'from'
+    ...             template = 'incapaz de convertir de {}'
+    ...     else:
+    ...         template = 'incapaz de convertir entre {} y {}'
+    ...     print(e.render(template))
+    ... except InvalidRecognizer as e:
+    ...     print(e.render("el reconocedor no contiene la clave 'val'"))
     tweed: no es un número valido.

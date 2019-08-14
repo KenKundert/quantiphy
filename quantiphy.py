@@ -115,7 +115,7 @@ class QuantiPhyError(Exception):
                 if msg == template and self.args:
                     break
                 return msg
-            except IndexError:
+            except (IndexError, KeyError):
                 continue
         culprits = ', '.join(str(a) for a in self.args)
         return '{}: {}'.format(culprits, template)
@@ -174,8 +174,8 @@ class UnknownConversion(QuantiPhyError, KeyError):
     conversion was requested and there is no corresponding unit converter.
     """
     _template = (
-        "unable to convert between '{}' and '{}'.",
         "unable to convert {direction} '{}'.",
+        "unable to convert between '{}' and '{}'.",
     )
 
 
