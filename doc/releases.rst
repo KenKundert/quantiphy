@@ -2,7 +2,7 @@ Releases
 ========
 
 **Latest development release**:
-    | Version: 2.6.1
+    | Version: 2.6.2
     | Released: 2019-08-14
 
     - now support Quantity arguments with :meth:`quantiphy.Quantity.extract()`.
