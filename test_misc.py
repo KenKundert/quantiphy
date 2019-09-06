@@ -651,7 +651,7 @@ def test_add():
     total = WholeDollars(0)
     total.name = 'total'
     assert str(total) == '$0'
-    total = total.add(1_000_000)
+    total = total.add(1000000)
     assert str(total) == '$1,000,000'
     assert total.name == 'total'
     total = total.add(Quantity('-2MHz'), check_units=False)
@@ -687,7 +687,7 @@ def test_scale():
 
     total = Dollars(1)
     assert str(total) == '$1.00'
-    total = total.scale(1_000_000)
+    total = total.scale(1000000)
     assert str(total) == '$1,000,000.00'
 
     class WholeDollars(Dollars):
@@ -695,7 +695,7 @@ def test_scale():
 
     total = WholeDollars(1)
     assert str(total) == '$1'
-    total = total.scale(1_000_000)
+    total = total.scale(1000000)
     assert str(total) == '$1,000,000'
     total = total.scale(5, Dollars)
     assert str(total) == '$5,000,000.00'
