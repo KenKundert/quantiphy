@@ -1775,7 +1775,10 @@ class Quantity(float):
         number, units = _scale(scale, self.real, self.units)
         if not cls:
             cls = self.__class__
-        return cls(number, units)
+        new = cls(number)
+        new.__dict__.update(self.__dict__)
+        new.units = units
+        return new
 
     # add() {{{2
     def add(self, addend, check_units=False):
@@ -1786,11 +1789,11 @@ class Quantity(float):
         :type addend: real, quantity
 
         :arg check_units:
-            If True, raise a TypeError if the units of the *addend* are not
+            If True, raise an exception if the units of the *addend* are not
             compatible with the underlying quantity. If the *addend* does not
             have units, then it is considered compatible unless *check_units* is
             'strict'.
-        :type addend: boolean or 'strict'
+        :type check_units: boolean or 'strict'
 
         :raises IncompatibleUnits(TypeError):
             Units of contribution do not match those of underlying quantity.
@@ -1814,17 +1817,7 @@ class Quantity(float):
                     getattr(addend, 'units', None)
                 )
         new = self.__class__(self.real + addend)
-
-        # copy important attributes
-        units = getattr(self, 'units', None)
-        if units:
-            new.units = units
-        name = getattr(self, 'name', None)
-        if name:
-            new.name = name
-        desc = getattr(self, 'desc', None)
-        if desc:
-            new.desc = desc
+        new.__dict__.update(self.__dict__)
         return new
 
     # render() {{{2

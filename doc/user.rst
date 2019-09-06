@@ -385,6 +385,32 @@ In addition, you can also override the preferences with attributes:
     100ns
 
 
+.. _subclassing Quantity:
+
+Subclassing Quantity
+""""""""""""""""""""
+
+You can subclass :class:`quantiphy.Quantity` to make it easier to create 
+a particular particular type of quantity, or to create quantities with 
+particular qualities.  The following example demonstrates both. It creates 
+a subclass for dollars that both sets the units and display preferences.  
+Display preferences for currencies are often very different from what you would 
+want from physical quantities:
+
+.. code-block:: python
+
+    >>> class Dollars(Quantity):
+    ...     units = '$'
+    ...     form = 'fixed'
+    ...     prec = 2
+    ...     strip_zeros = False
+    ...     show_commas = True
+
+    >>> cost = Dollars(100_000)
+    >>> print(cost)
+    $100,000.00
+
+
 .. _scaling upon creation:
 
 Scaling When Creating a Quantity

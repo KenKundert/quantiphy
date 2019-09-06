@@ -601,6 +601,7 @@ Summary @ 900.51 us: 7 tests run, 1 failures detected, 0 faults detected, 0 test
 
 
 def test_add():
+    Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None)
     q1 = Quantity('1ns')
     q2 = Quantity('2ns')
     assert str(q1.add(q2)) == '3 ns'
@@ -625,3 +626,76 @@ def test_add():
     assert q1.add(q2).name == 'period'
     assert q1.add(q2).desc == 'duration of one cycle'
 
+    class Dollars(Quantity):
+        units = '$'
+        prec = 2
+        form = 'fixed'
+        show_commas = True
+        minus = Quantity.minus_sign
+        strip_zeros = False
+
+    total = Dollars(0)
+    assert str(total) == '$0.00'
+    total = total.add(1_000_000)
+    assert str(total) == '$1,000,000.00'
+    total = total.add(Quantity('-2MHz'), check_units=False)
+    assert str(total) == '−$1,000,000.00'
+    with pytest.raises(IncompatibleUnits) as exception:
+        total.add(Quantity('-2MHz'), check_units=True)
+    total = total.add(Quantity('$6M'), check_units=True)
+    assert str(total) == '$5,000,000.00'
+
+    class WholeDollars(Dollars):
+        prec = 0
+
+    total = WholeDollars(0)
+    total.name = 'total'
+    assert str(total) == '$0'
+    total = total.add(1_000_000)
+    assert str(total) == '$1,000,000'
+    assert total.name == 'total'
+    total = total.add(Quantity('-2MHz'), check_units=False)
+    assert str(total) == '−$1,000,000'
+    assert total.name == 'total'
+    with pytest.raises(IncompatibleUnits) as exception:
+        total.add(Quantity('-2MHz'), check_units=True)
+    total = total.add(Quantity('$6M'), check_units=True)
+    assert str(total) == '$5,000,000'
+    assert total.name == 'total'
+
+def test_scale():
+    Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None)
+    q1 = Quantity('3ns')
+    q2 = Quantity('2')
+    v2 = 2
+    assert str(q1.scale(q2)) == '6 ns'
+    assert str(q1.scale(v2)) == '6 ns'
+
+    q1.name = 'period'
+    q3 = q1.scale(q2).name == 'period'
+    q1.desc = 'duration of one cycle'
+    assert q1.scale(q2).name == 'period'
+    assert q1.scale(q2).desc == 'duration of one cycle'
+
+    class Dollars(Quantity):
+        units = '$'
+        prec = 2
+        form = 'fixed'
+        show_commas = True
+        minus = Quantity.minus_sign
+        strip_zeros = False
+
+    total = Dollars(1)
+    assert str(total) == '$1.00'
+    total = total.scale(1_000_000)
+    assert str(total) == '$1,000,000.00'
+
+    class WholeDollars(Dollars):
+        prec = 0
+
+    total = WholeDollars(1)
+    assert str(total) == '$1'
+    total = total.scale(1_000_000)
+    assert str(total) == '$1,000,000'
+    total = total.scale(5, Dollars)
+    assert str(total) == '$5,000,000.00'
