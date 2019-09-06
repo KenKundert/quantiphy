@@ -1,4 +1,4 @@
-# encoding: utf8
+#1_000_000 encoding: utf8
 
 from quantiphy import (
     Quantity, add_constant,
@@ -631,7 +631,8 @@ def test_add():
         prec = 2
         form = 'fixed'
         show_commas = True
-        minus = Quantity.minus_sign
+        if sys.version_info.major == 3:
+            minus = Quantity.minus_sign
         strip_zeros = False
 
     total = Dollars(0)
@@ -639,7 +640,10 @@ def test_add():
     total = total.add(1000000)
     assert str(total) == '$1,000,000.00'
     total = total.add(Quantity('-2MHz'), check_units=False)
-    assert str(total) == '−$1,000,000.00'
+    if sys.version_info.major == 3:
+        assert str(total) == '−$1,000,000.00'
+    else:
+        assert str(total) == '-$1,000,000.00'
     with pytest.raises(IncompatibleUnits) as exception:
         total.add(Quantity('-2MHz'), check_units=True)
     total = total.add(Quantity('$6M'), check_units=True)
@@ -655,7 +659,10 @@ def test_add():
     assert str(total) == '$1,000,000'
     assert total.name == 'total'
     total = total.add(Quantity('-2MHz'), check_units=False)
-    assert str(total) == '−$1,000,000'
+    if sys.version_info.major == 3:
+        assert str(total) == '−$1,000,000'
+    else:
+        assert str(total) == '-$1,000,000'
     assert total.name == 'total'
     with pytest.raises(IncompatibleUnits) as exception:
         total.add(Quantity('-2MHz'), check_units=True)
