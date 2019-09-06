@@ -636,7 +636,7 @@ def test_add():
 
     total = Dollars(0)
     assert str(total) == '$0.00'
-    total = total.add(1_000_000)
+    total = total.add(1000000)
     assert str(total) == '$1,000,000.00'
     total = total.add(Quantity('-2MHz'), check_units=False)
     assert str(total) == '−$1,000,000.00'
