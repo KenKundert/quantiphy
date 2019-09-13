@@ -663,7 +663,7 @@ a quantity and then uses the sum to create a new Quantity. For example:
 When adding quantities, the units of the quantity should match. You can enforce 
 this by adding *check_units=True*. If the dimension of your quantities match but 
 not the units, you can often use :meth:`quantiphy.Quantity.scale` to get the 
-units right::
+units right:
 
 .. code-block:: python
 
