@@ -107,10 +107,15 @@ def test_misc2():
     assert isinstance(exception.value, ValueError)
     assert exception.value.args == ('%',)
     assert exception.value.render(template='bad number given ({!r})') == "bad number given ('%')"
+    assert exception.value.render(template='bad number given') == "%: bad number given"
     # the following is not kosher, but it should work
     exception.value._template = 'bad number ({!r})'
     assert str(exception.value) == "bad number ('%')"
     assert repr(exception.value) == "InvalidNumber('%')"
+    with pytest.raises(ValueError):
+        exception.value.render(template=['{} {}', '{} {} {}'])
+    with pytest.raises(ValueError):
+        exception.value.render(template=['{a} {b}', '{a} {b} {c}'])
 
     with pytest.raises(KeyError) as exception:
         Foo.set_prefs(assign_rec=r'(\w+)\s*=\s*(.*)') # no named groups

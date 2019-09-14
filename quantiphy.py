@@ -3,19 +3,19 @@
 
 # Description {{{1
 """
-*QuantiPhy* is a Python library that offers support for physical quantities.  
-A quantity is the pairing of a number and a unit of measure that indicates the 
-amount of some measurable thing.  *QuantiPhy* provides quantity objects that 
-keep the units with the number, making it easy to share them as single object.  
+*QuantiPhy* is a Python library that offers support for physical quantities.
+A quantity is the pairing of a number and a unit of measure that indicates the
+amount of some measurable thing.  *QuantiPhy* provides quantity objects that
+keep the units with the number, making it easy to share them as single object.
 They subclass float and so can be used anywhere a number is appropriate.
 
-*QuantiPhy* naturally supports SI scale factors, which are widely used in 
-science and engineering. SI scale factors make it possible to cleanly represent 
-both very large and very small quantities in a form that is both easy to read 
-and write.  While generally better for humans, no general programming language 
-provides direct support for reading or writing quantities with SI scale factors, 
-making it difficult to write software that communicates effectively with humans.  
-*QuantiPhy* addresses this deficiency, making it natural and simple to both 
+*QuantiPhy* naturally supports SI scale factors, which are widely used in
+science and engineering. SI scale factors make it possible to cleanly represent
+both very large and very small quantities in a form that is both easy to read
+and write.  While generally better for humans, no general programming language
+provides direct support for reading or writing quantities with SI scale factors,
+making it difficult to write software that communicates effectively with humans.
+*QuantiPhy* addresses this deficiency, making it natural and simple to both
 input and output physical quantities.
 
 Documentation can be found at quantiphy.readthedocs.io.
@@ -55,7 +55,6 @@ def is_str(obj):
     "Identifies strings in all their various guises."
     return isinstance(obj, string_types)
 
-
 # _named_regex {{{2
 def _named_regex(name, regex):
     return '(?P<%s>%s)' % (name, regex)
@@ -87,6 +86,7 @@ class QuantiPhyError(Exception):
 
     All of the specific QuantiPhy exceptions subclass this exception.
     """
+
     def __init__(self, *args, **kwargs):
         self.args = args
         self.kwargs = kwargs
@@ -108,17 +108,19 @@ class QuantiPhyError(Exception):
             templates = [template]
         else:
             templates = template
-        for template in templates:
+        for t in templates:
             # use first template for which all arguments are available.
             try:
-                msg = template.format(*self.args, **self.kwargs)
-                if msg == template and self.args:
+                msg = t.format(*self.args, **self.kwargs)
+                if msg == t and self.args:
                     break
                 return msg
-            except (IndexError, KeyError):
+            except (IndexError, KeyError) as e:
                 continue
+        else:
+            raise ValueError('No valid template found.')
         culprits = ', '.join(str(a) for a in self.args)
-        return '{}: {}'.format(culprits, template)
+        return '{}: {}'.format(culprits, t)
 
     def __str__(self):
         return self.render()
@@ -128,6 +130,7 @@ class QuantiPhyError(Exception):
         kwargs = ['{!s}={!r}'.format(k, v) for k, v in self.kwargs.items()]
         args = ', '.join(repr(a) for a in list(self.args) + kwargs)
         return '{}({})'.format(name, args)
+
 
 class ExpectedQuantity(QuantiPhyError, ValueError):
     """
@@ -225,14 +228,15 @@ def _convert_units(to_units, from_units, value):
 
 class UnitConversion(object):
     """
-    Creates a unit converter. Just the creation of the converter is sufficient
-    to make it available to :class:`Quantity` (the :class:`UnitConversion`
-    object itself is normally discarded). Once created, it is automatically
-    employed by :class:`Quantity` when a conversion is requested with the given
-    units. A forward conversion is performed if the from and to units match, and
-    a reversion conversion is performed if they are swapped. A no-op conversion
-    is performed when converting one from- unit to another or one to-unit to
-    another.
+    Creates a unit converter.
+
+    Just the creation of the converter is sufficient to make it available to
+    :class:`Quantity` (the :class:`UnitConversion` object itself is normally
+    discarded). Once created, it is automatically employed by :class:`Quantity`
+    when a conversion is requested with the given units. A forward conversion is
+    performed if the from and to units match, and a reversion conversion is
+    performed if they are swapped. A no-op conversion is performed when
+    converting one from- unit to another or one to-unit to another.
 
     :arg to_units:
         A collection of units. If given as a single string it is split.
@@ -265,7 +269,7 @@ class UnitConversion(object):
     In this case the name *slope* is misleading.
 
     **Reverse Conversion**:
-    The following conversion is applied if the given units are among 
+    The following conversion is applied if the given units are among
     the *to_units* and the desired units are among the *from_units*:
 
         *new_value* = (*given_value* - *intercept*)/*slope*
@@ -346,6 +350,7 @@ class UnitConversion(object):
         100 mA, 10 A
 
     """
+
     def __init__(self, to_units, from_units, slope=1, intercept=0):
         self.to_units = to_units.split() if is_str(to_units) else to_units
         self.from_units = from_units.split() if is_str(from_units) else from_units
@@ -563,6 +568,7 @@ def set_unit_system(unit_system):
     except KeyError:
         raise UnknownUnitSystem(unit_system)
 
+
 _default_unit_system = 'mks'
 _constants = {None: {}, _default_unit_system: {}}
 _active_constants = {}
@@ -572,7 +578,9 @@ set_unit_system(_default_unit_system)
 # add_constant {{{2
 def add_constant(value, alias=None, unit_systems=None):
     """
-    Saves a quantity in such a way that it can later be recalled by name when
+    Create a new constant.
+
+    Save a quantity in such a way that it can later be recalled by name when
     creating new quantities.
 
     :arg quantity value:
@@ -634,16 +642,14 @@ def add_constant(value, alias=None, unit_systems=None):
     if unit_systems:
         for system in unit_systems:
             constants = _constants.get(system, {})
-            for alias in aliases:
-                constants[alias] = value
+            for a in aliases:
+                constants[a] = value
             if value.name:
                 constants[value.name] = value
             _constants[system] = constants
     else:
-        for alias in aliases:
-            _constants[None][alias] = value
-        if alias:
-            _constants[None][alias] = value
+        for a in aliases:
+            _constants[None][a] = value
         if value.name:
             _constants[None][value.name] = value
 
@@ -772,7 +778,7 @@ CONSTANTS = {
 @python_2_unicode_compatible
 class Quantity(float):
     # description {{{2
-    """Create a Physical Quantity
+    """Create a physical quantity.
 
     A quantity is a number paired with a unit of measure.
 
@@ -806,7 +812,7 @@ class Quantity(float):
         - If a tuple, the first value, a float, is treated as a scale factor
           and the second value, a string, is take to be the units of the
           quantity.
-        - If a function, it takes two arguments, the given value and the units 
+        - If a function, it takes two arguments, the given value and the units
           and it returns two values, the value and units of the quantity.
         - If a string, it is taken to the be desired units. This value along
           with the units of the given value are used to select a known unit
@@ -1029,7 +1035,7 @@ class Quantity(float):
                 '{n}: {v}'
 
         :arg str label_fmt_full:
-            Format string used when label is requested if the quantity 
+            Format string used when label is requested if the quantity
             has a description and the description was requested (if
             *show_desc* is True).  Is passed through string .format() method.
             Format string takes four possible arguments named *n*, *v*, *d* and *V*
@@ -1101,7 +1107,7 @@ class Quantity(float):
             people do not recognize.
 
         :arg str plus:
-            The text to be used as the plus sign.  By default it is '+', 
+            The text to be used as the plus sign.  By default it is '+',
             but is sometimes '＋' (the unicode full width plus sign) or '' to
             simply eliminate plus signs from numbers.  You can access the
             Unicode full width plus sign using Quantity.plus_sign.
@@ -1214,7 +1220,7 @@ class Quantity(float):
     # get preference {{{3
     @classmethod
     def get_pref(cls, name):
-        """Get class preference
+        """Get class preference.
 
         Returns the value of given preference.
 
@@ -1312,7 +1318,7 @@ class Quantity(float):
         # only maps a leading sign, if no sign is present, it is assumed to be +
         if value[0] == '-':
             return self.minus + leading_units + value[1:]
-        elif value[0] == '+':
+        if value[0] == '+':
             return self.plus + leading_units + value[1:]
         return leading_units + value
 
@@ -1350,13 +1356,12 @@ class Quantity(float):
             if units in CURRENCY_SYMBOLS:
                 # prefix the value with the units
                 return self._map_leading_sign(mantissa + sf, units)
-            else:
-                mantissa = self._map_leading_sign(mantissa)
-                if sf_is_exp:
-                    # has an exponent
-                    return mantissa + sf + spacer + units
-                # has a scale factor
-                return mantissa + spacer + sf + units
+            mantissa = self._map_leading_sign(mantissa)
+            if sf_is_exp:
+                # has an exponent
+                return mantissa + sf + spacer + units
+            # has a scale factor
+            return mantissa + spacer + sf + units
         mantissa = self._map_leading_sign(mantissa)
         return mantissa + sf
 
@@ -1374,7 +1379,6 @@ class Quantity(float):
             unknown_sf = set(input_sf) - set(known_sf)
             if unknown_sf:
                 raise UnknownScaleFactor(*sorted(unknown_sf))
-
 
         # components {{{3
         sign = _named_regex('sign', '[-+]?')
@@ -1564,9 +1568,9 @@ class Quantity(float):
                     if len(components) == 3:
                         data['desc'] = components[2]
             else:
-                #data['name'] = getattr(model, 'name', '')
+                # data['name'] = getattr(model, 'name', '')
                 data['units'] = getattr(model, 'units', '')
-                #data['desc'] = getattr(model, 'desc', '')
+                # data['desc'] = getattr(model, 'desc', '')
 
         def recognize_number(value, ignore_sf):
             if binary and not ignore_sf:
@@ -1722,7 +1726,7 @@ class Quantity(float):
 
     # as_tuple() {{{2
     def as_tuple(self):
-        """Returns a tuple that contains the value as a float along with its units.
+        """Return a tuple that contains the value as a float along with its units.
 
         Example::
 
@@ -2034,7 +2038,7 @@ class Quantity(float):
                 sf = self.map_sf.get(sf, sf)
             except AttributeError:
                 sf = self.map_sf(sf)
-                if type(sf) == tuple:
+                if isinstance(sf, tuple):
                     sf, sf_is_exp = sf
 
         # shift the decimal place as needed
@@ -2324,7 +2328,7 @@ class Quantity(float):
         # cannot use binary scale factors, just use float format
         except (IndexError, ValueError):
             num = '{number:0.{prec}f}'.format(number=number, prec=prec)
-            if 'e' in num: # pragma: no cover
+            if 'e' in num:  # pragma: no cover
                 mantissa, exp = num.split('e')
                 sf = 'e' + exp
                 sf_is_exp = True
@@ -2343,10 +2347,9 @@ class Quantity(float):
         value = self._combine(mantissa, sf, units, self.spacer, sf_is_exp)
         return self._label(value, show_label)
 
-
     # is_close() {{{2
     def is_close(self, other, reltol=None, abstol=None, check_units=True):
-        '''
+        """
         Are values equivalent?
 
         Indicates  whether the value of a quantity or real number is equivalent
@@ -2359,11 +2362,11 @@ class Quantity(float):
 
         :arg float reltol:
             The relative tolerance.
-            If not specified. the *reltol* preference is 
+            If not specified. the *reltol* preference is
             used, which defaults to 1u.
 
         :arg float abstol:
-            The absolute tolerance.  If not specified. the *abstol* preference is 
+            The absolute tolerance.  If not specified. the *abstol* preference is
             used, which defaults to 1p.
 
         :arg bool check_units:
@@ -2388,7 +2391,7 @@ class Quantity(float):
             ... )
             True True False True False
 
-        '''
+        """
         if check_units:
             other_units = getattr(other, 'units', None)
             if other_units:
@@ -2549,19 +2552,20 @@ class Quantity(float):
                 if label:
                     value = self._label(value, True)
             if not align:
-                align = '>' # in python numbers are right-aligned
+                align = '>'  # in python numbers are right-aligned
             return '{0:{1}{2}s}'.format(value, align, width)
-        else:
-            # Not a valid Quantiphy format specifier, so pass it on to float
-            return '{0:{1}}'.format(self.real, template)
+
+        # Not a valid Quantiphy format specifier, so pass it on to float
+        return '{0:{1}}'.format(self.real, template)
+
     __format__ = format
 
     # extract() {{{2
     @classmethod
     def extract(cls, text, predefined=None, **kwargs):
-        r"""Extract quantities
+        r"""Extract quantities.
 
-        Takes a string that contains quantity definitions, one per line, and 
+        Takes a string that contains quantity definitions, one per line, and
         returns those quantities in a dictionary.
 
         :arg str text:
@@ -2719,7 +2723,7 @@ class Quantity(float):
 
     @staticmethod
     def map_sf_to_sci_notation(sf):
-        """ Render scale factors in scientific notation
+        """Render scale factors in scientific notation.
 
         Pass this function to *map_sf* preference if you prefer your large and
         small numbers in classic scientific notation. It also causes 'u' to be
@@ -2746,7 +2750,7 @@ class Quantity(float):
     # map_sf_to_greek() {{{2
     @staticmethod
     def map_sf_to_greek(sf):
-        '''Render scale factors in Greek alphabet if appropriate.
+        """Render scale factors in Greek alphabet if appropriate.
 
         Pass this dictionary to *map_sf* preference if you prefer µ rather than u.
 
@@ -2756,7 +2760,7 @@ class Quantity(float):
             ...     print(Quantity('mu0').render(show_label='f'))
             µ₀ = 1.2566 µH/m -- permeability of free space
 
-        '''
+        """
         # this could just as easily be a simple dictionary, but implement it as
         # a function so that it supports a docstring.
         return {'u': 'µ'}.get(sf, sf)

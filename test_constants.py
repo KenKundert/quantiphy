@@ -180,3 +180,11 @@ def test_constants():
     assert isinstance(exception.value, QuantiPhyError)
     assert isinstance(exception.value, KeyError)
     assert exception.value.args == ('nuts',)
+
+    add_constant(
+        'f_hy = 1420.405751786 MHz', alias=['hl', 'HL', 'hydrogen line']
+    )
+    assert str(Quantity('f_hy')) == '1.4204 GHz'
+    assert str(Quantity('hl')) == '1.4204 GHz'
+    assert str(Quantity('HL')) == '1.4204 GHz'
+    assert str(Quantity('hydrogen line')) == '1.4204 GHz'
