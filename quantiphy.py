@@ -1145,7 +1145,7 @@ class Quantity(float):
             Unicode full width plus sign using Quantity.plus_sign.
 
         :arg str minus:
-            The text to be used as the plus sign.  By default its value is '-',
+            The text to be used as the minus sign.  By default its value is '-',
             but is sometimes '−' (the unicode minus sign).  You can
             access the Unicode minus sign using Quantity.minus_sign.
 
