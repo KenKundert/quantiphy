@@ -1064,6 +1064,11 @@ class Quantity(float):
             :meth:`Quantity.map_sf_to_sci_notation`.
         :type map_sf: dictionary or function
 
+        :arg str minus:
+            The text to be used as the minus sign.  By default its value is '-',
+            but is sometimes '−' (the unicode minus sign).  You can
+            access the Unicode minus sign using Quantity.minus_sign.
+
         :arg number_fmt:
             Format string used to convert the components of the number into the
             number itself.  Normally this is not necessary. However, it can be
@@ -1094,6 +1099,12 @@ class Quantity(float):
             scale factors. The default is 'TGMkmunpfa', which gets rid or the
             very large ('YZEP') and very small ('zy') scale factors that many
             people do not recognize.
+
+        :arg str plus:
+            The text to be used as the plus sign.  By default it is '+', 
+            but is sometimes '＋' (the unicode full width plus sign) or '' to
+            simply eliminate plus signs from numbers.  You can access the
+            Unicode full width plus sign using Quantity.plus_sign.
 
         :arg int prec:
             Default precision  in digits where 0 corresponds to 1 digit.  Must
@@ -1137,17 +1148,6 @@ class Quantity(float):
             your convenience, you can access a non-breaking space using
             Quantity.non_breaking_space, Quantity.narrow_non_breaking_space, or
             Quantity.thin_space.
-
-        :arg str plus:
-            The text to be used as the plus sign.  By default it is '+', 
-            but is sometimes '＋' (the unicode full width plus sign) or '' to
-            simply eliminate plus signs from numbers.  You can access the
-            Unicode full width plus sign using Quantity.plus_sign.
-
-        :arg str minus:
-            The text to be used as the minus sign.  By default its value is '-',
-            but is sometimes '−' (the unicode minus sign).  You can
-            access the Unicode minus sign using Quantity.minus_sign.
 
         :arg bool strip_radix:
             When rendering, strip the radix (decimal point) if not needed from
