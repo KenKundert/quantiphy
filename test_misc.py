@@ -610,7 +610,9 @@ def test_add():
     q1 = Quantity('1ns')
     q2 = Quantity('2ns')
     assert str(q1.add(q2)) == '3 ns'
+    assert repr(q1.add(q2)) == "Quantity('3 ns')"
     assert str(q2.add(q1)) == '3 ns'
+    assert repr(q2.add(q1)) == "Quantity('3 ns')"
     assert str(q1.add(q2, check_units=False)) == '3 ns'
     assert str(q1.add(q2, check_units=True)) == '3 ns'
     assert str(q1.add(q2, check_units='strict')) == '3 ns'
@@ -681,7 +683,9 @@ def test_scale():
     q2 = Quantity('2')
     v2 = 2
     assert str(q1.scale(q2)) == '6 ns'
+    assert repr(q1.scale(q2)) == "Quantity('6 ns')"
     assert str(q1.scale(v2)) == '6 ns'
+    assert repr(q1.scale(v2)) == "Quantity('6 ns')"
 
     q1.name = 'period'
     q3 = q1.scale(q2).name == 'period'
