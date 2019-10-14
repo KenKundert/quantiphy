@@ -1830,7 +1830,7 @@ class Quantity(float):
                     getattr(self, 'units', None),
                     getattr(addend, 'units', None)
                 )
-        new = self.__class__(self.real + addend)
+        new = self.__class__(self.real + addend, self.units)
         new._inherit_attributes(self)
         return new
 
