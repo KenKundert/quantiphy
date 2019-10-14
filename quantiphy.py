@@ -1737,6 +1737,17 @@ class Quantity(float):
         """
         return self.real, self.units
 
+    # _inherit_attributes() {{{2
+    def _inherit_attributes(self, donor):
+        # Inherit attributes from the donor except those that represent the
+        # value, which may differ from the donor. So that means do not copy the
+        # units, the mantissa, or the scale factor.
+        self.__dict__.update({
+            k: v
+            for k, v in donor.__dict__.items()
+            if k not in ['units', '_mantissa', '_scale_factor']
+        })
+
     # scale() {{{2
     def scale(self, scale, cls=None):
         """Scale a quantity to create a new quantity.
@@ -1779,9 +1790,8 @@ class Quantity(float):
         number, units = _scale(scale, self.real, self.units)
         if not cls:
             cls = self.__class__
-        new = cls(number)
-        new.__dict__.update(self.__dict__)
-        new.units = units
+        new = cls(number, units)
+        new._inherit_attributes(self)
         return new
 
     # add() {{{2
@@ -1821,7 +1831,7 @@ class Quantity(float):
                     getattr(addend, 'units', None)
                 )
         new = self.__class__(self.real + addend)
-        new.__dict__.update(self.__dict__)
+        new._inherit_attributes(self)
         return new
 
     # render() {{{2

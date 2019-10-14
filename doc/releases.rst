@@ -5,6 +5,10 @@ Releases
     | Version: 2.6.4
     | Released: 2019-09-14
 
+    - improve the ability of both :meth:`quantiphy.Quantity.add()` and 
+      :meth:`quantiphy.Quantity.scale()` to retain attributes.
+
+**2.6 (2019-09-24)**:
     - now support Quantity arguments with :meth:`quantiphy.Quantity.extract()`.
     - allow plus and minus signs to be replaced with Unicode equivalents.
 
@@ -22,12 +26,12 @@ Releases
     - follow Python convention of right-justifying numbers by default.
     - add Quantity.add() (adds a number to a quantity returning a new quantity)
     - added # alternate form of string formatting.
-    - Change *show_si* to *form* (argument on 
+    - change *show_si* to *form* (argument on 
       :meth:`quantiphy.Quantity.set_prefs()` and 
       :meth:`quantiphy.Quantity.render()` (*show_si* is now obsolete, use 
       *form='si'* instead).
-    - Added concept of equivalent units for unit conversion to documentation.
-    - Enhance UnitConversion so that it supports nonlinear conversions.
+    - added concept of equivalent units for unit conversion to documentation.
+    - enhance UnitConversion so that it supports nonlinear conversions.
 
 **2.3 (2018-03-11)**:
     - enhanced :meth:`quantiphy.Quantity.extract()`
