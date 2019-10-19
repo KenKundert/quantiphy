@@ -410,6 +410,34 @@ want from physical quantities:
     >>> print(cost)
     $100,000.00
 
+This example creates a special class for bytes.
+
+.. code-block:: python
+
+    >>> class Bytes(Quantity):
+    ...     units = 'B'
+    ...     form = 'binary'
+    ...     accept_binary = True
+
+    >>> memory = Bytes('64KiB')
+    >>> print(memory)
+    64 KiB
+
+Lastly, this example creates a special class for temperatures. It disallows use 
+of 'K' as a scale factor to avoid confusion with Kelvin units.
+
+    >>> class Temperature(Quantity):
+    ...     units = 'K'
+    ...     input_sf = Quantity.get_pref('input_sf').replace('K', '')
+
+    >>> Tcore = Temperature('15M')
+    >>> Tphoto = Temperature('5.3k')
+    >>> Tcmb = Temperature('3.18')
+    >>> print(Tcore, Tphoto, Tcmb, sep='\n')
+    15 MK
+    5.3 kK
+    3.18 K
+
 
 .. _scaling upon creation:
 
@@ -1555,7 +1583,23 @@ existing known units.
 
 This same issue comes up for temperature quantities when given in Kelvin. There 
 are again several ways to handle this. First you can specify the acceptable 
-input scale factors leaving out 'K', ex. *input_sf* = 'TGMkmunpfa'.  
+input scale factors leaving out 'K', ex. *input_sf* = 'TGMkmunpfa', or:
+
+..  code-block:: python
+
+    >>> Quantity.set_prefs(input_sf = Quantity.get_pref('input_sf').replace('K', ''))
+    >>> temp = Quantity('100K')
+    >>> print(temp.as_tuple())
+    (100.0, 'K')
+
+    >>> temp = Quantity('100k')
+    >>> print(temp.as_tuple())
+    (100000.0, '')
+
+    >>> temp = Quantity('100k', 'K')
+    >>> print(temp.as_tuple())
+    (100000.0, 'K')
+
 Alternatively, you can specify 'K' as one of the known units. Finally, if you 
 know exactly when you will be converting a temperature to a quantity, you can 
 specify *ignore_sf* for that specific conversion. The effect is the same either 

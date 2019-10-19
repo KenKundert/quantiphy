@@ -7,6 +7,8 @@ Releases
 
     - improve the ability of both :meth:`quantiphy.Quantity.add()` and 
       :meth:`quantiphy.Quantity.scale()` to retain attributes.
+    - added *accept_binary* preference.
+    - support all preferences as class attributes.
 
 **2.6 (2019-09-24)**:
     - now support Quantity arguments with :meth:`quantiphy.Quantity.extract()`.

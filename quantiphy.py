@@ -727,6 +727,7 @@ FORMAT_SPEC = re.compile(r'''\A
 # Defaults {{{1
 DEFAULTS = dict(
     abstol = 1e-12,
+    accept_binary = False,
     assign_rec = r'''
         \A((
             (\#|--|//).*                             # simple comment
@@ -887,15 +888,14 @@ class Quantity(float):
         # These are used as the default values for these three attributes.
         # Putting them here means that the instances do not need to contain
         # these values if not specified, but yet they can always be accessed.
-    all_number_converters = None
-    sf_free_number_converters = None
-        # These must be initialized to None, but will be set the first time
-        # Quantity is instantiated.
     non_breaking_space = ' '
     narrow_non_breaking_space = ' '
     thin_space = ' '
     plus_sign = '＋'
     minus_sign = '−'
+    _provisioned_input_sf = None
+        # This must be initialized to None.
+        # It is set the first time Quantity is instantiated.
 
     # preferences {{{2
     _initialized = set()
@@ -930,6 +930,10 @@ class Quantity(float):
         :arg float abstol:
             Absolute tolerance, used by :meth:`Quantity.is_close()` when
             determining equivalence.  Default is 10⁻¹².
+
+        :arg bool accept_binary:
+            Allow use of binary scale factors (Ki, Mi, Gi, Ti, Pi, Ei, Zi, Yi).
+            Default is False.
 
         :arg str assign_rec:
             Regular expression used to recognize an assignment.  Used in
@@ -990,9 +994,9 @@ class Quantity(float):
 
         :arg str form:
             Specifies the form to use for representing numbers by default.
-            Choose from 'si', 'eng' and 'fixed'. As an example 0.25 A is
-            represented with 250 mA when form is 'si', as 250e-3 A when form is
-            'eng', and with 0.25 A when from is 'fixed'.
+            Choose from 'si', 'eng', 'fixed', and 'binary'. As an example 0.25 A
+            is represented with 250 mA when form is 'si', as 250e-3 A when form
+            is 'eng', and with 0.25 A when from is 'fixed'. Default is 'si'.
 
         :arg int full_prec:
             Default full precision in digits where 0 corresponds to 1 digit.
@@ -1001,7 +1005,7 @@ class Quantity(float):
 
         :arg bool ignore_sf:
             Whether all scale factors should be ignored by default when
-            recognizing numbers.
+            recognizing numbers.  Default is False.
 
         :arg str input_sf:
             Which scale factors to recognize when reading numbers.  The default
@@ -1015,13 +1019,14 @@ class Quantity(float):
             Indicate whether components should be kept if quantity value was
             given as string. Doing so takes a bit of space, but allows the
             original precision of the number to be recreated when full precision
-            is requested.
+            is requested.  Default is True.
 
         :arg known_units:
             List of units that are expected to be used in preference to a scale
             factor when the leading character could be mistaken as a scale
             factor.  If a string is given, it is split at white space to form
             the list. When set, any previous known units are overridden.
+            Default is empty.
         :type known_units: list or string
 
         :arg str label_fmt:
@@ -1068,6 +1073,7 @@ class Quantity(float):
             *QuantiPhy* provides two predefined functions intended for use with
             *maps_sf*: :meth:`Quantity.map_sf_to_greek` and
             :meth:`Quantity.map_sf_to_sci_notation`.
+            Default is empty.
         :type map_sf: dictionary or function
 
         :arg str minus:
@@ -1242,7 +1248,10 @@ class Quantity(float):
         """
         cls._initialize_preferences()
         try:
-            return cls._preferences[name]
+            value = getattr(cls, name, cls._preferences[name])
+            if name == 'known_units' and is_str(value):
+                value = value.split()
+            return value
         except KeyError:
             raise UnknownPreference(name)
 
@@ -1372,13 +1381,14 @@ class Quantity(float):
 
         # identify desired scale factors {{{3
         known_sf = ''.join(MAPPINGS)
-        if cls.get_pref('input_sf') is None: # pragma: no cover
+        if cls.get_pref('input_sf') is None:  # pragma: no cover
             input_sf = known_sf
         else:
             input_sf = cls.get_pref('input_sf')
             unknown_sf = set(input_sf) - set(known_sf)
             if unknown_sf:
                 raise UnknownScaleFactor(*sorted(unknown_sf))
+        cls._provisioned_input_sf = input_sf
 
         # components {{{3
         sign = _named_regex('sign', '[-+]?')
@@ -1546,14 +1556,16 @@ class Quantity(float):
     # constructor {{{2
     def __new__(
         cls, value, model=None, units=None, scale=None,
-        name=None, desc=None, ignore_sf=None, binary=False
+        name=None, desc=None, ignore_sf=None, binary=None
     ):
         if ignore_sf is None:
             ignore_sf = cls.get_pref('ignore_sf')
+        if binary is None:
+            binary = cls.get_pref('accept_binary')
         data = {}
 
-        # intialize Quantity if required
-        if not cls.all_number_converters or not cls.sf_free_number_converters:
+        # initialize Quantity if required
+        if cls._provisioned_input_sf != cls.get_pref('input_sf'):
             cls._initialize_recognizers()
 
         # process model to get values for name, units, and desc if available
@@ -1585,7 +1597,7 @@ class Quantity(float):
                             sf, units = '', sf+units
                         mantissa = mantissa.replace('_', '')
                         number = float(mantissa) * BINARY_MAPPINGS.get(sf, 1)
-                        return number, units, mantissa, ''
+                        return number, units, None, ''
             if ignore_sf:
                 number_converters = cls.sf_free_number_converters
             else:
@@ -1843,9 +1855,9 @@ class Quantity(float):
 
         :arg str form:
             Specifies the form to use for representing numbers by default.
-            Choose from 'si', 'eng' and 'fixed'. As an example 0.25 A is
-            represented with 250 mA when form is 'si', as 250e-3 A when form is
-            'eng', and with 0.25 A when from is 'fixed'.
+            Choose from 'si', 'eng', 'fixed', and 'binary'. As an example 0.25 A
+            is represented with 250 mA when form is 'si', as 250e-3 A when form
+            is 'eng', and with 0.25 A when from is 'fixed'.
 
         :arg bool show_units:
             Whether the units should be included in the string.

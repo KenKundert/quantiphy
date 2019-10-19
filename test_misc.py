@@ -328,6 +328,20 @@ def test_misc2():
     exception.value.render('{}, {}: unknown') == 'q, w: unknown'
 
     Quantity.set_prefs(input_sf=None, unity_sf=None, spacer=None)
+    assert Quantity('10m').render(form='eng') == '10e-3'
+
+    Quantity.input_sf = 'GMkwq'
+    with pytest.raises(ValueError) as exception:
+        Quantity('10m')
+    assert str(exception.value) == 'q, w: unknown scale factors.'
+    assert isinstance(exception.value, UnknownScaleFactor)
+    assert isinstance(exception.value, QuantiPhyError)
+    assert isinstance(exception.value, ValueError)
+    assert exception.value.args == ('q', 'w')
+    assert repr(exception.value) == "UnknownScaleFactor('q', 'w')"
+    exception.value.render('{}, {}: unknown') == 'q, w: unknown'
+
+    del Quantity.input_sf
 
     # test map_sf
     if sys.version_info.major == 3:
