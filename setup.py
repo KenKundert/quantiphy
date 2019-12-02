@@ -1,3 +1,10 @@
+import six
+
+if six.PY2:
+    # FileNotFoundError is only available since Python 3.3
+    FileNotFoundError = IOError
+    from io import open
+
 try:
     from setuptools import setup
 except ImportError:
