@@ -4,7 +4,7 @@ except ImportError:
     from distutils.core import setup
 import sys
 
-with open('README.rst') as f:
+with open('README.rst', encoding="UTF-8") as f:
     readme = f.read()
 
 if sys.version_info < (3,3):
