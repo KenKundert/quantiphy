@@ -1,10 +1,17 @@
+import six
+
+if six.PY2:
+    # FileNotFoundError is only available since Python 3.3
+    FileNotFoundError = IOError
+    from io import open
+
 try:
     from setuptools import setup
 except ImportError:
     from distutils.core import setup
 import sys
 
-with open('README.rst') as f:
+with open('README.rst', encoding="UTF-8") as f:
     readme = f.read()
 
 if sys.version_info < (3,3):
