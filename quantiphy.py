@@ -741,6 +741,7 @@ DEFAULTS = dict(
             (\s*(\#|--|//)\s*(?P<desc>.*?))?         # description: (--|//|#) .*
         ))\Z
     ''',
+    comma = ',',
     form = 'si',
     full_prec = 12,
     ignore_sf = False,
@@ -750,6 +751,7 @@ DEFAULTS = dict(
     label_fmt = '{n} = {v}',
     label_fmt_full = '{n} = {v} -- {d}',
     map_sf = {},
+    minus = '-',
     number_fmt = None,
     output_sf = 'TGMkmunpfa',
     prec = 4,
@@ -760,7 +762,7 @@ DEFAULTS = dict(
     show_units = True,
     spacer = ' ',
     plus = '+',
-    minus = '-',
+    radix = '.',
     strip_radix = True,
     strip_zeros = True,
     unity_sf = '',
@@ -992,6 +994,14 @@ class Quantity(float):
             In this example, the value for *Tstop* is given as an expression
             involving *Fin*.
 
+        :arg str comma:
+            The character to be used as the thousands separator.  It is very
+            common to use a comma, but using a space, period, or an underscore
+            can be used.
+            For your convenience, you can access a non-breaking space using
+            Quantity.non_breaking_space, Quantity.narrow_non_breaking_space, or
+            Quantity.thin_space.
+
         :arg str form:
             Specifies the form to use for representing numbers by default.
             Choose from 'si', 'eng', 'fixed', and 'binary'. As an example 0.25 A
@@ -1112,7 +1122,10 @@ class Quantity(float):
             very large ('YZEP') and very small ('zy') scale factors that many
             people do not recognize.
 
-        :arg str plus:
+        :arg str radix:
+            The character to be used as the radix.  By default it is '.'.
+
+        :arg str radix:
             The text to be used as the plus sign.  By default it is '+',
             but is sometimes '＋' (the unicode full width plus sign) or '' to
             simply eliminate plus signs from numbers.  You can access the
@@ -1340,6 +1353,17 @@ class Quantity(float):
             value = value.replace('+', self.plus)
         return value
 
+    # _fix_punct {{{2
+    def _fix_punct(self, mantissa):
+        def replace_char(c):
+            if c == '.':
+                return self.radix
+            elif c == ',':
+                return self.comma
+            return c
+        return ''.join((map(replace_char, mantissa)))
+
+
     # _combine {{{2
     def _combine(self, mantissa, sf, units, spacer, sf_is_exp=False):
         if self.number_fmt:
@@ -1372,6 +1396,7 @@ class Quantity(float):
             # has a scale factor
             return mantissa + spacer + sf + units
         mantissa = self._map_leading_sign(mantissa)
+        mantissa = self._fix_punct(mantissa)
         return mantissa + sf
 
     # recognizers {{{2

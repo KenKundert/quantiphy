@@ -9,6 +9,7 @@ Releases
       :meth:`quantiphy.Quantity.scale()` to retain attributes.
     - added *accept_binary* preference.
     - support all preferences as class attributes.
+    - allow radix and comma to be replaced with other characters
 
 **2.6 (2019-09-24)**:
     - now support Quantity arguments with :meth:`quantiphy.Quantity.extract()`.

@@ -26,7 +26,7 @@
     ...     unity_sf=None,
     ... )
 
-.. _examples:
+.. _quantiphy examples:
 
 Examples
 ========

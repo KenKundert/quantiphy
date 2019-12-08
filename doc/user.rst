@@ -3,7 +3,7 @@
 Users' Guide
 ============
 
-.. _overview:
+.. _quantiphy overview:
 
 Overview
 --------
@@ -1699,7 +1699,7 @@ Quantity for each column that requires distinct formatting:
 .. index::
    single: extracting quantities from text
 
-.. _extract:
+.. _extract function:
 
 Extract Quantities
 ------------------
@@ -2019,7 +2019,7 @@ using :meth:`quantiphy.Quantity.is_infinite()` or
 .. index::
    single: exceptions
 
-.. _exceptions:
+.. _quantiphy exceptions:
 
 Exceptions
 ----------
