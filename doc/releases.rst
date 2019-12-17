@@ -2,8 +2,8 @@ Releases
 ========
 
 **Latest development release**:
-    | Version: 2.6.6
-    | Released: 2019-12-08
+    | Version: 2.7.0
+    | Released: 2019-12-17
 
     - improve the ability of both :meth:`quantiphy.Quantity.add()` and 
       :meth:`quantiphy.Quantity.scale()` to retain attributes.
