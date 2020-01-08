@@ -2,8 +2,8 @@ Releases
 ========
 
 **Latest development release**:
-    | Version: 2.7.0
-    | Released: 2019-12-17
+    | Version: 2.8.0
+    | Released: 2020-01-08
 
 **2.8 (2020-01-08)**:
     - Fix nit in installer (setup.py).
