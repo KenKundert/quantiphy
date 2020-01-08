@@ -5,6 +5,10 @@ Releases
     | Version: 2.7.0
     | Released: 2019-12-17
 
+**2.8 (2020-01-08)**:
+    - Fix nit in installer (setup.py).
+
+**2.7 (2019-12-17)**:
     - improve the ability of both :meth:`quantiphy.Quantity.add()` and 
       :meth:`quantiphy.Quantity.scale()` to retain attributes.
     - added *accept_binary* preference.
