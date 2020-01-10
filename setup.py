@@ -2,8 +2,8 @@ try:
     from setuptools import setup
 except ImportError:
     from distutils.core import setup
-import sys
 from codecs import open
+import sys
 
 with open('README.rst', encoding="UTF-8") as f:
     readme = f.read()

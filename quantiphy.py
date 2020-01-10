@@ -2609,7 +2609,7 @@ class Quantity(float):
 
     # extract() {{{2
     @classmethod
-    def extract(cls, text, predefined=None, **kwargs):
+    def extract(cls, text, predefined=None, forgive=False, **kwargs):
         r"""Extract quantities.
 
         Takes a string that contains quantity definitions, one per line, and
@@ -2669,6 +2669,11 @@ class Quantity(float):
             become available to be used in the expressions that give values to
             the values being defined.  You can use *locals()* as this argument
             to make all local variables available.
+
+        :arg bool forgive:
+            If true, any syntax errors on a line will be forgiven without
+            complaint. This allows any line that might be confused for a value
+            to be ignored.
 
         :arg \**kwargs:
             Any argument that can be passed to Quantity can be passed to this
@@ -2737,12 +2742,17 @@ class Quantity(float):
                     symbols = ChainMap(
                         quantities, predefined, _active_constants, CONSTANTS
                     )
-                    value = eval(value, None, symbols)
                     try:
+                        value = eval(value, None, symbols)
                         quantity = cls(value, units=units, name=qname, desc=desc)
                     except InvalidNumber:
                         # not suitable to be a quantity, so just save value
                         quantity = value
+                    except SyntaxError:
+                        if forgive:
+                            continue
+                        else:
+                            raise
                 quantities[name] = quantity
         return quantities
 

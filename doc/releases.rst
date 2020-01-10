@@ -5,6 +5,8 @@ Releases
     | Version: 2.8.0
     | Released: 2020-01-08
 
+    - Added *forgive* argument to :meth:`quantiphy.Quantity.extract()`.
+
 **2.8 (2020-01-08)**:
     - Fix nit in installer (setup.py).
 

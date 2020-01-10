@@ -1832,7 +1832,7 @@ used in your expressions.  For example:
     ...     file_name = 'out.wave'               -- output filename
     ...     sim_name = f'{Fclk:q} ΔΣ Modulator'  -- simulation name
     ...
-    ... The values given above are used in the simulation, no further
+    ... The values given above are used in the simulation: no further
     ... modification of the code given below is required when changing
     ... these parameters.
     ... """
@@ -1840,7 +1840,7 @@ used in your expressions.  For example:
     >>> from quantiphy import Quantity
 
     >>> Fxtal = Quantity('200 MHz')
-    >>> parameters = Quantity.extract(__doc__, predefined=dict(Fxtal=Fxtal))
+    >>> parameters = Quantity.extract(__doc__, predefined=dict(Fxtal=Fxtal), forgive=True)
     >>> globals().update(parameters)
 
     >>> with Quantity.prefs(
@@ -1873,6 +1873,12 @@ at the top of the file. In this way, the parameters become very easy to set and
 the documentation is always up to date. Ignore the fact that the docstring is 
 assigned to *__doc__*. That was a hack that was needed to make the example 
 executable from within the documentation.
+
+It is possible for lines of text to be confused for values, which would result 
+in a *SyntaxError*. This would happen on the line that starts ``The values given 
+above`` because of the colon after ``simulation:`` (yes I know it should be 
+a semicolon, but that would not demonstrate the error). To suppress these 
+incidental errors, the *forgive* argument was set to *True*.
 
 
 .. index::
