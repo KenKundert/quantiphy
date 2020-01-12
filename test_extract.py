@@ -10,6 +10,9 @@ def test_workout():
     qs = Quantity.extract(
         r"""
             Fclk = 50MHz        -- clock frequency
+
+            This is an arbitrary line of text.
+            This is an line of text that: triggers the line processing but still should be ignored..
         """
     )
     f_clk = qs.pop('Fclk')
