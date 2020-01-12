@@ -2,8 +2,8 @@ Releases
 ========
 
 **Latest development release**:
-    | Version: 2.8.1
-    | Released: 2020-01-09
+    | Version: 2.8.2
+    | Released: 2020-01-11
 
     - Made :meth:`quantiphy.Quantity.extract()` more forgiving.
 
