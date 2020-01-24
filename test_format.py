@@ -285,6 +285,14 @@ def test_number_fmt():
         assert '<{:s}>'.format(Quantity('12.34 mm')) == '<12.34 mm>'
         assert '<{:s}>'.format(Quantity('123.4 mm')) == '<123.4 mm>'
 
+    with Quantity.prefs(number_fmt='{whole:>3s}{frac:<4s} {units:<2s}', radix=','):
+        assert '<{:s}>'.format(Quantity('1 mm')) ==     '<  1     mm>'
+        assert '<{:s}>'.format(Quantity('10 mm')) ==    '< 10     mm>'
+        assert '<{:s}>'.format(Quantity('100 mm')) ==   '<100     mm>'
+        assert '<{:s}>'.format(Quantity('1.234 mm')) == '<  1,234 mm>'
+        assert '<{:s}>'.format(Quantity('12.34 mm')) == '< 12,34  mm>'
+        assert '<{:s}>'.format(Quantity('123.4 mm')) == '<123,4   mm>'
+
 def test_alignment():
     assert '<{:<16s}>'.format(Quantity('h')) == '<662.61e-36 J-s  >'
     assert '<{:^16s}>'.format(Quantity('h')) == '< 662.61e-36 J-s >'
@@ -626,4 +634,80 @@ def test_sign():
         assert '{:e}'.format(q) == '−inf'
         assert '{:g}'.format(q) == '−inf'
         assert '{:p}'.format(q) == '−inf Hz'
+
+def test_radix_comma():
+    with Quantity.prefs(
+        spacer = None,
+        show_label = None,
+        label_fmt = None,
+        label_fmt_full = None,
+        show_desc = False,
+        prec = 4,
+        radix = ',',
+        comma = '.',
+    ):
+        q=Quantity('c')
+        assert '{}'.format(q) == '299,79 Mm/s'
+        assert '{:.8}'.format(q) == '299,792458 Mm/s'
+        assert '{:.8s}'.format(q) == '299,792458 Mm/s'
+        assert '{:.8S}'.format(q) == 'c = 299,792458 Mm/s'
+        assert '{:.8q}'.format(q) == '299,792458 Mm/s'
+        assert '{:.8Q}'.format(q) == 'c = 299,792458 Mm/s'
+        assert '{:r}'.format(q) == '299,79M'
+        assert '{:R}'.format(q) == 'c = 299,79M'
+        assert '{:u}'.format(q) == 'm/s'
+        assert '{:.4f}'.format(q) == '299792458'
+        assert '{:.4F}'.format(q) == 'c = 299792458'
+        assert '{:e}'.format(q) == '2.9979e+08'
+        assert '{:E}'.format(q) == 'c = 2.9979e+08'
+        assert '{:g}'.format(q) == '2.9979e+08'
+        assert '{:G}'.format(q) == 'c = 2.9979e+08'
+        assert '{:n}'.format(q) == 'c'
+        assert '{:d}'.format(q) == 'speed of light'
+        assert '{:#p}'.format(q) == '299792458,0000 m/s'
+        assert '{:#.2p}'.format(q) == '299792458,00 m/s'
+        assert '{:#,.2p}'.format(q) == '299.792.458,00 m/s'
+        assert '{:#,P}'.format(q) == 'c = 299.792.458,0000 m/s'
+        assert '{:#.2P}'.format(q) == 'c = 299792458,00 m/s'
+        assert '{:#,.2P}'.format(q) == 'c = 299.792.458,00 m/s'
+        assert '{:p}'.format(q) == '299792458 m/s'
+        assert '{:.2p}'.format(q) == '299792458 m/s'
+        assert '{:,.2p}'.format(q) == '299.792.458 m/s'
+        assert '{:,P}'.format(q) == 'c = 299.792.458 m/s'
+        assert '{:.2P}'.format(q) == 'c = 299792458 m/s'
+        assert '{:,.2P}'.format(q) == 'c = 299.792.458 m/s'
+
+def test_plus_minus():
+    if sys.version_info.major <= 3:
+        return
+    with Quantity.prefs(
+        spacer = None,
+        show_label = None,
+        label_fmt = None,
+        label_fmt_full = None,
+        show_desc = False,
+        prec = 4,
+        plus = Quantity.plus_sign,
+        minus = Quantity.minus_sign,
+        map_sf = Quantity.map_sf_to_sci_notation,
+    ):
+        qpp=Quantity('+1Ms')
+        qpm=Quantity('+1us')
+        qmp=Quantity('-1Ms')
+        qmm=Quantity('-1us')
+
+        assert '{}'.format(qpp) == '1 Ms'
+        assert '{}'.format(qpm) == '1 µs'
+        assert '{}'.format(qmp) == '−1 Ms'
+        assert '{}'.format(qmm) == '−1 µs'
+
+        assert '{0:e} {0:u}'.format(qpp) == '1e＋06 s'
+        assert '{0:e} {0:u}'.format(qpm) == '1e−06 s'
+        assert '{0:e} {0:u}'.format(qmp) == '−1e＋06 s'
+        assert '{0:e} {0:u}'.format(qmm) == '−1e−06 s'
+
+        assert '{:.8p}'.format(qpp) == '1000000 s'
+        assert '{:.8p}'.format(qpm) == '0.000001 s'
+        assert '{:.8p}'.format(qmp) == '−1000000 s'
+        assert '{:.8p}'.format(qmm) == '−0.000001 s'
 

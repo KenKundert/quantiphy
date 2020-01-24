@@ -1125,7 +1125,7 @@ class Quantity(float):
         :arg str radix:
             The character to be used as the radix.  By default it is '.'.
 
-        :arg str radix:
+        :arg str plus:
             The text to be used as the plus sign.  By default it is '+',
             but is sometimes '＋' (the unicode full width plus sign) or '' to
             simply eliminate plus signs from numbers.  You can access the
@@ -1371,7 +1371,7 @@ class Quantity(float):
             whole_part = parts[0]
             frac_part = ''.join(parts[1:])
             if frac_part:
-                frac_part = '.' + frac_part
+                frac_part = self.radix + frac_part
             if units in CURRENCY_SYMBOLS:
                 whole_part = self._map_leading_sign(whole_part, units)
                 units = ''
@@ -1384,7 +1384,7 @@ class Quantity(float):
                 whole=whole_part, frac=frac_part, units=sf+units
             )
 
-        mantissa = mantissa.lstrip('+')
+        mantissa = self._fix_punct(mantissa.lstrip('+'))
         if units:
             if units in CURRENCY_SYMBOLS:
                 # prefix the value with the units
@@ -1396,7 +1396,6 @@ class Quantity(float):
             # has a scale factor
             return mantissa + spacer + sf + units
         mantissa = self._map_leading_sign(mantissa)
-        mantissa = self._fix_punct(mantissa)
         return mantissa + sf
 
     # recognizers {{{2
