@@ -635,7 +635,7 @@ def test_sign():
         assert '{:g}'.format(q) == '−inf'
         assert '{:p}'.format(q) == '−inf Hz'
 
-def test_radix_comma():
+def test_radix_comma_output():
     with Quantity.prefs(
         spacer = None,
         show_label = None,
@@ -711,3 +711,22 @@ def test_plus_minus():
         assert '{:.8p}'.format(qmp) == '−1000000 s'
         assert '{:.8p}'.format(qmm) == '−0.000001 s'
 
+def test_radix_comma_input():
+    with Quantity.prefs(
+        spacer = None,
+        show_label = None,
+        label_fmt = None,
+        label_fmt_full = None,
+        show_desc = False,
+        prec = 4,
+        radix = ',',
+        comma = '.',
+    ):
+        assert Quantity('299,79 Mm/s').render() == '299,79 Mm/s'
+        assert Quantity('299,792458e6 m/s').render() == '299,79 Mm/s'
+        assert Quantity('299,792458 Mm/s').render() == '299,79 Mm/s'
+        assert Quantity('299.792.458,0000 m/s').render() == '299,79 Mm/s'
+        assert Quantity('299792458,0000 m/s').render() == '299,79 Mm/s'
+        assert Quantity('1.000.000,00 KiB', binary=True).render() == '1,024 GB'
+        assert Quantity('$1.000.000,00').render() == '$1M'
+        assert Quantity('$1.000.000,00e3').render() == '$1G'

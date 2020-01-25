@@ -1609,10 +1609,14 @@ class Quantity(float):
                 # data['desc'] = getattr(model, 'desc', '')
 
         def recognize_number(value, ignore_sf):
+            comma = cls.get_pref('comma')
+            radix = cls.get_pref('radix')
             if binary and not ignore_sf:
                 number_converters = cls.binary_number_converters
                 for pattern, get_mant, get_sf, get_units in number_converters:
-                    match = pattern.match(value.replace(',', ''))
+                    match = pattern.match(
+                        value.replace(comma, '').replace(radix, '.')
+                    )
                     if match:
                         mantissa = get_mant(match)
                         sf = get_sf(match)
@@ -1627,7 +1631,9 @@ class Quantity(float):
             else:
                 number_converters = cls.all_number_converters
             for pattern, get_mant, get_sf, get_units in number_converters:
-                match = pattern.match(value.replace(',', ''))
+                match = pattern.match(
+                    value.replace(comma, '').replace(radix, '.')
+                )
                 if match:
                     mantissa = get_mant(match)
                     sf = get_sf(match)
