@@ -1501,33 +1501,33 @@ Localization
 *comma*, *plus*, and *minus*.
 
 *radix*:
-    The decimal point; generally '.' or ','.
+    The decimal point; generally ``.`` or ``,``.
 
 *comma*:
-    The thousands separator; generally ',', '.', or ''.
+    The thousands separator; generally ``,``, ``.``, or the empty string.
 
 *plus*:
-    The sign that indicates a positive number; generally '+' or '＋'.
+    The sign that indicates a positive number; generally ``+`` or ``＋``.
     This only affect the plus sign used on exponents, a plus sign is never added 
     to the front of a number.
 
 *minus*:
-    The sign that indicates a negative number; generally '-' or '−'.
+    The sign that indicates a negative number; generally ``-`` or ``−``.
 
-By default *QuantiPhy* uses '.', ',', '+', and '-' as the defaults. These are 
-all simple ASCII characters.  They work as expected for the numbers normally 
-used in programming, such as -5.17e+06.  
+By default *QuantiPhy* uses ``.``, ``,``, ``+``, and ``-`` as the defaults.  
+These are all simple ASCII characters.  They work as expected for the numbers 
+normally used in programming, such as ``-5.17e+06``.
 
 Both *radix* and *comma* affect the way stings are converted to quantities and 
 they way quantities are rendered, whereas *plus* and *minus* only affect the way 
 quantities are rendered.  When interpreting a string as a number, *QuantiPhy* 
 first strips the *comma* character from the string and then replaces the *radix* 
-character with '.'.
+character with ``.``.
 
-If you prefer to use ',' for your radix, you generally have two choices. With 
-the first, *radix* is set to ',' and *comma* to '.'. This allows you to properly 
-read and write numbers like €100.000.000,00 but misinterpretes a number if it 
-uses '.' as the radix.
+If you prefer to use ``,`` for your radix, you generally have two choices. With 
+the first, *radix* is set to ``,`` and *comma* to ``.``. This allows you to 
+properly read and write numbers like €100.000.000,00 but misinterpretes a number 
+if it uses ``.`` as the radix.
 
 .. code-block:: python
 
@@ -1538,9 +1538,9 @@ uses '.' as the radix.
     €100k
     €10M
 
-With the second, *radix* is set to ',' and *comma* to ''. This allows both ',' 
-and '.' to be used as the radix, so €100,000 and €100.000 have the same value.  
-However, it fails for numbers that use '.' as the thousands separator.
+With the second, *radix* is set to ``,`` and *comma* to ''. This allows both 
+``,`` and ``.`` to be used as the radix, so €100,000 and €100.000 have the same 
+value.  However, it fails for numbers that use ``.`` as the thousands separator.
 
 .. code-block:: python
 
