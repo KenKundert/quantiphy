@@ -731,6 +731,23 @@ def test_radix_comma_input():
         assert Quantity('$1.000.000,00').render() == '$1M'
         assert Quantity('$1.000.000,00e3').render() == '$1G'
 
+    with Quantity.prefs(
+        spacer = None,
+        show_label = None,
+        label_fmt = None,
+        label_fmt_full = None,
+        show_desc = False,
+        prec = 4,
+        radix = ',',
+        comma = '',
+    ):
+        assert Quantity('299,79 Mm/s').render() == '299,79 Mm/s'
+        assert Quantity('299.79 Mm/s').render() == '299,79 Mm/s'
+        assert Quantity('$1000000,00').render() == '$1M'
+        assert Quantity('$1000000.00').render() == '$1M'
+        assert Quantity('$1,00e8').render() == '$100M'
+        assert Quantity('$1.00e8').render() == '$100M'
+
 def test_radix_comma_exception():
     with pytest.raises(ValueError) as exception:
         with Quantity.prefs(

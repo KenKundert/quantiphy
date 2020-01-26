@@ -1490,6 +1490,99 @@ printed values, which were rendered outside the *with* statement.
 
 
 .. index::
+   single: localization
+
+.. _localization:
+
+Localization
+------------
+
+*Quantiphy* provides 4 preferences that help with localization: *radix*, 
+*comma*, *plus*, and *minus*.
+
+*radix*:
+    The decimal point; generally '.' or ','.
+
+*comma*:
+    The thousands separator; generally ',', '.', or ''.
+
+*plus*:
+    The sign that indicates a positive number; generally '+' or '＋'.
+    This only affect the plus sign used on exponents, a plus sign is never added 
+    to the front of a number.
+
+*minus*:
+    The sign that indicates a negative number; generally '-' or '−'.
+
+By default *QuantiPhy* uses '.', ',', '+', and '-' as the defaults. These are 
+all simple ASCII characters.  They work as expected for the numbers normally 
+used in programming, such as -5.17e+06.  
+
+Both *radix* and *comma* affect the way stings are converted to quantities and 
+they way quantities are rendered, whereas *plus* and *minus* only affect the way 
+quantities are rendered.  When interpreting a string as a number, *QuantiPhy* 
+first strips the *comma* character from the string and then replaces the *radix* 
+character with '.'.
+
+If you prefer to use ',' for your radix, you generally have two choices. With 
+the first, *radix* is set to ',' and *comma* to '.'. This allows you to properly 
+read and write numbers like €100.000.000,00 but misinterpretes a number if it 
+uses '.' as the radix.
+
+.. code-block:: python
+
+    >>> Quantity.set_prefs(radix=',', comma='.')
+    >>> q1 = Quantity('€100.000,00')
+    >>> q2 = Quantity('€100000.00')
+    >>> print(q1, q2, sep='\n')
+    €100k
+    €10M
+
+With the second, *radix* is set to ',' and *comma* to ''. This allows both ',' 
+and '.' to be used as the radix, so €100,000 and €100.000 have the same value.  
+However, it fails for numbers that use '.' as the thousands separator.
+
+.. code-block:: python
+
+    >>> Quantity.set_prefs(radix=',', comma='')
+    >>> q1 = Quantity('€100,000')
+    >>> q2 = Quantity('€100.000')
+    >>> print(q1, q2, sep='\n')
+    €100
+    €100
+
+You can automatically adapt to local conventions using the Python *locale* 
+package:
+
+.. code-block:: python
+
+    >>> from quantiphy import Quantity
+    >>> import locale
+
+    >>> loc_conv = locale.localeconv()
+    >>> radix = loc_conv['decimal_point']
+    >>> comma = loc_conv['thousands_sep']
+    >>> Quantity.set_prefs(radix=radix, comma=comma)
+
+    >>> q = Quantity('€100.000')
+    >>> print(q)
+    €100
+
+    >>> print(f"radix is '{radix}'\ncomma is '{comma}'")
+    radix is '.'
+    comma is ''
+
+You can convert from one convention to the other by changing *radix* and *comma* 
+on the fly:
+
+    >>> with Quantity.prefs(radix=',', comma='.'):
+    ...     q = Quantity('€100.000.000,00')
+    >>> with Quantity.prefs(radix='.', comma=','):
+    ...     print(f'{q:#,.2p}')
+    €100,000,000.00
+
+
+.. index::
    single: Kelvin/kilo ambiguity
 
 .. _ambiguity:
