@@ -86,6 +86,7 @@ class QuantiPhyError(Exception):
 
     All of the specific QuantiPhy exceptions subclass this exception.
     """
+    _template = "{}"
 
     def __init__(self, *args, **kwargs):
         self.args = args
@@ -213,6 +214,12 @@ class UnknownUnitSystem(QuantiPhyError, KeyError):
     The name given does not correspond to a known unit system.
     """
     _template = "{}: unknown unit system."
+
+
+class IncompatiblePreferences(QuantiPhyError, ValueError):
+    """
+    Two preferences are not compatible
+    """
 
 
 # Unit Conversions {{{1
@@ -1611,6 +1618,8 @@ class Quantity(float):
         def recognize_number(value, ignore_sf):
             comma = cls.get_pref('comma')
             radix = cls.get_pref('radix')
+            if comma == radix:
+                raise IncompatiblePreferences('comma and radix must differ.')
             if binary and not ignore_sf:
                 number_converters = cls.binary_number_converters
                 for pattern, get_mant, get_sf, get_units in number_converters:

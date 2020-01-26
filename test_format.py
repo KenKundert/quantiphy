@@ -1,6 +1,6 @@
 # encoding: utf8
 
-from quantiphy import Quantity
+from quantiphy import Quantity, QuantiPhyError, IncompatiblePreferences
 import pytest
 import sys
 
@@ -285,13 +285,13 @@ def test_number_fmt():
         assert '<{:s}>'.format(Quantity('12.34 mm')) == '<12.34 mm>'
         assert '<{:s}>'.format(Quantity('123.4 mm')) == '<123.4 mm>'
 
-    with Quantity.prefs(number_fmt='{whole:>3s}{frac:<4s} {units:<2s}', radix=','):
+    with Quantity.prefs(number_fmt='{whole:>3s}{frac:<4s} {units:<2s}', radix=',', comma='.'):
         assert '<{:s}>'.format(Quantity('1 mm')) ==     '<  1     mm>'
         assert '<{:s}>'.format(Quantity('10 mm')) ==    '< 10     mm>'
         assert '<{:s}>'.format(Quantity('100 mm')) ==   '<100     mm>'
-        assert '<{:s}>'.format(Quantity('1.234 mm')) == '<  1,234 mm>'
-        assert '<{:s}>'.format(Quantity('12.34 mm')) == '< 12,34  mm>'
-        assert '<{:s}>'.format(Quantity('123.4 mm')) == '<123,4   mm>'
+        assert '<{:s}>'.format(Quantity('1,234 mm')) == '<  1,234 mm>'
+        assert '<{:s}>'.format(Quantity('12,34 mm')) == '< 12,34  mm>'
+        assert '<{:s}>'.format(Quantity('123,4 mm')) == '<123,4   mm>'
 
 def test_alignment():
     assert '<{:<16s}>'.format(Quantity('h')) == '<662.61e-36 J-s  >'
@@ -730,3 +730,26 @@ def test_radix_comma_input():
         assert Quantity('1.000.000,00 KiB', binary=True).render() == '1,024 GB'
         assert Quantity('$1.000.000,00').render() == '$1M'
         assert Quantity('$1.000.000,00e3').render() == '$1G'
+
+def test_radix_comma_exception():
+    with pytest.raises(ValueError) as exception:
+        with Quantity.prefs(
+            radix = ',',
+        ):
+            Quantity('$1M')
+    assert exception.value.args[0] == "comma and radix must differ."
+
+    with pytest.raises(QuantiPhyError) as exception:
+        with Quantity.prefs(
+            comma = '.',
+        ):
+            Quantity('$1M')
+    assert exception.value.args[0] == "comma and radix must differ."
+
+    with pytest.raises(IncompatiblePreferences) as exception:
+        with Quantity.prefs(
+            comma = '^',
+            radix = '^',
+        ):
+            Quantity('$1M')
+    assert exception.value.args[0] == "comma and radix must differ."

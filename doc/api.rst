@@ -31,6 +31,7 @@ Exceptions
     :members:
 
 .. autoexception:: quantiphy.ExpectedQuantity
+.. autoexception:: quantiphy.IncompatiblePreferences
 .. autoexception:: quantiphy.IncompatibleUnits
 .. autoexception:: quantiphy.InvalidNumber
 .. autoexception:: quantiphy.InvalidRecognizer

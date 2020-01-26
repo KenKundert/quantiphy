@@ -2043,6 +2043,12 @@ deprecated in the future.
     Raised when the value is either not an instance of 
     :class:`quantiphy.Quantity` or a string that can be converted to a quantity.
 
+:class:`quantiphy.IncompatiblePreferences`:
+    Subclass of :class:`quantiphy.QuantiPhyError` and *ValueError*.  Used by 
+    :class:`quantiphy.Quantity` constructor.
+
+    Raised when comma and radix preference is the same.
+
 :class:`quantiphy.IncompatibleUnits`:
     Subclass of :class:`quantiphy.QuantiPhyError` and *TypeError*.  Used by 
     :meth:`quantiphy.Quantity.add()`.

@@ -6,6 +6,8 @@ Releases
     | Released: 2020-01-25
 
     - Made :meth:`quantiphy.Quantity.extract()` more forgiving.
+    - Support radix and comma processing when converting strings to 
+      :class:`quantiphy.Quantity`.
 
 **2.8 (2020-01-08)**:
     - Fix nit in installer (setup.py).
