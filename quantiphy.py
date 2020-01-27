@@ -856,6 +856,10 @@ class Quantity(float):
     :raises InvalidNumber(QuantiPhyError, ValueError, TypeError):
         Not a valid number.
 
+    :raises IncompatiblePreferences(QuantiPhyError, ValueError):
+        *radix* and *comma* must differ.
+
+    You can use *Quantity* to create quantities from floats, strings, or other
     You can use *Quantity* to create quantities from floats, strings, or other
     quantities.  If a float is given, *model* or *units* would be used to
     specify the units.
