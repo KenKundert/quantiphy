@@ -2,8 +2,8 @@ Releases
 ========
 
 **Latest development release**:
-    | Version: 2.8.6
-    | Released: 2020-01-26
+    | Version: 2.9.0
+    | Released: 2020-01-28
 
     - Made :meth:`quantiphy.Quantity.extract()` more forgiving.
     - Support radix and comma processing when converting strings to 
