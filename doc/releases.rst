@@ -5,6 +5,12 @@ Releases
     | Version: 2.9.0
     | Released: 2020-01-28
 
+    - Added *tight_units*, *nan*, and *inf* preferences.
+    - Added *infinity_symbol* attribute.
+    - Changed the return values for :meth:`quantiphy.Quantity.is_nan()` and
+      :meth:`quantiphy.Quantity.is_infinite()`.
+
+**2.9 (2020-01-28)**:
     - Made :meth:`quantiphy.Quantity.extract()` more forgiving.
     - Support radix and comma processing when converting strings to 
       :class:`quantiphy.Quantity`.

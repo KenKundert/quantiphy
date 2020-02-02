@@ -1456,9 +1456,9 @@ undesired.
     >>> print(gain)
     250 mdB
 
-    >>> gain.form = 'eng'
+    >>> gain.form = 'fixed'
     >>> print(gain)
-    250e-3 dB
+    0.25 dB
 
 To retrieve a preference, use the :meth:`quantiphy.Quantity.get_pref` class 
 method. This is useful with *known_units*. Normally setting *known_units* 
@@ -2088,25 +2088,32 @@ Exceptional Values
 
    >>> nan = Quantity('NaN Hz')
    >>> print(nan)
-   nan Hz
+   NaN Hz
 
 You can test whether the value of the quantity is infinite or is not-a-number
 using :meth:`quantiphy.Quantity.is_infinite()` or 
-:meth:`quantiphy.Quantity.is_nan()`:
+:meth:`quantiphy.Quantity.is_nan()`. These method return a rendered value for 
+the number without units if they are true and None otherwise:
 
 .. code-block:: python
 
    >>> h_line.is_infinite()
-   False
 
    >>> inf.is_infinite()
-   True
+   'inf'
 
    >>> h_line.is_nan()
-   False
 
    >>> nan.is_nan()
-   True
+   'NaN'
+
+The rendered value is affected by the *inf* and *nan* preferences or attributes:
+
+.. code-block:: python
+
+   >>> inf.inf = '∞'
+   >>> inf.is_infinite()
+   '∞'
 
 
 .. index::

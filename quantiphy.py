@@ -18,7 +18,7 @@ making it difficult to write software that communicates effectively with humans.
 *QuantiPhy* addresses this deficiency, making it natural and simple to both
 input and output physical quantities.
 
-Documentation can be found at quantiphy.readthedocs.io.
+Documentation can be found at https://quantiphy.readthedocs.io.
 """
 
 # License {{{1
@@ -614,7 +614,7 @@ def add_constant(value, alias=None, unit_systems=None):
     :type unit_systems: list or str
 
     :raises ExpectedQuantity(QuantiPhyError, ValueError):
-        *value* must be an instance of :class:`quantiphy.Quantity` or it must be
+        *value* must be an instance of :class:`Quantity` or it must be
         a string that can be converted to a quantity.
 
     :raises MissingName(QuantiPhyError, NameError):
@@ -752,6 +752,7 @@ DEFAULTS = dict(
     form = 'si',
     full_prec = 12,
     ignore_sf = False,
+    inf = 'inf',
     input_sf = ''.join(MAPPINGS.keys()),
     keep_components = True,
     known_units = [],
@@ -759,19 +760,21 @@ DEFAULTS = dict(
     label_fmt_full = '{n} = {v} -- {d}',
     map_sf = {},
     minus = '-',
+    nan = 'NaN',
     number_fmt = None,
     output_sf = 'TGMkmunpfa',
+    plus = '+',
     prec = 4,
+    radix = '.',
     reltol = 1e-6,
     show_commas = False,
     show_desc = False,
     show_label = False,
     show_units = True,
     spacer = ' ',
-    plus = '+',
-    radix = '.',
     strip_radix = True,
     strip_zeros = True,
+    tight_units = ''' % ° ' " ′ ″ '''.split(),
     unity_sf = '',
 )
 
@@ -901,14 +904,17 @@ class Quantity(float):
         # These are used as the default values for these three attributes.
         # Putting them here means that the instances do not need to contain
         # these values if not specified, but yet they can always be accessed.
+    _provisioned_input_sf = None
+        # This must be initialized to None.
+        # It is set the first time Quantity is instantiated.
+
+    # these are constants that might be useful to the user
     non_breaking_space = ' '
     narrow_non_breaking_space = ' '
     thin_space = ' '
     plus_sign = '＋'
     minus_sign = '−'
-    _provisioned_input_sf = None
-        # This must be initialized to None.
-        # It is set the first time Quantity is instantiated.
+    infinity_symbol = '∞'
 
     # preferences {{{2
     _initialized = set()
@@ -972,7 +978,7 @@ class Quantity(float):
 
             The regular expression is interpreted using the re.VERBOSE flag.
 
-            When used with :meth:`quantiphy.Quantity.extract` there are a few
+            When used with :meth:`Quantity.extract` there are a few
             more features.
 
             First, you may also introduce comments using '--', '#', or '//'::
@@ -1010,8 +1016,9 @@ class Quantity(float):
             common to use a comma, but using a space, period, or an underscore
             can be used.
             For your convenience, you can access a non-breaking space using
-            Quantity.non_breaking_space, Quantity.narrow_non_breaking_space, or
-            Quantity.thin_space.
+            :attr:`Quantity.non_breaking_space`,
+            :attr:`Quantity.narrow_non_breaking_space`, or
+            :attr:`Quantity.thin_space`.
 
         :arg str form:
             Specifies the form to use for representing numbers by default.
@@ -1027,6 +1034,12 @@ class Quantity(float):
         :arg bool ignore_sf:
             Whether all scale factors should be ignored by default when
             recognizing numbers.  Default is False.
+
+        :arg str inf:
+            The text to be used to represent infinity.  By default its value is
+            'inf', but is often set to '∞' (the unicode infinity symbol).  You
+            can access the Unicode infinity symbol using
+            :attr:`Quantity.infinity_symbol`.
 
         :arg str input_sf:
             Which scale factors to recognize when reading numbers.  The default
@@ -1099,8 +1112,12 @@ class Quantity(float):
 
         :arg str minus:
             The text to be used as the minus sign.  By default its value is '-',
-            but is sometimes '−' (the unicode minus sign).  You can
-            access the Unicode minus sign using Quantity.minus_sign.
+            but is sometimes '−' (the unicode minus sign).  You can access the
+            Unicode minus sign using :attr:`Quantity.minus_sign`.
+
+        :arg str nan:
+            The text to be used to represent a value that is not-a-number.
+            By default its value is 'NaN'.
 
         :arg number_fmt:
             Format string used to convert the components of the number into the
@@ -1140,7 +1157,8 @@ class Quantity(float):
             The text to be used as the plus sign.  By default it is '+',
             but is sometimes '＋' (the unicode full width plus sign) or '' to
             simply eliminate plus signs from numbers.  You can access the
-            Unicode full width plus sign using Quantity.plus_sign.
+            Unicode full width plus sign using
+            :attr:`Quantity.plus_sign`.
 
         :arg int prec:
             Default precision  in digits where 0 corresponds to 1 digit.  Must
@@ -1182,8 +1200,12 @@ class Quantity(float):
             read, particularly with complex units, and using '' is easier to
             parse.  You could also use a Unicode non-breaking space ' '. For
             your convenience, you can access a non-breaking space using
-            Quantity.non_breaking_space, Quantity.narrow_non_breaking_space, or
-            Quantity.thin_space.
+            :attr:`Quantity.non_breaking_space`,
+            :attr:`Quantity.narrow_non_breaking_space`, or
+            :attr:`Quantity.thin_space`.
+
+            Certain units, as defined using the *tight_units* preference, cause
+            the spacer to be suppressed.
 
         :arg bool strip_radix:
             When rendering, strip the radix (decimal point) if not needed from
@@ -1201,6 +1223,11 @@ class Quantity(float):
 
             Set strip_zeros to False when you would like to indicated the
             precision of your numbers based on the number of digits shown.
+
+        :arg list of strings tight_units:
+            The spacer is suppressed with these units.
+            By default, this is done for: % ° ' " ′ ″.
+            Some add °F and °C as well.
 
         :arg str unity_sf:
             The output scale factor for unity, generally '' or '_'. The default
@@ -1377,6 +1404,8 @@ class Quantity(float):
 
     # _combine {{{2
     def _combine(self, mantissa, sf, units, spacer, sf_is_exp=False):
+        if units in self.tight_units:
+            spacer = ''
         if self.number_fmt:
             parts = mantissa.split('.')
             whole_part = parts[0]
@@ -1426,7 +1455,8 @@ class Quantity(float):
         cls._provisioned_input_sf = input_sf
 
         # components {{{3
-        sign = _named_regex('sign', '[-+]?')
+        sign = _named_regex('sign', '[-+−＋]?')
+        fix_sign = lambda x: x.replace('−', '-').replace('＋', '+')
         space = r'[\s ]'  # the space in this regex is a non-breaking space
         required_digits = r'(?:[0-9][0-9_]*[0-9]|[0-9]+)'  # allow interior underscores
         optional_digits = r'(?:[0-9][0-9_]*[0-9]|[0-9]*)'
@@ -1440,10 +1470,10 @@ class Quantity(float):
         scale_factor = _named_regex('sf', '[%s]' % input_sf)
         binary_scale_factor = _named_regex('sf', '%s' % '|'.join(BINARY_MAPPINGS))
         units = _named_regex(
-            r'units', r'(?:[a-zA-Z%{us}][-^/()\w·⁻⁰¹²³⁴⁵⁶⁷⁸⁹]*)?'.format(
+            r'units', r'(?:[a-zA-Z%√{us}][-^/()\w·⁻⁰¹²³⁴⁵⁶⁷⁸⁹√{us}]*)?'.format(
                 us=UNIT_SYMBOLS
             )
-            # examples: Ohms, V/A, J-s, m/s^2, H/(m-s), Ω, %, m·s⁻²
+            # examples: Ohms, V/A, J-s, m/s^2, H/(m-s), Ω, %, m·s⁻², V/√Hz
             # leading char must be letter to avoid 1.0E-9s -> (1e18, '-9s')
         )
         currency = _named_regex('currency', '[%s]' % CURRENCY_SYMBOLS)
@@ -1452,7 +1482,7 @@ class Quantity(float):
         # number_with_scale_factor {{{3
         number_with_scale_factor = (
             r'{sign}{mantissa}{space}*{scale_factor}{units}'.format(**locals()),
-            lambda match: match.group('sign') + match.group('mant'),
+            lambda match: fix_sign(match.group('sign')) + match.group('mant'),
             lambda match: match.group('sf'),
             lambda match: match.group('units')
         )
@@ -1460,7 +1490,7 @@ class Quantity(float):
         # number_with_exponent {{{3
         number_with_exponent = (
             r'{sign}{mantissa}{exponent}{space}*{units}'.format(**locals()),
-            lambda match: match.group('sign') + match.group('mant'),
+            lambda match: fix_sign(match.group('sign')) + match.group('mant'),
             lambda match: match.group('exp').lower(),
             lambda match: match.group('units')
         )
@@ -1469,7 +1499,7 @@ class Quantity(float):
         # this one must be processed after number_with_scale_factor
         simple_number = (
             r'{sign}{mantissa}{space}*{units}'.format(**locals()),
-            lambda match: match.group('sign') + match.group('mant'),
+            lambda match: fix_sign(match.group('sign')) + match.group('mant'),
             lambda match: '',
             lambda match: match.group('units')
         )
@@ -1477,7 +1507,7 @@ class Quantity(float):
         # currency_with_scale_factor {{{3
         currency_with_scale_factor = (
             r'{sign}{currency}{mantissa}{space}*{scale_factor}'.format(**locals()),
-            lambda match: match.group('sign') + match.group('mant'),
+            lambda match: fix_sign(match.group('sign')) + match.group('mant'),
             lambda match: match.group('sf'),
             lambda match: match.group('currency')
         )
@@ -1485,7 +1515,7 @@ class Quantity(float):
         # currency_with_exponent {{{3
         currency_with_exponent = (
             r'{sign}{currency}{mantissa}{exponent}'.format(**locals()),
-            lambda match: match.group('sign') + match.group('mant'),
+            lambda match: fix_sign(match.group('sign')) + match.group('mant'),
             lambda match: match.group('exp').lower(),
             lambda match: match.group('currency')
         )
@@ -1493,7 +1523,7 @@ class Quantity(float):
         # simple_currency {{{3
         simple_currency = (
             r'{sign}{currency}{mantissa}'.format(**locals()),
-            lambda match: match.group('sign') + match.group('mant'),
+            lambda match: fix_sign(match.group('sign')) + match.group('mant'),
             lambda match: '',
             lambda match: match.group('currency')
         )
@@ -1501,7 +1531,7 @@ class Quantity(float):
         # nan_with_units {{{3
         nan_with_units = (
             r'{sign}{nan}{space}+{units}'.format(**locals()),
-            lambda match: match.group('sign') + match.group('nan').lower(),
+            lambda match: fix_sign(match.group('sign')) + match.group('nan').lower(),
             lambda match: '',
             lambda match: match.group('units')
         )
@@ -1509,7 +1539,7 @@ class Quantity(float):
         # currency_nan {{{3
         currency_nan = (
             r'{sign}{currency}{nan}'.format(**locals()),
-            lambda match: match.group('sign') + match.group('nan').lower(),
+            lambda match: fix_sign(match.group('sign')) + match.group('nan').lower(),
             lambda match: '',
             lambda match: match.group('currency')
         )
@@ -1517,22 +1547,42 @@ class Quantity(float):
         # simple_nan {{{3
         simple_nan = (
             r'{sign}{nan}'.format(**locals()),
-            lambda match: match.group('sign') + match.group('nan').lower(),
+            lambda match: fix_sign(match.group('sign')) + match.group('nan').lower(),
             lambda match: '',
             lambda match: ''
         )
 
-        cls.all_number_converters = [
-            (r'\A\s*{}\s*\Z'.format(pattern), get_mant, get_sf, get_units)
-            for pattern, get_mant, get_sf, get_units in [
-                nan_with_units,
-            ]
-        ]
+        # inf_with_units {{{3
+        # the word 'inf' is handled as a nan, this only matches ∞
+        inf_with_units = (
+            r'{sign}∞{space}*{units}'.format(**locals()),
+            lambda match: fix_sign(match.group('sign')) + 'inf',
+            lambda match: '',
+            lambda match: match.group('units')
+        )
+
+        # currency_inf {{{3
+        # the word 'inf' is handled as a nan, this only matches ∞
+        currency_inf = (
+            r'{sign}{currency}∞'.format(**locals()),
+            lambda match: fix_sign(match.group('sign')) + 'inf',
+            lambda match: '',
+            lambda match: match.group('currency')
+        )
+
+        # simple_inf {{{3
+        # the word 'inf' is handled as a nan, this only matches ∞
+        simple_inf = (
+            r'{sign}∞'.format(**locals()),
+            lambda match: fix_sign(match.group('sign')) + 'inf',
+            lambda match: '',
+            lambda match: ''
+        )
 
         # number_with_binary_scale_factor {{{3
         number_with_binary_scale_factor = (
             r'{sign}{mantissa}{space}*{binary_scale_factor}{units}'.format(**locals()),
-            lambda match: match.group('sign') + match.group('mant'),
+            lambda match: fix_sign(match.group('sign')) + match.group('mant'),
             lambda match: match.group('sf'),
             lambda match: match.group('units')
         )
@@ -1544,6 +1594,7 @@ class Quantity(float):
                 number_with_exponent, number_with_scale_factor, simple_number,
                 currency_with_exponent, currency_with_scale_factor, simple_currency,
                 nan_with_units, currency_nan, simple_nan,
+                inf_with_units, currency_inf, simple_inf,
             ]
         ]
 
@@ -1554,6 +1605,7 @@ class Quantity(float):
                 number_with_exponent, simple_number,
                 currency_with_exponent, simple_currency,
                 nan_with_units, currency_nan, simple_nan,
+                inf_with_units, currency_inf, simple_inf,
             ]
         ]
 
@@ -1748,36 +1800,45 @@ class Quantity(float):
     # is_infinte() {{{2
     def is_infinite(self):
         """Test value to determine if quantity is infinite.
+        Returns a representation of the number (sign combined with self.inf) if
+        value is infinite and None otherwise.
 
         Example::
 
             >>> inf = Quantity('inf Hz')
             >>> inf.is_infinite()
-            True
+            'inf'
 
         """
         try:
             value = self._mantissa
         except AttributeError:
             value = str(self.real)
-        return value.lower() in ['inf', '-inf', '+inf']
+        sign, inf, _ = value.lower().partition('inf')
+        if inf == 'inf':
+            return sign + self.inf
 
     # is_nan() {{{2
     def is_nan(self):
         """Test value to determine if quantity is not a number.
+        Returns a representation of the number (sign combined with self.nan) if
+        value is not a number and None otherwise.
 
         Example::
 
-            >>> nan = Quantity('NaN Hz')
+            >>> nan = Quantity('-nan Hz')
             >>> nan.is_nan()
-            True
+            '-NaN'
 
         """
         try:
             value = self._mantissa
         except AttributeError:
             value = str(self.real)
-        return value.lower() in ['nan', '-nan', '+nan']
+        sign, nan, _ = value.lower().partition('nan')
+        if nan == 'nan':
+            return sign + self.nan
+
 
     # as_tuple() {{{2
     def as_tuple(self):
@@ -2009,8 +2070,9 @@ class Quantity(float):
             )
 
         # check for infinities or NaN
-        if self.is_infinite() or self.is_nan():
-            value = self._combine(str(self.real), '', units, ' ')
+        value = self.is_infinite() or self.is_nan()
+        if value:
+            value = self._combine(value, '', units, ' ')
             return self._label(value, show_label)
 
         # convert into scientific notation with proper precision
@@ -2240,8 +2302,9 @@ class Quantity(float):
             prec = self.prec
 
         # check for infinities or NaN
-        if self.is_infinite() or self.is_nan():
-            value = self._combine(str(self.real), '', units, ' ')
+        value = self.is_infinite() or self.is_nan()
+        if value:
+            value = self._combine(value, '', units, ' ')
             return self._label(value, show_label)
 
         # handle fixed point formatting
@@ -2358,8 +2421,9 @@ class Quantity(float):
             prec = self.full_prec
 
         # check for infinities or NaN
-        if self.is_infinite() or self.is_nan():
-            value = self._combine(str(self.real), '', units, ' ')
+        value = self.is_infinite() or self.is_nan()
+        if value:
+            value = self._combine(value, '', units, ' ')
             return self._label(value, show_label)
 
         # handle scaling

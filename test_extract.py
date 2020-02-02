@@ -6,6 +6,8 @@ import sys
 from math import pi
 from textwrap import dedent
 
+py3 = int(sys.version[0]) == 3
+
 def test_workout():
     qs = Quantity.extract(
         r"""
@@ -103,6 +105,49 @@ def test_disallow():
     rate = qs.pop('rate')
     assert float(rate) == 68719476736
     assert rate.units == 'B/s'
+    assert not qs
+
+def test_anatomy():
+    qs = Quantity.extract(
+        r"""
+            Rin = ∞Ω -- input resistance
+        """,
+    )
+    Rin = qs.pop('Rin')
+    assert float(Rin) == float('inf')
+    assert Rin.units == 'Ω'
+    assert Rin.is_infinite() == 'inf'
+    assert not qs
+
+def test_billow():
+    if not py3:
+        return
+    import math
+    qs = Quantity.extract(
+        r"""
+            C3 = 250.7nF
+            f_corner (f₀) = 500mHz
+            w_corner (ω₀) = 2*pi*f_corner 'rads/s'
+            Aw = C3*sqrt(w_corner) '√Ω'
+        """,
+        predefined = dict(sqrt=math.sqrt)
+    )
+    C3 = qs.pop('C3')
+    assert str(C3) == '250.7 nF'
+    assert C3.units == 'F'
+    assert C3.name == 'C3'
+    f_corner = qs.pop('f_corner')
+    assert str(f_corner) == '500 mHz'
+    assert f_corner.units == 'Hz'
+    assert f_corner.name == 'f₀'
+    w_corner = qs.pop('w_corner')
+    assert str(w_corner) == '3.1416 rads/s'
+    assert w_corner.units == 'rads/s'
+    assert w_corner.name == 'ω₀'
+    Aw = qs.pop('Aw')
+    assert str(Aw) == '444.35 n√Ω'
+    assert Aw.units == '√Ω'
+    assert Aw.name == 'Aw'
     assert not qs
 
 def test_invention():

@@ -263,7 +263,7 @@ def test_number_fmt():
         assert '<{:s}>'.format(Quantity('-$1.234k')) ==       '<  -$1.234    k     >'
         assert '<{:s}>'.format(Quantity('-$12.34k')) ==       '< -$12.34     k     >'
         assert '<{:s}>'.format(Quantity('-$123.4k')) ==       '<-$123.4      k     >'
-        assert '<{:s}>'.format(Quantity('NaN Hz')) ==         '<  nan        Hz    >'
+        assert '<{:s}>'.format(Quantity('nan Hz')) ==         '<  NaN        Hz    >'
         assert '<{:s}>'.format(Quantity('inf Hz')) ==         '<  inf        Hz    >'
 
     with Quantity.prefs(number_fmt='{whole:>3s}{frac} {units}'):

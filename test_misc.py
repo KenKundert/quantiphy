@@ -10,6 +10,8 @@ import pytest
 import sys
 from textwrap import dedent
 
+py3 = int(sys.version[0]) == 3
+
 def test_misc():
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None)
     q = Quantity(1420405751.786, 'Hz')
@@ -43,22 +45,39 @@ def test_misc():
     assert q == '1.4204 GHZ'
 
     q = Quantity('1420405751.786 Hz')
-    assert q.is_nan() == False
+    assert q.is_nan() is None
 
     q = Quantity('1420405751.786 Hz')
-    assert q.is_infinite() == False
+    assert q.is_infinite() is None
 
     q = Quantity('NaN Hz')
-    assert q.is_nan() == True
+    assert q.is_nan() == 'NaN'
 
     q = Quantity('NaN Hz')
-    assert q.is_infinite() == False
+    q.nan = 'nan'
+    assert q.is_nan() == 'nan'
+
+    q = Quantity('NaN Hz')
+    assert q.is_infinite() is None
 
     q = Quantity('inf Hz')
-    assert q.is_nan() == False
+    assert q.is_nan() is None
 
     q = Quantity('inf Hz')
-    assert q.is_infinite() == True
+    assert q.is_infinite() == 'inf'
+
+    q = Quantity('inf Hz')
+    q.inf = '∞'
+    assert q.is_infinite() == '∞'
+
+    q = Quantity('∞ Hz')
+    assert q.is_infinite() == 'inf'
+
+    q = Quantity('$∞')
+    assert q.is_infinite() == 'inf'
+
+    q = Quantity('∞Ω')
+    assert q.is_infinite() == 'inf'
 
     # check the various formats for assignment recognition
     q = Quantity('f_hy = 1420405751.786 Hz -- frequency of hydrogen line')
@@ -90,6 +109,19 @@ def test_misc():
     assert q.render(show_label='f') == '1.4204 GHz'
     assert q.name == ''
     assert q.desc == ''
+
+    if py3:
+        # check tight_units
+        q = Quantity('90°')
+        assert q.render() == '90°'
+
+        q = Quantity('80°F')
+        assert q.render() == '80 °F'
+
+        q = Quantity('80°F')
+        assert q.render() == '80 °F'
+        q.tight_units = '''' % ° ' " ′ ″ °F °C '''.split()
+        assert q.render() == '80°F'
 
 
 def test_misc2():
@@ -185,7 +217,7 @@ def test_misc2():
     q4 = Quantity('10%', name='bar', desc='buzz')
     assert '{:G}'.format(q3) == 'foo = 0.1'
     assert '{:G}'.format(q4) == 'bar = 10  # buzz'
-    assert '{:S}'.format(q4) == 'bar = 10 %  # buzz'
+    assert '{:S}'.format(q4) == 'bar = 10%  # buzz'
 
     class Derived(Quantity):
         pass
@@ -221,10 +253,10 @@ def test_misc2():
 
     f1 = Quantity('1GHz')
     f2 = Quantity('1GOhms')
-    assert f1.is_close(f1) == True
-    assert f1.is_close(f2) == False
-    assert f1.is_close(f1+1) == True
-    assert f1.is_close(f1+1e6) == False
+    assert f1.is_close(f1) is True
+    assert f1.is_close(f2) is False
+    assert f1.is_close(f1+1) is True
+    assert f1.is_close(f1+1e6) is False
 
     p = Quantity('3_1_4_1.592_65_36mRads')
     assert p.render() == '3.1416 Rads'
