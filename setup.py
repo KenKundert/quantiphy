@@ -19,7 +19,7 @@ keywords='''
 
 setup(
     name='quantiphy',
-    version='2.9.0',
+    version='2.9.1',
     description='physical quantities (numbers with units)',
     long_description=readme,
     author="Ken Kundert",

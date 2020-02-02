@@ -2,8 +2,8 @@ Releases
 ========
 
 **Latest development release**:
-    | Version: 2.9.0
-    | Released: 2020-01-28
+    | Version: 2.9.1
+    | Released: 2020-02-01
 
     - Added *tight_units*, *nan*, and *inf* preferences.
     - Added *infinity_symbol* attribute.
