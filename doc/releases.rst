@@ -2,8 +2,8 @@ Releases
 ========
 
 **Latest development release**:
-    | Version: 2.9.1
-    | Released: 2020-02-01
+    | Version: 2.9.2
+    | Released: 2020-02-04
 
     - Added *negligible*, *tight_units*, *nan*, and *inf* preferences.
     - Added *negligible* argument to render.
