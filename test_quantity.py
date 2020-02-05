@@ -347,3 +347,16 @@ def test_number_recognition():
         prec=None, full_prec=None, spacer=None, unity_sf=None, output_sf=None,
         ignore_sf=None, label_fmt=None, assign_rec=None
     )
+
+
+if __name__ == '__main__':
+    # As a debugging aid allow the tests to be run on their own, outside pytest.
+    # This makes it easier to see and interpret and textual output.
+
+    defined = dict(globals())
+    for k, v in defined.items():
+        if callable(v) and k.startswith('test_'):
+            print()
+            print('Calling:', k)
+            print((len(k)+9)*'=')
+            v()

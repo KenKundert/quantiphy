@@ -5,7 +5,8 @@ Releases
     | Version: 2.9.1
     | Released: 2020-02-01
 
-    - Added *tight_units*, *nan*, and *inf* preferences.
+    - Added *negligible*, *tight_units*, *nan*, and *inf* preferences.
+    - Added *negligible* argument to render.
     - Added *infinity_symbol* attribute.
     - Changed the return values for :meth:`quantiphy.Quantity.is_nan()` and
       :meth:`quantiphy.Quantity.is_infinite()`.

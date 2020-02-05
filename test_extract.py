@@ -331,3 +331,16 @@ def test_assign_rec():
         assert f_hy.name == 'f_hy'
         assert f_hy.desc == 'Hydrogen line frequency'
         assert not qs
+
+
+if __name__ == '__main__':
+    # As a debugging aid allow the tests to be run on their own, outside pytest.
+    # This makes it easier to see and interpret and textual output.
+
+    defined = dict(globals())
+    for k, v in defined.items():
+        if callable(v) and k.startswith('test_'):
+            print()
+            print('Calling:', k)
+            print((len(k)+9)*'=')
+            v()

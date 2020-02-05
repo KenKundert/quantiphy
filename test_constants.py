@@ -188,3 +188,16 @@ def test_constants():
     assert str(Quantity('hl')) == '1.4204 GHz'
     assert str(Quantity('HL')) == '1.4204 GHz'
     assert str(Quantity('hydrogen line')) == '1.4204 GHz'
+
+
+if __name__ == '__main__':
+    # As a debugging aid allow the tests to be run on their own, outside pytest.
+    # This makes it easier to see and interpret and textual output.
+
+    defined = dict(globals())
+    for k, v in defined.items():
+        if callable(v) and k.startswith('test_'):
+            print()
+            print('Calling:', k)
+            print((len(k)+9)*'=')
+            v()

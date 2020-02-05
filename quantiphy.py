@@ -761,6 +761,7 @@ DEFAULTS = dict(
     map_sf = {},
     minus = '-',
     nan = 'NaN',
+    negligible = False,
     number_fmt = None,
     output_sf = 'TGMkmunpfa',
     plus = '+',
@@ -1118,6 +1119,16 @@ class Quantity(float):
         :arg str nan:
             The text to be used to represent a value that is not-a-number.
             By default its value is 'NaN'.
+
+        :arg negligible:
+            If the absolute value of the quantity is equal to or smaller than
+            *negligible*, it is rendered as 0.  To make *negligible* a function
+            of the units of the quantity, pass a dictionary where the keys are
+            the units and the values are the value to use for negligible. A key
+            of '' is used for quantities with no units and a key of None
+            provides a default value for *negligible* that is used if the units
+            of the quantity are not found in the dictionary.
+        :type map_sf: real or dictionary
 
         :arg number_fmt:
             Format string used to convert the components of the number into the
@@ -1953,7 +1964,7 @@ class Quantity(float):
     # render() {{{2
     def render(
         self, form=None, show_units=None, prec=None, show_label=None,
-        strip_zeros=None, strip_radix=None, scale=None,
+        strip_zeros=None, strip_radix=None, scale=None, negligible=None
     ):
         """Convert quantity to a string.
 
@@ -2008,6 +2019,16 @@ class Quantity(float):
               conversion, which is applied to create the displayed value.
         :type scale: real, pair, function, string, or quantity
 
+        :arg negligible:
+            If the absolute value of the quantity is equal to or smaller than
+            *negligible*, it is rendered as 0.  To make *negligible* a function
+            of the units of the quantity, pass a dictionary where the keys are
+            the units and the values are the value to use for negligible. A key
+            of '' is used for quantities with no units and a key of None
+            provides a default value for *negligible* that is used if the units
+            of the quantity are not found in the dictionary.
+        :type scale: real or dict
+
         :raises UnknownConversion(QuantiPhyError, KeyError):
             A unit conversion was requested and there is no corresponding unit
             converter.
@@ -2054,6 +2075,7 @@ class Quantity(float):
         show_units = self.show_units if show_units is None else show_units
         strip_zeros = self.strip_zeros if strip_zeros is None else strip_zeros
         strip_radix = self.strip_radix if strip_radix is None else strip_radix
+        negligible = self.negligible if negligible is None else negligible
         units = self.units if show_units else ''
         if prec is None:
             prec = self.prec
@@ -2133,6 +2155,16 @@ class Quantity(float):
             sign = '-' if mantissa[0] == '-' else ''
             mantissa = mantissa.lstrip('-')
             exp = int(exp)
+
+        if negligible is not False:
+            try:
+                negligible = negligible.get(self.units, negligible.get(None, -1))
+            except AttributeError:
+                pass
+            if abs(self.real) <= negligible:
+                mantissa = '0'
+                exp = 0
+                sign = ''
 
         #  scale factor
         index = exp // 3
@@ -2547,7 +2579,7 @@ class Quantity(float):
     def __repr__(self):
         form = 'eng' if self.ignore_sf else 'si'
         return 'Quantity({!r})'.format(
-            self.render(form=form, show_units=True, prec='full')
+            self.render(form=form, show_units=True, prec='full', negligible=-1)
         )
 
     # format() {{{2

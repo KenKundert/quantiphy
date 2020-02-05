@@ -86,3 +86,16 @@ def test_namespace():
     assert str(epsilon0) == '8.8542 pF/m'
     assert str(mu0) == '1.2566 uH/m'
     assert str(Z0) == '376.73 Ohms'
+
+
+if __name__ == '__main__':
+    # As a debugging aid allow the tests to be run on their own, outside pytest.
+    # This makes it easier to see and interpret and textual output.
+
+    defined = dict(globals())
+    for k, v in defined.items():
+        if callable(v) and k.startswith('test_'):
+            print()
+            print('Calling:', k)
+            print((len(k)+9)*'=')
+            v()

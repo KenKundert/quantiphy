@@ -376,3 +376,15 @@ def test_func():
     assert '{:pA}'.format(Quantity('-20 dBA')) == '0.1 A'
     assert '{:pA}'.format(Quantity('20 dBA')) == '10 A'
 
+
+if __name__ == '__main__':
+    # As a debugging aid allow the tests to be run on their own, outside pytest.
+    # This makes it easier to see and interpret and textual output.
+
+    defined = dict(globals())
+    for k, v in defined.items():
+        if callable(v) and k.startswith('test_'):
+            print()
+            print('Calling:', k)
+            print((len(k)+9)*'=')
+            v()

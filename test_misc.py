@@ -761,3 +761,96 @@ def test_scale():
     assert str(total) == '$1,000,000'
     total = total.scale(5, Dollars)
     assert str(total) == '$5,000,000.00'
+
+def test_negligible():
+    Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None)
+    pn=Quantity('1nV')
+    nn=Quantity('-1nV')
+    pf=Quantity('1fV')
+    nf=Quantity('-1fV')
+    assert pn.render() == '1 nV'
+    assert nn.render() == '-1 nV'
+    assert pf.render() == '1 fV'
+    assert nf.render() == '-1 fV'
+    assert pn.render(negligible=1e-12) == '1 nV'
+    assert nn.render(negligible=1e-12) == '-1 nV'
+    assert pf.render(negligible=1e-12) == '0 V'
+    assert nf.render(negligible=1e-12) == '0 V'
+    with Quantity.prefs(negligible=1e-12):
+        assert pn.render() == '1 nV'
+        assert nn.render() == '-1 nV'
+        assert pf.render() == '0 V'
+        assert nf.render() == '0 V'
+        assert repr(pn) == "Quantity('1 nV')"
+        assert repr(nn) == "Quantity('-1 nV')"
+        assert repr(pf) == "Quantity('1 fV')"
+        assert repr(nf) == "Quantity('-1 fV')"
+        assert pn.render(negligible=1e-6) == '0 V'
+        assert nn.render(negligible=1e-6) == '0 V'
+        assert pf.render(negligible=1e-6) == '0 V'
+        assert nf.render(negligible=1e-6) == '0 V'
+
+    q=Quantity('-0')
+    assert q.render() == '-0'
+    assert q.render(negligible=0) == '0'
+
+    v=Quantity('1nV')
+    c=Quantity('1fA')
+    f=Quantity('1mHz')
+    k=Quantity('k')
+    u=Quantity(1e-9)
+    with Quantity.prefs():
+        assert v.render() == '1 nV'
+        assert c.render() == '1 fA'
+        assert f.render() == '1 mHz'
+        assert u.render() == '1n'
+        assert k.render() == '13.806e-24 J/K'
+    with Quantity.prefs(negligible = 1e-6):
+        assert v.render() == '0 V'
+        assert c.render() == '0 A'
+        assert f.render() == '1 mHz'
+        assert u.render() == '0'
+        assert k.render() == '0 J/K'
+    with Quantity.prefs(negligible = dict(V=1e-6, A=1e-12, Hz=1)):
+        assert v.render() == '0 V'
+        assert c.render() == '0 A'
+        assert f.render() == '0 Hz'
+        assert u.render() == '1n'
+        assert k.render() == '13.806e-24 J/K'
+    with Quantity.prefs(negligible = {'V':1e-6, 'A':1e-12, 'Hz':1, None:1e-12}):
+        assert v.render() == '0 V'
+        assert c.render() == '0 A'
+        assert f.render() == '0 Hz'
+        assert u.render() == '1n'
+        assert k.render() == '0 J/K'
+    with Quantity.prefs(negligible = {'V':1e-6, 'A':1e-12, 'Hz':1, None:1e-6}):
+        assert v.render() == '0 V'
+        assert c.render() == '0 A'
+        assert f.render() == '0 Hz'
+        assert u.render() == '0'
+        assert k.render() == '0 J/K'
+    with Quantity.prefs(negligible = {'V':1e-6, 'A':1e-12, 'Hz':1, '':1e-10, None:1e-12}):
+        assert v.render() == '0 V'
+        assert c.render() == '0 A'
+        assert f.render() == '0 Hz'
+        assert u.render() == '1n'
+        assert k.render() == '0 J/K'
+    with Quantity.prefs(negligible = {'V':1e-6, 'A':1e-12, 'Hz':1, '':1e-6, None:1e-12}):
+        assert v.render() == '0 V'
+        assert c.render() == '0 A'
+        assert f.render() == '0 Hz'
+        assert u.render() == '0'
+        assert k.render() == '0 J/K'
+
+
+if __name__ == '__main__':
+    # As a debugging aid allow the tests to be run on their own, outside pytest.
+    # This makes it easier to see and interpret and textual output.
+
+    defined = dict(globals())
+    for k, v in defined.items():
+        if callable(v) and k.startswith('test_'):
+            print()
+            print('Calling:', k)
+            print((len(k)+9)*'=')
+            v()

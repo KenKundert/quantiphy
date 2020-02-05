@@ -811,6 +811,9 @@ of converting a quantity to a string. For example:
     >>> bytes.render(form='binary')
     '1 KiB'
 
+    >>> k.render(negligible=1e-12)
+    '0 J/K'
+
 
 *show_label* allows you to display the name and description of the quantity when 
 rendering. If *show_label* is *False*, the quantity is not labeled with the name 

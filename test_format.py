@@ -770,3 +770,16 @@ def test_radix_comma_exception():
         ):
             Quantity('$1M')
     assert exception.value.args[0] == "comma and radix must differ."
+
+
+if __name__ == '__main__':
+    # As a debugging aid allow the tests to be run on their own, outside pytest.
+    # This makes it easier to see and interpret and textual output.
+
+    defined = dict(globals())
+    for k, v in defined.items():
+        if callable(v) and k.startswith('test_'):
+            print()
+            print('Calling:', k)
+            print((len(k)+9)*'=')
+            v()
