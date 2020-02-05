@@ -1635,18 +1635,18 @@ class Quantity(float):
         sf_or_units = '[a-zA-Z_µ{us}]+'.format(us=UNIT_SYMBOLS)
             # must match units or scale factors: add µ, make non-optional
         space = '[ ]?'  # optional non-breaking space (do not use a normal space)
-        left_delimit = r'(?:\A|(?<=[^a-zA-Z0-9_.]))'
+        left_delimit = r'(?:\A|(?<=[^-−a-zA-Z0-9_.]))'
         right_delimit = r'(?=[^-+0-9]|\Z)'
             # right_delim excludes [-+0-9] to avoid matches with 1e2, 1e-2, 1e+2
             # this is not great because it seems like it should fail for
             # 10uA+20uA, but it does not and I don't know why.
         cls.embedded_si_notation = re.compile(
-            '{left_delimit}{mantissa}{space}{sf_or_units}{right_delimit}'.format(
+            '{left_delimit}{sign}{mantissa}{space}{sf_or_units}{right_delimit}'.format(
                 **locals()
             )
         )
         cls.embedded_e_notation = re.compile(
-            '{left_delimit}{mantissa}{exponent}?{space}{smpl_units}{right_delimit}'.format(
+            '{left_delimit}{sign}{mantissa}{exponent}?{space}{smpl_units}{right_delimit}'.format(
                 **locals()
             )
         )

@@ -842,6 +842,15 @@ def test_negligible():
         assert u.render() == '0'
         assert k.render() == '0 J/K'
 
+    given = 'Pass @ 3.40000006e-03s: V(atb) voltage: expected=0.00000000e+00V, measured=-8.60793065e-76V, diff=8.60793065e-76V.'
+    expected = 'Pass @ 3.4 ms: V(atb) voltage: expected=0 V, measured=-860.79e-78 V, diff=860.79e-78 V.'
+    got = Quantity.all_from_conv_fmt(given)
+    assert got == expected
+
+    expected = 'Pass @ 3.4 ms: V(atb) voltage: expected=0 V, measured=0 V, diff=0 V.'
+    got = Quantity.all_from_conv_fmt(given, negligible=1e-12)
+    assert got == expected
+
 
 if __name__ == '__main__':
     # As a debugging aid allow the tests to be run on their own, outside pytest.
