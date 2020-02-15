@@ -1314,9 +1314,9 @@ constant.  You can also specify an alias as an argument to *add_constant*.
     >>> print(hy_wavelength.render(show_label=True))
     λₕ = 211.06 mm -- wavelength of hydrogen line
 
-    It is not necessary to specify both the name and the alias, one is 
-sufficient; the constant is accessible using either.  Notice that the alias does 
-not actually become part of the constant, it is only used for looking up the 
+It is not necessary to specify both the name and the alias, one is sufficient; 
+the constant is accessible using either.  Notice that the alias does not 
+actually become part of the constant, it is only used for looking up the 
 constant.
 
 By default, user defined constants are not associated with a unit system, 

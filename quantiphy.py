@@ -1370,15 +1370,21 @@ class Quantity(float):
 
     # label formatter {{{3
     def _label(self, value, show_label):
-        show_label = self.show_label if show_label is None else show_label
-        if not show_label or not self.name:
+        show_desc = self.show_label if show_label is None else show_label
+        if not self.name or not show_desc:
             return value
-        Value = value
+
+        if show_desc is True:
+            show_desc = self.show_label == 'f' or self.show_desc
+        else:
+            show_desc = show_desc == 'f'
+
         try:
-            if self.desc and show_label != 'a' and (show_label == 'f' or self.show_desc):
+            if show_desc and self.desc:
                 Value = self.label_fmt.format(n=self.name, v=value)
                 label_fmt = self.label_fmt_full
             else:
+                Value = value
                 label_fmt = self.label_fmt
             return label_fmt.format(n=self.name, v=value, d=self.desc, V=Value)
         except KeyError as e:

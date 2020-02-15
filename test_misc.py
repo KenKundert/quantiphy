@@ -430,10 +430,10 @@ def test_misc2():
     Quantity.set_prefs(show_label='f')
     assert str(c) == 'c = 299.79 Mm/s -- speed of light'
     assert '{:s}'.format(c) == '299.79 Mm/s'
-    assert '{:S}'.format(c) == 'c = 299.79 Mm/s'
+    assert '{:S}'.format(c) == 'c = 299.79 Mm/s -- speed of light'
     assert c.render() == 'c = 299.79 Mm/s -- speed of light'
     assert c.render(show_label=False) == '299.79 Mm/s'
-    assert c.render(show_label=True) == 'c = 299.79 Mm/s'
+    assert c.render(show_label=True) == 'c = 299.79 Mm/s -- speed of light'
     assert c.render(show_label='f') == 'c = 299.79 Mm/s -- speed of light'
     assert c.render(show_label='a') == 'c = 299.79 Mm/s'
 
@@ -459,10 +459,10 @@ def test_misc2():
     Quantity.set_prefs(show_label='f')
     assert str(c) == 'c: 299.79 Mm/s -- speed of light'
     assert '{:s}'.format(c) == '299.79 Mm/s'
-    assert '{:S}'.format(c) == 'c: 299.79 Mm/s'
+    assert '{:S}'.format(c) == 'c: 299.79 Mm/s -- speed of light'
     assert c.render() == 'c: 299.79 Mm/s -- speed of light'
     assert c.render(show_label=False) == '299.79 Mm/s'
-    assert c.render(show_label=True) == 'c: 299.79 Mm/s'
+    assert c.render(show_label=True) == 'c: 299.79 Mm/s -- speed of light'
     assert c.render(show_label='f') == 'c: 299.79 Mm/s -- speed of light'
     assert c.render(show_label='a') == 'c: 299.79 Mm/s'
 
