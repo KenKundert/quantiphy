@@ -1,3 +1,4 @@
+..  initialization {{{1
 ..  Reset Quantity preferences to their original defaults.
 
     >>> from quantiphy import Quantity
@@ -26,12 +27,15 @@
     ...     unity_sf=None,
     ... )
 
+
+..  examples top level {{{1
 .. _quantiphy examples:
 
 Examples
 ========
 
 
+.. motivating example {{{1
 .. _motivation example:
 
 Motivating Example
@@ -186,6 +190,7 @@ main difference occurs when it is time to convert it back to a string. When
 doing so, the scale factor and units are included by default.
 
 
+.. dram prices {{{1
 .. _dram:
 
 DRAM Prices
@@ -258,6 +263,7 @@ the binary scale factors by changing the *q* format characters to *b*:
     2018     4.66 Gib       596 MiB
 
 
+.. thermal voltage example {{{1
 .. _thermal voltage example:
 
 Thermal Voltage Example
@@ -309,6 +315,7 @@ since all the quantities have descriptions, *label_fmt_full* is used to format
 the output.
 
 
+.. casual time units example {{{1
 .. _casual time units example:
 
 Casual Time Units
@@ -366,6 +373,7 @@ time has past. You can find `alarm <https://github.com/KenKundert/alarm>`_ on
 GitHub.
 
 
+.. unicode example {{{1
 .. _unicode example:
 
 Unicode Text Example
@@ -423,6 +431,8 @@ this:
     Zero degrees Celsius in Kelvin is 273.15 K.  Permittivity of free
     space is 8.8542 pF/m.  Permeability of free space is 1.2566 µH/m.
 
+
+.. timeit example {{{1
 .. _timeit example:
 
 Timeit Example
@@ -509,6 +519,7 @@ Contrast this with the normal output from *timeit*::
 The essential information is there, but it takes longer to make sense of it.
 
 
+.. disk usage example {{{1
 .. _disk usage example:
 
 Disk Usage Example
@@ -562,6 +573,7 @@ And here is an example of the programs output::
     3.48 MB  quantiphy
 
 
+.. simulation example {{{1
 .. _simulation example:
 
 Parameterized Simulation Example
@@ -685,6 +697,7 @@ parameters, it produces this waveform:
 ..  image:: wave.png
 
 
+.. matplotlib example {{{1
 .. _matplotlib example:
 
 .. index::
@@ -784,6 +797,28 @@ the line:
     Quantity.set_prefs(map_sf=Quantity.map_sf_to_sci_notation)
 
 
+.. flicker-noise example {{{1
+.. _flicker-noise example:
+
+.. index::
+   single: Flicker Noise
+
+Flicker Noise
+-------------
+
+This example represents a very typical use of *QuantiPhy* in a simulation 
+script.  As in the two previous examples, it includes both extraction of 
+simulation parameters from the script's documentation and attractive formatting 
+of units in MatPlotLib graphs.  It is a bit long and you cannot run it yourself 
+as it requires access to a proprietary circuit simulator, and as such the code 
+is not included here.  But it is an excellent example of how to use *QuantiPhy* 
+in a variety of ways.  You can find the `Flicker Noise code 
+<https://github.com/KenKundert/flicker-noise>`_ on GitHub.  It produces results 
+like the following:
+
+..  image:: flicker.svg
+
+.. cryptocurrency example {{{1
 .. _cryptocurrency example:
 
 Cryptocurrency Example
@@ -901,6 +936,7 @@ A more sophisticated version of `cryptcurrency
 this example can be found on GitHub.
 
 
+.. rkm codes example {{{1
 .. _rkm codes example:
 
 .. index::
@@ -1019,7 +1055,8 @@ For example::
     vdda_in_2v5
 
 
-.. time-value of money example:
+.. time-value of money example {{{1
+.. _time-value of money example:
 
 .. index::
    single: Time-Value of Money
@@ -1058,3 +1095,5 @@ The source code is a bit long to include here, but you can find it on
 `GitHub <https://github.com/KenKundert/tvm>`_, or you can install it with::
 
     pip3 install --user tvm
+
+
