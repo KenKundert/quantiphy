@@ -2789,6 +2789,10 @@ class Quantity(float):
             the values being defined.  You can use *locals()* as this argument
             to make all local variables available.
 
+            You can specify both values and functions. For example,
+            ``predefined=dict(sqrt=sqrt)`` allows ``sqrt`` to be
+            used in expressions.
+
         :arg \**kwargs:
             Any argument that can be passed to Quantity can be passed to this
             function, and are in turn passed to Quantity as the quantities are
@@ -2938,6 +2942,10 @@ class Quantity(float):
     def all_from_conv_fmt(cls, text, **kwargs):
         r"""Convert all numbers and quantities from conventional notation.
 
+        Only supports a subset of the conventional formats that *QuantiPhy*
+        normally accepts.  For example, leading units (ex. $1M) and embedded
+        commas are not supported, and the radix is always '.'.
+
         :arg str text:
             A search and replace is performed on this text. The search looks for
             numbers and quantities in floating point or e-notation. They are
@@ -2982,6 +2990,10 @@ class Quantity(float):
     @classmethod
     def all_from_si_fmt(cls, text, **kwargs):
         r"""Convert all numbers and quantities from SI notation.
+
+        Only supports a subset of the SI formats that *QuantiPhy* normally
+        accepts.  For example, leading units (ex. $1M) and embedded commas
+        are not supported, and the radix is always '.'.
 
         :arg str text:
             A search and replace is performed on this text. The search looks for

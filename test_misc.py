@@ -1,4 +1,4 @@
-#1_000_000 encoding: utf8
+# encoding: utf8
 
 from quantiphy import (
     Quantity, add_constant,
