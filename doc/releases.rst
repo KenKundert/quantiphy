@@ -2,7 +2,7 @@ Releases
 ========
 
 **Latest development release**:
-    | Version: 2.9.4
+    | Version: 2.10.1
     | Released: 2020-02-14
 
 **2.10 (2020-03-2)**:
@@ -14,18 +14,18 @@ Releases
 
 **2.9 (2020-01-28)**:
     - Made :meth:`quantiphy.Quantity.extract()` more forgiving.
-    - Support radix and comma processing when converting strings to 
+    - Support radix and comma processing when converting strings to
       :class:`quantiphy.Quantity`.
 
 **2.8 (2020-01-08)**:
     - Fix nit in installer (setup.py).
 
 **2.7 (2019-12-17)**:
-    - improve the ability of both :meth:`quantiphy.Quantity.add()` and 
+    - improve the ability of both :meth:`quantiphy.Quantity.add()` and
       :meth:`quantiphy.Quantity.scale()` to retain attributes.
     - added *accept_binary* preference.
     - support all preferences as class attributes.
-    - allow radix and comma to be replaced by adding *radix* and *comma* 
+    - allow radix and comma to be replaced by adding *radix* and *comma*
       preferences.
 
 **2.6 (2019-09-24)**:
@@ -35,7 +35,7 @@ Releases
 **2.5 (2019-01-16)**:
     - added RKM codes example.
     - added *check_value* = 'strict' to :meth:`quantiphy.Quantity.add()`.
-    - added backward compatibility for *form* argument of 
+    - added backward compatibility for *form* argument of
       :meth:`quantiphy.Quantity.render()` if it is passed as unnamed argument.
     - made :meth:`quantiphy.Quantity.extract()` a bit more general.
     - reformulated exceptions.
@@ -46,9 +46,9 @@ Releases
     - follow Python convention of right-justifying numbers by default.
     - add Quantity.add() (adds a number to a quantity returning a new quantity)
     - added # alternate form of string formatting.
-    - change *show_si* to *form* (argument on 
-      :meth:`quantiphy.Quantity.set_prefs()` and 
-      :meth:`quantiphy.Quantity.render()` (*show_si* is now obsolete, use 
+    - change *show_si* to *form* (argument on
+      :meth:`quantiphy.Quantity.set_prefs()` and
+      :meth:`quantiphy.Quantity.render()` (*show_si* is now obsolete, use
       *form='si'* instead).
     - added concept of equivalent units for unit conversion to documentation.
     - enhance UnitConversion so that it supports nonlinear conversions.
@@ -78,27 +78,27 @@ Releases
     - added no-op conversions (units change but value stays the same, ex: $ → USD)
 
 **2.1 (2017-07-30)**:
-    The primary focus of this release was on improving the documentation, though 
+    The primary focus of this release was on improving the documentation, though
     there are a few small feature enhancements.
 
     - added support for SI standard composite units
     - added support for non-breaking space as spacer
-    - removed constraint in :meth:`quantiphy.Quantity.extract()` that names must 
+    - removed constraint in :meth:`quantiphy.Quantity.extract()` that names must
       be identifiers
 
 **2.0 (2017-07-15)**:
-    This is a 'coming of age' release where the emphasis shifts from finding the 
-    right interface to providing an interface that is stable over time. This 
-    release includes the first formal documentation and a number of new features 
+    This is a 'coming of age' release where the emphasis shifts from finding the
+    right interface to providing an interface that is stable over time. This
+    release includes the first formal documentation and a number of new features
     and refinements to the API.
 
     - created formal documentation
     - enhanced *label_fmt* to accept {V}
     - allow quantity to be passed as value to :class:`quantiphy.Quantity`
-    - replaced *Quantity.add_to_namespace* with 
+    - replaced *Quantity.add_to_namespace* with
       :meth:`quantiphy.Quantity.extract`
     - raise *NameError* rather than *AssertionError* for unknown preferences
-    - added :meth:`quantiphy.Quantity.all_from_conv_fmt()` and 
+    - added :meth:`quantiphy.Quantity.all_from_conv_fmt()` and
       :meth:`quantiphy.Quantity.all_from_si_fmt()`
     - change *assign_rec* to support more formats
     - changed *Constant()* to :func:`quantiphy.add_constant()`

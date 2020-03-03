@@ -1,7 +1,7 @@
 QuantiPhy: Physical Quantities
 ==============================
 
-| Version: 2.9.4
+| Version: 2.10.1
 | Released: 2020-02-14
 | Please post all bugs and suggestions at
   `Github <https://github.com/KenKundert/quantiphy/issues>`_
@@ -12,23 +12,23 @@ QuantiPhy: Physical Quantities
 What?
 -----
 
-*QuantiPhy* is a Python library that offers support for physical quantities.  
-A quantity is the pairing of a number and a unit of measure that indicates the 
-amount of some measurable thing.  *QuantiPhy* provides quantity objects that 
-keep the units with the number, making it easy to share them as single object.  
+*QuantiPhy* is a Python library that offers support for physical quantities.
+A quantity is the pairing of a number and a unit of measure that indicates the
+amount of some measurable thing.  *QuantiPhy* provides quantity objects that
+keep the units with the number, making it easy to share them as single object.
 They subclass float and so can be used anywhere a real number is appropriate.
 
 
 Why?
 ----
 
-*QuantiPhy* naturally supports SI scale factors, which are widely used in 
-science and engineering. SI scale factors make it possible to cleanly represent 
-both very large and very small quantities in a form that is both easy to read 
-and write.  While generally better for humans, no general programming language 
-provides direct support for reading or writing quantities with SI scale factors, 
-making it difficult to write software that communicates effectively with people.  
-*QuantiPhy* addresses this deficiency, making it natural and simple to both 
+*QuantiPhy* naturally supports SI scale factors, which are widely used in
+science and engineering. SI scale factors make it possible to cleanly represent
+both very large and very small quantities in a form that is both easy to read
+and write.  While generally better for humans, no general programming language
+provides direct support for reading or writing quantities with SI scale factors,
+making it difficult to write software that communicates effectively with people.
+*QuantiPhy* addresses this deficiency, making it natural and simple to both
 input and output physical quantities.
 
 
@@ -36,11 +36,11 @@ Features
 --------
 
 - Flexibly reads amounts with units and SI scale factors.
-- Quantities subclass the *float* class and so can be used as conventional 
+- Quantities subclass the *float* class and so can be used as conventional
   numbers.
-- Generally includes the units when printing or converting to strings and by 
+- Generally includes the units when printing or converting to strings and by
   default employs SI scale factors.
-- Flexible unit conversion and scaling is supported to make it easy to convert 
+- Flexible unit conversion and scaling is supported to make it easy to convert
   to or from any required form.
 - Provides a small but extensible collection of physical constants.
 
@@ -48,25 +48,25 @@ Features
 Alternatives
 ------------
 
-There are a considerable number of Python packages dedicated to units and 
-quantities (`alternatives <https://kdavies4.github.io/natu/seealso.html>`_).  
-However, as a rule, they focus on the units rather than the scale factors. In 
-particular, they build a system of units that you are expected to use throughout 
-your calculations.  These packages demand a high level of commitment from their 
+There are a considerable number of Python packages dedicated to units and
+quantities (`alternatives <https://kdavies4.github.io/natu/seealso.html>`_).
+However, as a rule, they focus on the units rather than the scale factors. In
+particular, they build a system of units that you are expected to use throughout
+your calculations.  These packages demand a high level of commitment from their
 users and in turn provide unit consistency and built-in unit conversions.
 
-In contrast, *QuantiPhy* treats units basically as documentation.  They are 
-simply strings that are attached to quantities largely so they can be presented 
-to the user when the values are printed. As such, *QuantiPhy* is a light-weight 
-package that demands little from the user.  It is used when inputting and 
-outputting values, and then only when it provides value.  As a result, it 
+In contrast, *QuantiPhy* treats units basically as documentation.  They are
+simply strings that are attached to quantities largely so they can be presented
+to the user when the values are printed. As such, *QuantiPhy* is a light-weight
+package that demands little from the user.  It is used when inputting and
+outputting values, and then only when it provides value.  As a result, it
 provides a simplicity in use that cannot be matched by the other packages.
 
-In addition, these alternative packages generally build their unit systems upon 
-the `SI base units <https://en.wikipedia.org/wiki/SI_base_unit>`, which tends to 
-restrict usage to physical quantities with static conversion factors.  They are 
-less suited to non-physical quantities or conversion factors that change 
-dynamically, such as with currencies.  *QuantiPhy* gracefully handles all of 
+In addition, these alternative packages generally build their unit systems upon
+the `SI base units <https://en.wikipedia.org/wiki/SI_base_unit>`, which tends to
+restrict usage to physical quantities with static conversion factors.  They are
+less suited to non-physical quantities or conversion factors that change
+dynamically, such as with currencies.  *QuantiPhy* gracefully handles all of
 these cases.
 
 
@@ -77,7 +77,7 @@ Install with::
 
    pip3 install quantiphy
 
-Requires Python3.4 or better.  Python2.7 is also supported, however support for 
+Requires Python3.4 or better.  Python2.7 is also supported, however support for
 unicode is weak.
 
 You use *Quantity* to convert numbers and units in various forms to quantities:
@@ -106,7 +106,7 @@ You use *Quantity* to convert numbers and units in various forms to quantities:
    >>> print(Tboil)
    100 °C
 
-Once you have a quantity, there are a variety of ways of accessing aspects of 
+Once you have a quantity, there are a variety of ways of accessing aspects of
 the quantity:
 
 .. code-block:: python
@@ -145,7 +145,7 @@ You can use the render method to flexibly convert the quantity to a string:
    >>> Tboil.render(scale='°F')
    '212 °F'
 
-You can use the string format method or the new format strings to flexibly 
+You can use the string format method or the new format strings to flexibly
 incorporate quantity values into strings:
 
 .. code-block:: python
@@ -172,7 +172,7 @@ incorporate quantity values into strings:
 Issues
 ------
 
-Please ask questions or report problems on `Github 
+Please ask questions or report problems on `Github
 <https://github.com/KenKundert/quantiphy/issues>`_.
 
 
