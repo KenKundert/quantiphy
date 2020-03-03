@@ -5,6 +5,7 @@ Releases
     | Version: 2.9.4
     | Released: 2020-02-14
 
+**2.10 (2020-03-2)**:
     - Added *negligible*, *tight_units*, *nan*, and *inf* preferences.
     - Added *negligible* argument to render.
     - Added *infinity_symbol* attribute.
