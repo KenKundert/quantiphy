@@ -51,7 +51,7 @@ def _named_regex(name, regex):
 
 # _scale {{{2
 def _scale(scale, number, units):
-    if isinstance(scale, 'str'):
+    if isinstance(scale, str):
         # if scale is string, it contains the units to convert from
         number = _convert_units(scale, units, number)
         units = scale
@@ -95,7 +95,7 @@ class QuantiPhyError(Exception):
         """
         if not template:
             template = self._template
-        if isinstance(template, 'str'):
+        if isinstance(template, str):
             templates = [template]
         else:
             templates = template
@@ -349,8 +349,8 @@ class UnitConversion(object):
     """
 
     def __init__(self, to_units, from_units, slope=1, intercept=0):
-        self.to_units = to_units.split() if isinstance(to_units, 'str') else to_units
-        self.from_units = from_units.split() if isinstance(from_units, 'str') else from_units
+        self.to_units = to_units.split() if isinstance(to_units, str) else to_units
+        self.from_units = from_units.split() if isinstance(from_units, str) else from_units
         self.slope = slope
         self.intercept = intercept
         if callable(slope) or callable(intercept):
@@ -445,7 +445,7 @@ class UnitConversion(object):
             Quantity('30.857e15 m')
 
         """
-        if isinstance(value, 'str'):
+        if isinstance(value, str):
             if not from_units:
                 from_units = value
             value = 1
@@ -622,16 +622,16 @@ def add_constant(value, alias=None, unit_systems=None):
         f_hy = 1.4204 GHz -- Frequency of hydrogen line
 
     """
-    if isinstance(value, 'str'):
+    if isinstance(value, str):
         value = Quantity(value)
     if not isinstance(value, Quantity):
         raise ExpectedQuantity()
     if not alias and not value.name:
         raise MissingName()
-    if isinstance(unit_systems, 'str'):
+    if isinstance(unit_systems, str):
         unit_systems = unit_systems.split()
     if alias:
-        aliases = [alias] if isinstance(alias, 'str') else alias
+        aliases = [alias] if isinstance(alias, str) else alias
     else:
         aliases = []
 
@@ -1257,7 +1257,7 @@ class Quantity(float):
 
         """
         cls._initialize_preferences()
-        if isinstance(kwargs.get('known_units'), 'str'):
+        if isinstance(kwargs.get('known_units'), str):
             kwargs['known_units'] = kwargs['known_units'].split()
         for k, v in kwargs.items():
             if k not in DEFAULTS.keys():
@@ -1300,7 +1300,7 @@ class Quantity(float):
         cls._initialize_preferences()
         try:
             value = getattr(cls, name, cls._preferences[name])
-            if name == 'known_units' and isinstance(value, 'str'):
+            if name == 'known_units' and isinstance(value, str):
                 value = value.split()
             return value
         except KeyError:
@@ -1663,7 +1663,7 @@ class Quantity(float):
 
         # process model to get values for name, units, and desc if available
         if model:
-            if isinstance(model, 'str'):
+            if isinstance(model, str):
                 components = model.split(None, 2)
                 if len(components) == 1:
                     data['units'] = components[0]
@@ -1744,7 +1744,7 @@ class Quantity(float):
             return number, mantissa, sf
 
         # process the value
-        if isinstance(value, 'str') and value in _active_constants:
+        if isinstance(value, str) and value in _active_constants:
             value = _active_constants[value]
         if isinstance(value, Quantity):
             number = float(value)
@@ -1756,7 +1756,7 @@ class Quantity(float):
                 data['name'] = value.name
             if value.desc:
                 data['desc'] = value.desc
-        elif isinstance(value, 'str'):
+        elif isinstance(value, str):
             number, mantissa, sf = recognize_all(value)
         else:
             number = value
