@@ -25,7 +25,7 @@ setup(
     license='GPLv3+',
     zip_safe=True,
     py_modules='quantiphy'.split(),
-    install_requires=dependencies.split(),
+    install_requires=[],
     setup_requires='pytest-runner>=2.0'.split(),
     tests_require='pytest'.split(),
     python_requires='>=3.5',
