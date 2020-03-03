@@ -37,22 +37,13 @@ Documentation can be found at https://quantiphy.readthedocs.io.
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 # Imports {{{1
-from __future__ import division
+
 import re
 import math
 import sys
-try:
-    from collections import ChainMap
-except ImportError:  # pragma: no cover
-    from chainmap import ChainMap
-from six import string_types, python_2_unicode_compatible
 
+from collections import ChainMap
 
-# Utilities {{{1
-# is_str {{{2
-def is_str(obj):
-    "Identifies strings in all their various guises."
-    return isinstance(obj, string_types)
 
 # _named_regex {{{2
 def _named_regex(name, regex):
@@ -60,7 +51,7 @@ def _named_regex(name, regex):
 
 # _scale {{{2
 def _scale(scale, number, units):
-    if is_str(scale):
+    if isinstance(scale, 'str'):
         # if scale is string, it contains the units to convert from
         number = _convert_units(scale, units, number)
         units = scale
@@ -104,7 +95,7 @@ class QuantiPhyError(Exception):
         """
         if not template:
             template = self._template
-        if is_str(template):
+        if isinstance(template, 'str'):
             templates = [template]
         else:
             templates = template
@@ -358,8 +349,8 @@ class UnitConversion(object):
     """
 
     def __init__(self, to_units, from_units, slope=1, intercept=0):
-        self.to_units = to_units.split() if is_str(to_units) else to_units
-        self.from_units = from_units.split() if is_str(from_units) else from_units
+        self.to_units = to_units.split() if isinstance(to_units, 'str') else to_units
+        self.from_units = from_units.split() if isinstance(from_units, 'str') else from_units
         self.slope = slope
         self.intercept = intercept
         if callable(slope) or callable(intercept):
@@ -454,7 +445,7 @@ class UnitConversion(object):
             Quantity('30.857e15 m')
 
         """
-        if is_str(value):
+        if isinstance(value, 'str'):
             if not from_units:
                 from_units = value
             value = 1
@@ -631,16 +622,16 @@ def add_constant(value, alias=None, unit_systems=None):
         f_hy = 1.4204 GHz -- Frequency of hydrogen line
 
     """
-    if is_str(value):
+    if isinstance(value, 'str'):
         value = Quantity(value)
     if not isinstance(value, Quantity):
         raise ExpectedQuantity()
     if not alias and not value.name:
         raise MissingName()
-    if is_str(unit_systems):
+    if isinstance(unit_systems, 'str'):
         unit_systems = unit_systems.split()
     if alias:
-        aliases = [alias] if is_str(alias) else alias
+        aliases = [alias] if isinstance(alias, 'str') else alias
     else:
         aliases = []
 
@@ -788,7 +779,6 @@ CONSTANTS = {
 
 
 # Quantity class {{{1
-@python_2_unicode_compatible
 class Quantity(float):
     # description {{{2
     """Create a physical quantity.
@@ -1267,7 +1257,7 @@ class Quantity(float):
 
         """
         cls._initialize_preferences()
-        if is_str(kwargs.get('known_units')):
+        if isinstance(kwargs.get('known_units'), 'str'):
             kwargs['known_units'] = kwargs['known_units'].split()
         for k, v in kwargs.items():
             if k not in DEFAULTS.keys():
@@ -1310,7 +1300,7 @@ class Quantity(float):
         cls._initialize_preferences()
         try:
             value = getattr(cls, name, cls._preferences[name])
-            if name == 'known_units' and is_str(value):
+            if name == 'known_units' and isinstance(value, 'str'):
                 value = value.split()
             return value
         except KeyError:
@@ -1673,7 +1663,7 @@ class Quantity(float):
 
         # process model to get values for name, units, and desc if available
         if model:
-            if is_str(model):
+            if isinstance(model, 'str'):
                 components = model.split(None, 2)
                 if len(components) == 1:
                     data['units'] = components[0]
@@ -1754,7 +1744,7 @@ class Quantity(float):
             return number, mantissa, sf
 
         # process the value
-        if is_str(value) and value in _active_constants:
+        if isinstance(value, 'str') and value in _active_constants:
             value = _active_constants[value]
         if isinstance(value, Quantity):
             number = float(value)
@@ -1766,7 +1756,7 @@ class Quantity(float):
                 data['name'] = value.name
             if value.desc:
                 data['desc'] = value.desc
-        elif is_str(value):
+        elif isinstance(value, 'str'):
             number, mantissa, sf = recognize_all(value)
         else:
             number = value
