@@ -22,6 +22,7 @@ setup(
     version='2.10.0',
     description='physical quantities (numbers with units)',
     long_description=readme,
+    long_description_content_type='text/x-rst',
     author="Ken Kundert",
     author_email='quantiphy@nurdletech.com',
     url='https://quantiphy.readthedocs.io',
