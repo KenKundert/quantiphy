@@ -2,8 +2,8 @@ Releases
 ========
 
 **Latest development release**:
-    | Version: 2.10.0
-    | Released: 2020-03-02
+    | Version: 2.10.1
+    | Released: 2020-03-04
 
     - Dropping support for all versions of Python older than 3.5.
 
