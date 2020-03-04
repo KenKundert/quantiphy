@@ -372,6 +372,10 @@ Another example of using *QuantiPhy* to implement casual time units is the
 time has past. You can find `alarm <https://github.com/KenKundert/alarm>`_ on 
 GitHub.
 
+.. hide the following
+
+    >>> Quantity.set_prefs(ignore_sf=None)
+
 
 .. unicode example {{{1
 .. _unicode example:
@@ -968,27 +972,25 @@ provides a more general version of RKM codes which includes the units by
 default, but it can be configured to conform to the standard by setting 
 *rkm_maps* as follows:
 
-.. rkm_code examples are commented out because they don't work in python2
-
 .. code-block:: python
 
-    >> from rkm_codes import from_rkm, to_rkm
-    >> from rkm_codes import set_prefs, IEC60062_MAPS
-    >> set_prefs(rkm_maps=IEC60062_MAPS)
+    >>> from rkm_codes import from_rkm, to_rkm
+    >>> from rkm_codes import set_prefs, IEC60062_MAPS
+    >>> set_prefs(rkm_maps=IEC60062_MAPS)
 
-    >> r = from_rkm('6k8')
-    >> r
-    Quantity('6.8 kΩ')
+    >>> r = from_rkm('6k8')
+    >>> r
+    Quantity('6.8 kΩ')
 
-    >> c = from_rkm('4u7')
-    >> c
-    Quantity('4.7 µF')
+    >>> c = from_rkm('4u7')
+    >>> c
+    Quantity('4.7 µF')
 
-    >> to_rkm(r)
-    '6k8'
+    >>> to_rkm(r)
+    '6K8'
 
-    >> to_rkm(c)
-    '4u7'
+    >>> to_rkm(c)
+    '4µ7'
 
 You can also use RKM codes for values other than just resistances and 
 capacitances.  In this case, the RKM codes are treated as being unitless, but 
@@ -1026,29 +1028,27 @@ As a practical example of the use of RKM codes, imagine wanting a program that
 creates pin names for an electrical circuit based on a naming convention.  It 
 would take a table of pin characteristics that are used to create the names.
 
-..  This example is not being tested because it fails in python2
-
 For example::
 
-    >> from quantiphy import Quantity
-    >> from rkm_codes import to_rkm, set_prefs as set_rkm_prefs
+    >>> from quantiphy import Quantity
+    >>> from rkm_codes import to_rkm, set_prefs as set_rkm_prefs
 
-    >> pins = [
-    ..     dict(kind='ibias', direction='out', polarity='sink', dest='dac', value='250nA'),
-    ..     dict(kind='ibias', direction='out', polarity='src', dest='rampgen', value='2.5µA'),
-    ..     dict(kind='vref', direction='out', dest='dac', value='1.25V'),
-    ..     dict(kind='vdda', direction='in', value='2.5V'),
-    .. ]
-    >> set_rkm_prefs(map_sf={}, units_to_rkm_base_code=None)
+    >>> pins = [
+    ...     dict(kind='ibias', direction='out', polarity='sink', dest='dac', value='250nA'),
+    ...     dict(kind='ibias', direction='out', polarity='src', dest='rampgen', value='2.5µA'),
+    ...     dict(kind='vref', direction='out', dest='dac', value='1.25V'),
+    ...     dict(kind='vdda', direction='in', value='2.5V'),
+    ... ]
+    >>> set_rkm_prefs(map_sf={}, units_to_rkm_base_code=None)
 
-    >> for pin in pins:
-    ..     components = []
-    ..     if 'value' in pin:
-    ..         pin['VALUE'] = to_rkm(Quantity(pin['value']))
-    ..     for name in ['dest', 'kind', 'direction', 'VALUE', 'polarity']:
-    ..         if name in pin:
-    ..             components.append(pin[name])
-    ..     print('_'.join(components))
+    >>> for pin in pins:
+    ...     components = []
+    ...     if 'value' in pin:
+    ...         pin['VALUE'] = to_rkm(Quantity(pin['value']))
+    ...     for name in ['dest', 'kind', 'direction', 'VALUE', 'polarity']:
+    ...         if name in pin:
+    ...             components.append(pin[name])
+    ...     print('_'.join(components))
     dac_ibias_out_250n_sink
     rampgen_ibias_out_2u5_src
     dac_vref_out_1v2

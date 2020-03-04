@@ -1,16 +1,21 @@
 # encoding: utf8
 
+# PyTest naturally loads the QuantiPhy package only once for all test files, but
+# this can cause problems here as any preference set in a previous test file
+# could affect the results for this file.  Explicitly delete the QuantiPhy
+# module if it is currently loaded so we get a fresh start.
+import sys
+for module in [m for m in sys.modules.keys() if m.startswith('quantiphy')]:
+    del sys.modules[module]
+
+from textwrap import dedent
+import pytest
 from quantiphy import (
     Quantity, add_constant,
     QuantiPhyError, IncompatibleUnits, UnknownPreference, UnknownConversion,
     UnknownUnitSystem, InvalidRecognizer, UnknownFormatKey, UnknownScaleFactor,
     InvalidNumber, ExpectedQuantity, MissingName,
 )
-import pytest
-import sys
-from textwrap import dedent
-
-py3 = int(sys.version[0]) == 3
 
 def test_misc():
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None)
@@ -110,18 +115,17 @@ def test_misc():
     assert q.name == ''
     assert q.desc == ''
 
-    if py3:
-        # check tight_units
-        q = Quantity('90°')
-        assert q.render() == '90°'
+    # check tight_units
+    q = Quantity('90°')
+    assert q.render() == '90°'
 
-        q = Quantity('80°F')
-        assert q.render() == '80 °F'
+    q = Quantity('80°F')
+    assert q.render() == '80 °F'
 
-        q = Quantity('80°F')
-        assert q.render() == '80 °F'
-        q.tight_units = '''' % ° ' " ′ ″ °F °C '''.split()
-        assert q.render() == '80°F'
+    q = Quantity('80°F')
+    assert q.render() == '80 °F'
+    q.tight_units = '''' % ° ' " ′ ″ °F °C '''.split()
+    assert q.render() == '80°F'
 
 
 def test_misc2():
@@ -270,24 +274,23 @@ def test_misc2():
     p = Quantity.get_pref(name='known_units')
     assert ' '.join(p) == 'au pc'
 
-    if sys.version_info.major == 3:
-        class Foo(Quantity):
-            pass
-        t = Foo('1us')
+    class Foo(Quantity):
+        pass
+    t = Foo('1us')
 
-        assert Foo.get_pref('map_sf') == {}
-        assert Quantity.get_pref('map_sf') == {}
+    assert Foo.get_pref('map_sf') == {}
+    assert Quantity.get_pref('map_sf') == {}
 
-        Foo.set_prefs(map_sf=Foo.map_sf_to_greek)
-        assert t.render() == '1 µs'
-        assert Foo.get_pref('map_sf') == Foo.map_sf_to_greek
-        assert Quantity.get_pref('map_sf') == {}
+    Foo.set_prefs(map_sf=Foo.map_sf_to_greek)
+    assert t.render() == '1 µs'
+    assert Foo.get_pref('map_sf') == Foo.map_sf_to_greek
+    assert Quantity.get_pref('map_sf') == {}
 
-        Foo.set_prefs(map_sf=Quantity.map_sf_to_sci_notation)
-        assert t.render(form='eng') == '1×10⁻⁶ s'
-        assert t.render(form='si') == '1 µs'
-        assert Foo.get_pref('map_sf') == Foo.map_sf_to_sci_notation
-        assert Quantity.get_pref('map_sf') == {}
+    Foo.set_prefs(map_sf=Quantity.map_sf_to_sci_notation)
+    assert t.render(form='eng') == '1×10⁻⁶ s'
+    assert t.render(form='si') == '1 µs'
+    assert Foo.get_pref('map_sf') == Foo.map_sf_to_sci_notation
+    assert Quantity.get_pref('map_sf') == {}
 
     Quantity.set_prefs(label_fmt_full='{V:<18}  # {d}', label_fmt='{n} = {v}', show_desc=True)
     T = Quantity('T = 300K -- ambient temperature', ignore_sf=True)
@@ -331,15 +334,14 @@ def test_misc2():
     processed = Quantity.all_from_si_fmt('1420405751.786_Hz', form='eng')
     assert processed == '1.4204e9 Hz'
 
-    if sys.version_info.major == 3:
-        # spacer is non-breaking space
-        processed = Quantity.all_from_conv_fmt('1420405751.786 Hz', form='si')
-        assert processed == '1.4204 GHz'
+    # spacer is non-breaking space
+    processed = Quantity.all_from_conv_fmt('1420405751.786 Hz', form='si')
+    assert processed == '1.4204 GHz'
 
-        q = Quantity('3.45e6 m·s⁻²')
-        assert q.render() == '3.45 Mm·s⁻²'
-        q = Quantity('accel = 3.45e6 m·s⁻² -- acceleration')
-        assert q.render() == '3.45 Mm·s⁻²'
+    q = Quantity('3.45e6 m·s⁻²')
+    assert q.render() == '3.45 Mm·s⁻²'
+    q = Quantity('accel = 3.45e6 m·s⁻² -- acceleration')
+    assert q.render() == '3.45 Mm·s⁻²'
 
     processed = Quantity.all_from_si_fmt('0s', form='si')
     assert processed == '0 s'
@@ -376,13 +378,12 @@ def test_misc2():
     del Quantity.input_sf
 
     # test map_sf
-    if sys.version_info.major == 3:
-        Quantity.set_prefs(map_sf=Quantity.map_sf_to_greek)
-        assert Quantity('10e-6 m').render() == '10 µm'
-        Quantity.set_prefs(map_sf=Quantity.map_sf_to_sci_notation)
-        assert Quantity('10e-6 m').render() == '10 µm'
-        assert Quantity('10e-6 m').render(form='eng') == '10×10⁻⁶ m'
-        Quantity.set_prefs(map_sf=None)
+    Quantity.set_prefs(map_sf=Quantity.map_sf_to_greek)
+    assert Quantity('10e-6 m').render() == '10 µm'
+    Quantity.set_prefs(map_sf=Quantity.map_sf_to_sci_notation)
+    assert Quantity('10e-6 m').render() == '10 µm'
+    assert Quantity('10e-6 m').render(form='eng') == '10×10⁻⁶ m'
+    Quantity.set_prefs(map_sf=None)
     sf_map = {
         'u': ' PPM',
         'n': ' PPB',
@@ -684,8 +685,7 @@ def test_add():
         prec = 2
         form = 'fixed'
         show_commas = True
-        if sys.version_info.major == 3:
-            minus = Quantity.minus_sign
+        minus = Quantity.minus_sign
         strip_zeros = False
 
     total = Dollars(0)
@@ -693,10 +693,7 @@ def test_add():
     total = total.add(1000000)
     assert str(total) == '$1,000,000.00'
     total = total.add(Quantity('-2MHz'), check_units=False)
-    if sys.version_info.major == 3:
-        assert str(total) == '−$1,000,000.00'
-    else:
-        assert str(total) == '-$1,000,000.00'
+    assert str(total) == '−$1,000,000.00'
     with pytest.raises(IncompatibleUnits) as exception:
         total.add(Quantity('-2MHz'), check_units=True)
     total = total.add(Quantity('$6M'), check_units=True)
@@ -712,10 +709,7 @@ def test_add():
     assert str(total) == '$1,000,000'
     assert total.name == 'total'
     total = total.add(Quantity('-2MHz'), check_units=False)
-    if sys.version_info.major == 3:
-        assert str(total) == '−$1,000,000'
-    else:
-        assert str(total) == '-$1,000,000'
+    assert str(total) == '−$1,000,000'
     assert total.name == 'total'
     with pytest.raises(IncompatibleUnits) as exception:
         total.add(Quantity('-2MHz'), check_units=True)
@@ -851,6 +845,13 @@ def test_negligible():
     got = Quantity.all_from_conv_fmt(given, negligible=1e-12)
     assert got == expected
 
+def test_prefs_defaults():
+    Quantity.set_prefs(spacer='-', map_sf=dict(k='K'))
+    assert Quantity.get_pref('spacer') == '-'
+    assert Quantity.get_pref('map_sf') == dict(k='K')
+    with Quantity.prefs(spacer=None, map_sf=None):
+        assert Quantity.get_pref('spacer') == ' '
+        assert Quantity.get_pref('map_sf') == {}
 
 if __name__ == '__main__':
     # As a debugging aid allow the tests to be run on their own, outside pytest.

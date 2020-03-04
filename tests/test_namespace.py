@@ -1,5 +1,13 @@
 # encoding: utf8
 
+# PyTest naturally loads the QuantiPhy package only once for all test files, but
+# this can cause problems here as any preference set in a previous test file
+# could affect the results for this file.  Explicitly delete the QuantiPhy
+# module if it is currently loaded so we get a fresh start.
+import sys
+for module in [m for m in sys.modules.keys() if m.startswith('quantiphy')]:
+    del sys.modules[module]
+
 from quantiphy import Quantity
 
 def test_namespace():

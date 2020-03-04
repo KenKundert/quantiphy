@@ -85,8 +85,8 @@ You can find the documentation on `ReadTheDocs
 
    pip3 install --user quantiphy
 
-Requires Python3.4 or better.  Python2.7 is also supported, however support for 
-unicode is weak.
+Requires Python3.5 or newer.  If you using an earlier version of Python,
+install version 2.10 of *QuantiPhy*.
 
 You can find the full documentation `here <https://quantiphy.readthedocs.io>`_.
 

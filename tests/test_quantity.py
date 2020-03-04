@@ -1,7 +1,14 @@
 # encoding: utf8
 
-from quantiphy import Quantity
+# PyTest naturally loads the QuantiPhy package only once for all test files, but
+# this can cause problems here as any preference set in a previous test file
+# could affect the results for this file.  Explicitly delete the QuantiPhy
+# module if it is currently loaded so we get a fresh start.
 import sys
+for module in [m for m in sys.modules.keys() if m.startswith('quantiphy')]:
+    del sys.modules[module]
+
+from quantiphy import Quantity
 
 class Case:
     def __init__(self, name, text, raw, formatted, prefs=None):
@@ -10,8 +17,6 @@ class Case:
         self.raw = raw
         self.formatted = formatted
         self.prefs = prefs
-
-py3 = int(sys.version[0]) == 3
 
 test_cases = [
     Case('grange', '0', ('0', ''), '0'),
@@ -34,8 +39,8 @@ test_cases = [
     Case('banker', '1ps', ('1e-12', 's'), '1ps'),
     Case('conquer', '1ns', ('1e-9', 's'), '1ns'),
     Case('share', '1us', ('1e-6', 's'), '1us'),
-    Case('resurface', '1μs', ('1e-6', 's'), '1us') if py3 else None,
-    Case('scallywag', '1µs', ('1e-6', 's'), '1us') if py3 else None,
+    Case('resurface', '1μs', ('1e-6', 's'), '1us'),
+    Case('scallywag', '1µs', ('1e-6', 's'), '1us'),
     Case('witch', '1ms', ('1e-3', 's'), '1ms'),
     Case('engrave', '1cs', ('10e-3', 's'), '10ms'),
     Case('finance', '1_s', ('1', 's'), '1s'),
@@ -179,8 +184,8 @@ test_cases = [
     Case('carpet', '1e-9m/s^2', ('1e-9', 'm/s^2'), '1nm/s^2'),
     Case('intrigue', '1 nm/s^2', ('1e-9', 'm/s^2'), '1nm/s^2'),
     Case('picky', '1e-9 m/s^2', ('1e-9', 'm/s^2'), '1nm/s^2'),
-    Case('piper', '1e-9 √Ω', ('1e-9', '√Ω'), '1n√Ω') if py3 else None,
-    Case('fizzle', '1e-9 m·s⁻²', ('1e-9', 'm·s⁻²'), '1nm·s⁻²') if py3 else None,
+    Case('piper', '1e-9 √Ω', ('1e-9', '√Ω'), '1n√Ω'),
+    Case('fizzle', '1e-9 m·s⁻²', ('1e-9', 'm·s⁻²'), '1nm·s⁻²'),
 
     # test currency
     Case('bishop', '$10K', ('10e3', '$'), '$10k'),
@@ -230,20 +235,20 @@ test_cases = [
     Case('southward', '+NAN', ('NaN', ''), 'NaN'),
     Case('wander', '+NAN Hz', ('NaN', 'Hz'), 'NaN Hz'),
     Case('stack', '+$NAN', ('NaN', '$'), '$NaN'),
-    Case('oratory', '∞', ('inf', ''), 'inf') if py3 else None,
-    Case('bundle', '∞ Hz', ('inf', 'Hz'), 'inf Hz') if py3 else None,
-    Case('argot', '∞Ω', ('inf', 'Ω'), 'inf Ω') if py3 else None,
-    Case('unsay', '$∞', ('inf', '$'), '$inf') if py3 else None,
-    Case('bulldoze', '-∞', ('-inf', ''), '-inf') if py3 else None,
-    Case('salivate', '-∞ Hz', ('-inf', 'Hz'), '-inf Hz') if py3 else None,
-    Case('endanger', '-$∞', ('-inf', '$'), '-$inf') if py3 else None,
-    Case('tweet', '+∞', ('inf', ''), 'inf') if py3 else None,
-    Case('calendar', '+∞ Hz', ('inf', 'Hz'), 'inf Hz') if py3 else None,
-    Case('monogram', '+$∞', ('inf', '$'), '$inf') if py3 else None,
-    Case('lucky', '−100μs', ('-100e-6', 's'), '-100us') if py3 else None,
-    Case('stocking', '＋100μs', ('100e-6', 's'), '100us') if py3 else None,
-    Case('scrap', '−$100M', ('-100e6', '$'), '-$100M') if py3 else None,
-    Case('companion', '＋$100M', ('100e6', '$'), '$100M') if py3 else None,
+    Case('oratory', '∞', ('inf', ''), 'inf'),
+    Case('bundle', '∞ Hz', ('inf', 'Hz'), 'inf Hz'),
+    Case('argot', '∞Ω', ('inf', 'Ω'), 'inf Ω'),
+    Case('unsay', '$∞', ('inf', '$'), '$inf'),
+    Case('bulldoze', '-∞', ('-inf', ''), '-inf'),
+    Case('salivate', '-∞ Hz', ('-inf', 'Hz'), '-inf Hz'),
+    Case('endanger', '-$∞', ('-inf', '$'), '-$inf'),
+    Case('tweet', '+∞', ('inf', ''), 'inf'),
+    Case('calendar', '+∞ Hz', ('inf', 'Hz'), 'inf Hz'),
+    Case('monogram', '+$∞', ('inf', '$'), '$inf'),
+    Case('lucky', '−100μs', ('-100e-6', 's'), '-100us'),
+    Case('stocking', '＋100μs', ('100e-6', 's'), '100us'),
+    Case('scrap', '−$100M', ('-100e6', '$'), '-$100M'),
+    Case('companion', '＋$100M', ('100e6', '$'), '$100M'),
 
     # test full precision
     Case('cauldron', '1420.405751786 MHz', ('1.420405751786e9', 'Hz'), '1.420405751786GHz', {'prec':'full'}),

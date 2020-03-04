@@ -1,5 +1,13 @@
 # encoding: utf8
 
+# PyTest naturally loads the QuantiPhy package only once for all test files, but
+# this can cause problems here as any preference set in a previous test file
+# could affect the results for this file.  Explicitly delete the QuantiPhy
+# module if it is currently loaded so we get a fresh start.
+import sys
+for module in [m for m in sys.modules.keys() if m.startswith('quantiphy')]:
+    del sys.modules[module]
+
 from quantiphy import (
     Quantity, UnitConversion,
     QuantiPhyError, IncompatibleUnits, UnknownPreference, UnknownConversion,
@@ -7,7 +15,6 @@ from quantiphy import (
     InvalidNumber, ExpectedQuantity, MissingName,
 )
 import math
-import sys
 import pytest
 
 def test_simple_scaling():
@@ -65,16 +72,15 @@ def test_temperature():
         spacer=None, show_label=None, label_fmt=None, label_fmt_full=None,
         ignore_sf=True
     ):
-        if sys.version_info.major == 3:
-            q=Quantity('100 °C')
-            assert q.render() == '100 °C'
-            assert q.render(scale='C') == '100 C'
-            assert q.render(scale='°C') == '100 °C'
-            assert q.render(scale='K') == '373.15 K'
-            assert q.render(scale='°F') == '212 °F'
-            assert q.render(scale='F') == '212 F'
-            assert q.render(scale='°R') == '671.67 °R'
-            assert q.render(scale='R') == '671.67 R'
+        q=Quantity('100 °C')
+        assert q.render() == '100 °C'
+        assert q.render(scale='C') == '100 C'
+        assert q.render(scale='°C') == '100 °C'
+        assert q.render(scale='K') == '373.15 K'
+        assert q.render(scale='°F') == '212 °F'
+        assert q.render(scale='F') == '212 F'
+        assert q.render(scale='°R') == '671.67 °R'
+        assert q.render(scale='R') == '671.67 R'
 
         q=Quantity('100 C')
         assert q.render() == '100 C'
@@ -82,10 +88,9 @@ def test_temperature():
         assert q.render(scale='K') == '373.15 K'
         assert q.render(scale='F') == '212 F'
         assert q.render(scale='R') == '671.67 R'
-        if sys.version_info.major == 3:
-            assert q.render(scale='°C') == '100 °C'
-            assert q.render(scale='°F') == '212 °F'
-            assert q.render(scale='°R') == '671.67 °R'
+        assert q.render(scale='°C') == '100 °C'
+        assert q.render(scale='°F') == '212 °F'
+        assert q.render(scale='°R') == '671.67 °R'
 
         q=Quantity('373.15 K')
         assert q.render() == '373.15 K'
@@ -93,48 +98,44 @@ def test_temperature():
         assert q.render(scale='K') == '373.15 K'
         assert q.render(scale='F') == '212 F'
         assert q.render(scale='R') == '671.67 R'
-        if sys.version_info.major == 3:
-            assert q.render(scale='°C') == '100 °C'
-            assert q.render(scale='°F') == '212 °F'
-            assert q.render(scale='°R') == '671.67 °R'
+        assert q.render(scale='°C') == '100 °C'
+        assert q.render(scale='°F') == '212 °F'
+        assert q.render(scale='°R') == '671.67 °R'
 
-        if sys.version_info.major == 3:
-            q=Quantity('212 °F')
-            assert q.render() == '212 °F'
-            assert q.render(scale='°C') == '100 °C'
-            assert q.render(scale='C') == '100 C'
-            assert q.render(scale='K') == '373.15 K'
-            #assert q.render(scale='°F') == '212 °F'
-            #assert q.render(scale='F') == '212 F'
-            #assert q.render(scale='°R') == '671.67 °R'
-            #assert q.render(scale='R') == '671.67 R'
+        q=Quantity('212 °F')
+        assert q.render() == '212 °F'
+        assert q.render(scale='°C') == '100 °C'
+        assert q.render(scale='C') == '100 C'
+        assert q.render(scale='K') == '373.15 K'
+        assert q.render(scale='°F') == '212 °F'
+        assert q.render(scale='F') == '212 F'
+        #assert q.render(scale='°R') == '671.67 °R'
+        #assert q.render(scale='R') == '671.67 R'
 
         q=Quantity('212 F')
         assert q.render() == '212 F'
         assert q.render(scale='C') == '100 C'
         assert q.render(scale='K') == '373.15 K'
-        if sys.version_info.major == 3:
-            assert q.render(scale='°C') == '100 °C'
-            #assert q.render(scale='°F') == '212 °F'
-            #assert q.render(scale='F') == '212 F'
-            #assert q.render(scale='°R') == '671.67 °R'
-            #assert q.render(scale='R') == '671.67 R'
+        assert q.render(scale='°C') == '100 °C'
+        assert q.render(scale='°F') == '212 °F'
+        assert q.render(scale='F') == '212 F'
+        #assert q.render(scale='°R') == '671.67 °R'
+        #assert q.render(scale='R') == '671.67 R'
 
-        if sys.version_info.major == 3:
-            q=Quantity('100 °C', scale='K')
-            assert q.render() == '373.15 K'
+        q=Quantity('100 °C', scale='K')
+        assert q.render() == '373.15 K'
 
-            q=Quantity('212 °F', scale='K')
-            assert q.render() == '373.15 K'
+        q=Quantity('212 °F', scale='K')
+        assert q.render() == '373.15 K'
 
-            q=Quantity('212 °F', scale='C')
-            assert q.render() == '100 C'
+        q=Quantity('212 °F', scale='C')
+        assert q.render() == '100 C'
 
-            q=Quantity('212 F', scale='°C')
-            assert q.render() == '100 °C'
+        q=Quantity('212 F', scale='°C')
+        assert q.render() == '100 °C'
 
-            q=Quantity('491.67 R', scale='°C')
-            assert q.is_close(Quantity('0 °C'))
+        q=Quantity('491.67 R', scale='°C')
+        assert q.is_close(Quantity('0 °C'))
 
         q=Quantity('491.67 R', scale='K')
         assert q.render() == '273.15 K'
@@ -151,8 +152,7 @@ def test_distance():
         assert q.render(scale='um', form='eng') == '1e6 um'
         assert q.render(scale='μm', form='eng') == '1e6 μm'
         assert q.render(scale='nm', form='eng') == '1e9 nm'
-        if sys.version_info.major == 3:
-            assert q.render(scale='Å', form='eng') == '10e9 Å'
+        assert q.render(scale='Å', form='eng') == '10e9 Å'
         assert q.render(scale='angstrom', form='eng') == '10e9 angstrom'
         assert q.render(scale='mi') == '621.37 umi'
         assert q.render(scale='mile') == '621.37 umile'
@@ -182,12 +182,11 @@ def test_distance():
         q=Quantity('1um', scale='m')
         assert q.render() == '1 um'
 
-        if sys.version_info.major == 3:
-            q=Quantity('1000000μm', scale='m')
-            assert q.render() == '1 m'
+        q=Quantity('1000000μm', scale='m')
+        assert q.render() == '1 m'
 
-            q=Quantity('1μm', scale='m')
-            assert q.render() == '1 um'
+        q=Quantity('1μm', scale='m')
+        assert q.render() == '1 um'
 
         q=Quantity('1000000000nm', scale='m')
         assert q.render() == '1 m'
@@ -195,12 +194,11 @@ def test_distance():
         q=Quantity('1nm', scale='m')
         assert q.render() == '1 nm'
 
-        if sys.version_info.major == 3:
-            q=Quantity('10000000000Å', scale='m')
-            assert q.render() == '1 m'
+        q=Quantity('10000000000Å', scale='m')
+        assert q.render() == '1 m'
 
-            q=Quantity('1Å', scale='m')
-            assert q.render() == '100 pm'
+        q=Quantity('1Å', scale='m')
+        assert q.render() == '100 pm'
 
         q=Quantity('1_mi', scale='m')
         assert q.render() == '1.6093 km'

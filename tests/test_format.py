@@ -1,8 +1,15 @@
 # encoding: utf8
 
+# PyTest naturally loads the QuantiPhy package only once for all test files, but
+# this can cause problems here as any preference set in a previous test file
+# could affect the results for this file.  Explicitly delete the QuantiPhy
+# module if it is currently loaded so we get a fresh start.
+import sys
+for module in [m for m in sys.modules.keys() if m.startswith('quantiphy')]:
+    del sys.modules[module]
+
 from quantiphy import Quantity, QuantiPhyError, IncompatiblePreferences
 import pytest
-import sys
 
 def test_format():
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None, show_desc=False)
@@ -195,35 +202,34 @@ def test_exceptional():
 def test_scaled_format():
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None, show_desc=False)
     Quantity.set_prefs(prec=None)
-    if sys.version_info.major == 3:
-        q=Quantity('Tboil = 100 °C -- boiling point of water')
-        assert '{}'.format(q) == '100 °C'
-        assert '{:.8}'.format(q) == '100 °C'
-        assert '{:.8s°F}'.format(q) == '212 °F'
-        assert '{:.8S°F}'.format(q) == 'Tboil = 212 °F'
-        assert '{:.8q°F}'.format(q) == '212 °F'
-        assert '{:.8Q°F}'.format(q) == 'Tboil = 212 °F'
-        assert '{:r°F}'.format(q) == '212'
-        assert '{:R°F}'.format(q) == 'Tboil = 212'
-        assert '{:u°F}'.format(q) == '°F'
-        assert '{:f°F}'.format(q) == '212'
-        assert '{:F°F}'.format(q) == 'Tboil = 212'
-        assert '{:e°F}'.format(q) == '2.12e+02'
-        assert '{:E°F}'.format(q) == 'Tboil = 2.12e+02'
-        assert '{:g°F}'.format(q) == '212'
-        assert '{:G°F}'.format(q) == 'Tboil = 212'
-        assert '{:n°F}'.format(q) == 'Tboil'
-        assert '{:d°F}'.format(q) == 'boiling point of water'
-        assert '{!r}'.format(q) == "Quantity('100 °C')"
-        assert '{:.8s°C}'.format(q) == '100 °C'
-        assert '{:p°F}'.format(q) == '212 °F'
-        assert '{:,.2p°F}'.format(q) == '212 °F'
-        assert '{:P°F}'.format(q) == 'Tboil = 212 °F'
-        assert '{:,.2P°F}'.format(q) == 'Tboil = 212 °F'
-        assert '{:#p°F}'.format(q) == '212.0000 °F'
-        assert '{:#,.2p°F}'.format(q) == '212.00 °F'
-        assert '{:#P°F}'.format(q) == 'Tboil = 212.0000 °F'
-        assert '{:#,.2P°F}'.format(q) == 'Tboil = 212.00 °F'
+    q=Quantity('Tboil = 100 °C -- boiling point of water')
+    assert '{}'.format(q) == '100 °C'
+    assert '{:.8}'.format(q) == '100 °C'
+    assert '{:.8s°F}'.format(q) == '212 °F'
+    assert '{:.8S°F}'.format(q) == 'Tboil = 212 °F'
+    assert '{:.8q°F}'.format(q) == '212 °F'
+    assert '{:.8Q°F}'.format(q) == 'Tboil = 212 °F'
+    assert '{:r°F}'.format(q) == '212'
+    assert '{:R°F}'.format(q) == 'Tboil = 212'
+    assert '{:u°F}'.format(q) == '°F'
+    assert '{:f°F}'.format(q) == '212'
+    assert '{:F°F}'.format(q) == 'Tboil = 212'
+    assert '{:e°F}'.format(q) == '2.12e+02'
+    assert '{:E°F}'.format(q) == 'Tboil = 2.12e+02'
+    assert '{:g°F}'.format(q) == '212'
+    assert '{:G°F}'.format(q) == 'Tboil = 212'
+    assert '{:n°F}'.format(q) == 'Tboil'
+    assert '{:d°F}'.format(q) == 'boiling point of water'
+    assert '{!r}'.format(q) == "Quantity('100 °C')"
+    assert '{:.8s°C}'.format(q) == '100 °C'
+    assert '{:p°F}'.format(q) == '212 °F'
+    assert '{:,.2p°F}'.format(q) == '212 °F'
+    assert '{:P°F}'.format(q) == 'Tboil = 212 °F'
+    assert '{:,.2P°F}'.format(q) == 'Tboil = 212 °F'
+    assert '{:#p°F}'.format(q) == '212.0000 °F'
+    assert '{:#,.2p°F}'.format(q) == '212.00 °F'
+    assert '{:#P°F}'.format(q) == 'Tboil = 212.0000 °F'
+    assert '{:#,.2P°F}'.format(q) == 'Tboil = 212.00 °F'
 
 def test_number_fmt():
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None, show_desc=False)
@@ -678,8 +684,6 @@ def test_radix_comma_output():
         assert '{:,.2P}'.format(q) == 'c = 299.792.458 m/s'
 
 def test_plus_minus():
-    if sys.version_info.major <= 3:
-        return
     with Quantity.prefs(
         spacer = None,
         show_label = None,

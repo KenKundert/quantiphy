@@ -22,7 +22,7 @@ Documentation can be found at https://quantiphy.readthedocs.io.
 """
 
 # License {{{1
-# Copyright (C) 2016-2020 Kenneth S. Kundert #
+# Copyright (C) 2016-2020 Kenneth S. Kundert
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -1268,7 +1268,10 @@ class Quantity(float):
                 except KeyError:
                     # This occurs if pref is not set in first member of chain
                     # could pass, explicitly set to default, or raise
-                    pass
+                    # pass does not work with context managers, ends up being a
+                    # no-op. raise also does not work with context managers, as
+                    # the user can do nothing to avoid the exception.
+                    cls._preferences[k] = DEFAULTS[k]
             else:
                 cls._preferences[k] = v
         if 'input_sf' in kwargs:
@@ -2556,15 +2559,9 @@ class Quantity(float):
                     return False
         reltol = self.reltol if reltol is None else reltol
         abstol = self.abstol if abstol is None else abstol
-        try:
-            return math.isclose(
-                self.real, float(other), rel_tol=reltol, abs_tol=abstol
-            )
-        except AttributeError:  # pragma: no cover
-            # used by python3.4 and earlier
-            delta = abs(self.real-float(other))
-            reference = max(abs(self.real), abs(float(other)))
-            return delta <= max(reltol * reference, abstol)
+        return math.isclose(
+            self.real, float(other), rel_tol=reltol, abs_tol=abstol
+        )
 
     # __str__() {{{2
     def __str__(self):
@@ -2862,25 +2859,23 @@ class Quantity(float):
         return quantities
 
     # map_sf_to_sci_notation() {{{2
-    # The explicit references to unicode here are for backward compatibility
-    # with python2. It can be removed when python2 support is dropped.
     _SCI_NOTATION_MAPPER = {
-        ord(u'e'): u'×10',
-        ord(u'+'): u'',
-        ord(u'＋'): u'',
-        ord(u'-'): u'⁻',
-        ord(u'−'): u'⁻',
-        ord(u'0'): u'⁰',
-        ord(u'1'): u'¹',
-        ord(u'2'): u'²',
-        ord(u'3'): u'³',
-        ord(u'4'): u'⁴',
-        ord(u'5'): u'⁵',
-        ord(u'6'): u'⁶',
-        ord(u'7'): u'⁷',
-        ord(u'8'): u'⁸',
-        ord(u'9'): u'⁹',
-        ord(u'u'): u'µ',
+        ord('e'): '×10',
+        ord('+'): '',
+        ord('＋'): '',
+        ord('-'): '⁻',
+        ord('−'): '⁻',
+        ord('0'): '⁰',
+        ord('1'): '¹',
+        ord('2'): '²',
+        ord('3'): '³',
+        ord('4'): '⁴',
+        ord('5'): '⁵',
+        ord('6'): '⁶',
+        ord('7'): '⁷',
+        ord('8'): '⁸',
+        ord('9'): '⁹',
+        ord('u'): 'µ',
     }
 
     @staticmethod
@@ -2907,7 +2902,7 @@ class Quantity(float):
 
         """
         mapped = sf.translate(Quantity._SCI_NOTATION_MAPPER)
-        return mapped, u'×' in mapped
+        return mapped, '×' in mapped
 
     # map_sf_to_greek() {{{2
     @staticmethod
