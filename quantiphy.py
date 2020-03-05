@@ -49,6 +49,7 @@ from collections import ChainMap
 def _named_regex(name, regex):
     return '(?P<%s>%s)' % (name, regex)
 
+
 # _scale {{{2
 def _scale(scale, number, units):
     if isinstance(scale, str):
@@ -106,7 +107,7 @@ class QuantiPhyError(Exception):
                 if msg == t and self.args:
                     break
                 return msg
-            except (IndexError, KeyError) as e:
+            except (IndexError, KeyError):
                 continue
         else:
             raise ValueError('No valid template found.')
@@ -214,6 +215,8 @@ class IncompatiblePreferences(QuantiPhyError, ValueError):
 
 # Unit Conversions {{{1
 _unit_conversions = {}
+
+
 def _convert_units(to_units, from_units, value):
     if to_units == from_units:
         return value
@@ -689,16 +692,16 @@ BINARY_MAPPINGS = {
     'Gi': 1024*1024*1024,
     'Mi': 1024*1024,
     'Ki': 1024,
-    '_' : 1,
+    '_': 1,
 }
 
 # These mappings are only used when writing numbers
 BIG_SCALE_FACTORS = 'kMGTPEZY'
-    # These must be given in order, one for every three decades.
-    # Use k rather than K, because K looks like a temperature when used alone.
+# These must be given in order, one for every three decades.
+# Use k rather than K, because K looks like a temperature when used alone.
 
 SMALL_SCALE_FACTORS = 'munpfazy'
-    # These must be given in order, one for every three decades.
+# These must be given in order, one for every three decades.
 
 # Supported currency symbols (these go on left side of number)
 CURRENCY_SYMBOLS = '$€¥£₩₺₽₹ɃΞȄ' if sys.version_info.major == 3 else '$'
@@ -723,9 +726,9 @@ FORMAT_SPEC = re.compile(r'''\A
 
 # Defaults {{{1
 DEFAULTS = dict(
-    abstol = 1e-12,
-    accept_binary = False,
-    assign_rec = r'''
+    abstol=1e-12,
+    accept_binary=False,
+    assign_rec=r'''
         \A((
             (\#|--|//).*                             # simple comment
         )|(
@@ -738,35 +741,35 @@ DEFAULTS = dict(
             (\s*(\#|--|//)\s*(?P<desc>.*?))?         # description: (--|//|#) .*
         ))\Z
     ''',
-    comma = ',',
-    form = 'si',
-    full_prec = 12,
-    ignore_sf = False,
-    inf = 'inf',
-    input_sf = ''.join(MAPPINGS.keys()),
-    keep_components = True,
-    known_units = [],
-    label_fmt = '{n} = {v}',
-    label_fmt_full = '{n} = {v} -- {d}',
-    map_sf = {},
-    minus = '-',
-    nan = 'NaN',
-    negligible = False,
-    number_fmt = None,
-    output_sf = 'TGMkmunpfa',
-    plus = '+',
-    prec = 4,
-    radix = '.',
-    reltol = 1e-6,
-    show_commas = False,
-    show_desc = False,
-    show_label = False,
-    show_units = True,
-    spacer = ' ',
-    strip_radix = True,
-    strip_zeros = True,
-    tight_units = ''' % ° ' " ′ ″ '''.split(),
-    unity_sf = '',
+    comma=',',
+    form='si',
+    full_prec=12,
+    ignore_sf=False,
+    inf='inf',
+    input_sf=''.join(MAPPINGS.keys()),
+    keep_components=True,
+    known_units=[],
+    label_fmt='{n} = {v}',
+    label_fmt_full='{n} = {v} -- {d}',
+    map_sf={},
+    minus='-',
+    nan='NaN',
+    negligible=False,
+    number_fmt=None,
+    output_sf='TGMkmunpfa',
+    plus='+',
+    prec=4,
+    radix='.',
+    reltol=1e-6,
+    show_commas=False,
+    show_desc=False,
+    show_label=False,
+    show_units=True,
+    spacer=' ',
+    strip_radix=True,
+    strip_zeros=True,
+    tight_units=''' % ° ' " ′ ″ '''.split(),
+    unity_sf='',
 )
 
 # These constants are available to expressions in extract strings.
@@ -891,12 +894,12 @@ class Quantity(float):
     units = ''
     name = ''
     desc = ''
-        # These are used as the default values for these three attributes.
-        # Putting them here means that the instances do not need to contain
-        # these values if not specified, but yet they can always be accessed.
+    # These are used as the default values for these three attributes.
+    # Putting them here means that the instances do not need to contain
+    # these values if not specified, but yet they can always be accessed.
     _provisioned_input_sf = None
-        # This must be initialized to None.
-        # It is set the first time Quantity is instantiated.
+    # This must be initialized to None.
+    # It is set the first time Quantity is instantiated.
 
     # these are constants that might be useful to the user
     non_breaking_space = ' '
@@ -919,14 +922,14 @@ class Quantity(float):
             prefs = DEFAULTS
         else:
             parent = cls.__mro__[1]
-                # for some reason I cannot get super to work right
+            # for some reason I cannot get super to work right
             prefs = parent._preferences
         # copy dict so any changes made to parent's preferences do not affect us
         prefs = dict(prefs)
         cls._preferences = ChainMap({}, prefs)
-            # use chain to support use of contexts
-            # put empty map in as first so user never accidentally deletes or
-            # changes one of the initial preferences
+        # use chain to support use of contexts
+        # put empty map in as first so user never accidentally deletes or
+        # changes one of the initial preferences
 
     # set preferences {{{3
     @classmethod
@@ -1407,7 +1410,6 @@ class Quantity(float):
             return c
         return ''.join((map(replace_char, mantissa)))
 
-
     # _combine {{{2
     def _combine(self, mantissa, sf, units, spacer, sf_is_exp=False):
         if units in self.tight_units:
@@ -1460,9 +1462,11 @@ class Quantity(float):
                 raise UnknownScaleFactor(*sorted(unknown_sf))
         cls._provisioned_input_sf = input_sf
 
+        def fix_sign(x):
+            return x.replace('−', '-').replace('＋', '+')
+
         # components {{{3
         sign = _named_regex('sign', '[-+−＋]?')
-        fix_sign = lambda x: x.replace('−', '-').replace('＋', '+')
         space = r'[\s ]'  # the space in this regex is a non-breaking space
         required_digits = r'(?:[0-9][0-9_]*[0-9]|[0-9]+)'  # allow interior underscores
         optional_digits = r'(?:[0-9][0-9_]*[0-9]|[0-9]*)'
@@ -1625,16 +1629,16 @@ class Quantity(float):
 
         # numbers embedded in text {{{3
         smpl_units = '[a-zA-Z_{us}]*'.format(us=UNIT_SYMBOLS)
-            # may only contain alphabetic characters, ex: V, A, _Ohms, etc.
-            # or obvious unicode units, ex: °ÅΩ℧
+        # may only contain alphabetic characters, ex: V, A, _Ohms, etc.
+        # or obvious unicode units, ex: °ÅΩ℧
         sf_or_units = '[a-zA-Z_µ{us}]+'.format(us=UNIT_SYMBOLS)
-            # must match units or scale factors: add µ, make non-optional
+        # must match units or scale factors: add µ, make non-optional
         space = '[ ]?'  # optional non-breaking space (do not use a normal space)
         left_delimit = r'(?:\A|(?<=[^-−a-zA-Z0-9_.]))'
         right_delimit = r'(?=[^-+0-9]|\Z)'
-            # right_delim excludes [-+0-9] to avoid matches with 1e2, 1e-2, 1e+2
-            # this is not great because it seems like it should fail for
-            # 10uA+20uA, but it does not and I don't know why.
+        # right_delim excludes [-+0-9] to avoid matches with 1e2, 1e-2, 1e+2
+        # this is not great because it seems like it should fail for
+        # 10uA+20uA, but it does not and I don't know why.
         cls.embedded_si_notation = re.compile(
             '{left_delimit}{sign}{mantissa}{space}{sf_or_units}{right_delimit}'.format(
                 **locals()
@@ -1844,7 +1848,6 @@ class Quantity(float):
         sign, nan, _ = value.lower().partition('nan')
         if nan == 'nan':
             return sign + self.nan
-
 
     # as_tuple() {{{2
     def as_tuple(self):
@@ -2184,7 +2187,7 @@ class Quantity(float):
                         sf = SMALL_SCALE_FACTORS[index-1]
         else:
             assert form in ['eng', False], '{}: unknown form.'.format(form)
-                # False is included for backward compatibility
+            # False is included for backward compatibility
 
         # render the scale factor if appropriate
         if self.map_sf:
@@ -2696,7 +2699,7 @@ class Quantity(float):
                 value = self._map_leading_sign(value)
                 value = self._map_sign(value)
                 width = width.lstrip('0')
-                    # format function treats 0 as a padding rather than a width
+                # format function treats 0 as a padding rather than a width
                 if self.strip_zeros:
                     if 'e' in value:
                         mantissa, exponent = value.split('e')
