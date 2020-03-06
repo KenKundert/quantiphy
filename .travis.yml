@@ -1,4 +1,5 @@
 language: python
+
 matrix:
   include:
     - python: 3.5
@@ -12,10 +13,12 @@ matrix:
     - python: nightly
       dist: xenial
       sudo: true
+
 install:
-  - pip install .
-  - pip install coveralls
+  - pip install virtualenv tox coveralls
+
 script:
-  - coverage run setup.py pytest
+  - tox
+
 after_success:
   - coveralls
