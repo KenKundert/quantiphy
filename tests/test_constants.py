@@ -51,7 +51,7 @@ def test_constants():
     assert '{:S}'.format(Quantity('k')) == "k = 13.806e-24 J/K -- Boltzmann's constant"
     assert '{:S}'.format(Quantity('q')) == 'q = 160.22e-21 C -- elementary charge'
     assert '{:S}'.format(Quantity('c')) == 'c = 299.79 Mm/s -- speed of light'
-    assert '{:S}'.format(Quantity('0C')) == '0°C = 273.15 K -- zero degrees Celsius in Kelvin'
+    assert '{:S}'.format(Quantity('0C')) == '0°C = 273.15 K -- zero degrees Celsius'
     assert '{:S}'.format(Quantity('eps0')) == 'ε₀ = 8.8542 pF/m -- permittivity of free space'
     assert '{:S}'.format(Quantity('mu0')) == 'µ₀ = 1.2566 uH/m -- permeability of free space'
     assert '{:S}'.format(Quantity('µ₀')) == 'µ₀ = 1.2566 uH/m -- permeability of free space'  # uses micro
@@ -105,7 +105,7 @@ def test_constants():
     assert '{:S}'.format(Quantity('k')) == "k = 138.06 aerg/K -- Boltzmann's constant"
     assert '{:S}'.format(Quantity('q')) == 'q = 480.32 pFr -- elementary charge'
     assert '{:S}'.format(Quantity('c')) == 'c = 299.79 Mm/s -- speed of light'
-    assert '{:S}'.format(Quantity('0C')) == '0°C = 273.15 K -- zero degrees Celsius in Kelvin'
+    assert '{:S}'.format(Quantity('0C')) == '0°C = 273.15 K -- zero degrees Celsius'
 
     set_unit_system('mks')
     assert '{:.12q}'.format(Quantity('h')) == '662.607004e-36 J-s'
@@ -140,7 +140,7 @@ def test_constants():
     assert '{:S}'.format(Quantity('k')) == "k = 13.806e-24 J/K -- Boltzmann's constant"
     assert '{:S}'.format(Quantity('q')) == 'q = 160.22e-21 C -- elementary charge'
     assert '{:S}'.format(Quantity('c')) == 'c = 299.79 Mm/s -- speed of light'
-    assert '{:S}'.format(Quantity('0C')) == '0°C = 273.15 K -- zero degrees Celsius in Kelvin'
+    assert '{:S}'.format(Quantity('0C')) == '0°C = 273.15 K -- zero degrees Celsius'
     assert '{:S}'.format(Quantity('eps0')) == 'ε₀ = 8.8542 pF/m -- permittivity of free space'
     assert '{:S}'.format(Quantity('mu0')) == 'µ₀ = 1.2566 uH/m -- permeability of free space'
     assert '{:S}'.format(Quantity('µ₀')) == 'µ₀ = 1.2566 uH/m -- permeability of free space'  # uses micro

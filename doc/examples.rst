@@ -422,19 +422,19 @@ also replaced by their Unicode forms.
     Plank's constant is 662.61×10⁻³⁶ J-s.  Reduced plank's constant is
     105.46×10⁻³⁶ J-s.  Boltzmann's constant is 13.806×10⁻²⁴ J/K.
     Elementary charge is 160.22×10⁻²¹ C.  Speed of light is 299.79 Mm/s.
-    Zero degrees celsius in kelvin is 273.15 K.  Permittivity of free
-    space is 8.8542 pF/m.  Permeability of free space is 1.2566 µH/m.
-    Absolute zero is −273.15 °C.
+    Zero degrees celsius is 273.15 K.  Permittivity of free space is
+    8.8542 pF/m.  Permeability of free space is 1.2566 µH/m.  Absolute
+    zero is −273.15 °C.
 
 When rendered in your browser with a variable width font, the result looks like 
 this:
 
-    Plank's constant is 662.61×10⁻³⁶ J-s.  Reduced plank's constant is
-    105.46×10⁻³⁶ J-s.  Boltzmann's constant is 13.806×10⁻²⁴ J/K.
-    Elementary charge is 160.22×10⁻²¹ C.  Speed of light is 299.79 Mm/s.
-    Zero degrees Celsius in Kelvin is 273.15 K.  Permittivity of free
-    space is 8.8542 pF/m.  Permeability of free space is 1.2566 µH/m.
-
+    Plank's constant is 662.61×10⁻³⁶ J-s.  Reduced plank's constant is
+    105.46×10⁻³⁶ J-s.  Boltzmann's constant is 13.806×10⁻²⁴ J/K.
+    Elementary charge is 160.22×10⁻²¹ C.  Speed of light is 299.79 Mm/s.
+    Zero degrees celsius is 273.15 K.  Permittivity of free space is
+    8.8542 pF/m.  Permeability of free space is 1.2566 µH/m.  Absolute
+    zero is −273.15 °C.
 
 .. timeit example {{{1
 .. _timeit example:

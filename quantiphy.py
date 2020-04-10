@@ -3121,7 +3121,7 @@ add_constant(
         '273.15',
         units='K',
         name='0°C',
-        desc="zero degrees Celsius in Kelvin"
+        desc="zero degrees Celsius"
     ),
     alias='0C',
     unit_systems='mks cgs'
