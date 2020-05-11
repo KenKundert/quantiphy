@@ -7,14 +7,18 @@ Quantities
 ==========
 
 .. autoclass:: quantiphy.Quantity
-    :members:
+   :members:
+
+   .. autoclasstoc::
 
 
 Unit Conversion
 ===============
 
 .. autoclass:: quantiphy.UnitConversion
-    :members:
+   :members:
+
+   .. autoclasstoc::
 
 
 Constants and Unit Systems

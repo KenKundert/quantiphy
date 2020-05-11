@@ -26,12 +26,14 @@ import sys, os
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = '''
+    autoclasstoc
     sphinx.ext.autodoc
     sphinx.ext.coverage
     sphinx.ext.doctest
     sphinx.ext.napoleon
     sphinx.ext.todo
     sphinx.ext.viewcode
+    sphinx.ext.autosummary
 '''.split()
 
 # Add any paths that contain templates here, relative to this directory.
@@ -256,4 +258,22 @@ def setup(app):
     import os
     if os.path.exists('.static/css/custom.css'):
         app.add_stylesheet('css/custom.css')
+
+
+autodoc_default_options = {
+    'members': True,
+    #'special-members': True,
+    #'private-members': True,
+    #'inherited-members': True,
+    #'undoc-members': True,
+    #'exclude-members': '__weakref__',
+}
+autoclasstoc_sections = ['public-methods']
+
+from autoclasstoc import PublicMethods
+
+class DocumentedPublicMethods(PublicMethods):
+    def predicate(self, name, attr):
+        return super().predicate(name, attr) and attr.__doc__
+
 
