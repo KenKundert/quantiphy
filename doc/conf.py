@@ -260,14 +260,14 @@ def setup(app):
         app.add_stylesheet('css/custom.css')
 
 
-autodoc_default_options = {
-    'members': True,
-    #'special-members': True,
-    #'private-members': True,
-    #'inherited-members': True,
-    #'undoc-members': True,
-    #'exclude-members': '__weakref__',
-}
+#autodoc_default_options = {
+#    'members': True,
+#    #'special-members': True,
+#    #'private-members': True,
+#    #'inherited-members': True,
+#    #'undoc-members': True,
+#    #'exclude-members': '__weakref__',
+#}
 autoclasstoc_sections = ['public-methods']
 
 from autoclasstoc import PublicMethods
