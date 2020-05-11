@@ -18,6 +18,7 @@ Unit Conversion
 .. autoclass:: quantiphy.UnitConversion
    :members:
 
+.. ignore the following (there is only one method, so no need for TOC)
    .. autoclasstoc::
 
 
@@ -33,6 +34,9 @@ Exceptions
 
 .. autoexception:: quantiphy.QuantiPhyError
     :members:
+
+.. ignore the following (there is only one method, so no need for TOC)
+   .. autoclasstoc::
 
 .. autoexception:: quantiphy.ExpectedQuantity
 .. autoexception:: quantiphy.IncompatiblePreferences
