@@ -223,7 +223,7 @@ def _convert_units(to_units, from_units, value):
         raise UnknownConversion(to_units, from_units)
 
 
-class UnitConversion(object):
+class UnitConversion:
     """
     Creates a unit converter.
 
@@ -706,7 +706,7 @@ CURRENCY_SYMBOLS = '$€¥£₩₺₽₹ɃΞȄ' if sys.version_info.major == 3 e
 # Unit symbols that are not simple letters.
 # Do not include % as it will be picked up when converting text to numbers,
 # which is generally not desired (you would end up converting 0.001% to 1m%).
-UNIT_SYMBOLS = '°ÅΩ℧'
+UNIT_SYMBOLS = '°ÅΩƱΩ℧'
 
 # Regular expression for recognizing and decomposing string .format method codes
 FORMAT_SPEC = re.compile(r'''\A
@@ -1935,7 +1935,7 @@ class Quantity(float):
             'strict'.
         :type check_units: boolean or 'strict'
 
-        :raises IncompatibleUnits(QuantiPhyError,TypeError):
+        :raises IncompatibleUnits(QuantiPhyError, TypeError):
             Units of contribution do not match those of underlying quantity.
 
         Example::
@@ -2176,7 +2176,7 @@ class Quantity(float):
                 sf = self.unity_sf
             else:
                 sf = ''
-        elif form in ['si', True]:  # True is included for backward compatibility
+        elif form in ['si', 'sia', True]:  # True is included for backward compatibility
             if index > 0:
                 if index <= len(BIG_SCALE_FACTORS):
                     if BIG_SCALE_FACTORS[index-1] in self.output_sf:
@@ -2191,7 +2191,7 @@ class Quantity(float):
                 # False is included for backward compatibility
 
         # render the scale factor if appropriate
-        if self.map_sf:
+        if self.map_sf and form != 'sia':
             try:
                 sf = self.map_sf.get(sf, sf)
             except AttributeError:

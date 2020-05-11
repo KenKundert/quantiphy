@@ -6,6 +6,7 @@ Releases
     | Released: 2020-03-04
 
     - Dropping support for all versions of Python older than 3.5.
+    - Added 'sia' form.
 
 **2.10 (2020-03-2)**:
     - Added *negligible*, *tight_units*, *nan*, and *inf* preferences.

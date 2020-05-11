@@ -239,6 +239,12 @@ When given as a string, the number may use any of the following scale factors
     |   z (10\ :sup:`-21`) zepto
     |   y (10\ :sup:`-24`) yocto
 
+In addition, the units must start with a letter or any of these characters: 
+``%√°ÅΩƱ``, and may be followed by those characters or digits or any of these 
+characters: ``-^/()·⁻⁰¹²³⁴⁵⁶⁷⁸⁹``.  Thus, any of the following would be accepted 
+as units: ``Ohms``, ``V/A``, ``J-s``, ``m/s^2``, ``H/(m-s)``, ``Ω``, ``%``, 
+``m·s⁻²``, ``V/√Hz``.
+
 When specifying the value as a string you may also give a name and description, 
 and if you do they become available as the attributes *name* and *desc*.  This 
 conversion is under the control of the *assign_rec* preference.  The default 
@@ -1985,7 +1991,7 @@ formatted numbers and quantities embedded in text and reformats them using
 so some constraints are placed on the values to make them easier to distinguish.  
 Specifically, the units, if given, must be simple and immediately adjacent to 
 the number. Units are simple if they only consist of letters and underscores.  
-The characters °, Å, Ω and ℧ are also allowed.  So '47e3Ohms', '50_Ohms' and 
+The characters °, Å, Ω and Ʊ are also allowed.  So '47e3Ohms', '50_Ohms' and 
 '1.0e+12Ω' are recognized as quantities, but '50 Ohms' and '12m/s' are not.
 
 Besides the text to be translated, :meth:`all_from_conv_fmt` takes the same 
