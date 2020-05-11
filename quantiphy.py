@@ -1288,7 +1288,8 @@ class Quantity(float):
             Name of the desired preference. See
             :meth:`Quantity.set_prefs()` for list of preferences.
 
-        :raises UnknownPreference(KeyError): unknown preference.
+        :raises UnknownPreference(QuantiPhyError, KeyError):
+            unknown preference.
 
         Example::
 
@@ -1345,7 +1346,7 @@ class Quantity(float):
 
         See :meth:`Quantity.set_prefs()` for list of available arguments.
 
-        :raises UnknownPreference(QuantiPhyError,KeyError):
+        :raises UnknownPreference(QuantiPhyError, KeyError):
             Unknown preference.
 
         :raises UnknownScaleFactor(QuantiPhyError, ValueError):
@@ -1934,7 +1935,7 @@ class Quantity(float):
             'strict'.
         :type check_units: boolean or 'strict'
 
-        :raises IncompatibleUnits(TypeError):
+        :raises IncompatibleUnits(QuantiPhyError,TypeError):
             Units of contribution do not match those of underlying quantity.
 
         Example::

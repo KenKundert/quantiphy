@@ -260,6 +260,12 @@ def setup(app):
         app.add_stylesheet('css/custom.css')
 
 
+# Do not set the defaults, it occasionally confuses autodoc, which sometimes
+# does not seem to like booleans, and they are only defaults.
+# (I think the issues is that it expects a string (which represents the
+# argument, or None or True, which represents no argument, I think False is
+# invalid. I also had trouble when using True, butthat may be because
+# ReadTheDocs is using an old version of Sphinx).
 #autodoc_default_options = {
 #    'members': True,
 #    #'special-members': True,
@@ -274,6 +280,6 @@ from autoclasstoc import PublicMethods
 
 class DocumentedPublicMethods(PublicMethods):
     def predicate(self, name, attr):
-        return super().predicate(name, attr) and attr.__doc__
+        return super().predicate(name, attr) and attr.__doc__ and not name.startswith('__')
 
 
