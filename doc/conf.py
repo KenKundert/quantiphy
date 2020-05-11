@@ -279,7 +279,14 @@ autoclasstoc_sections = ['public-methods']
 from autoclasstoc import PublicMethods
 
 class DocumentedPublicMethods(PublicMethods):
+    include_inherited = False
     def predicate(self, name, attr):
-        return super().predicate(name, attr) and attr.__doc__ and not name.startswith('__')
+        return (
+            super().predicate(name, attr) and
+            attr.__doc__
+            and not name.startswith('__')
+        )
+
+
 
 

@@ -5,6 +5,7 @@ install.out
 .coverage
 htmlcov
 .eggs
+doc/.build
 
 # Packages
 *.egg
