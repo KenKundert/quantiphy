@@ -286,7 +286,3 @@ class DocumentedPublicMethods(PublicMethods):
             attr.__doc__
             and not name.startswith('__')
         )
-
-
-
-

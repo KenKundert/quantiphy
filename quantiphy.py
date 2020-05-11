@@ -1012,9 +1012,11 @@ class Quantity(float):
 
         :arg str form:
             Specifies the form to use for representing numbers by default.
-            Choose from 'si', 'eng', 'fixed', and 'binary'. As an example 0.25 A
-            is represented with 250 mA when form is 'si', as 250e-3 A when form
-            is 'eng', and with 0.25 A when from is 'fixed'. Default is 'si'.
+            Choose from 'si', 'sia', 'eng', 'fixed', and 'binary'. As an example,
+            0.25 A is represented with 250 mA when form is 'si', as 250e-3 A
+            when form is 'eng', and with 0.25 A when from is 'fixed'. Default is 'si'.
+            'sia' (SI ASCII) is like 'si', but causes *map_sf* to be ignored.
+            Default is 'si'.
 
         :arg int full_prec:
             Default full precision in digits where 0 corresponds to 1 digit.
@@ -1630,7 +1632,7 @@ class Quantity(float):
         # numbers embedded in text {{{3
         smpl_units = '[a-zA-Z_{us}]*'.format(us=UNIT_SYMBOLS)
             # may only contain alphabetic characters, ex: V, A, _Ohms, etc.
-            # or obvious unicode units, ex: °ÅΩ℧
+            # or obvious unicode units, ex: °ÅΩƱ
         sf_or_units = '[a-zA-Z_µ{us}]+'.format(us=UNIT_SYMBOLS)
             # must match units or scale factors: add µ, make non-optional
         space = '[ ]?'  # optional non-breaking space (do not use a normal space)
@@ -1972,8 +1974,8 @@ class Quantity(float):
             Choose from 'si', 'sia', 'eng', 'fixed', and 'binary'. As an example
             0.25 A is represented with 250 mA when form is 'si', as 250e-3 A
             when form is 'eng', and with 0.25 A when from is 'fixed'.
-            'sia' is like 'si' except that is always uses ASCII characters when
-            rendering the scale factor.
+            'sia' (SI ASCII) is like 'si', but causes *map_sf* preference to be
+            ignored.  Default is 'si'.
 
         :arg bool show_units:
             Whether the units should be included in the string.

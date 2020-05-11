@@ -1,13 +1,5 @@
 # encoding: utf8
 
-# PyTest naturally loads the QuantiPhy package only once for all test files, but
-# this can cause problems here as any preference set in a previous test file
-# could affect the results for this file.  Explicitly delete the QuantiPhy
-# module if it is currently loaded so we get a fresh start.
-import sys
-for module in [m for m in sys.modules.keys() if m.startswith('quantiphy')]:
-    del sys.modules[module]
-
 from textwrap import dedent
 import pytest
 from quantiphy import (
@@ -283,12 +275,15 @@ def test_misc2():
 
     Foo.set_prefs(map_sf=Foo.map_sf_to_greek)
     assert t.render() == '1 µs'
+    assert t.render(form='si') == '1 µs'
+    assert t.render(form='sia') == '1 us'
     assert Foo.get_pref('map_sf') == Foo.map_sf_to_greek
     assert Quantity.get_pref('map_sf') == {}
 
     Foo.set_prefs(map_sf=Quantity.map_sf_to_sci_notation)
     assert t.render(form='eng') == '1×10⁻⁶ s'
     assert t.render(form='si') == '1 µs'
+    assert t.render(form='sia') == '1 us'
     assert Foo.get_pref('map_sf') == Foo.map_sf_to_sci_notation
     assert Quantity.get_pref('map_sf') == {}
 
@@ -380,8 +375,12 @@ def test_misc2():
     # test map_sf
     Quantity.set_prefs(map_sf=Quantity.map_sf_to_greek)
     assert Quantity('10e-6 m').render() == '10 µm'
+    assert Quantity('10e-6 m').render(form='si') == '10 µm'
+    assert Quantity('10e-6 m').render(form='sia') == '10 um'
     Quantity.set_prefs(map_sf=Quantity.map_sf_to_sci_notation)
     assert Quantity('10e-6 m').render() == '10 µm'
+    assert Quantity('10e-6 m').render(form='si') == '10 µm'
+    assert Quantity('10e-6 m').render(form='sia') == '10 um'
     assert Quantity('10e-6 m').render(form='eng') == '10×10⁻⁶ m'
     Quantity.set_prefs(map_sf=None)
     sf_map = {
@@ -852,6 +851,7 @@ def test_prefs_defaults():
     with Quantity.prefs(spacer=None, map_sf=None):
         assert Quantity.get_pref('spacer') == ' '
         assert Quantity.get_pref('map_sf') == {}
+    Quantity.set_prefs(spacer=None, map_sf=None)
 
 if __name__ == '__main__':
     # As a debugging aid allow the tests to be run on their own, outside pytest.
