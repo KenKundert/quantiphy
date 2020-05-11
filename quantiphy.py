@@ -1969,9 +1969,11 @@ class Quantity(float):
 
         :arg str form:
             Specifies the form to use for representing numbers by default.
-            Choose from 'si', 'eng', 'fixed', and 'binary'. As an example 0.25 A
-            is represented with 250 mA when form is 'si', as 250e-3 A when form
-            is 'eng', and with 0.25 A when from is 'fixed'.
+            Choose from 'si', 'sia', 'eng', 'fixed', and 'binary'. As an example
+            0.25 A is represented with 250 mA when form is 'si', as 250e-3 A
+            when form is 'eng', and with 0.25 A when from is 'fixed'.
+            'sia' is like 'si' except that is always uses ASCII characters when
+            rendering the scale factor.
 
         :arg bool show_units:
             Whether the units should be included in the string.
