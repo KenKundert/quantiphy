@@ -2,8 +2,8 @@ Releases
 ========
 
 **Latest development release**:
-    | Version: 2.10.2
-    | Released: 2020-05-11
+    | Version: 2.10.3
+    | Released: 2020-05-19
 
     - Dropping support for all versions of Python older than 3.5.
     - Added 'sia' form.
