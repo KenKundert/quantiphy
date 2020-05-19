@@ -53,7 +53,7 @@ def _named_regex(name, regex):
 def _scale(scale, number, units):
     if isinstance(scale, str):
         # if scale is string, it contains the units to convert from
-        number = _convert_units(scale, units, number)
+        number = convert_units(scale, units, number)
         units = scale
     else:
         try:
@@ -71,6 +71,7 @@ def _scale(scale, number, units):
 
 
 # Exceptions {{{1
+# QuantiPhyError {{{2
 class QuantiPhyError(Exception):
     """QuantiPhy base exception.
 
@@ -123,6 +124,7 @@ class QuantiPhyError(Exception):
         return '{}({})'.format(name, args)
 
 
+# ExpectedQuantity {{{2
 class ExpectedQuantity(QuantiPhyError, ValueError):
     """
     The value is required to be a Quantity or a string that can be converted to
@@ -131,6 +133,7 @@ class ExpectedQuantity(QuantiPhyError, ValueError):
     _template = 'expected a quantity for value.'
 
 
+# IncompatibleUnits {{{2
 class IncompatibleUnits(QuantiPhyError, TypeError):
     """
     The units of the contribution do not match those of the underlying quantity.
@@ -138,6 +141,7 @@ class IncompatibleUnits(QuantiPhyError, TypeError):
     _template = '{}: incompatible units.'
 
 
+# InvalidNumber {{{2
 class InvalidNumber(QuantiPhyError, ValueError, TypeError):
     """
     The value given could not be converted to a number.
@@ -145,6 +149,7 @@ class InvalidNumber(QuantiPhyError, ValueError, TypeError):
     _template = "{}: not a valid number."
 
 
+# InvalidRecognizer {{{2
 class InvalidRecognizer(QuantiPhyError, KeyError):
     """
     The *assign_rec* preference is expected to be a regular expression that
@@ -155,6 +160,7 @@ class InvalidRecognizer(QuantiPhyError, KeyError):
     _template = "recognizer does not contain 'val' key."
 
 
+# MissingName {{{2
 class MissingName(QuantiPhyError, NameError):
     """
     *alias* was not specified and no name was available from *value*.
@@ -162,6 +168,7 @@ class MissingName(QuantiPhyError, NameError):
     _template = 'no name specified.'
 
 
+# UnknownConversion {{{2
 class UnknownConversion(QuantiPhyError, KeyError):
     """
     The given units are not supported by the underlying class, or a unit
@@ -173,6 +180,7 @@ class UnknownConversion(QuantiPhyError, KeyError):
     )
 
 
+# UnknownFormatKey {{{2
 class UnknownFormatKey(QuantiPhyError, KeyError):
     """
     The *label_fmt* and *label_fmt_full* are expected to be format strings that
@@ -183,6 +191,7 @@ class UnknownFormatKey(QuantiPhyError, KeyError):
     _template = '{}: unknown format key.'
 
 
+# UnknownPreference {{{2
 class UnknownPreference(QuantiPhyError, KeyError):
     """
     The name given for a preference is unknown.
@@ -190,6 +199,7 @@ class UnknownPreference(QuantiPhyError, KeyError):
     _template = '{}: unknown preference.'
 
 
+# UnknownScaleFactor {{{2
 class UnknownScaleFactor(QuantiPhyError, ValueError):
     """
     The *input_sf* preference gives the list of scale factors that should be
@@ -199,6 +209,7 @@ class UnknownScaleFactor(QuantiPhyError, ValueError):
     _template = "unknown scale factors."
 
 
+# UnknownUnitSystem {{{2
 class UnknownUnitSystem(QuantiPhyError, KeyError):
     """
     The name given does not correspond to a known unit system.
@@ -206,6 +217,7 @@ class UnknownUnitSystem(QuantiPhyError, KeyError):
     _template = "{}: unknown unit system."
 
 
+# IncompatiblePreferences {{{2
 class IncompatiblePreferences(QuantiPhyError, ValueError):
     """
     Two preferences are not compatible
@@ -214,7 +226,9 @@ class IncompatiblePreferences(QuantiPhyError, ValueError):
 
 # Unit Conversions {{{1
 _unit_conversions = {}
-def _convert_units(to_units, from_units, value):
+
+# convert_units() {{{2
+def convert_units(to_units, from_units, value):
     if to_units == from_units:
         return value
     try:
@@ -223,7 +237,8 @@ def _convert_units(to_units, from_units, value):
         raise UnknownConversion(to_units, from_units)
 
 
-class UnitConversion:
+# UnitConversion class {{{2
+class UnitConversion(object):
     """
     Creates a unit converter.
 
@@ -348,6 +363,7 @@ class UnitConversion:
 
     """
 
+    # constructor {{{3
     def __init__(self, to_units, from_units, slope=1, intercept=0):
         self.to_units = to_units.split() if isinstance(to_units, str) else to_units
         self.from_units = from_units.split() if isinstance(from_units, str) else from_units
@@ -380,15 +396,19 @@ class UnitConversion:
                 if u1 != u2:
                     _unit_conversions[(u1, u2)] = self._no_op
 
+    # forward conversion {{{3
     def _forward(self, value):
         return value*self.slope + self.intercept
 
+    # reverse conversion {{{3
     def _reverse(self, value):
         return (value - self.intercept)/self.slope
 
+    # no conversion {{{3
     def _no_op(self, value):
         return value
 
+    # convert {{{3
     def convert(self, value=1, from_units=None, to_units=None):
         """Convert value to quantity with new units.
 
@@ -478,6 +498,7 @@ class UnitConversion:
             raise UnknownConversion(to_units, direction='to')
         raise UnknownConversion(from_units, direction='from')
 
+    # __str__ {{{3
     def __str__(self):
         if callable(self.slope) or callable(self.intercept):
             # using functions to do the conversion, have no good description
@@ -701,7 +722,7 @@ SMALL_SCALE_FACTORS = 'munpfazy'
     # These must be given in order, one for every three decades.
 
 # Supported currency symbols (these go on left side of number)
-CURRENCY_SYMBOLS = '$€¥£₩₺₽₹ɃΞȄ' if sys.version_info.major == 3 else '$'
+CURRENCY_SYMBOLS = '$€¥£₩₺₽₹ɃΞȄ'
 
 # Unit symbols that are not simple letters.
 # Do not include % as it will be picked up when converting text to numbers,
@@ -1654,7 +1675,7 @@ class Quantity(float):
 
     # constructor {{{2
     def __new__(
-        cls, value, model=None, units=None, scale=None,
+        cls, value, model=None, *, units=None, scale=None,
         name=None, desc=None, ignore_sf=None, binary=None
     ):
         if ignore_sf is None:
@@ -2842,6 +2863,7 @@ class Quantity(float):
                 try:
                     quantity = cls(value, name=qname, desc=desc, **kwargs)
                 except InvalidNumber:
+
                     # extract the units if given (they are embedded in "")
                     components = value.split()
                     if len(components) >= 2 and _is_quoted(components[-1]):
@@ -2849,6 +2871,8 @@ class Quantity(float):
                         value = ' '.join(components[:-1])
                     else:
                         units = ''
+
+                    # evaluate value as expression
                     symbols = ChainMap(
                         quantities, predefined, _active_constants, CONSTANTS
                     )

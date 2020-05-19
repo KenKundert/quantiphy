@@ -274,6 +274,8 @@ def setup(app):
 #    #'undoc-members': True,
 #    #'exclude-members': '__weakref__',
 #}
+
+# Kale's autoclasstoc for adding Tables of Contents to autoclass entries.
 autoclasstoc_sections = ['public-methods']
 
 from autoclasstoc import PublicMethods
