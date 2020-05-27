@@ -1618,7 +1618,7 @@ scale factor by specifying the *unity_sf* argument to
     1_m
 
 This is often a good way to go if you are outputting numbers intended to be read 
-by people and machines.
+unambiguously or by both people and machines.
 
 If you need to interpret numbers that have units and are known not to have scale 
 factors, you can specify the *ignore_sf* preference:
@@ -1653,7 +1653,7 @@ preference.
     1 km
 
 Specifying *input_sf=None* causes *QuantiPhy* to again accept all known scale 
-factors again.
+factors.
 
 .. code-block:: python
 

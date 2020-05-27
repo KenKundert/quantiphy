@@ -571,10 +571,10 @@ presenting the results.
 
 And here is an example of the programs output::
 
-     460 kB  quantiphy/examples/delta-sigma
-     464 kB  quantiphy/examples
-    1.54 kB  quantiphy/doc
-    3.48 MB  quantiphy
+     460 kiB  quantiphy/examples/delta-sigma
+     464 kiB  quantiphy/examples
+    1.54 kiB  quantiphy/doc
+    3.48 MiB  quantiphy
 
 
 .. simulation example {{{1
@@ -1088,7 +1088,7 @@ strings on the way out is performed by *QuantiPhy*.
 
 *QuantiPhy* is quite flexible when it comes to converting a string to a number, 
 so the present value can be given in any of the following ways: -$250k, 
--$250,000, $2.5e5.  You can also specify the value without the currency symbol, 
+-$250,000, -$2.5e5.  You can also specify the value without the currency symbol, 
 which is desirable as it generally confuses the shell.
 
 The source code is a bit long to include here, but you can find it on
