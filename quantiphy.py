@@ -37,14 +37,13 @@ Documentation can be found at https://quantiphy.readthedocs.io.
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 # Imports {{{1
-
 import re
 import math
 import sys
-
 from collections import ChainMap
 
 
+# Helpers {{{1
 # _named_regex {{{2
 def _named_regex(name, regex):
     return '(?P<%s>%s)' % (name, regex)
