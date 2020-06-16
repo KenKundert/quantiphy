@@ -1672,16 +1672,20 @@ existing known units.
 
     >>> d1 = Quantity('1 au')
     >>> d2 = Quantity('1000 pc')
-    >>> print(d1.render(form='eng'), d2, sep='\n')
+    >>> p = Quantity('138 Pa')
+    >>> print(d1.render(form='eng'), d2, p, sep='\n')
     1e-18 u
     1 nc
+    138e15 a
 
-    >>> Quantity.set_prefs(known_units='au pc')
+    >>> Quantity.set_prefs(known_units='au pc Pa')
     >>> d1 = Quantity('1 au')
     >>> d2 = Quantity('1000 pc')
-    >>> print(d1.render(form='eng'), d2, sep='\n')
+    >>> p = Quantity('138 Pa')
+    >>> print(d1.render(form='eng'), d2, p, sep='\n')
     1 au
     1 kpc
+    138 Pa
 
 This same issue comes up for temperature quantities when given in Kelvin. There 
 are again several ways to handle this. First you can specify the acceptable 
