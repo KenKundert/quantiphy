@@ -1,4 +1,7 @@
 language: python
+os:
+  - linux
+  - osx
 install:
   - pip install .
   - pip install coveralls
