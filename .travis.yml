@@ -4,13 +4,13 @@ matrix:
     - python: 3.5
     - python: 3.6
     - python: 3.7
-      dist: xenial
+      dist: bionic
       sudo: true
     - python: 3.8
-      dist: xenial
+      dist: bionic
       sudo: true
     - python: nightly
-      dist: xenial
+      dist: bionic
       sudo: true
 install:
   - pip install .
