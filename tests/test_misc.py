@@ -333,10 +333,15 @@ def test_misc2():
     processed = Quantity.all_from_conv_fmt('1420405751.786 Hz', form='si')
     assert processed == '1.4204 GHz'
 
+    # composite units
     q = Quantity('3.45e6 m·s⁻²')
     assert q.render() == '3.45 Mm·s⁻²'
     q = Quantity('accel = 3.45e6 m·s⁻² -- acceleration')
     assert q.render() == '3.45 Mm·s⁻²'
+    q = Quantity('Vn = 3.45nV/√Hz -- Input referred RMS noise voltage')
+    assert q.render() == '3.45 nV/√Hz'
+    q = Quantity('Vn² = 11.902aV²/Hz -- Input referred noise power')
+    assert q.render() == '11.902 aV²/Hz'
 
     processed = Quantity.all_from_si_fmt('0s', form='si')
     assert processed == '0 s'
