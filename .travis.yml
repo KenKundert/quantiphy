@@ -1,17 +1,4 @@
 language: python
-matrix:
-  include:
-    - python: 3.5
-    - python: 3.6
-    - python: 3.7
-      dist: bionic
-      sudo: true
-    - python: 3.8
-      dist: bionic
-      sudo: true
-    - python: nightly
-      dist: bionic
-      sudo: true
 install:
   - pip install .
   - pip install coveralls
@@ -20,6 +7,15 @@ script:
 after_success:
   - coveralls
 jobs:
+  include:
+    - python: 3.5
+    - python: 3.6
+    - python: 3.7
+      dist: bionic
+    - python: 3.8
+      dist: bionic
+    - python: nightly
+      dist: bionic
   allow_failures:
     - python: nightly
   fast_finish: true
