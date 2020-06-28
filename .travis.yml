@@ -19,3 +19,7 @@ script:
   - coverage run setup.py pytest
 after_success:
   - coveralls
+jobs:
+  allow_failures:
+    - python: nightly
+  fast_finish: true
