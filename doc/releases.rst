@@ -6,7 +6,9 @@ Releases
     | Released: 2020-05-19
 
     - Dropping support for all versions of Python older than 3.5.
-    - Added 'sia' form.
+    - Added *sia* form (ASCII only SI scale factors).
+    - Added *only_e_notation* argument to 
+      :meth:`quantiphy.Quantity.all_from_conv_fmt()`.
 
 **2.10 (2020-03-2)**:
     - Added *negligible*, *tight_units*, *nan*, and *inf* preferences.

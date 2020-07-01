@@ -1655,12 +1655,12 @@ class Quantity(float):
             # or obvious unicode units, ex: °ÅΩƱ
         sf_or_units = '[a-zA-Z_µ{us}]+'.format(us=UNIT_SYMBOLS)
             # must match units or scale factors: add µ, make non-optional
-        space = '[ ]?'  # optional non-breaking space (do not use a normal space)
-        left_delimit = r'(?:\A|(?<=[^-−a-zA-Z0-9_.]))'
-        right_delimit = r'(?=[^-+0-9]|\Z)'
+        space = '[   ]?'  # optional non-breaking space (do not use a normal space)
+        left_delimit = r'(?:\A|(?<=[^a-zA-Z0-9_.]))'
+        right_delimit = r'(?=[^-+−＋0-9]|\Z)'
             # right_delim excludes [-+0-9] to avoid matches with 1e2, 1e-2, 1e+2
             # this is not great because it seems like it should fail for
-            # 10uA+20uA, but it does not and I don't know why.
+            # 10uA+20uA.
         cls.embedded_si_notation = re.compile(
             '{left_delimit}{sign}{mantissa}{space}{sf_or_units}{right_delimit}'.format(
                 **locals()
@@ -1668,6 +1668,11 @@ class Quantity(float):
         )
         cls.embedded_e_notation = re.compile(
             '{left_delimit}{sign}{mantissa}{exponent}?{space}{smpl_units}{right_delimit}'.format(
+                **locals()
+            )
+        )
+        cls.embedded_e_notation_only = re.compile(
+            '{left_delimit}{sign}{mantissa}{exponent}{space}{smpl_units}{right_delimit}'.format(
                 **locals()
             )
         )
@@ -2952,12 +2957,16 @@ class Quantity(float):
 
     # all_from_conv_fmt {{{2
     @classmethod
-    def all_from_conv_fmt(cls, text, **kwargs):
+    def all_from_conv_fmt(cls, text, only_e_notation=False, **kwargs):
         r"""Convert all numbers and quantities from conventional notation.
 
         Only supports a subset of the conventional formats that *QuantiPhy*
         normally accepts.  For example, leading units (ex. $1M) and embedded
         commas are not supported, and the radix is always '.'.
+
+        There may be a space between the number an units, but it cannot be a
+        normal space. Only non-breaking, thin-non-breakn and thin spaces are
+        allowed.
 
         :arg str text:
             A search and replace is performed on this text. The search looks for
@@ -2966,6 +2975,11 @@ class Quantity(float):
             recognized any units must be simple (only letters or underscores, no
             digits or symbols) and the units must be immediately adjacent to the
             number.
+        :arg bool only_e_notation:
+            If true, only numbers that explicitly have exponents are converted
+            (1e6Hz is converted, but not 1.6 or 2009).  If False, numbers with
+            or without exponents are converted ( 1e6Hz, 1.6 and 2009 are all
+            converted.
         :arg \**kwargs:
             By default the numbers are rendered using the currently active
             preferences, but any valid argument to :meth:`Quantity.render()` can
@@ -2986,7 +3000,11 @@ class Quantity(float):
         """
         out = []
         start = 0
-        for match in cls.embedded_e_notation.finditer(text):
+        if only_e_notation:
+            regex = cls.embedded_e_notation_only
+        else:
+            regex = cls.embedded_e_notation
+        for match in regex.finditer(text):
             end = match.start(0)
             number = match.group(0)
             try:

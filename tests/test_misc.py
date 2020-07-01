@@ -333,6 +333,23 @@ def test_misc2():
     processed = Quantity.all_from_conv_fmt('1420405751.786 Hz', form='si')
     assert processed == '1.4204 GHz'
 
+    t = '-disable_sem2009 2009 0.209 2.09e6 2.09e-06'
+    processed = Quantity.all_from_conv_fmt(t, form='sia')
+    assert processed == '-disable_sem2009 2.009k 209m 2.09M 2.09u'
+    processed = Quantity.all_from_conv_fmt(t, only_e_notation=False, form='sia')
+    assert processed == '-disable_sem2009 2.009k 209m 2.09M 2.09u'
+    processed = Quantity.all_from_conv_fmt(t, only_e_notation=True, form='sia')
+    assert processed == '-disable_sem2009 2009 0.209 2.09M 2.09u'
+
+    t = '20e6Hz 20e6 Hz 20e6Ω 20e-6Ʊ 3.45e6m·s⁻² 3.45e6 m·s⁻²'
+    processed = Quantity.all_from_conv_fmt(t, form='sia')
+    assert processed == '20 MHz 20 MHz 20 MΩ 20 uƱ 3.45 Mm·s⁻² 3.45 Mm·s⁻²'
+    processed = Quantity.all_from_conv_fmt(t, only_e_notation=False, form='sia')
+    assert processed == '20 MHz 20 MHz 20 MΩ 20 uƱ 3.45 Mm·s⁻² 3.45 Mm·s⁻²'
+    processed = Quantity.all_from_conv_fmt(t, only_e_notation=True, form='sia')
+    assert processed == '20 MHz 20 MHz 20 MΩ 20 uƱ 3.45 Mm·s⁻² 3.45 Mm·s⁻²'
+
+
     # composite units
     q = Quantity('3.45e6 m·s⁻²')
     assert q.render() == '3.45 Mm·s⁻²'
@@ -649,11 +666,20 @@ Summary @ 900.51 us: 7 tests run, 1 failures detected, 0 faults detected, 0 test
     processed = Quantity.all_from_si_fmt('1420.40575MHz+1420.40575MHz+1420.40575MHz', form='si')
     assert processed == '1.4204 GHz+1.4204 GHz+1.4204 GHz'
 
+    processed = Quantity.all_from_si_fmt('1420.40575MHz-1420.40575MHz-1420.40575MHz', form='si')
+    assert processed == '1.4204 GHz-1.4204 GHz-1.4204 GHz'
+
     processed = Quantity.all_from_si_fmt('1420.40575MHz+abc+1420.40575MHz+abc+1420.40575MHz', form='si')
     assert processed == '1.4204 GHz+abc+1.4204 GHz+abc+1.4204 GHz'
 
+    processed = Quantity.all_from_si_fmt('1420.40575MHz-abc-1420.40575MHz-abc-1420.40575MHz', form='si')
+    assert processed == '1.4204 GHz-abc-1.4204 GHz-abc-1.4204 GHz'
+
     processed = Quantity.all_from_si_fmt('1420.40575e+6+1420.40575e+6', form='si')
     assert processed == '1420.40575e+6+1420.40575e+6'
+
+    processed = Quantity.all_from_si_fmt('1420.40575e-6-1420.40575e-6', form='si')
+    assert processed == '1420.40575e-6-1420.40575e-6'
 
 
 def test_add():
