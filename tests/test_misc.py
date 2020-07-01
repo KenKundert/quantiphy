@@ -107,6 +107,14 @@ def test_misc():
     assert q.name == ''
     assert q.desc == ''
 
+    with pytest.raises(ValueError) as exception:
+        q = Quantity('f_hy = 1420405751;786 Hz')
+    assert str(exception.value) == '1420405751;786 Hz: not a valid number.'
+    assert isinstance(exception.value, InvalidNumber)
+    assert isinstance(exception.value, QuantiPhyError)
+    assert isinstance(exception.value, ValueError)
+    assert exception.value.args == ('1420405751;786 Hz',)
+
     # check tight_units
     q = Quantity('90°')
     assert q.render() == '90°'

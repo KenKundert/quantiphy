@@ -1325,10 +1325,7 @@ class Quantity(float):
         """
         cls._initialize_preferences()
         try:
-            value = getattr(cls, name, cls._preferences[name])
-            if name == 'known_units' and isinstance(value, str):
-                value = value.split()
-            return value
+            return getattr(cls, name, cls._preferences[name])
         except KeyError:
             raise UnknownPreference(name)
 
@@ -1407,10 +1404,12 @@ class Quantity(float):
 
     # _map_leading_sign {{{2
     def _map_leading_sign(self, value, leading_units=''):
-        # only maps a leading sign, if no sign is present, it is assumed to be +
+        # maps a leading sign, but only if given
         if value[0] == '-':
             return self.minus + leading_units + value[1:]
-        if value[0] == '+':
+        if value[0] == '+':  # pragma: no cover
+            # quantiphy does not currently add leading plus signs to either
+            # mantissa or exponent
             return self.plus + leading_units + value[1:]
         return leading_units + value
 
