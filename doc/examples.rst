@@ -571,9 +571,9 @@ presenting the results.
 
 And here is an example of the programs output::
 
-     460 kiB  quantiphy/examples/delta-sigma
-     464 kiB  quantiphy/examples
-    1.54 kiB  quantiphy/doc
+     460 KiB  quantiphy/examples/delta-sigma
+     464 KiB  quantiphy/examples
+    1.54 KiB  quantiphy/doc
     3.48 MiB  quantiphy
 
 
