@@ -1032,11 +1032,12 @@ class Quantity(float):
 
         :arg str form:
             Specifies the form to use for representing numbers by default.
-            Choose from 'si', 'sia', 'eng', 'fixed', and 'binary'. As an example,
-            0.25 A is represented with 250 mA when form is 'si', as 250e-3 A
-            when form is 'eng', and with 0.25 A when from is 'fixed'. Default is 'si'.
+            Choose from 'si', 'sia', 'eng', 'fixed', and 'binary'. As an
+            example, 0.25 A is represented with 250 mA when form is 'si', as
+            250e-3 A when form is 'eng', and with 0.25 A when from is 'fixed'.
             'sia' (SI ASCII) is like 'si', but causes *map_sf* to be ignored.
-            Default is 'si'.
+            'binary' is like 'sia', but specifies that binary scale factors be
+            used.  Default is 'si'.
 
         :arg int full_prec:
             Default full precision in digits where 0 corresponds to 1 digit.
@@ -1999,7 +2000,8 @@ class Quantity(float):
             0.25 A is represented with 250 mA when form is 'si', as 250e-3 A
             when form is 'eng', and with 0.25 A when from is 'fixed'.
             'sia' (SI ASCII) is like 'si', but causes *map_sf* preference to be
-            ignored.  Default is 'si'.
+            ignored.  'binary' is like 'sia', but specifies that binary scale
+            factors be used.  Default is 'si'.
 
         :arg bool show_units:
             Whether the units should be included in the string.
