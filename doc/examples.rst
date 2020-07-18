@@ -368,8 +368,8 @@ satisfy the testing framework that tests the code found in this documentation;
 normally the return value is discarded.
 
 Another example of using *QuantiPhy* to implement casual time units is the 
-*alarm* script, which notifies you as reminder after the specified amount of 
-time has past. You can find `alarm <https://github.com/KenKundert/alarm>`_ on 
+*remind* script, which notifies you as reminder after the specified amount of 
+time has past. You can find `remind <https://github.com/KenKundert/remind>`_ on 
 GitHub.
 
 .. hide the following
@@ -935,7 +935,7 @@ If you do, the output of the script looks like this::
     100000 ADA =   $8,203.00  4%   (1 ADA =     $0.08)
          Total = $218,227.10
 
-A more sophisticated version of `cryptcurrency 
+A more sophisticated version of `cryptocurrency 
 <https://github.com/KenKundert/cryptocurrency/blob/master/cryptocurrency>`_
 this example can be found on GitHub.
 

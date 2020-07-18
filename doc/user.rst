@@ -314,8 +314,7 @@ have units. The same is true for the description. For example:
 The Remaining Arguments
 """""""""""""""""""""""
 
-Any arguments beyond the first two should be given as named arguments (though 
-not a requirement at the moment, it eventually will be).
+Any arguments beyond the first two must be given as named arguments.
 
 If you need to override the name, units or the description given in either the 
 value or the model, you can do so by specifying them with corresponding named 
@@ -333,7 +332,7 @@ arguments.  For example:
 In this the value is ``10*period``, which is a float and so has no name, units, 
 or description attributes, but the model is ``period`` that has all three 
 attributes, but the name name and description, coming from a quantity, are 
-ignored. As such, they specified explicitly using the *name* and *desc* named 
+ignored. Instead, they are specified explicitly using the *name* and *desc* 
 arguments.
 
 Specifying *binary* as *True* allows you to use the binary scale factors. The 
@@ -349,8 +348,8 @@ scale factors are found.
 Finally, you can also specify *scale* and *ignore_sf* as named arguments.  
 *scale* allows you to scale the value or convert it to different units. It is 
 described :ref:`in a bit <scaling upon creation>`. *ignore_sf* indicates that 
-any scale factors should be ignored. This is one way of handling units whose 
-name starts with a scale factor character. For example:
+any scale factors should be ignored. This is :ref:`one way <ambiguity>` of 
+handling units whose name starts with a scale factor character. For example:
 
     >>> x = Quantity('1m')                                  # unitless value
     >>> print(x, x.real, x.units, sep=', ')
@@ -397,11 +396,11 @@ Subclassing Quantity
 """"""""""""""""""""
 
 You can subclass :class:`quantiphy.Quantity` to make it easier to create 
-a particular particular type of quantity, or to create quantities with 
-particular qualities.  The following example demonstrates both. It creates 
-a subclass for dollars that both sets the units and display preferences.  
-Display preferences for currencies are often very different from what you would 
-want from physical quantities:
+a particular type of quantity, or to create quantities with particular 
+qualities.  The following example demonstrates both. It creates a subclass for 
+dollars that both sets the units and display preferences.  Display preferences 
+for currencies are often very different from what you would want from physical 
+quantities:
 
 .. code-block:: python
 
@@ -596,10 +595,10 @@ You can find an example of this usage in :ref:`cryptocurrency example`.
 
 When using unit conversions it is important to only convert to units without 
 scale factors (such as those in the first column above) when creating 
-a quantity.  For example, it is better to convert to 'm' rather than 'cm'.  If 
+a quantity.  For example, it is better to convert to 'g' rather than 'kg'.  If 
 the desired units used when creating a quantity includes a scale factor, then it 
 is easy to end up with two scale factors when converting the number to a string 
-(ex: 1 mkm or one milli-kilo-meter).
+(ex: 1 mkg or one milli-kilo-gram).
 
 Here is an example that uses quantity rescaling. Imagine that a table is being 
 read that gives temperature versus time, but the temperature is given in °F and 
