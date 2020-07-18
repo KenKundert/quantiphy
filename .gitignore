@@ -29,8 +29,15 @@ pip-log.txt
 .test*.sum
 generated_settings/**
 
-#Translations
+# Translations
 *.mo
 
-#Mr Developer
+# Mr Developer
 .mr.developer.cfg
+
+# virtual envs
+.env
+.venv
+
+# Dev
+.vscode
