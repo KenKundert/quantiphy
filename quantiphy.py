@@ -39,7 +39,6 @@ Documentation can be found at https://quantiphy.readthedocs.io.
 # Imports {{{1
 import re
 import math
-import sys
 from collections import ChainMap
 
 
@@ -47,6 +46,7 @@ from collections import ChainMap
 # _named_regex {{{2
 def _named_regex(name, regex):
     return '(?P<%s>%s)' % (name, regex)
+
 
 # _scale {{{2
 def _scale(scale, number, units):
@@ -106,7 +106,7 @@ class QuantiPhyError(Exception):
                 if msg == t and self.args:
                     break
                 return msg
-            except (IndexError, KeyError) as e:
+            except (IndexError, KeyError):
                 continue
         else:
             raise ValueError('No valid template found.')
@@ -225,6 +225,7 @@ class IncompatiblePreferences(QuantiPhyError, ValueError):
 
 # Unit Conversions {{{1
 _unit_conversions = {}
+
 
 # convert_units() {{{2
 def convert_units(to_units, from_units, value):
@@ -1433,7 +1434,6 @@ class Quantity(float):
             return c
         return ''.join((map(replace_char, mantissa)))
 
-
     # _combine {{{2
     def _combine(self, mantissa, sf, units, spacer, sf_is_exp=False):
         if units in self.tight_units:
@@ -1486,9 +1486,11 @@ class Quantity(float):
                 raise UnknownScaleFactor(*sorted(unknown_sf))
         cls._provisioned_input_sf = input_sf
 
+        def fix_sign(num):
+            return num.replace('−', '-').replace('＋', '+')
+
         # components {{{3
         sign = _named_regex('sign', '[-+−＋]?')
-        fix_sign = lambda x: x.replace('−', '-').replace('＋', '+')
         space = r'[\s ]'  # the space in this regex is a non-breaking space
         required_digits = r'(?:[0-9][0-9_]*[0-9]|[0-9]+)'  # allow interior underscores
         optional_digits = r'(?:[0-9][0-9_]*[0-9]|[0-9]*)'
@@ -1875,7 +1877,6 @@ class Quantity(float):
         sign, nan, _ = value.lower().partition('nan')
         if nan == 'nan':
             return sign + self.nan
-
 
     # as_tuple() {{{2
     def as_tuple(self):

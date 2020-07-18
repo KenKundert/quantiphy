@@ -2,8 +2,7 @@ language: python
 os:
   - linux
 install:
-  - pip install .
-  - pip install coveralls
+  - pip install virtualenv tox coveralls
 script:
   - coverage run setup.py pytest
 after_success:
