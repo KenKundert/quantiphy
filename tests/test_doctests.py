@@ -1,23 +1,34 @@
 # encoding: utf8
 
+from quantiphy import Quantity
 import pytest
 import doctest
 import glob
-from quantiphy import Quantity
+import sys
+
 
 def test_README():
+    if sys.version_info < (3, 6):
+        # code used in doctests assumes python3.6
+        return
     Quantity.reset_prefs()
     rv = doctest.testfile('../README.rst', optionflags=doctest.ELLIPSIS)
     assert rv.failed == 0
     assert rv.attempted == 27
 
 def test_quantiphy():
+    if sys.version_info < (3, 6):
+        # code used in doctests assumes python3.6
+        return
     Quantity.reset_prefs()
     rv = doctest.testfile('../quantiphy.py', optionflags=doctest.ELLIPSIS)
     assert rv.failed == 0
     assert rv.attempted == 97
 
 def test_manual():
+    if sys.version_info < (3, 6):
+        # code used in doctests assumes python3.6
+        return
     Quantity.reset_prefs()
     files = {
         '../doc/index.rst': 29,

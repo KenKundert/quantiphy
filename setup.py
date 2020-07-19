@@ -28,7 +28,7 @@ setup(
     py_modules = 'quantiphy'.split(),
     install_requires = [],
     setup_requires = 'pytest-runner>=2.0'.split(),
-    tests_require = 'pytest'.split(),
+    tests_require = 'pytest inform rkm_codes'.split(),
     python_requires = '>=3.5',
     keywords = keywords.split(),
     classifiers = [
