@@ -70,9 +70,9 @@ outputting values, and then only when it provides value.  As a result, it
 provides a simplicity in use that cannot be matched by the other packages.
 
 In addition, these alternative packages generally build their unit systems upon 
-the `SI base units <https://en.wikipedia.org/wiki/SI_base_unit>`, which tends to 
-restrict usage to physical quantities with static conversion factors.  They are 
-less suited to non-physical quantities or conversion factors that change 
+the `SI base units <https://en.wikipedia.org/wiki/SI_base_unit>`_, which tends 
+to restrict usage to physical quantities with static conversion factors.  They 
+are less suited to non-physical quantities or conversion factors that change 
 dynamically, such as with currencies.  *QuantiPhy* gracefully handles all of 
 these cases.
 

@@ -8,7 +8,7 @@ rm -rf .cache
 rm -f *.pyc *.pyo
 rm -f .test*.sum expected result install.out .*.log
 rm -rf build *.egg-info dist __pycache__ .eggs **/{__pycache__,*.pyc,*.pyo}
-rm -rf .coverage .coverage-html htmlcov
+rm -rf .coverage .coverage-html htmlcov .tox
 rm -rf .pytest_cache .cache dist .build quantiphy.egg.info
 rm -rf tests/{htmlcov,.cache,.coverage,.pytest_cache}
 rm -rf doc/.build
