@@ -7,6 +7,7 @@ import pytest
 from quantiphy import Quantity, add_constant
 
 def test_workout():
+    Quantity.reset_prefs()
     qs = Quantity.extract(
         r"""
             Fclk = 50MHz        -- clock frequency
@@ -24,6 +25,7 @@ def test_workout():
     assert not qs
 
 def test_roomful():
+    Quantity.reset_prefs()
     qs = Quantity.extract(
         r"""
             Fclk: 50MHz        // clock frequency
@@ -38,6 +40,7 @@ def test_roomful():
     assert not qs
 
 def test_bulletin():
+    Quantity.reset_prefs()
     qs = Quantity.extract(
         r"""
             Fclk = 50MHz        # clock frequency
@@ -52,6 +55,7 @@ def test_bulletin():
     assert not qs
 
 def test_deduce():
+    Quantity.reset_prefs()
     qs = Quantity.extract(
         r"""
             Fclk = 50MHz
@@ -66,6 +70,7 @@ def test_deduce():
     assert not qs
 
 def test_proof():
+    Quantity.reset_prefs()
     qs = Quantity.extract(
         r"""
             $F_{\rm clk}$ = 50MHz        -- clock frequency
@@ -80,6 +85,7 @@ def test_proof():
     assert not qs
 
 def test_wager():
+    Quantity.reset_prefs()
     qs = Quantity.extract(
         r"""
             Fclk ($F_{\rm clk}$) = 50MHz -- clock frequency
@@ -94,6 +100,7 @@ def test_wager():
     assert not qs
 
 def test_disallow():
+    Quantity.reset_prefs()
     qs = Quantity.extract(
         r"""
             rate = 64GiB/s -- bit rate
@@ -106,6 +113,7 @@ def test_disallow():
     assert not qs
 
 def test_anatomy():
+    Quantity.reset_prefs()
     qs = Quantity.extract(
         r"""
             Rin = ∞Ω -- input resistance
@@ -118,6 +126,7 @@ def test_anatomy():
     assert not qs
 
 def test_billow():
+    Quantity.reset_prefs()
     qs = Quantity.extract(
         r"""
             C3 = 250.7nF
@@ -146,6 +155,7 @@ def test_billow():
     assert not qs
 
 def test_invention():
+    Quantity.reset_prefs()
     qs = Quantity.extract(
         r"""
             Fin = 10MHz        -- input frequency
@@ -167,6 +177,7 @@ def test_invention():
     assert not qs
 
 def test_route():
+    Quantity.reset_prefs()
     qs = Quantity.extract(
         r"""
             Fin = 10MHz        -- input frequency
@@ -188,6 +199,7 @@ def test_route():
     assert not qs
 
 def test_critique():
+    Quantity.reset_prefs()
     qs = Quantity.extract(
         r"""
             -- Fclk = 50MHz        -- clock frequency
@@ -196,6 +208,7 @@ def test_critique():
     assert not qs
 
 def test_socialist():
+    Quantity.reset_prefs()
     qs = Quantity.extract(
         r"""
             # Fclk = 50MHz        -- clock frequency
@@ -204,6 +217,7 @@ def test_socialist():
     assert not qs
 
 def test_stumble():
+    Quantity.reset_prefs()
     qs = Quantity.extract(
         r"""
             // Fclk = 50MHz        -- clock frequency
@@ -212,6 +226,7 @@ def test_stumble():
     assert not qs
 
 def test_guardian():
+    Quantity.reset_prefs()
     qs = Quantity.extract(
         r"""
             This is a non conforming line.
@@ -220,6 +235,7 @@ def test_guardian():
     assert not qs
 
 def test_hussy():
+    Quantity.reset_prefs()
     qs = Quantity.extract(
         r"""
             This is a non conforming line.
@@ -228,6 +244,7 @@ def test_hussy():
     assert not qs
 
 def test_affiliate():
+    Quantity.reset_prefs()
     qs = Quantity.extract(
         r"""
             This is a non conforming line.
@@ -255,6 +272,7 @@ def test_affiliate():
     assert not qs
 
 def test_sagan():
+    Quantity.reset_prefs()
     qs = Quantity.extract(
         r"""
             Carl Sagan's frequencies
@@ -307,6 +325,7 @@ def test_sagan():
     assert not qs
 
 def test_assign_rec():
+    Quantity.reset_prefs()
     with Quantity.prefs(
         assign_rec=r'(?P<name>\w+?)\s*=\s*(?P<val>\w*)(\s+(--)\s*(?P<desc>.*?))?\Z'
     ):

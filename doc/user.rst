@@ -1,3 +1,10 @@
+..  initialization
+..  Reset Quantity preferences to their original defaults.
+
+    >>> from quantiphy import Quantity
+    >>> Quantity.reset_prefs()
+
+
 .. _users guide:
 
 Users' Guide
@@ -1904,7 +1911,7 @@ a version that displays the name and description by default.
     ... except InvalidNumber as e:
     ...     fatal(e, culprit=filename)
 
-    >>> display(Fref, Kdet, Kvco, N, Fout, sep='\n')
+    >>> print(Fref, Kdet, Kvco, N, Fout, sep='\n')
     Fref = 156 MHz     -- Reference frequency
     Kdet = 88.3 uA     -- Gain of phase detector (Imax)
     Kvco = 9.07 GHz/V  -- Gain of VCO

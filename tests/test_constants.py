@@ -9,6 +9,7 @@ from quantiphy import (
 import pytest
 
 def test_constants():
+    Quantity.reset_prefs()
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None)
     Quantity.set_prefs(show_desc=True)
     assert '{:.12q}'.format(Quantity('h')) == '662.607004e-36 J-s'

@@ -4,6 +4,8 @@ from quantiphy import Quantity, QuantiPhyError, IncompatiblePreferences
 import pytest
 
 def test_format():
+    Quantity.reset_prefs()
+    print(Quantity._preferences)
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None, show_desc=False)
     q=Quantity('f = 1420.405751786 MHz -- frequency of hydrogen line')
     assert '{}'.format(q) == '1.4204 GHz'

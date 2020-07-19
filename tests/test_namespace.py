@@ -1,8 +1,10 @@
 # encoding: utf8
 
 from quantiphy import Quantity
+Quantity.reset_prefs()
 
 def test_namespace():
+    Quantity.reset_prefs()
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None)
     globals().update(Quantity.extract('''
         h_line = 1420.405751786 MHz -- Frequency of the hydrogen line

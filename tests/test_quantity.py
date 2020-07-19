@@ -1,6 +1,7 @@
 # encoding: utf8
 
 from quantiphy import Quantity
+Quantity.reset_prefs()
 
 class Case:
     def __init__(self, name, text, raw, formatted, prefs=None):
@@ -313,6 +314,7 @@ test_cases = [
 
 names = set()
 def test_number_recognition():
+    Quantity.reset_prefs()
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None)
     for case in test_cases:
         if not case:

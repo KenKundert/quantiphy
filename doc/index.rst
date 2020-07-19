@@ -1,3 +1,10 @@
+..  initialization
+..  Reset Quantity preferences to their original defaults.
+
+    >>> from quantiphy import Quantity
+    >>> Quantity.reset_prefs()
+
+
 QuantiPhy: Physical Quantities
 ==============================
 

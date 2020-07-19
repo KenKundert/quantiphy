@@ -2,30 +2,7 @@
 ..  Reset Quantity preferences to their original defaults.
 
     >>> from quantiphy import Quantity
-    >>> Quantity.set_prefs(
-    ...     abstol=None,
-    ...     assign_rec=None,
-    ...     form=None,
-    ...     full_prec=None,
-    ...     ignore_sf=None,
-    ...     input_sf=None,
-    ...     keep_components=None,
-    ...     known_units=None,
-    ...     label_fmt=None,
-    ...     label_fmt_full=None,
-    ...     map_sf=None,
-    ...     number_fmt=None,
-    ...     output_sf=None,
-    ...     prec=None,
-    ...     reltol=None,
-    ...     show_commas=None,
-    ...     show_desc=None,
-    ...     show_label=None,
-    ...     spacer=None,
-    ...     strip_radix=None,
-    ...     strip_zeros=None,
-    ...     unity_sf=None,
-    ... )
+    >>> Quantity.reset_prefs()
 
 
 ..  examples top level {{{1

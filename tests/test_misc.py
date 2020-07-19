@@ -10,6 +10,7 @@ from quantiphy import (
 )
 
 def test_misc():
+    Quantity.reset_prefs()
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None)
     q = Quantity(1420405751.786, 'Hz')
     assert q.render(form='eng', show_units=False) == '1.4204e9'
@@ -139,9 +140,12 @@ def test_misc():
 
 
 def test_misc2():
+    Quantity.reset_prefs()
     class Foo(Quantity):
         pass
+    assert Quantity.get_pref('assign_rec') == Foo.get_pref('assign_rec')
     Foo.set_prefs(assign_rec=r'(?P<name>\w+)\s*=\s*(?P<val>.*)')
+    assert Quantity.get_pref('assign_rec') != Foo.get_pref('assign_rec')
     q = Foo('seven = 7')
     assert q.name == 'seven'
     assert str(q) == '7'
@@ -164,13 +168,14 @@ def test_misc2():
         exception.value.render(template=['{a} {b}', '{a} {b} {c}'])
 
     with pytest.raises(KeyError) as exception:
-        Foo.set_prefs(assign_rec=r'(\w+)\s*=\s*(.*)') # no named groups
+        Foo.set_prefs(assign_rec=r'(\w+)\s*=\s*(.*)') # no named groups!
         Foo('seven = 7')
     assert str(exception.value) == "recognizer does not contain 'val' key."
     assert isinstance(exception.value, InvalidRecognizer)
     assert isinstance(exception.value, QuantiPhyError)
     assert isinstance(exception.value, KeyError)
     assert exception.value.args == ()
+    assert Quantity.get_pref('assign_rec') != Foo.get_pref('assign_rec')
 
     assert Foo.get_pref('prec') == 4
     assert Foo.get_pref('full_prec') == 12
@@ -537,6 +542,7 @@ def test_misc2():
 
 
 def test_converters():
+    Quantity.reset_prefs()
     mvi_raw_conv = '''
 Status @ 0.00000000e+00s: Tests started for mylib.sh:MiM.
     Assertion successfully detects expected fault @ 1.00013334e-04s in sh_tb.REF (sh): 'V(cm)' out of range.
@@ -701,6 +707,7 @@ Summary @ 900.51 us: 7 tests run, 1 failures detected, 0 faults detected, 0 test
 
 
 def test_add():
+    Quantity.reset_prefs()
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None)
     q1 = Quantity('1ns')
     q2 = Quantity('2ns')
@@ -766,6 +773,7 @@ def test_add():
     assert total.name == 'total'
 
 def test_scale():
+    Quantity.reset_prefs()
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None)
     q1 = Quantity('3ns')
     q2 = Quantity('2')
@@ -805,6 +813,7 @@ def test_scale():
     assert str(total) == '$5,000,000.00'
 
 def test_negligible():
+    Quantity.reset_prefs()
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None)
     pn=Quantity('1nV')
     nn=Quantity('-1nV')
@@ -894,12 +903,28 @@ def test_negligible():
     assert got == expected
 
 def test_prefs_defaults():
+    Quantity.reset_prefs()
     Quantity.set_prefs(spacer='-', map_sf=dict(k='K'))
     assert Quantity.get_pref('spacer') == '-'
     assert Quantity.get_pref('map_sf') == dict(k='K')
+
+    class Foo(Quantity):
+        pass
+    assert Foo.get_pref('spacer') == '-'
+    assert Foo.get_pref('map_sf') == dict(k='K')
+    Foo.set_prefs(spacer='~', map_sf={})
+    assert Foo.get_pref('spacer') == '~'
+    assert Foo.get_pref('map_sf') == dict()
+    assert Quantity.get_pref('spacer') == '-'
+    assert Quantity.get_pref('map_sf') == dict(k='K')
+
     with Quantity.prefs(spacer=None, map_sf=None):
         assert Quantity.get_pref('spacer') == ' '
         assert Quantity.get_pref('map_sf') == {}
+
+    assert Quantity.get_pref('spacer') == '-'
+    assert Quantity.get_pref('map_sf') == dict(k='K')
+
     Quantity.set_prefs(spacer=None, map_sf=None)
 
 if __name__ == '__main__':

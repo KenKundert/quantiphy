@@ -6,10 +6,12 @@ from quantiphy import (
     UnknownUnitSystem, InvalidRecognizer, UnknownFormatKey, UnknownScaleFactor,
     InvalidNumber, ExpectedQuantity, MissingName,
 )
+Quantity.reset_prefs()
 import math
 import pytest
 
 def test_simple_scaling():
+    Quantity.reset_prefs()
     with Quantity.prefs(
         spacer=None, show_label=None, label_fmt=None, label_fmt_full=None
     ):
@@ -60,6 +62,7 @@ def test_simple_scaling():
         assert str(q.scale(dB)) == '-40 dBV'
 
 def test_temperature():
+    Quantity.reset_prefs()
     with Quantity.prefs(
         spacer=None, show_label=None, label_fmt=None, label_fmt_full=None,
         ignore_sf=True
@@ -133,6 +136,7 @@ def test_temperature():
         assert q.render() == '273.15 K'
 
 def test_distance():
+    Quantity.reset_prefs()
     with Quantity.prefs(
         spacer=None, show_label=None, label_fmt=None, label_fmt_full=None,
         ignore_sf=False
@@ -205,6 +209,7 @@ def test_distance():
         assert q.render() == '149.67 Gm'
 
 def test_mass():
+    Quantity.reset_prefs()
     with Quantity.prefs(
         spacer=None, show_label=None, label_fmt=None, label_fmt_full=None,
         ignore_sf=False
@@ -225,6 +230,7 @@ def test_mass():
         assert q.render() == '453.59 g'
 
 def test_time():
+    Quantity.reset_prefs()
     with Quantity.prefs(
         spacer=None, show_label=None, label_fmt=None, label_fmt_full=None,
         ignore_sf=True
@@ -253,12 +259,14 @@ def test_time():
         assert q.render() == '60 s'
 
 def test_scale():
+    Quantity.reset_prefs()
     secs = Quantity('86400 s')
     days = secs.scale('day')
     assert secs.render() == '86.4 ks'
     assert days.render() == '1 day'
 
 def test_add():
+    Quantity.reset_prefs()
     total = Quantity(0, '$')
     for contribution in [1.23, 4.56, 7.89]:
         total = total.add(contribution)
@@ -276,6 +284,7 @@ def test_add():
         assert True
 
 def test_coversion():
+    Quantity.reset_prefs()
     conversion = UnitConversion('USD', 'BTC', 100000)
     assert str(conversion) == 'USD = 100000*BTC'
 
@@ -339,6 +348,7 @@ def test_coversion():
     assert exception.value.args == ('X',)
 
 def test_func():
+    Quantity.reset_prefs()
 
     def from_dB(value):
         return 10**(value/20)

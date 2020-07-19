@@ -199,6 +199,7 @@ from quantiphy import Quantity
 
 
 def test_reader():
+    Quantity.reset_prefs()
     with Quantity.prefs(known_units = 'Zippy'):
         for line in data1.splitlines():
             v, s1, s2, s3, s4, s5 = [c.strip() for c in line.strip().split(';')]
@@ -226,6 +227,7 @@ def test_reader():
             assert s5 == res, exp
 
 def test_writer():
+    Quantity.reset_prefs()
     q = Quantity('mem = 1GiB', binary=True)
 
     res = str(q)
@@ -303,6 +305,7 @@ def test_writer():
     assert res == exp, res
 
 def test_writer_prec():
+    Quantity.reset_prefs()
     for line in data2.splitlines():
         v, p0, p1, p2, p3, p4 = [c.strip() for c in line.strip().split(';')]
         print('Trying: v={v}, p0={p0}, p1={p1}, p2={p2}, p3={p3}, p4={p4}'.format(**locals()))

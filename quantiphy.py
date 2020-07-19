@@ -751,9 +751,9 @@ DEFAULTS = dict(
             (\#|--|//).*                             # simple comment
         )|(
             (
-                (?P<name>[^(=:]+?)\s*                # name: \.+
+                (?P<name>[^(=:]+?)\s*                # name:  [^(=:]+
                 (\(\s*(?P<qname>[^)]*?)\s*\)\s*)?    # qname: (.*)
-                [=:]\s*
+                [=:]\s*                              #        [=:]
             )?
             (?P<val>.+?)                             # value: .+
             (\s*(\#|--|//)\s*(?P<desc>.*?))?         # description: (--|//|#) .*
@@ -928,14 +928,24 @@ class Quantity(float):
     infinity_symbol = '∞'
 
     # preferences {{{2
-    _initialized = set()
+    _initialized = False
 
-    # _initialize_preferences {{{3
+    # initialize preferences {{{3
     @classmethod
     def _initialize_preferences(cls):
-        if id(cls) in cls._initialized:
+        if cls._initialized == id(cls):
             return
-        cls._initialized.add(id(cls))
+        cls.reset_prefs()
+
+    # reset preferences {{{3
+    @classmethod
+    def reset_prefs(cls):
+        """Reset preferences
+
+        Resets all preferences to the current preferences of the parent class.
+        If there is no parent class, they are reset to their defaults.
+        """
+        cls._initialized = id(cls)
         if cls == Quantity:
             prefs = DEFAULTS
         else:
