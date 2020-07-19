@@ -283,10 +283,8 @@ from autoclasstoc import PublicMethods
 class DocumentedPublicMethods(PublicMethods):
     include_inherited = False
     def predicate(self, name, attr, *args, **kwargs):
-        # occasionally predicate seems to get more than the three arguments
-        # so just ignore the extras and hope for the best
         return (
-            super().predicate(name, attr) and
+            super().predicate(name, attr, *args, **kwargs) and
             attr.__doc__
             and not name.startswith('__')
         )
