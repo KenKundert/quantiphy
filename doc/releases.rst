@@ -2,8 +2,8 @@ Releases
 ========
 
 **Latest development release**:
-    | Version: 2.10.4
-    | Released: 2020-07-01
+    | Version: 2.10.5
+    | Released: 2020-07-18
 
     - Dropping support for all versions of Python older than 3.5.
     - Added *sia* form (ASCII only SI scale factors).
