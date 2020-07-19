@@ -5,6 +5,8 @@ Releases
     | Version: 2.10.5
     | Released: 2020-07-18
 
+
+**2.11 (2020-07-19)**:
     - Dropping support for all versions of Python older than 3.5.
     - Added *sia* form (ASCII only SI scale factors).
     - Added *only_e_notation* argument to 
