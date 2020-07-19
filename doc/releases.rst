@@ -9,6 +9,7 @@ Releases
     - Added *sia* form (ASCII only SI scale factors).
     - Added *only_e_notation* argument to 
       :meth:`quantiphy.Quantity.all_from_conv_fmt()`.
+    - Added :meth:`quantiphy.Quantity.reset_prefs()` method.
 
 **2.10 (2020-03-2)**:
     - Added *negligible*, *tight_units*, *nan*, and *inf* preferences.

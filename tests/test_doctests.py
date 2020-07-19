@@ -20,7 +20,6 @@ def test_quantiphy():
 def test_manual():
     Quantity.reset_prefs()
     files = {
-        # the order the files are given in is important
         '../doc/index.rst': 29,
         '../doc/user.rst': 361,
         '../doc/api.rst': 0,
@@ -32,7 +31,6 @@ def test_manual():
         assert f in files, f
     for path, tests in files.items():
         rv = doctest.testfile(path, optionflags=doctest.ELLIPSIS)
-        print(f'{path}: attempted={rv.attempted}, failed={rv.failed}')
         assert rv.failed == 0, path
         assert rv.attempted == tests, path
 

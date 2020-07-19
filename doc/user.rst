@@ -1902,7 +1902,7 @@ a version that displays the name and description by default.
     ...    label_fmt = '{n} = {v}'
     ...    label_fmt_full = '{V:<18} -- {d}'
 
-    >>> filename = 'parameters'
+    >>> filename = '.parameters'
     >>> try:
     ...     with open(filename) as f:
     ...         globals().update(VerboseQuantity.extract(f.read()))
