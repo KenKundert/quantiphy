@@ -257,7 +257,7 @@ texinfo_documents = [
 def setup(app):
     import os
     if os.path.exists('.static/css/custom.css'):
-        app.add_stylesheet('css/custom.css')
+        app.add_css_file('css/custom.css')
 
 
 # Do not set the defaults, it occasionally confuses autodoc, which sometimes
@@ -282,7 +282,9 @@ from autoclasstoc import PublicMethods
 
 class DocumentedPublicMethods(PublicMethods):
     include_inherited = False
-    def predicate(self, name, attr):
+    def predicate(self, name, attr, *args, **kwargs):
+        # occasionally predicate seems to get more than the three arguments
+        # so just ignore the extras and hope for the best
         return (
             super().predicate(name, attr) and
             attr.__doc__
