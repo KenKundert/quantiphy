@@ -5,6 +5,7 @@ Releases
     | Version: 2.11.1
     | Released: 2020-07-24
 
+    - Allow currency symbols in compound units (ex: $/oz or lbs/$).
 
 **2.11 (2020-07-19)**:
     - Dropping support for all versions of Python older than 3.5.
