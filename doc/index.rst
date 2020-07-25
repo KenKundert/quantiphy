@@ -8,8 +8,8 @@
 QuantiPhy: Physical Quantities
 ==============================
 
-| Version: 2.11.0
-| Released: 2020-07-19
+| Version: 2.11.1
+| Released: 2020-07-24
 | Please post all bugs and suggestions at
   `Github <https://github.com/KenKundert/quantiphy/issues>`_
   (or contact me directly at
