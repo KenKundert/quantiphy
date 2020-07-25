@@ -1599,6 +1599,7 @@ on the fly:
 
 .. index::
    single: Kelvin/kilo ambiguity
+   single: ambiguity between scale factors and units
 
 .. _ambiguity:
 

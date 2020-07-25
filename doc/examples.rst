@@ -588,10 +588,9 @@ to date.
         vin_file = 'vin.wave'   -- output data file for vin
         vout_file = 'vout.wave' -- output data file for vout
         dout_file = 'dout.wave' -- output data file for dout
-
-    The values given above are used in the simulation, no further modification 
-    of the code given below is required when changing these parameters.
     """
+    # The values given above are used in the simulation, no further modification 
+    # of the code given below is required when changing these parameters.
 
     from quantiphy import Quantity
     from math import sin, tau

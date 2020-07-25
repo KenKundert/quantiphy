@@ -198,6 +198,17 @@ def test_route():
     assert t_stop.desc == 'stop time'
     assert not qs
 
+def test_basilica():
+    Quantity.reset_prefs()
+    qs = Quantity.extract('XAU = 1.9 k$/oz  # price of gold on 23 July 2020')
+    xau = qs.pop('XAU')
+    assert xau.is_close(Quantity(1900, '$/oz'), check_units=True)
+    assert xau.is_close(1900)
+    assert xau.units == '$/oz'
+    assert xau.name == 'XAU'
+    assert xau.desc == 'price of gold on 23 July 2020'
+    assert not qs
+
 def test_critique():
     Quantity.reset_prefs()
     qs = Quantity.extract(

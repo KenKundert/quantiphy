@@ -383,6 +383,15 @@ def test_render():
     assert q.fixed(prec='full', strip_zeros=False) == '$1000000.000000000000'
     assert q.render(form='fixed') == '$1000000'
 
+    q=Quantity('$100')
+    assert q.fixed(prec=0, strip_zeros=False, strip_radix=False) == '$100.'
+    assert q.fixed(prec=0, strip_zeros=True, strip_radix=False) == '$100.'
+    assert q.fixed(prec=0, strip_zeros=False, strip_radix=True) == '$100'
+    assert q.fixed(prec=0, strip_zeros=True, strip_radix=True) == '$100'
+    assert q.fixed(prec=2, strip_zeros=False, strip_radix=False) == '$100.00'
+    assert q.fixed(prec=2, strip_zeros=True, strip_radix=False) == '$100.'
+    assert q.fixed(prec=2, strip_zeros=False, strip_radix=True) == '$100.00'
+    assert q.fixed(prec=2, strip_zeros=True, strip_radix=True) == '$100'
 
 def test_sign():
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None, show_desc=False)

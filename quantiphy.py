@@ -1513,14 +1513,15 @@ class Quantity(float):
         exponent = _named_regex('exp', '[eE][-+]?[0-9]+')
         scale_factor = _named_regex('sf', '[%s]' % input_sf)
         binary_scale_factor = _named_regex('sf', '%s' % '|'.join(BINARY_MAPPINGS))
+        currency = _named_regex('currency', '[%s]' % CURRENCY_SYMBOLS)
         units = _named_regex(
-            r'units', r'(?:[a-zA-Z%√{us}][-^/()\w·⁻⁰¹²³⁴⁵⁶⁷⁸⁹√{us}]*)?'.format(
-                us=UNIT_SYMBOLS
+            r'units', r'(?:[a-zA-Z%√{us}{cur}][-^/()\w·⁻⁰¹²³⁴⁵⁶⁷⁸⁹√{us}{cur}]*)?'.format(
+                us = UNIT_SYMBOLS,
+                cur = CURRENCY_SYMBOLS,
             )
             # examples: Ohms, V/A, J-s, m/s^2, H/(m-s), Ω, %, m·s⁻², V/√Hz
             # leading char must be letter to avoid 1.0E-9s -> (1e18, '-9s')
         )
-        currency = _named_regex('currency', '[%s]' % CURRENCY_SYMBOLS)
         nan = _named_regex('nan', '(?:[iI][nN][fF])|(?:[nN][aA][nN])')
 
         # number_with_scale_factor {{{3
@@ -1635,8 +1636,8 @@ class Quantity(float):
         cls.all_number_converters = [
             (re.compile(r'\A\s*{}\s*\Z'.format(pattern)), get_mant, get_sf, get_units)
             for pattern, get_mant, get_sf, get_units in [
-                number_with_exponent, number_with_scale_factor, simple_number,
                 currency_with_exponent, currency_with_scale_factor, simple_currency,
+                number_with_exponent, number_with_scale_factor, simple_number,
                 nan_with_units, currency_nan, simple_nan,
                 inf_with_units, currency_inf, simple_inf,
             ]
@@ -1646,8 +1647,8 @@ class Quantity(float):
         cls.sf_free_number_converters = [
             (re.compile(r'\A\s*{}\s*\Z'.format(pattern)), get_mant, get_sf, get_units)
             for pattern, get_mant, get_sf, get_units in [
-                number_with_exponent, simple_number,
                 currency_with_exponent, simple_currency,
+                number_with_exponent, simple_number,
                 nan_with_units, currency_nan, simple_nan,
                 inf_with_units, currency_inf, simple_inf,
             ]
@@ -2389,7 +2390,7 @@ class Quantity(float):
             number = float(self)
         comma = ',' if show_commas else ''
         mantissa = '{0:{1}.{2}f}'.format(number, comma, prec)
-        if strip_zeros:
+        if '.' in mantissa and strip_zeros:
             mantissa = mantissa.rstrip('0')
         if strip_radix:
             mantissa = mantissa.rstrip('.')
@@ -2707,7 +2708,7 @@ class Quantity(float):
             elif ftype == 'p':
                 value = self.fixed(
                     prec=prec, show_units=True, show_label=label,
-                    show_commas=comma, strip_zeros=not alt_form,
+                    show_commas=bool(comma), strip_zeros=not alt_form,
                     strip_radix=not alt_form, scale=scale
                 )
             elif ftype == 'b':
@@ -2785,7 +2786,7 @@ class Quantity(float):
                 the name taken by the quantity.
 
             <value>:
-                A number with optional units (ex: 3 or 1pF or 1 kOhm),
+                A number with optional units (ex: 3 or 1pF or 1 kΩ);
                 the units need not be a simple identifier (ex: 9.07 GHz/V).
 
                 The value may also be an expression.  When giving an expression,
@@ -2794,8 +2795,9 @@ class Quantity(float):
                 The expressions may only contain value defined previously in the
                 same set of definitions, values contained in *predefined*,
                 physical constants, the mathematical constants pi and tau
-                (2*pi), which may be named π or τ, or number literals. The units
-                should not include a scale factor.
+                (2*pi), which may be named π or τ, or number literals without
+                scale factors or units. The units should not include a scale
+                factor.
 
                 When processing the value, it is passed as an argument to
                 Quantity, if cannot be converted to a quantity, then it is
@@ -2838,8 +2840,8 @@ class Quantity(float):
             ...     -- Carl Sagan's SETI frequencies of high interest
             ...
             ...     f_hy = 1420.405751786 MHz -- Hydrogen line frequency
-            ...     f_sagan1 = pi*f_hy "Hz" -- Sagan's first frequency
-            ...     f_sagan2 = 2*pi*f_hy "Hz" -- Sagan's second frequency
+            ...     f_sagan1 = π*f_hy "Hz" -- Sagan's first frequency
+            ...     f_sagan2 = τ*f_hy "Hz" -- Sagan's second frequency
             ... '''
             >>> freqs = Quantity.extract(sagan_frequencies)
             >>> for f in freqs.values():
