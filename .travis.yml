@@ -4,7 +4,7 @@ os:
 install:
   - pip install virtualenv tox coveralls
 script:
-  - coverage run setup.py pytest
+  - tox
 after_success:
   - coveralls
 jobs:
