@@ -1151,7 +1151,7 @@ class Quantity(float):
             of '' is used for quantities with no units and a key of None
             provides a default value for *negligible* that is used if the units
             of the quantity are not found in the dictionary.
-        :type map_sf: real or dictionary
+        :type negligible: real or dictionary
 
         :arg number_fmt:
             Format string used to convert the components of the number into the
