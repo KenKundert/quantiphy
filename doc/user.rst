@@ -1401,7 +1401,7 @@ instance of that class regardless of whether they were instantiated before or
 after the preferences were set. If you would like to have more than one set of 
 preferences, then you should subclass :class:`quantiphy.Quantity`. For example, 
 imagine a situation where you have different types of quantities that would 
-naturally want different precisions:
+naturally want different preferences:
 
 .. code-block:: python
 
@@ -1502,6 +1502,39 @@ preferences:
 
 Notice that the specified preferences only affected the table, not the final 
 printed values, which were rendered outside the *with* statement.
+
+If you are using *QuantiPhy* in a large package with multiple modules and more 
+than one includes :class:`quantiphy.Quantity`, you may find that the preferences 
+are not shared between the modules. This occurs because each module gets its own 
+independent version of *Quantity*. To work around this issue you would create 
+your own module that imports from *QuantiPhy*, and then each of you modules 
+import from your module rather than directly from *QuantiPhy*.  For example, 
+consider creating a local module named *quantity.py*:
+
+.. code-block:: python
+
+    from quantiphy import *
+
+    # Base preferences
+    # Configure Quantity to produce values that are parsable by Verilog-AMS.
+    Quantity.set_prefs(
+        form='sia',         # use SI scale factors, but not unicode versions
+        prec='full',        # include all precision specified by user
+        spacer='',          # no space between number and scale factor
+        strip_radix=False,  # assures quantities are always treated as reals
+        show_units=False,   # do not include units
+        map_sf=Quantity.map_sf_to_greek,
+                            # because we are using sia this is ignored by 
+                            # default;  it comes into play when form is 
+                            # overridden to 'si' in comments
+    )
+
+Now, in the other modules, you would simply import from *quantity* rather than 
+*quantiphy*:
+
+.. code-block:: python
+
+    from quantity import Quantity, QuantiPhyError
 
 
 .. index::
