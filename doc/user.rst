@@ -1507,9 +1507,9 @@ If you are using *QuantiPhy* in a large package with multiple modules and more
 than one includes :class:`quantiphy.Quantity`, you may find that the preferences 
 are not shared between the modules. This occurs because each module gets its own 
 independent version of *Quantity*. To work around this issue you would create 
-your own module that imports from *QuantiPhy*, and then each of you modules 
-import from your module rather than directly from *QuantiPhy*.  For example, 
-consider creating a local module named *quantity.py*:
+your own module that imports from *QuantiPhy*.  Each of the packages' modules 
+then import from your new module rather than directly from *QuantiPhy*.  For 
+example, consider creating a local module named *quantity.py*:
 
 .. code-block:: python
 
@@ -1526,7 +1526,7 @@ consider creating a local module named *quantity.py*:
         map_sf=Quantity.map_sf_to_greek,
                             # because we are using sia this is ignored by 
                             # default;  it comes into play when form is 
-                            # overridden to 'si' in comments
+                            # overridden to 'si' for comments
     )
 
 Now, in the other modules, you would simply import from *quantity* rather than 
