@@ -192,6 +192,7 @@ Documentation
    user
    api
    examples
+   accessories
    releases
 
 *  :ref:`genindex`
