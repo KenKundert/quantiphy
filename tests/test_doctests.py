@@ -34,7 +34,8 @@ def test_manual():
         '../doc/index.rst': 29,
         '../doc/user.rst': 361,
         '../doc/api.rst': 0,
-        '../doc/examples.rst': 50,
+        '../doc/examples.rst': 36,
+        '../doc/accessories.rst': 12,
         '../doc/releases.rst': 0,
     }
     found = glob.glob('../doc/*.rst')
