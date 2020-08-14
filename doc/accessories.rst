@@ -161,6 +161,13 @@ such as 20m or 2h.
     Alarm scheduled for 6:36 PM, 45 minutes from now.
     Message: remove roast from oven
 
+You can specify the time as either a time-of-day or an elapsed time. You can 
+even combine them to do simple calculations::
+
+    > remind 10am -15m meet with Jamie
+    Alarm scheduled for 9:45 AM, 108 minutes from now.
+    Message: meet with Jamie
+
 The source code is available from the `remind repository
 <https://github.com/KenKundert/remind>`_ on GitHub, or you can install it 
 directly with::
