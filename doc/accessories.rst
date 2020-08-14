@@ -11,13 +11,13 @@ enhance their functionality.  These utilities are not included as part of
 *QuantiPhy*, but are available via PyPi.
 
 
-.. engineering calculator package {{{1
-.. _engineering calculator package:
+.. ec package {{{1
+.. _ec package:
 
 .. index::
    single: Engineering Calculator (ec) package
 
-ec — Engineering Calculator
+Engineering Calculator
 ---------------------------
 
 `ec <https://github.com/KenKundert/ec>`_ is a handy command-line calculator for 
@@ -38,8 +38,8 @@ with::
 
 
 
-.. time-value of money package {{{1
-.. _time-value of money package:
+.. tvm package {{{1
+.. _tvm package:
 
 .. index::
    single: Time-Value of Money (tvm) package
@@ -115,8 +115,8 @@ directly with::
 .. index::
    single: QuantiPhy Eval package
 
-QuantiPhy Eval — Evaluate Expressions in Strings
-------------------------------------------------
+Evaluate Expressions in Strings
+-------------------------------
 
 `QuantiPhy Eval <https://github.com/KenKundert/quantiphy_eval>`_ is yet another 
 calculator, this one is a Python API that allows you to evaluate expressions 
@@ -145,8 +145,8 @@ it directly with::
 .. index::
    single: Remind package
 
-remind — Schedule Reminder
---------------------------
+Schedule Reminders
+------------------
 
 `remind <https://github.com/KenKundert/remind>`_ is command line reminder 
 program. At the appointed time it sends you a notification to remind you of some 
@@ -182,8 +182,8 @@ directly with::
 .. index::
    single: RKM codes
 
-RKM Codes Example
------------------
+RKM Codes
+---------
 
 RKM codes are a way of writing numbers that is often used for specifying the 
 sizes of resistors and capacitors on schematics and on the components 
