@@ -17,9 +17,10 @@ QuantiPhy — Physical Quantities
     .. image:: https://img.shields.io/pypi/dm/quantiphy.svg
         :target: https://pypi.python.org/pypi/quantiphy/
 
-:Author: Ken Kundert
-:Version: 2.13.0
-:Released: 2020-10-13
+| Author: Ken Kundert
+| Version: 2.13.0
+| Released: 2020-10-13
+|
 
 
 What?
