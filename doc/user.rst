@@ -657,22 +657,22 @@ Any value that can be passed to the *scale* argument for
 :class:`quantiphy.Quantity` or :meth:`quantiphy.Quantity.render` can be passed 
 to the *scale* method. Specifically, the following types are accepted:
 
-float or Quantity:
+float or Quantity
     The argument scales the underlying value (a new quantity is returned whose 
     value equals the underlying quantity multiplied by scale). In this case the 
     scale is assumed unitless (any units are ignored) and so the units of the 
     new quantity are the same as those of the underlying quantity.
 
-tuple:
+tuple
     The argument consists of two values. Tthe first value, a float, is treated 
     as a scale factor. The the second value, a string, is taken to be the units 
     of the new quantity.
 
-function:
+function
     The function takes two arguments, the value and the units of the quantity 
     and it returns two values, the value and units of the new value.
 
-string:
+string
     The argument is taken to the be desired units. This value along with the 
     units of the underlying quantity are used to select a known unit conversion, 
     which is applied to create the new value.
@@ -1548,18 +1548,18 @@ Localization
 *Quantiphy* provides 4 preferences that help with localization: *radix*, 
 *comma*, *plus*, and *minus*.
 
-*radix*:
+radix
     The decimal point; generally ``.`` or ``,``.
 
-*comma*:
+comma
     The thousands separator; generally ``,``, ``.``, or the empty string.
 
-*plus*:
+plus
     The sign that indicates a positive number; generally ``+`` or ``＋``.
     This only affect the plus sign used on exponents, a plus sign is never added 
     to the front of a number.
 
-*minus*:
+minus
     The sign that indicates a negative number; generally ``-`` or ``−``.
 
 By default *QuantiPhy* uses ``.``, ``,``, ``+``, and ``-`` as the defaults.  

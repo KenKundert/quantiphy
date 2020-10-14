@@ -21,14 +21,56 @@ Engineering Calculator
 ---------------------------
 
 `ec <https://github.com/KenKundert/ec>`_ is a handy command-line calculator for 
-engineers and scientists that employs Reverse-Polish Notation and allows numbers 
-to be specified with units and SI scale factors.
+engineers and scientists that employs Reverse-Polish Notation (RPN) and allows 
+numbers to be specified with units and SI scale factors.  With  RPN, the 
+arguments are pushed onto a stack and the operators pull the needed argument 
+from the stack and push the result back onto the stack.  For example, to compute 
+the effective resistance of two parallel resistors:
 
 ::
 
     > ec
     0: 100k 50k ||
     33.333k:
+
+And here is a fuller example that shows some of the features of *ec*. In this 
+case we create initialization scripts, ~/.ecrc and ./.ecrc, and a dedicated 
+script, compute-zo, and use it to compute the output impedance of a simple RC 
+circuit::
+
+    > cat ~/.ecrc
+    # define some functions useful in phasor analysis
+    (2pi * "rads/s")to_omega    # convert frequency in Herts to radians/s
+    (mag 2pi / "Hz")to_freq     # convert frequency in radians/s to Hertz
+    (j2pi * "rads/s")to_jomega  # convert frequency in Herts to imaginary radians/s
+
+    > cat ./.ecrc
+    # define default values for parameters
+    10MHz =freq   # operating frequency
+    1nF =Cin      # input capacitance
+    50Ω =Rl       # load resistance
+
+    > cat ./compute-zo
+    freq to_jomega           # enter 10MHz and convert to radial freq.
+    Cin * recip              # enter 1nF, multiply by 𝑥 and reciprocate
+                             # to compute impedance of capacitor at 10MHz
+    Rl ||                    # enter 50 Ohms and compute impedance of
+                             # parallel combination
+    "Ω" =Zo                  # apply units of Ω and save to Zo
+    ph                       # compute the phase of impedance
+    Zo mag                   # recall complex impedance from Zo and compute its magnitude
+    `Zo = $0 ∠ $1 @ $freq.`  # display the magnitude and phase of Zo
+    quit
+
+    > ec compute-zo
+    Zo = 15.166 Ω ∠ -72.343 degs @ 10 MHz.
+
+    > ec 500pF =Cin compute-zo
+    Zo = 26.851 Ω ∠ -57.518 degs @ 10 MHz.
+
+It may be a bit confusing, just remember that with RPN you give the values first 
+by pushing them on to the stack, and then act on them.  And once you get use to 
+it, you'll likely find it quite efficient.
 
 The source code is available from the `ec repository 
 <https://github.com/KenKundert/ec>`_ on GitHub, or you can install it directly 
