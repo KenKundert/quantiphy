@@ -8,11 +8,12 @@ Latest development release
 | Version: 2.12.2
 | Released: 2020-08-14
 
-
 2.13 (2020-10-13)
+-----------------
 - Allow currency symbols in compound units (ex: $/oz or lbs/$).
 
 2.12 (2020-07-25)
+-----------------
 - bug fix release.
 
 2.11 (2020-07-19)
