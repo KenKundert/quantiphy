@@ -39,16 +39,16 @@ provide another important benefit.  They naturally support the SI scale factors,
 which for those that are familiar with them are much easier to read and write 
 than the alternatives. The most common SI scale factors are:
 
-    |   T (10\ :sup:`12`) tera
-    |   G (10\ :sup:`9`) giga
-    |   M (10\ :sup:`6`) mega
-    |   k (10\ :sup:`3`) kilo
-    |   m (10\ :sup:`-3`) milli
-    |   μ (10\ :sup:`-6`) micro
-    |   n (10\ :sup:`-9`) nano
-    |   p (10\ :sup:`-12`) pico
-    |   f (10\ :sup:`-15`) fempto
-    |   a (10\ :sup:`-18`) atto
+|   T (10\ :sup:`12`) tera
+|   G (10\ :sup:`9`) giga
+|   M (10\ :sup:`6`) mega
+|   k (10\ :sup:`3`) kilo
+|   m (10\ :sup:`-3`) milli
+|   μ (10\ :sup:`-6`) micro
+|   n (10\ :sup:`-9`) nano
+|   p (10\ :sup:`-12`) pico
+|   f (10\ :sup:`-15`) fempto
+|   a (10\ :sup:`-18`) atto
 
 Numbers with SI scale factors are commonly used in science and engineering
 to represent physical quantities because it is easy to read and write numbers
@@ -226,25 +226,25 @@ units:
 When given as a string, the number may use any of the following scale factors 
 (though you can use the *input_sf* preference to prune this list if desired):
 
-    |   Y (10\ :sup:`24`) yotta
-    |   Z (10\ :sup:`21`) zetta
-    |   E (10\ :sup:`18`) exa
-    |   P (10\ :sup:`15`) peta
-    |   T (10\ :sup:`12`) tera
-    |   G (10\ :sup:`9`) giga
-    |   M (10\ :sup:`6`) mega
-    |   k (10\ :sup:`3`) kilo
-    |   _ (1)
-    |   c (10\ :sup:`-2`) centi
-    |   m (10\ :sup:`-3`) milli
-    |   u (10\ :sup:`-6`) micro
-    |   μ (10\ :sup:`-6`) micro
-    |   n (10\ :sup:`-9`) nano
-    |   p (10\ :sup:`-12`) pico
-    |   f (10\ :sup:`-15`) fempto
-    |   a (10\ :sup:`-18`) atto
-    |   z (10\ :sup:`-21`) zepto
-    |   y (10\ :sup:`-24`) yocto
+|   Y (10\ :sup:`24`) yotta
+|   Z (10\ :sup:`21`) zetta
+|   E (10\ :sup:`18`) exa
+|   P (10\ :sup:`15`) peta
+|   T (10\ :sup:`12`) tera
+|   G (10\ :sup:`9`) giga
+|   M (10\ :sup:`6`) mega
+|   k (10\ :sup:`3`) kilo
+|   _ (1)
+|   c (10\ :sup:`-2`) centi
+|   m (10\ :sup:`-3`) milli
+|   u (10\ :sup:`-6`) micro
+|   μ (10\ :sup:`-6`) micro
+|   n (10\ :sup:`-9`) nano
+|   p (10\ :sup:`-12`) pico
+|   f (10\ :sup:`-15`) fempto
+|   a (10\ :sup:`-18`) atto
+|   z (10\ :sup:`-21`) zepto
+|   y (10\ :sup:`-24`) yocto
 
 In addition, the units must start with a letter or any of these characters: 
 ``%√°ÅΩƱ``, and may be followed by those characters or digits or any of these 
@@ -788,22 +788,22 @@ a string:
 SI scale factors are used by default when converting numbers to strings. The 
 following scale factors could be used:
 
-    |   Y (10\ :sup:`24`) yotta
-    |   Z (10\ :sup:`21`) zetta
-    |   E (10\ :sup:`18`) exa
-    |   P (10\ :sup:`15`) peta
-    |   T (10\ :sup:`12`) tera
-    |   G (10\ :sup:`9`) giga
-    |   M (10\ :sup:`6`) mega
-    |   k (10\ :sup:`3`) kilo
-    |   m (10\ :sup:`-3`) milli
-    |   u (10\ :sup:`-6`) micro
-    |   n (10\ :sup:`-9`) nano
-    |   p (10\ :sup:`-12`) pico
-    |   f (10\ :sup:`-15`) fempto
-    |   a (10\ :sup:`-18`) atto
-    |   z (10\ :sup:`-21`) zepto
-    |   y (10\ :sup:`-24`) yocto
+|   Y (10\ :sup:`24`) yotta
+|   Z (10\ :sup:`21`) zetta
+|   E (10\ :sup:`18`) exa
+|   P (10\ :sup:`15`) peta
+|   T (10\ :sup:`12`) tera
+|   G (10\ :sup:`9`) giga
+|   M (10\ :sup:`6`) mega
+|   k (10\ :sup:`3`) kilo
+|   m (10\ :sup:`-3`) milli
+|   u (10\ :sup:`-6`) micro
+|   n (10\ :sup:`-9`) nano
+|   p (10\ :sup:`-12`) pico
+|   f (10\ :sup:`-15`) fempto
+|   a (10\ :sup:`-18`) atto
+|   z (10\ :sup:`-21`) zepto
+|   y (10\ :sup:`-24`) yocto
 
 However, only the scale factors listed in the *output_sf* preference are 
 actually used, and by default that is set to 'TGMkmunpfa', which avoids the more
@@ -999,17 +999,17 @@ convention of right justifying numbers by default.
 
 .. code-block:: python
 
-    >>> print('|{:16.6}|'.format(h_line))
-    |    1.420406 GHz|
+    >>> print('«{:16.6}»'.format(h_line))
+    «    1.420406 GHz»
 
-    >>> print('|{:<16.6}|'.format(h_line))
-    |1.420406 GHz    |
+    >>> print('«{:<16.6}»'.format(h_line))
+    «1.420406 GHz    »
 
-    >>> print('|{:>16.6}|'.format(h_line))
-    |    1.420406 GHz|
+    >>> print('«{:>16.6}»'.format(h_line))
+    «    1.420406 GHz»
 
-    >>> print('|{:^16.6}|'.format(h_line))
-    |  1.420406 GHz  |
+    >>> print('«{:^16.6}»'.format(h_line))
+    «  1.420406 GHz  »
 
 The general form of the format specifiers supported by quantities is::
 
@@ -2119,7 +2119,7 @@ are close.
 
 :meth:`quantiphy.Quantity.is_close()` returns true if the units match and if:
 
-   | abs(*a* - *b*) <= max(reltol * max(abs(*a*), abs(*b*)), abstol)
+| abs(*a* - *b*) <= max(reltol * max(abs(*a*), abs(*b*)), abstol)
 
 where *a* and *b* represent *other* and the numeric value of the underlying 
 quantity.

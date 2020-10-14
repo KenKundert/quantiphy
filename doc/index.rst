@@ -163,11 +163,11 @@ incorporate quantity values into strings:
    >>> f'{Fhy:.6}'
    '1.420406 GHz'
 
-   >>> f'|{Fhy:<15.6}|'
-   '|1.420406 GHz   |'
+   >>> f'«{Fhy:<15.6}»'
+   '«1.420406 GHz   »'
 
-   >>> f'|{Fhy:>15.6}|'
-   '|   1.420406 GHz|'
+   >>> f'«{Fhy:>15.6}»'
+   '«   1.420406 GHz»'
 
    >>> f'Boiling point of water: {Tboil:s}'
    'Boiling point of water: 100 °C'
