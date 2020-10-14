@@ -49,6 +49,7 @@ than the alternatives. The most common SI scale factors are:
 |   p (10\ :sup:`-12`) pico
 |   f (10\ :sup:`-15`) fempto
 |   a (10\ :sup:`-18`) atto
+|
 
 Numbers with SI scale factors are commonly used in science and engineering
 to represent physical quantities because it is easy to read and write numbers
@@ -245,6 +246,7 @@ When given as a string, the number may use any of the following scale factors
 |   a (10\ :sup:`-18`) atto
 |   z (10\ :sup:`-21`) zepto
 |   y (10\ :sup:`-24`) yocto
+|
 
 In addition, the units must start with a letter or any of these characters: 
 ``%√°ÅΩƱ``, and may be followed by those characters or digits or any of these 
@@ -804,6 +806,7 @@ following scale factors could be used:
 |   a (10\ :sup:`-18`) atto
 |   z (10\ :sup:`-21`) zepto
 |   y (10\ :sup:`-24`) yocto
+|
 
 However, only the scale factors listed in the *output_sf* preference are 
 actually used, and by default that is set to 'TGMkmunpfa', which avoids the more
