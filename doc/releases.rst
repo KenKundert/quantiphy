@@ -1,35 +1,41 @@
 Releases
 ========
 
-**Latest development release**:
+Latest development release
+--------------------------
     | Version: 2.12.2
     | Released: 2020-08-14
 
     - Allow currency symbols in compound units (ex: $/oz or lbs/$).
 
-**2.11 (2020-07-19)**:
+2.11 (2020-07-19)
+-----------------
     - Dropping support for all versions of Python older than 3.5.
     - Added *sia* form (ASCII only SI scale factors).
     - Added *only_e_notation* argument to 
       :meth:`quantiphy.Quantity.all_from_conv_fmt()`.
     - Added :meth:`quantiphy.Quantity.reset_prefs()` method.
 
-**2.10 (2020-03-2)**:
+2.10 (2020-03-2)
+----------------
     - Added *negligible*, *tight_units*, *nan*, and *inf* preferences.
     - Added *negligible* argument to render.
     - Added *infinity_symbol* attribute.
     - Changed the return values for :meth:`quantiphy.Quantity.is_nan()` and
       :meth:`quantiphy.Quantity.is_infinite()`.
 
-**2.9 (2020-01-28)**:
+2.9 (2020-01-28)
+----------------
     - Made :meth:`quantiphy.Quantity.extract()` more forgiving.
     - Support radix and comma processing when converting strings to 
       :class:`quantiphy.Quantity`.
 
-**2.8 (2020-01-08)**:
+2.8 (2020-01-08)
+----------------
     - Fix nit in installer (setup.py).
 
-**2.7 (2019-12-17)**:
+2.7 (2019-12-17)
+----------------
     - improve the ability of both :meth:`quantiphy.Quantity.add()` and 
       :meth:`quantiphy.Quantity.scale()` to retain attributes.
     - added *accept_binary* preference.
@@ -37,11 +43,13 @@ Releases
     - allow radix and comma to be replaced by adding *radix* and *comma* 
       preferences.
 
-**2.6 (2019-09-24)**:
+2.6 (2019-09-24)
+----------------
     - now support Quantity arguments with :meth:`quantiphy.Quantity.extract()`.
     - allow plus and minus signs to be replaced with Unicode equivalents.
 
-**2.5 (2019-01-16)**:
+2.5 (2019-01-16)
+----------------
     - added RKM codes example.
     - added *check_value* = 'strict' to :meth:`quantiphy.Quantity.add()`.
     - added backward compatibility for *form* argument of 
@@ -50,7 +58,8 @@ Releases
     - reformulated exceptions.
     - added support for binary scale factors and :meth:`quantiphy.Quantity.binary()`.
 
-**2.4 (2018-09-12)**:
+2.4 (2018-09-12)
+----------------
     - fixed bug in format that resulted in several format codes ignoring width
     - follow Python convention of right-justifying numbers by default.
     - add Quantity.add() (adds a number to a quantity returning a new quantity)
@@ -62,7 +71,8 @@ Releases
     - added concept of equivalent units for unit conversion to documentation.
     - enhance UnitConversion so that it supports nonlinear conversions.
 
-**2.3 (2018-03-11)**:
+2.3 (2018-03-11)
+----------------
     - enhanced :meth:`quantiphy.Quantity.extract()`
 
       * non-conforming lines are now ignored
@@ -80,13 +90,15 @@ Releases
       * added :meth:`quantiphy.Quantity.format()` method
       * support any format specifier supported by Python for floats
 
-**2.2 (2017-11-22)**:
+2.2 (2017-11-22)
+----------------
     - added :meth:`quantiphy.Quantity.scale()`
     - added :meth:`quantiphy.UnitConversion.convert()`
     - added *strip_zeros*
     - added no-op conversions (units change but value stays the same, ex: $ → USD)
 
-**2.1 (2017-07-30)**:
+2.1 (2017-07-30)
+----------------
     The primary focus of this release was on improving the documentation, though 
     there are a few small feature enhancements.
 
@@ -95,7 +107,8 @@ Releases
     - removed constraint in :meth:`quantiphy.Quantity.extract()` that names must 
       be identifiers
 
-**2.0 (2017-07-15)**:
+2.0 (2017-07-15)
+----------------
     This is a 'coming of age' release where the emphasis shifts from finding the 
     right interface to providing an interface that is stable over time. This 
     release includes the first formal documentation and a number of new features 
@@ -121,11 +134,13 @@ Releases
     - renamed *strip_dp* option to *strip_radix*
     - added *number_fmt* option
 
-**1.3 (2017-03-19)**:
+1.3 (2017-03-19)
+----------------
     - reworked constants
     - added unit systems for physical constants
 
-**1.2 (2017-02-24)**:
+1.2 (2017-02-24)
+----------------
     - allow digits after decimal point to be optional
     - support underscores in numbers
     - allow options to be monkey-patched on to Quantity objects
@@ -133,10 +148,12 @@ Releases
     - fix some issues in full precision mode
     - ranamed some options, arguments and methods
 
-**1.1 (2016-11-27)**:
+1.1 (2016-11-27)
+----------------
     - added *known_units* preference.
     - added *get_preference* class method.
 
-**1.0 (2016-11-26)**:
+1.0 (2016-11-26)
+----------------
     - initial production release.
 
