@@ -313,6 +313,8 @@ units are inherited. For example:
 If the model contains units, those units are only used if the value does not 
 have units. The same is true for the description. For example:
 
+.. code-block:: python
+
     >>> h = Quantity('18in', 'm')
     >>> print(h)
     18 in
@@ -348,6 +350,8 @@ Unlike the normal scale factors, you cannot use a lower case *k* in *Ki*. Also,
 *input_sf* is ignored. The normal recognizers are used if none of the binary 
 scale factors are found.
 
+.. code-block:: python
+
     >>> bytes = Quantity('1 KiB', binary=True)
     >>> print(bytes)
     1.024 kB
@@ -357,6 +361,8 @@ Finally, you can also specify *scale* and *ignore_sf* as named arguments.
 described :ref:`in a bit <scaling upon creation>`. *ignore_sf* indicates that 
 any scale factors should be ignored. This is :ref:`one way <ambiguity>` of 
 handling units whose name starts with a scale factor character. For example:
+
+.. code-block:: python
 
     >>> x = Quantity('1m')                                  # unitless value
     >>> print(x, x.real, x.units, sep=', ')
@@ -391,6 +397,8 @@ the units, name, or description.
     output period = 100 ns -- period at output of frequency divider
 
 In addition, you can also override the preferences with attributes:
+
+.. code-block:: python
 
     >>> out_period.spacer = ''
     >>> print(out_period)
@@ -437,6 +445,8 @@ This example creates a special class for bytes.
 
 Lastly, this example creates a special class for temperatures. It disallows use 
 of 'K' as a scale factor to avoid confusion with Kelvin units.
+
+.. code-block:: python
 
     >>> class Temperature(Quantity):
     ...     units = 'K'
@@ -566,6 +576,8 @@ You can also create your own converters using :class:`quantiphy.UnitConversion`:
 
 This unit conversion says, when converting units of 'm' to either 'pc' or 
 'parsec' multiply by 3.0857e16, when going the other way, divide by 3.0857e16.
+
+.. code-block:: python
 
     >>> d_sol = Quantity('154.285 Gm', scale='pc')
     >>> print(d_sol)
@@ -1005,13 +1017,13 @@ The general form of the format specifiers supported by quantities is::
 
 *align* specifies the alignment using one of the following characters:
 
-   ===== =======================================================================
-   Align Meaning
-   ===== =======================================================================
-   >     Right justification.
-   <     Left justification.
-   ^     Center justification.
-   ===== =======================================================================
+===== =====================
+Align Meaning
+===== =====================
+>     Right justification.
+<     Left justification.
+^     Center justification.
+===== =====================
 
 The hash (#) is a literal hash that when present indicates that trailing zeros 
 and radix should not be stripped from the fractional part of the number.
@@ -1026,23 +1038,23 @@ be added to the whole part of the mantissa, every three digits.
 And finally, *type* specifies which form should be used when formatting the 
 value. The choices include:
 
-   ==== ========================================================================
-   Type Meaning
-   ==== ========================================================================
-        Use default formatting options.
-   s    Use default formatting options.
-   q    Format using SI scale factors and show the units.
-   r    Format using SI scale factors but do not show the units.
-   p    Format using fixed-point notation and show the units.
-   e    Format using exponent notation but do not show the units.
-   f    Format using fixed-point notation but do not show the units.
-   b    Format using binary prefixes while showing the units.
-   g    Format using fixed-point or exponential notation, whichever is shorter, 
-        but do not show the units.
-   u    Only include the units.
-   n    Only include the name.
-   d    Only include the description.
-   ==== ========================================================================
+==== ========================================================================
+Type Meaning
+==== ========================================================================
+     Use default formatting options.
+s    Use default formatting options.
+q    Format using SI scale factors and show the units.
+r    Format using SI scale factors but do not show the units.
+p    Format using fixed-point notation and show the units.
+e    Format using exponent notation but do not show the units.
+f    Format using fixed-point notation but do not show the units.
+b    Format using binary prefixes while showing the units.
+g    Format using fixed-point or exponential notation, whichever is shorter, but 
+     do not show the units.
+u    Only include the units.
+n    Only include the name.
+d    Only include the description.
+==== ========================================================================
 
 You can capitalize any of the format characters that output the value of the 
 quantity (any of 'sqrpefg', but not 'und'). If you do, the label will also be 
@@ -1623,6 +1635,8 @@ package:
 You can convert from one convention to the other by changing *radix* and *comma* 
 on the fly:
 
+.. code-block:: python
+
     >>> with Quantity.prefs(radix=',', comma='.'):
     ...     q = Quantity('€100.000.000,00')
     >>> with Quantity.prefs(radix='.', comma=','):
@@ -2134,6 +2148,8 @@ Exceptional Values
 ------------------
 
 *QuantiPhy* supports NaN (not a number) and infinite values:
+
+.. code-block:: python
 
    >>> inf = Quantity('inf Hz')
    >>> print(inf)
