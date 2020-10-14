@@ -75,20 +75,20 @@ Latest development release
 ----------------
 - enhanced :meth:`quantiphy.Quantity.extract()`
 
-    * non-conforming lines are now ignored
-    * values may be expressions
-    * values need not be quantities
-    * can specify a quantity name distinct from dictionary name
+  * non-conforming lines are now ignored
+  * values may be expressions
+  * values need not be quantities
+  * can specify a quantity name distinct from dictionary name
 
 - enhanced the formatting capabilities.
 
-    * added center alignment
-    * added *p* format
-    * added *show_commas* preference.
-    * added *strip_zeros*, *strip_radix* to :meth:`quantiphy.Quantity.render()`
-    * added :meth:`quantiphy.Quantity.fixed()` method
-    * added :meth:`quantiphy.Quantity.format()` method
-    * support any format specifier supported by Python for floats
+  * added center alignment
+  * added *p* format
+  * added *show_commas* preference.
+  * added *strip_zeros*, *strip_radix* to :meth:`quantiphy.Quantity.render()`
+  * added :meth:`quantiphy.Quantity.fixed()` method
+  * added :meth:`quantiphy.Quantity.format()` method
+  * support any format specifier supported by Python for floats
 
 2.2 (2017-11-22)
 ----------------
