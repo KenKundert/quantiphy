@@ -22,14 +22,12 @@ Latest development release
 - Added *negligible*, *tight_units*, *nan*, and *inf* preferences.
 - Added *negligible* argument to render.
 - Added *infinity_symbol* attribute.
-- Changed the return values for :meth:`Quantity.is_nan()` and
-    :meth:`Quantity.is_infinite()`.
+- Changed the return values for :meth:`Quantity.is_nan()` and :meth:`Quantity.is_infinite()`.
 
 2.9 (2020-01-28)
 ----------------
 - Made :meth:`Quantity.extract()` more forgiving.
-- Support radix and comma processing when converting strings to 
-  :class:`Quantity`.
+- Support radix and comma processing when converting strings to :class:`Quantity`.
 
 2.8 (2020-01-08)
 ----------------
@@ -37,12 +35,10 @@ Latest development release
 
 2.7 (2019-12-17)
 ----------------
-- improve the ability of both :meth:`Quantity.add()` and 
-  :meth:`Quantity.scale()` to retain attributes.
+- improve the ability of both :meth:`Quantity.add()` and :meth:`Quantity.scale()` to retain attributes.
 - added *accept_binary* preference.
 - support all preferences as class attributes.
-- allow radix and comma to be replaced by adding *radix* and *comma* 
-    preferences.
+- allow radix and comma to be replaced by adding *radix* and *comma* preferences.
 
 2.6 (2019-09-24)
 ----------------
@@ -53,8 +49,7 @@ Latest development release
 ----------------
 - added RKM codes example.
 - added *check_value* = 'strict' to :meth:`Quantity.add()`.
-- added backward compatibility for *form* argument of :meth:`Quantity.render()` 
-  if it is passed as unnamed argument.
+- added backward compatibility for *form* argument of :meth:`Quantity.render()` if it is passed as unnamed argument.
 - made :meth:`Quantity.extract()` a bit more general.
 - reformulated exceptions.
 - added support for binary scale factors and :meth:`Quantity.binary()`.
@@ -65,9 +60,7 @@ Latest development release
 - follow Python convention of right-justifying numbers by default.
 - add Quantity.add() (adds a number to a quantity returning a new quantity)
 - added # alternate form of string formatting.
-- change *show_si* to *form* (argument on :meth:`Quantity.set_prefs()` and 
-  :meth:`Quantity.render()` (*show_si* is now obsolete, use *form='si'* 
-  instead).
+- change *show_si* to *form* (argument on :meth:`Quantity.set_prefs()` and :meth:`Quantity.render()` (*show_si* is now obsolete, use *form='si'* instead).
 - added concept of equivalent units for unit conversion to documentation.
 - enhance UnitConversion so that it supports nonlinear conversions.
 
@@ -104,8 +97,7 @@ there are a few small feature enhancements.
 
 - added support for SI standard composite units
 - added support for non-breaking space as spacer
-- removed constraint in :meth:`Quantity.extract()` that names must be 
-  identifiers
+- removed constraint in :meth:`Quantity.extract()` that names must be identifiers
 
 2.0 (2017-07-15)
 ----------------
@@ -119,13 +111,11 @@ and refinements to the API.
 - allow quantity to be passed as value to :class:`Quantity`
 - replaced *Quantity.add_to_namespace* with :meth:`Quantity.extract`
 - raise *NameError* rather than *AssertionError* for unknown preferences
-- added :meth:`Quantity.all_from_conv_fmt()` and 
-  :meth:`Quantity.all_from_si_fmt()`
+- added :meth:`Quantity.all_from_conv_fmt()` and :meth:`Quantity.all_from_si_fmt()`
 - change *assign_rec* to support more formats
 - changed *Constant()* to :func:`add_constant()`
 - changed the way preferences are implemented
-- changed name of preference methods:
-    *set_preferences* → *set_prefs*, *get_preference* → *get_pref*
+- changed name of preference methods: *set_preferences* → *set_prefs*, *get_preference* → *get_pref*
 - added :meth:`Quantity.prefs()` (preferences context manager)
 - split *label_fmt* preference into two: *label_fmt* and *label_fmt_full*
 - added *show_desc* preference
