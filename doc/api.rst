@@ -1,3 +1,5 @@
+.. currentmodule:: quantiphy
+
 ---------------------
 Classes and Functions
 ---------------------
@@ -6,7 +8,7 @@ Classes and Functions
 Quantities
 ==========
 
-.. autoclass:: quantiphy.Quantity
+.. autoclass:: Quantity
    :members:
 
    .. autoclasstoc::
@@ -15,7 +17,7 @@ Quantities
 Unit Conversion
 ===============
 
-.. autoclass:: quantiphy.UnitConversion
+.. autoclass:: UnitConversion
    :members:
 
 .. ignore the following (there is only one method, so no need for TOC)
@@ -25,27 +27,27 @@ Unit Conversion
 Constants and Unit Systems
 ==========================
 
-.. autofunction:: quantiphy.add_constant
-.. autofunction:: quantiphy.set_unit_system
+.. autofunction:: add_constant
+.. autofunction:: set_unit_system
 
 
 Exceptions
 ==========
 
-.. autoexception:: quantiphy.QuantiPhyError
+.. autoexception:: QuantiPhyError
     :members:
 
 .. ignore the following (there is only one method, so no need for TOC)
    .. autoclasstoc::
 
-.. autoexception:: quantiphy.ExpectedQuantity
-.. autoexception:: quantiphy.IncompatiblePreferences
-.. autoexception:: quantiphy.IncompatibleUnits
-.. autoexception:: quantiphy.InvalidNumber
-.. autoexception:: quantiphy.InvalidRecognizer
-.. autoexception:: quantiphy.MissingName
-.. autoexception:: quantiphy.UnknownConversion
-.. autoexception:: quantiphy.UnknownFormatKey
-.. autoexception:: quantiphy.UnknownPreference
-.. autoexception:: quantiphy.UnknownScaleFactor
-.. autoexception:: quantiphy.UnknownUnitSystem
+.. autoexception:: ExpectedQuantity
+.. autoexception:: IncompatiblePreferences
+.. autoexception:: IncompatibleUnits
+.. autoexception:: InvalidNumber
+.. autoexception:: InvalidRecognizer
+.. autoexception:: MissingName
+.. autoexception:: UnknownConversion
+.. autoexception:: UnknownFormatKey
+.. autoexception:: UnknownPreference
+.. autoexception:: UnknownScaleFactor
+.. autoexception:: UnknownUnitSystem

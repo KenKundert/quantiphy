@@ -1,3 +1,5 @@
+.. currentmodule:: quantiphy
+
 Releases
 ========
 
@@ -12,23 +14,22 @@ Latest development release
 -----------------
 - Dropping support for all versions of Python older than 3.5.
 - Added *sia* form (ASCII only SI scale factors).
-- Added *only_e_notation* argument to 
-    :meth:`quantiphy.Quantity.all_from_conv_fmt()`.
-- Added :meth:`quantiphy.Quantity.reset_prefs()` method.
+- Added *only_e_notation* argument to :meth:`Quantity.all_from_conv_fmt()`.
+- Added :meth:`Quantity.reset_prefs()` method.
 
 2.10 (2020-03-2)
 ----------------
 - Added *negligible*, *tight_units*, *nan*, and *inf* preferences.
 - Added *negligible* argument to render.
 - Added *infinity_symbol* attribute.
-- Changed the return values for :meth:`quantiphy.Quantity.is_nan()` and
-    :meth:`quantiphy.Quantity.is_infinite()`.
+- Changed the return values for :meth:`Quantity.is_nan()` and
+    :meth:`Quantity.is_infinite()`.
 
 2.9 (2020-01-28)
 ----------------
-- Made :meth:`quantiphy.Quantity.extract()` more forgiving.
+- Made :meth:`Quantity.extract()` more forgiving.
 - Support radix and comma processing when converting strings to 
-    :class:`quantiphy.Quantity`.
+  :class:`Quantity`.
 
 2.8 (2020-01-08)
 ----------------
@@ -36,8 +37,8 @@ Latest development release
 
 2.7 (2019-12-17)
 ----------------
-- improve the ability of both :meth:`quantiphy.Quantity.add()` and 
-    :meth:`quantiphy.Quantity.scale()` to retain attributes.
+- improve the ability of both :meth:`Quantity.add()` and 
+  :meth:`Quantity.scale()` to retain attributes.
 - added *accept_binary* preference.
 - support all preferences as class attributes.
 - allow radix and comma to be replaced by adding *radix* and *comma* 
@@ -45,18 +46,18 @@ Latest development release
 
 2.6 (2019-09-24)
 ----------------
-- now support Quantity arguments with :meth:`quantiphy.Quantity.extract()`.
+- now support Quantity arguments with :meth:`Quantity.extract()`.
 - allow plus and minus signs to be replaced with Unicode equivalents.
 
 2.5 (2019-01-16)
 ----------------
 - added RKM codes example.
-- added *check_value* = 'strict' to :meth:`quantiphy.Quantity.add()`.
-- added backward compatibility for *form* argument of 
-    :meth:`quantiphy.Quantity.render()` if it is passed as unnamed argument.
-- made :meth:`quantiphy.Quantity.extract()` a bit more general.
+- added *check_value* = 'strict' to :meth:`Quantity.add()`.
+- added backward compatibility for *form* argument of :meth:`Quantity.render()` 
+  if it is passed as unnamed argument.
+- made :meth:`Quantity.extract()` a bit more general.
 - reformulated exceptions.
-- added support for binary scale factors and :meth:`quantiphy.Quantity.binary()`.
+- added support for binary scale factors and :meth:`Quantity.binary()`.
 
 2.4 (2018-09-12)
 ----------------
@@ -64,16 +65,15 @@ Latest development release
 - follow Python convention of right-justifying numbers by default.
 - add Quantity.add() (adds a number to a quantity returning a new quantity)
 - added # alternate form of string formatting.
-- change *show_si* to *form* (argument on 
-    :meth:`quantiphy.Quantity.set_prefs()` and 
-    :meth:`quantiphy.Quantity.render()` (*show_si* is now obsolete, use 
-    *form='si'* instead).
+- change *show_si* to *form* (argument on :meth:`Quantity.set_prefs()` and 
+  :meth:`Quantity.render()` (*show_si* is now obsolete, use *form='si'* 
+  instead).
 - added concept of equivalent units for unit conversion to documentation.
 - enhance UnitConversion so that it supports nonlinear conversions.
 
 2.3 (2018-03-11)
 ----------------
-- enhanced :meth:`quantiphy.Quantity.extract()`
+- enhanced :meth:`Quantity.extract()`
 
   * non-conforming lines are now ignored
   * values may be expressions
@@ -85,15 +85,15 @@ Latest development release
   * added center alignment
   * added *p* format
   * added *show_commas* preference.
-  * added *strip_zeros*, *strip_radix* to :meth:`quantiphy.Quantity.render()`
-  * added :meth:`quantiphy.Quantity.fixed()` method
-  * added :meth:`quantiphy.Quantity.format()` method
+  * added *strip_zeros*, *strip_radix* to :meth:`Quantity.render()`
+  * added :meth:`Quantity.fixed()` method
+  * added :meth:`Quantity.format()` method
   * support any format specifier supported by Python for floats
 
 2.2 (2017-11-22)
 ----------------
-- added :meth:`quantiphy.Quantity.scale()`
-- added :meth:`quantiphy.UnitConversion.convert()`
+- added :meth:`Quantity.scale()`
+- added :meth:`UnitConversion.convert()`
 - added *strip_zeros*
 - added no-op conversions (units change but value stays the same, ex: $ → USD)
 
@@ -104,8 +104,8 @@ there are a few small feature enhancements.
 
 - added support for SI standard composite units
 - added support for non-breaking space as spacer
-- removed constraint in :meth:`quantiphy.Quantity.extract()` that names must 
-    be identifiers
+- removed constraint in :meth:`Quantity.extract()` that names must be 
+  identifiers
 
 2.0 (2017-07-15)
 ----------------
@@ -116,18 +116,17 @@ and refinements to the API.
 
 - created formal documentation
 - enhanced *label_fmt* to accept {V}
-- allow quantity to be passed as value to :class:`quantiphy.Quantity`
-- replaced *Quantity.add_to_namespace* with 
-    :meth:`quantiphy.Quantity.extract`
+- allow quantity to be passed as value to :class:`Quantity`
+- replaced *Quantity.add_to_namespace* with :meth:`Quantity.extract`
 - raise *NameError* rather than *AssertionError* for unknown preferences
-- added :meth:`quantiphy.Quantity.all_from_conv_fmt()` and 
-    :meth:`quantiphy.Quantity.all_from_si_fmt()`
+- added :meth:`Quantity.all_from_conv_fmt()` and 
+  :meth:`Quantity.all_from_si_fmt()`
 - change *assign_rec* to support more formats
-- changed *Constant()* to :func:`quantiphy.add_constant()`
+- changed *Constant()* to :func:`add_constant()`
 - changed the way preferences are implemented
 - changed name of preference methods:
     *set_preferences* → *set_prefs*, *get_preference* → *get_pref*
-- added :meth:`quantiphy.Quantity.prefs()` (preferences context manager)
+- added :meth:`Quantity.prefs()` (preferences context manager)
 - split *label_fmt* preference into two: *label_fmt* and *label_fmt_full*
 - added *show_desc* preference
 - allow *show_label* to be either 'a' or 'f' as well True or False

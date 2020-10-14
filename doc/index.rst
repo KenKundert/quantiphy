@@ -1,3 +1,5 @@
+.. currentmodule:: quantiphy
+
 ..  initialization
 ..  Reset Quantity preferences to their original defaults.
 

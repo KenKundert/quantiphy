@@ -1,3 +1,5 @@
+.. currentmodule:: quantiphy
+
 .. index::
     single: accessories
 

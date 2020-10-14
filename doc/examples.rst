@@ -1,3 +1,5 @@
+.. currentmodule:: quantiphy
+
 ..  initialization {{{1
 ..  Reset Quantity preferences to their original defaults.
 
@@ -159,12 +161,12 @@ accessible for computation (approximates table2).  Finally, the third output
 represents a compromise between being human and machine readable (approximates 
 table3).
 
-:class:`quantiphy.Quantity` is used to convert a number string, such as '155.52 
-Mb/s' into an internal representation that includes the value and the units: 
-155.52e6 and 'b/s'.  The scaling factor is properly interpreted. Once a value is 
-converted to a *Quantity*, it can be treated just like a normal *float*. The 
-main difference occurs when it is time to convert it back to a string. When 
-doing so, the scale factor and units are included by default.
+:class:`Quantity` is used to convert a number string, such as '155.52 Mb/s' into 
+an internal representation that includes the value and the units: 155.52e6 and 
+'b/s'.  The scaling factor is properly interpreted. Once a value is converted to 
+a *Quantity*, it can be treated just like a normal *float*. The main difference 
+occurs when it is time to convert it back to a string. When doing so, the scale 
+factor and units are included by default.
 
 
 .. dram prices {{{1
@@ -268,7 +270,7 @@ demonstrate several of the features of *QuantiPhy*.
     q = 160.22e-21 C    # elementary charge
     Vt = 25.852 mV      # thermal voltage at 300 K
 
-The first part of this example imports :class:`quantiphy.Quantity` and sets the 
+The first part of this example imports :class:`Quantity` and sets the 
 *show_label*, *label_fmt* and *label_fmt_full* preferences to display both the 
 value and the description by default.  *label_fmt* is used when the description 
 is not present and *label_fmt_full* is used when it is present.  In *label_fmt* 
@@ -562,10 +564,9 @@ Parameterized Simulation Example
 
 In this example, Python is used to perform a simulation of a ΔΣ modulator. There 
 are a collection of parameters that control the simulation, which are placed at 
-the top of the Python file as documentation. :meth:`quantiphy.Quantity.extract` 
-is used to access these parameters and control the simulation. In this way, 
-modifying the simulation parameters is easy and the documentation is always up 
-to date.
+the top of the Python file as documentation. :meth:`Quantity.extract` is used to 
+access these parameters and control the simulation. In this way, modifying the 
+simulation parameters is easy and the documentation is always up to date.
 
 .. code-block:: python
 

@@ -1,3 +1,5 @@
+.. currentmodule:: quantiphy
+
 ..  initialization
 ..  Reset Quantity preferences to their original defaults.
 
@@ -76,9 +78,9 @@ Quantities
 
 *QuantiPhy* is a library that adds support to Python for both reading and 
 writing numbers with SI scale factors and units. The primary working construct 
-for *QuantiPhy* is :class:`quantiphy.Quantity`, which is a class whose objects 
-hold the number and units that are used to represent a physical quantity. For 
-example, to create a quantity from a string you can use:
+for *QuantiPhy* is :class:`Quantity`, which is a class whose objects hold the 
+number and units that are used to represent a physical quantity. For example, to 
+create a quantity from a string you can use:
 
 .. code-block:: python
 
@@ -117,9 +119,9 @@ erroneous results are printed and is always a risk when two related pieces of
 information are specified far from one another. *QuantiPhy* addresses this issue 
 by binding the value and the units into one object.
 
-:class:`quantiphy.Quantity` is a subclass of float, and so *distance_to_sun* can 
-be used just like any real number. For example, you can convert the distance to 
-miles using:
+:class:`Quantity` is a subclass of float, and so *distance_to_sun* can be used 
+just like any real number. For example, you can convert the distance to miles 
+using:
 
 .. code-block:: python
 
@@ -149,9 +151,9 @@ provides many of the most common conversions for you:
 Specifying Quantities
 .....................
 
-Normally, creating a :class:`quantiphy.Quantity` takes one or two arguments.  
-The first is taken to be the value, and the second, if given, is taken to be the 
-model, which is a source of default values.
+Normally, creating a :class:`Quantity` takes one or two arguments.  The first is 
+taken to be the value, and the second, if given, is taken to be the model, which 
+is a source of default values.
 
 
 The First Argument: The Value
@@ -384,8 +386,8 @@ handling units whose name starts with a scale factor character. For example:
 Quantity Attributes
 """""""""""""""""""
 
-Finally, you can overwrite :class:`quantiphy.Quantity` attributes to override 
-the units, name, or description.
+Finally, you can overwrite :class:`Quantity` attributes to override the units, 
+name, or description.
 
 .. code-block:: python
 
@@ -410,12 +412,11 @@ In addition, you can also override the preferences with attributes:
 Subclassing Quantity
 """"""""""""""""""""
 
-You can subclass :class:`quantiphy.Quantity` to make it easier to create 
-a particular type of quantity, or to create quantities with particular 
-qualities.  The following example demonstrates both. It creates a subclass for 
-dollars that both sets the units and display preferences.  Display preferences 
-for currencies are often very different from what you would want from physical 
-quantities:
+You can subclass :class:`Quantity` to make it easier to create a particular type 
+of quantity, or to create quantities with particular qualities.  The following 
+example demonstrates both. It creates a subclass for dollars that both sets the 
+units and display preferences.  Display preferences for currencies are often 
+very different from what you would want from physical quantities:
 
 .. code-block:: python
 
@@ -562,7 +563,7 @@ convert between equivalent units even though both are found in the second
 column. This feature was used in the above example where *lbs* was converted to 
 *lb*.
 
-You can also create your own converters using :class:`quantiphy.UnitConversion`:
+You can also create your own converters using :class:`UnitConversion`:
 
 .. code-block:: python
 
@@ -583,8 +584,8 @@ This unit conversion says, when converting units of 'm' to either 'pc' or
     >>> print(d_sol)
     5 upc
 
-:class:`quantiphy.UnitConversion` supports linear conversions (slope only), 
-affine conversions (slope and intercept) and nonlinear conversions.
+:class:`UnitConversion` supports linear conversions (slope only), affine 
+conversions (slope and intercept) and nonlinear conversions.
 
 Notice that the return value of *UnitConversion* was not used. It is enough to 
 simply create the *UnitConversion* for it to be available to *Quantity*. So, it 
@@ -645,8 +646,8 @@ seconds:
 Creating a Quantity by Scaling an Existing Quantity
 ...................................................
 
-The :meth:`quantiphy.Quantity.scale` method scales the value of a quantity and 
-then uses the new value to create a new Quantity. For example:
+The :meth:`Quantity.scale` method scales the value of a quantity and then uses 
+the new value to create a new Quantity. For example:
 
 .. code-block:: python
 
@@ -660,14 +661,14 @@ then uses the new value to create a new Quantity. For example:
     8.9247 GHz
 
     >>> type(h_line)
-    <class 'quantiphy.Quantity'>
+    <class 'Quantity'>
 
     >>> type(sagan)
-    <class 'quantiphy.Quantity'>
+    <class 'Quantity'>
 
-Any value that can be passed to the *scale* argument for 
-:class:`quantiphy.Quantity` or :meth:`quantiphy.Quantity.render` can be passed 
-to the *scale* method. Specifically, the following types are accepted:
+Any value that can be passed to the *scale* argument for :class:`Quantity` or 
+:meth:`Quantity.render` can be passed to the *scale* method.  Specifically, the 
+following types are accepted:
 
 float or Quantity
     The argument scales the underlying value (a new quantity is returned whose 
@@ -699,8 +700,8 @@ string
 Creating a Quantity by Adding to an Existing Quantity
 .....................................................
 
-The :meth:`quantiphy.Quantity.add` method adds a contribution to the  value of 
-a quantity and then uses the sum to create a new Quantity. For example:
+The :meth:`Quantity.add` method adds a contribution to the  value of a quantity 
+and then uses the sum to create a new Quantity. For example:
 
 .. code-block:: python
 
@@ -714,8 +715,7 @@ a quantity and then uses the sum to create a new Quantity. For example:
 
 When adding quantities, the units of the quantity should match. You can enforce 
 this by adding *check_units=True*. If the dimension of your quantities match but 
-not the units, you can often use :meth:`quantiphy.Quantity.scale` to get the 
-units right:
+not the units, you can often use :meth:`Quantity.scale` to get the units right:
 
 .. code-block:: python
 
@@ -755,13 +755,13 @@ numeric value:
     8.9247 GHz
 
     >>> type(h_line)
-    <class 'quantiphy.Quantity'>
+    <class 'Quantity'>
 
     >>> type(second_sagan_freq)
     <class 'float'>
 
     >>> type(sagan2)
-    <class 'quantiphy.Quantity'>
+    <class 'Quantity'>
 
 Notice that when performing arithmetic operations on quantities the units 
 are completely ignored and do not propagate in any way to the newly computed 
@@ -809,8 +809,8 @@ However, only the scale factors listed in the *output_sf* preference are
 actually used, and by default that is set to 'TGMkmunpfa', which avoids the more
 uncommon scale factors.
 
-The :meth:`quantiphy.Quantity.render` method allows you to control the process 
-of converting a quantity to a string. For example:
+The :meth:`Quantity.render` method allows you to control the process of 
+converting a quantity to a string. For example:
 
 .. code-block:: python
 
@@ -844,11 +844,11 @@ rendering. If *show_label* is *False*, the quantity is not labeled with the name
 or description. Otherwise the quantity is labeled under the control of the 
 *show_label* value and the *show_desc*, *label_fmt* and *label_fmt_full*  
 preferences (described further in :ref:`preferences` and 
-:meth:`quantiphy.Quantity.set_prefs()`).  If *show_label* is 'a' (for 
-abbreviated) or if the quantity has no description, *label_fmt* is used to label 
-the quantity with its name.  If *show_label* is 'f' (for full), *label_fmt_full* 
-is used to label the quantity with its name and description.  Otherwise 
-*label_fmt_full* is used if *show_desc* is True and *label_fmt* otherwise.
+:meth:`Quantity.set_prefs()`).  If *show_label* is 'a' (for abbreviated) or if 
+the quantity has no description, *label_fmt* is used to label the quantity with 
+its name.  If *show_label* is 'f' (for full), *label_fmt_full* is used to label 
+the quantity with its name and description.  Otherwise *label_fmt_full* is used 
+if *show_desc* is True and *label_fmt* otherwise.
 
 .. code-block:: python
 
@@ -882,8 +882,8 @@ Otherwise a fixed number of digits, specified in the *full_prec* preference, is
 used (default=12).  Generally one uses 'full' when generating output that is 
 intended to be read by a machine without loss of precision.
 
-An alternative to *render* is :meth:`quantiphy.Quantity.fixed`. It converts the 
-quantity to a string in fixed-point format:
+An alternative to *render* is :meth:`Quantity.fixed`. It converts the quantity 
+to a string in fixed-point format:
 
 .. code-block:: python
 
@@ -891,16 +891,16 @@ quantity to a string in fixed-point format:
     >>> print(total.fixed(prec=2, show_commas=True, strip_zeros=False))
     $11,200,000.00
 
-You can also use :meth:`quantiphy.Quantity.render` to produce a fixed format, 
-but it does not support all of the options available with *fixed*:
+You can also use :meth:`Quantity.render` to produce a fixed format, but it does 
+not support all of the options available with *fixed*:
 
 .. code-block:: python
 
     >>> print(total.render(form='fixed', prec=2))
     $11200000
 
-Another alternative to *render* is :meth:`quantiphy.Quantity.binary`. It 
-converts the quantity to a string that uses binary scale factors:
+Another alternative to *render* is :meth:`Quantity.binary`. It converts the 
+quantity to a string that uses binary scale factors:
 
 .. code-block:: python
 
@@ -1061,9 +1061,8 @@ quantity (any of 'sqrpefg', but not 'und'). If you do, the label will also be
 included.
 
 These format specifiers are generally included in format strings. However, in 
-addition, *Quantitphy* provides the :meth:`quantiphy.Quantity.format` method 
-that converts a quantity to a string based on a naked format string. For 
-example:
+addition, *Quantitphy* provides the :meth:`Quantity.format` method that converts 
+a quantity to a string based on a naked format string. For example:
 
 .. code-block:: python
 
@@ -1177,7 +1176,7 @@ of the quantity (SQRFEG) indicates that the quantity should be labeled with its
 name and perhaps its description (as if the *show_label* preference were set). 
 They are under the control of the *show_desc*, *label_fmt* and *label_fmt_full*  
 preferences (described further in :ref:`preferences` and 
-:meth:`quantiphy.Quantity.set_prefs()`).
+:meth:`Quantity.set_prefs()`).
 
 If *show_desc* is False or the quantity does not have a description, then 
 *label_fmt* is used to add the labeling.
@@ -1283,8 +1282,8 @@ Physical Constants
 ------------------
 
 *QuantiPhy* has several built-in constants that are available by specifying 
-their name to the :class:`quantiphy.Quantity` class.  The following quantities 
-are built in:
+their name to the :class:`Quantity` class.  The following quantities are built 
+in:
 
 ========  =====================  ===================== ==========================
 Name      MKS value              CGS value             Description
@@ -1308,12 +1307,12 @@ system, the speed of light is given as 300Mm/s (rather than 30Gcm/s).
 As shown, these constants are partitioned into two *unit systems*: *mks* and 
 *cgs*.  Only those constants that are associated with the active unit system and 
 those that are not associated with any unit system are available when creating 
-a new quantity. You can activate a unit system using 
-:func:`quantiphy.set_unit_system`.  Doing so deactivates the previous system. By 
-default, the *mks* system is active.
+a new quantity. You can activate a unit system using :func:`set_unit_system`.  
+Doing so deactivates the previous system. By default, the *mks* system is 
+active.
 
 You can create your own constants and unit systems using
-:func:`quantiphy.add_constant`:
+:func:`add_constant`:
 
 .. code-block:: python
 
@@ -1389,11 +1388,11 @@ For example, when rendering quantities you can control the number of digits used
 included (*show_units*), etc.  Similar preferences also control the conversion 
 of strings into quantities, which can help disambiguate whether a suffix 
 represents a scale factor or a unit. The list of available preferences and their 
-descriptions are given in the description of the 
-:meth:`quantiphy.Quantity.set_prefs` method.
+descriptions are given in the description of the :meth:`Quantity.set_prefs` 
+method.
 
-To set a preference, use the :meth:`quantiphy.Quantity.set_prefs` class method.  
-You can set more than one preference at once:
+To set a preference, use the :meth:`Quantity.set_prefs` class method.  You can 
+set more than one preference at once:
 
 .. code-block:: python
 
@@ -1411,9 +1410,9 @@ Setting preferences to *None* returns them to their default values:
 The preferences are changed on the class itself, meaning that they affect any 
 instance of that class regardless of whether they were instantiated before or 
 after the preferences were set. If you would like to have more than one set of 
-preferences, then you should subclass :class:`quantiphy.Quantity`. For example, 
-imagine a situation where you have different types of quantities that would 
-naturally want different preferences:
+preferences, then you should subclass :class:`Quantity`. For example, imagine 
+a situation where you have different types of quantities that would naturally 
+want different preferences:
 
 .. code-block:: python
 
@@ -1487,18 +1486,17 @@ undesired.
     >>> print(gain)
     0.25 dB
 
-To retrieve a preference, use the :meth:`quantiphy.Quantity.get_pref` class 
-method. This is useful with *known_units*. Normally setting *known_units* 
-overrides the existing units. You can simply add more with:
+To retrieve a preference, use the :meth:`Quantity.get_pref` class method. This 
+is useful with *known_units*. Normally setting *known_units* overrides the 
+existing units. You can simply add more with:
 
 .. code-block:: python
 
     >>> Quantity.set_prefs(known_units=Quantity.get_pref('known_units') + ['K'])
 
-A variation on :meth:`quantiphy.Quantity.set_prefs` is 
-:meth:`quantiphy.Quantity.prefs`. It is basically the same, except that it is 
-meant to work with Python's *with* statement to temporarily override 
-preferences:
+A variation on :meth:`Quantity.set_prefs` is :meth:`Quantity.prefs`.  It is 
+basically the same, except that it is meant to work with Python's *with* 
+statement to temporarily override preferences:
 
 .. code-block:: python
 
@@ -1516,8 +1514,8 @@ Notice that the specified preferences only affected the table, not the final
 printed values, which were rendered outside the *with* statement.
 
 If you are using *QuantiPhy* in a large package with multiple modules and more 
-than one includes :class:`quantiphy.Quantity`, you may find that the preferences 
-are not shared between the modules. This occurs because each module gets its own 
+than one includes :class:`Quantity`, you may find that the preferences are not 
+shared between the modules. This occurs because each module gets its own 
 independent version of *Quantity*. To work around this issue you would create 
 your own module that imports from *QuantiPhy*.  Each of the packages' modules 
 then import from your new module rather than directly from *QuantiPhy*.  For 
@@ -1662,7 +1660,7 @@ may represent 1 meter.  Similarly, '1meter' my represent 1 meter or
 *QuantiPhy* accepts '_' as the unity scale factor.  In this way '1_m' is 
 unambiguously 1 meter. You can instruct *QuantiPhy* to output '_' as the unity 
 scale factor by specifying the *unity_sf* argument to 
-:meth:`quantiphy.Quantity.set_prefs()`:
+:meth:`Quantity.set_prefs()`:
 
 .. code-block:: python
 
@@ -1783,7 +1781,7 @@ is passed to the string *format* function with named arguments: *whole*, *frac*
 and *units*, which contains the integer part of the number, the fractional part 
 including the decimal point, and the units including the scale factor.  More 
 information about the content of the components can be found in 
-:meth:`quantiphy.Quantity.set_prefs()`.
+:meth:`Quantity.set_prefs()`.
 
 For example, you can align the decimal point and units of a column of numbers 
 like this:
@@ -1865,8 +1863,8 @@ Extract Quantities
 ------------------
 
 It is possible to put a collection of quantities in a text string and then use 
-the :meth:`quantiphy.Quantity.extract()` method to parse the quantities and 
-return them in a dictionary.  For example:
+the :meth:`Quantity.extract()` method to parse the quantities and return them in 
+a dictionary.  For example:
 
 .. code-block:: python
 
@@ -1924,9 +1922,9 @@ Finally, empty lines are ignored.
     N = 128             # Divide ratio
     Fout = 19.968 GHz   # Output Frequency
 
-In this case the output of the :meth:`quantiphy.Quantity.extract()` call is fed 
-into globals().update() so as to add the quantities into the module namespace, 
-making the quantities accessible as local variables.  This is an example of how 
+In this case the output of the :meth:`Quantity.extract()` call is fed into 
+globals().update() so as to add the quantities into the module namespace, making 
+the quantities accessible as local variables.  This is an example of how 
 simulation scripts could be written. The system and simulation parameters would 
 be gathered together at the top into a multiline string, which would then be 
 read and loaded into the local name space. It allows you to quickly give 
@@ -1937,8 +1935,8 @@ the quantity definitions.
 
 Here is an example that uses this feature to read parameters from a file. This 
 is basically the same idea as above, except the design parameters are kept in 
-a separate file.  It also subclasses :class:`quantiphy.Quantity` to create 
-a version that displays the name and description by default.
+a separate file.  It also subclasses :class:`Quantity` to create a version that 
+displays the name and description by default.
 
 .. code-block:: python
 
@@ -1966,8 +1964,8 @@ a version that displays the name and description by default.
     N = 128            -- Divide ratio
     Fout = 19.968 GHz  -- Output Frequency
 
-With :meth:`quantiphy.Quantity.extract()` the values of quantities can be given 
-as a expression that contains previously defined quantities (or :ref:`physical 
+With :meth:`Quantity.extract()` the values of quantities can be given as 
+a expression that contains previously defined quantities (or :ref:`physical 
 constants <constants>` or select mathematical constants (pi, tau, π, or τ).  You 
 can follow an expression with a string to give the units. Finally, you can use 
 the *predefined* argument to pass in a dictionary of named values that can be 
@@ -2043,10 +2041,10 @@ executable from within the documentation.
 Translating Quantities
 ----------------------
 
-:meth:`quantiphy.Quantity.all_from_conv_fmt()` recognizes conventionally 
-formatted numbers and quantities embedded in text and reformats them using 
-:meth:`quantiphy.Quantity.render()`. This is an difficult task in general, and 
-so some constraints are placed on the values to make them easier to distinguish.  
+:meth:`Quantity.all_from_conv_fmt()` recognizes conventionally formatted numbers 
+and quantities embedded in text and reformats them using 
+:meth:`Quantity.render()`. This is an difficult task in general, and so some 
+constraints are placed on the values to make them easier to distinguish.  
 Specifically, the units, if given, must be simple and immediately adjacent to 
 the number. Units are simple if they only consist of letters and underscores.  
 The characters °, Å, Ω and Ʊ are also allowed.  So '47e3Ohms', '50_Ohms' and 
@@ -2068,10 +2066,9 @@ arguments as :meth:`render`, though they must be given as named arguments.
     Applying stimulus @ 200.5us: V(in) = 500mV.
     Pass @ 300.5us: V(out): expected=2V, measured=2V, diff=346.12nV.
 
-:meth:`quantiphy.Quantity.all_from_si_fmt()` is similar, except that it 
-recognizes quantities formatted with either a scale factor or units and ignores 
-plain numbers. Again, units are expected to be simple and adjacent to their 
-number.
+:meth:`Quantity.all_from_si_fmt()` is similar, except that it recognizes 
+quantities formatted with either a scale factor or units and ignores plain 
+numbers. Again, units are expected to be simple and adjacent to their number.
 
 .. code-block:: python
 
@@ -2101,10 +2098,9 @@ Equivalence
 -----------
 
 You can determine whether the value of a quantity or real number is equivalent 
-to that of a quantity using :meth:`quantiphy.Quantity.is_close()`.  The two 
-values need not be identical, they just need to be close to be deemed 
-equivalent. The *reltol* and *abstol* preferences are used to determine if they 
-are close.
+to that of a quantity using :meth:`Quantity.is_close()`.  The two values need 
+not be identical, they just need to be close to be deemed equivalent. The 
+*reltol* and *abstol* preferences are used to determine if they are close.
 
 .. code-block:: python
 
@@ -2117,7 +2113,7 @@ are close.
    >>> h_line.is_close(h_line + 1e4)
    False
 
-:meth:`quantiphy.Quantity.is_close()` returns true if the units match and if:
+:meth:`Quantity.is_close()` returns true if the units match and if:
 
 | abs(*a* - *b*) <= max(reltol * max(abs(*a*), abs(*b*)), abstol)
 
@@ -2160,9 +2156,9 @@ Exceptional Values
    NaN Hz
 
 You can test whether the value of the quantity is infinite or is not-a-number
-using :meth:`quantiphy.Quantity.is_infinite()` or 
-:meth:`quantiphy.Quantity.is_nan()`. These method return a rendered value for 
-the number without units if they are true and None otherwise:
+using :meth:`Quantity.is_infinite()` or :meth:`Quantity.is_nan()`.  These method 
+return a rendered value for the number without units if they are true and None 
+otherwise:
 
 .. code-block:: python
 
@@ -2195,111 +2191,109 @@ Exceptions
 
 The way exceptions are defined in *QuantiPhy* has changed. Initially, the 
 standard Python exceptions were used to indicate errors. For example, 
-a *ValueError* was raised by :class:`quantiphy.Quantity` if it were passed 
-a string it cannot convert into a number.  Now, a variety of *QuantiPhy* 
-specific exceptions are used to indicate specific errors. However, these 
-exceptions subclass the corresponding Python error for compatibility with 
-existing code.  It is recommended that new code catch the *QuantiPhy* specific 
-exceptions rather than the generic Python exceptions as their use may be 
-deprecated in the future.
+a *ValueError* was raised by :class:`Quantity` if it were passed a string it 
+cannot convert into a number.  Now, a variety of *QuantiPhy* specific exceptions 
+are used to indicate specific errors. However, these exceptions subclass the 
+corresponding Python error for compatibility with existing code.  It is 
+recommended that new code catch the *QuantiPhy* specific exceptions rather than 
+the generic Python exceptions as their use may be deprecated in the future.
 
 *QuantiPhy* employs the following exceptions:
 
-:class:`quantiphy.ExpectedQuantity`:
-    Subclass of :class:`quantiphy.QuantiPhyError` and *ValueError*.  Used by 
-    :func:`quantiphy.add_constant()`.
+:class:`ExpectedQuantity`:
+    Subclass of :class:`QuantiPhyError` and *ValueError*.  Used by 
+    :func:`add_constant()`.
 
-    Raised when the value is either not an instance of 
-    :class:`quantiphy.Quantity` or a string that can be converted to a quantity.
+    Raised when the value is either not an instance of :class:`Quantity` or 
+    a string that can be converted to a quantity.
 
-:class:`quantiphy.IncompatiblePreferences`:
-    Subclass of :class:`quantiphy.QuantiPhyError` and *ValueError*.  Used by 
-    :class:`quantiphy.Quantity` constructor.
+:class:`IncompatiblePreferences`:
+    Subclass of :class:`QuantiPhyError` and *ValueError*.  Used by 
+    :class:`Quantity` constructor.
 
     Raised when comma and radix preference is the same.
 
-:class:`quantiphy.IncompatibleUnits`:
-    Subclass of :class:`quantiphy.QuantiPhyError` and *TypeError*.  Used by 
-    :meth:`quantiphy.Quantity.add()`.
+:class:`IncompatibleUnits`:
+    Subclass of :class:`QuantiPhyError` and *TypeError*.  Used by 
+    :meth:`Quantity.add()`.
 
     Raised when the units of contribution do not match those of underlying 
     quantity.
 
-:class:`quantiphy.InvalidNumber`:
-    Subclass of :class:`quantiphy.QuantiPhyError`, *ValueError*, and 
-    *TypeError*.  Used by :class:`quantiphy.Quantity()`.
+:class:`InvalidNumber`:
+    Subclass of :class:`QuantiPhyError`, *ValueError*, and *TypeError*.  Used by 
+    :class:`Quantity()`.
 
     Raised if the value given could not be converted to a number.
 
-:class:`quantiphy.InvalidRecognizer`:
-    Subclass of :class:`quantiphy.QuantiPhyError` and *KeyError*.  Used by 
-    :class:`quantiphy.Quantity()`.
+:class:`InvalidRecognizer`:
+    Subclass of :class:`QuantiPhyError` and *KeyError*.  Used by 
+    :class:`Quantity()`.
 
     The *assign_rec* preference is expected to be a regular expression that 
     defines one or more named fields, one of which must be *val*. This exception 
     is raised when the current value of *assign_rec* does not satisfy this 
     requirement.
 
-:class:`quantiphy.MissingName`:
-    Subclass of :class:`quantiphy.QuantiPhyError` and *NameError*.  Used by 
-    :func:`quantiphy.add_constant()`.
+:class:`MissingName`:
+    Subclass of :class:`QuantiPhyError` and *NameError*.  Used by 
+    :func:`add_constant()`.
 
     Raised when *alias* was not specified and no name was available from 
     *value*.
 
-:class:`quantiphy.UnknownConversion`:
-    Subclass of :class:`quantiphy.QuantiPhyError` and *KeyError*.
+:class:`UnknownConversion`:
+    Subclass of :class:`QuantiPhyError` and *KeyError*.
 
-    Used by :meth:`quantiphy.UnitConversion.convert()`.
+    Used by :meth:`UnitConversion.convert()`.
 
     Raised when the given units are not supported by the underlying class.
 
-    Used by :class:`quantiphy.Quantity()`,
-    :meth:`quantiphy.Quantity.scale()`,
-    :meth:`quantiphy.Quantity.render()`,
-    :meth:`quantiphy.Quantity.fixed()`, and
-    :meth:`quantiphy.Quantity.format()`.
+    Used by :class:`Quantity()`,
+    :meth:`Quantity.scale()`,
+    :meth:`Quantity.render()`,
+    :meth:`Quantity.fixed()`, and
+    :meth:`Quantity.format()`.
 
     Raised when a unit conversion was requested and there is no corresponding 
     unit converter.
 
-:class:`quantiphy.UnknownFormatKey`:
-    Subclass of :class:`quantiphy.QuantiPhyError` and *KeyError*.  Used by 
-    :meth:`quantiphy.Quantity.render()`, :meth:`quantiphy.Quantity.fixed()`, and 
-    :meth:`quantiphy.Quantity.format()`.
+:class:`UnknownFormatKey`:
+    Subclass of :class:`QuantiPhyError` and *KeyError*.  Used by 
+    :meth:`Quantity.render()`, :meth:`Quantity.fixed()`, and 
+    :meth:`Quantity.format()`.
 
     The *label_fmt* and *label_fmt_full* are expected to be format strings that 
     may interpolate certain named arguments. The valid named arguments are *n* 
     for name, *v* for value, and *d* for description. This exception is raised 
     when some other name is used for an interpolated argument.
 
-:class:`quantiphy.UnknownPreference`:
-    Subclass of :class:`quantiphy.QuantiPhyError` and *KeyError*.  Used by 
-    :meth:`quantiphy.Quantity.set_prefs()`, 
-    :meth:`quantiphy.Quantity.get_pref()`, and 
-    :meth:`quantiphy.Quantity.prefs()`.
+:class:`UnknownPreference`:
+    Subclass of :class:`QuantiPhyError` and *KeyError*.  Used by 
+    :meth:`Quantity.set_prefs()`, :meth:`Quantity.get_pref()`, and 
+    :meth:`Quantity.prefs()`.
 
     Raised when the name given for a preference is unknown.
 
-:class:`quantiphy.UnknownScaleFactor`:
-    Subclass of :class:`quantiphy.QuantiPhyError` and *ValueError*.  Used by 
-    :class:`quantiphy.Quantity()`, :meth:`quantiphy.Quantity.set_prefs()`, or 
-    :meth:`quantiphy.Quantity.prefs()`.
+:class:`UnknownScaleFactor`:
+    Subclass of :class:`QuantiPhyError` and *ValueError*.  Used by 
+    :class:`Quantity()`, :meth:`Quantity.set_prefs()`, or 
+    :meth:`Quantity.prefs()`.
 
     The *input_sf* preference gives the list of scale factors that should be 
     accepted. This exception is raised if *input_sf* contains an unknown scale 
     factor.
 
-:class:`quantiphy.UnknownUnitSystem`:
-    Subclass of :class:`quantiphy.QuantiPhyError` and *KeyError*.  Used by 
-    :func:`quantiphy.set_unit_system()`.
+:class:`UnknownUnitSystem`:
+    Subclass of :class:`QuantiPhyError` and *KeyError*.  Used by 
+    :func:`set_unit_system()`.
 
     Raised when the name given does not correspond to a known unit system.
 
-*QuantiPhy* defines a common base exception, :class:`quantiphy.QuantiPhyError`, 
-that all specific exceptions derive from.  This allows you to simplify your 
-exception handling if you are not interested in distinguishing between the 
-specific errors:
+*QuantiPhy* defines a common base exception, :class:`QuantiPhyError`, that all 
+specific exceptions derive from.  This allows you to simplify your exception 
+handling if you are not interested in distinguishing between the specific 
+errors:
 
 .. code-block:: python
 
@@ -2330,8 +2324,8 @@ The alternative would be to catch each error individually:
 all the unnamed arguments passed to the exception using the *args* attribute, 
 you can access the named arguments using *kwargs*, and you can create 
 a customized message that incorporates the arguments using 
-:meth:`quantiphy.QuantiPhyError.render()` method. The argument to *render* is 
-a format string that can access both the unnamed and named arguments:
+:meth:`QuantiPhyError.render()` method. The argument to *render* is a format 
+string that can access both the unnamed and named arguments:
 
 .. code-block:: python
 
