@@ -530,18 +530,18 @@ presenting the results.
     import sys
 
     try:
-        du = Run(['du'] + sys.argv[1:], modes='WEO1')
+        du = Run(['du', '-xd1'] + sys.argv[1:], modes='sWEO1')
 
         files = []
-        for line in du.stdout.split('\n'):
+        for line in du.stdout.splitlines():
             if line:
-                size, filename = line.split('\t', 1)
+                size, _, filename = line.partition('\t')
                 files += [(Quantity(size, scale=(1024, 'B')), filename)]
 
         files.sort(key=lambda x: x[0])
 
         for size, name in files:
-            display('{:7.2b}  {}'.format(size, name))
+            display('{:8.2b}  {}'.format(size, name))
 
     except OSError as err:
         fatal(os_error(err))
