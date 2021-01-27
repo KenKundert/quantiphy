@@ -2141,13 +2141,21 @@ class Quantity(float):
 
         if form == 'fixed':
             return self.fixed(
-                show_units=show_units, prec=prec, strip_zeros=strip_zeros,
-                strip_radix=strip_radix, scale=scale
+                prec = prec,
+                show_units = show_units,
+                show_label = show_label,
+                strip_zeros = strip_zeros,
+                strip_radix = strip_radix,
+                scale = scale
             )
         if form == 'binary':
             return self.binary(
-                show_units=show_units, prec=prec, strip_zeros=strip_zeros,
-                strip_radix=strip_radix, scale=scale
+                prec = prec,
+                show_units = show_units,
+                show_label = show_label,
+                strip_zeros = strip_zeros,
+                strip_radix = strip_radix,
+                scale = scale
             )
 
         # check for infinities or NaN
