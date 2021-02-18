@@ -708,10 +708,12 @@ and then uses the sum to create a new Quantity. For example:
     >>> import math
 
     >>> total = Quantity(0, '$')
-    >>> for contribution in [1.23, 4.56, 7.89]:
+    >>> for contribution in ['1.23', '4.56', '7.89']:
     ...     total = total.add(contribution)
     >>> print(total)
     $13.68
+
+The argument to *add* can be a quantity, a real number, or a string.
 
 When adding quantities, the units of the quantity should match. You can enforce 
 this by adding *check_units=True*. If the dimension of your quantities match but 
@@ -2097,10 +2099,11 @@ you use 'full' precision:
 Equivalence
 -----------
 
-You can determine whether the value of a quantity or real number is equivalent 
-to that of a quantity using :meth:`Quantity.is_close()`.  The two values need 
-not be identical, they just need to be close to be deemed equivalent. The 
-*reltol* and *abstol* preferences are used to determine if they are close.
+You can determine whether a value is equivalent to that of a quantity using 
+:meth:`Quantity.is_close()`.  The value may be given as a quantity, a real 
+number, or a string. The two values need not be identical, they just need to be 
+close to be deemed equivalent. The *reltol* and *abstol* preferences are used to 
+determine if they are close.
 
 .. code-block:: python
 
@@ -2127,10 +2130,10 @@ behavior can be overridden by specifying *check_units*.
 
 .. code-block:: python
 
-   >>> Quantity('$10').is_close(Quantity('10 USD'))
+   >>> Quantity('$10').is_close('10 USD')
    False
 
-   >>> Quantity('$10').is_close(Quantity('10 USD'), check_units=False)
+   >>> Quantity('$10').is_close('10 USD', check_units=False)
    True
 
 
