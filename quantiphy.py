@@ -22,7 +22,7 @@ Documentation can be found at https://quantiphy.readthedocs.io.
 """
 
 # License {{{1
-# Copyright (C) 2016-2020 Kenneth S. Kundert
+# Copyright (C) 2016-2021 Kenneth S. Kundert
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -1983,7 +1983,7 @@ class Quantity(float):
 
         :arg addend:
             The amount to add to the quantity.
-        :type addend: real, quantity
+        :type addend: real, quantity, string
 
         :arg check_units:
             If True, raise an exception if the units of the *addend* are not
@@ -2004,6 +2004,9 @@ class Quantity(float):
             $13.68
 
         """
+        if isinstance(addend, str):
+            addend = self.__class__(addend)
+
         try:
             if check_units and self.units != addend.units:
                 raise IncompatibleUnits(self.units, addend.units)
@@ -2586,7 +2589,7 @@ class Quantity(float):
 
         :arg other:
             The value to compare against.
-        :type other: quantity or real
+        :type other: quantity, real, or string
 
         :arg float reltol:
             The relative tolerance.
@@ -2616,10 +2619,14 @@ class Quantity(float):
             ...     c.is_close(c+1e4),                 # should fail, not close
             ...     c.is_close(Quantity(c+1, 'm/s')),  # should pass, is close
             ...     c.is_close(Quantity(c+1, 'Hz')),   # should fail, wrong units
+            ...     c.is_close('299.7925 Mm/s'),       # should pass, is close
             ... )
-            True True False True False
+            True True False True False True
 
         """
+        if isinstance(other, str):
+            other = self.__class__(other)
+
         if check_units:
             other_units = getattr(other, 'units', None)
             if other_units:

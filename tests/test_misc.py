@@ -253,6 +253,8 @@ def test_misc2():
     assert q.render(show_label=True) == 'Tclk = 10 ns'
     assert q.is_close(1e-8) is True
     assert q.is_close(1.001e-8) is False
+    assert q.is_close('10ns') is True
+    assert q.is_close('10.01ns') is False
 
     add_constant(Quantity('F_hy = 1420405751.786 Hz -- frequency of hydrogen line'))
     h_line = Quantity('F_hy')
@@ -753,6 +755,11 @@ def test_add():
         total.add(Quantity('-2MHz'), check_units=True)
     total = total.add(Quantity('$6M'), check_units=True)
     assert str(total) == '$5,000,000.00'
+
+    total = Dollars(0)
+    assert str(total) == '$0.00'
+    total = total.add('$1,000,000.00', check_units=True)
+    assert total.is_close('$1,000,000.00', check_units=True)
 
     class WholeDollars(Dollars):
         prec = 0
