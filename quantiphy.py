@@ -248,7 +248,7 @@ class UnitConversion(object):
     when a conversion is requested with the given units. A forward conversion is
     performed if the from and to units match, and a reversion conversion is
     performed if they are swapped. A no-op conversion is performed when
-    converting one from- unit to another or one to-unit to another.
+    converting one from-unit to another or from one to-unit to another.
 
     :arg to_units:
         A collection of units. If given as a single string it is split.
