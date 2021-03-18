@@ -2151,7 +2151,7 @@ Negligible Values
 *QuantiPhy* can round small values to zero when rendering them, which can help 
 to reduce visual clutter.  You can specify the size of a negligible value as 
 a preference using :meth:`Quantity.set_prefs` or :meth:`Quantity.prefs`, or you 
-can specify it locally using:meth:`Quantity.render`.  Any quantity whose 
+can specify it locally using :meth:`Quantity.render`.  Any quantity whose 
 absolute value is smaller than the specified value is rendered as zero with the 
 underlying value remaining unchanged.
 
