@@ -2231,7 +2231,7 @@ class Quantity(float):
                 negligible = negligible.get(self.units, negligible.get(None, -1))
             except AttributeError:
                 pass
-            if abs(self.real) <= negligible:
+            if abs(self.real) < negligible:
                 mantissa = '0'
                 exp = 0
                 sign = ''

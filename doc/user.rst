@@ -2090,6 +2090,9 @@ you use 'full' precision:
     Applying stimulus @ 200.5us: V(in) = 500mV.
     Pass @ 300.5us: V(out): expected=2V, measured=1.99999965V, diff=346.11713nV.
 
+.. ignore
+    >>> Quantity.set_prefs(spacer=' ')
+
 
 .. index::
    single: equivalence
@@ -2135,6 +2138,48 @@ behavior can be overridden by specifying *check_units*.
 
    >>> Quantity('$10').is_close('10 USD', check_units=False)
    True
+
+
+.. index::
+   single: negligible
+
+.. _negligible values:
+
+Negligible Values
+-----------------
+
+*QuantiPhy* can round small values to zero, which can help to reduce visual 
+clutter.  You can specify the size of a negligible value as a preference using 
+:meth:`Quantity.set_prefs` or :meth:`Quantity.prefs`, or you can specify it 
+locally using:meth:`Quantity.render`.  Any quantity whose absolute value is 
+smaller than the specified value is rendered as zero with the underlying value 
+remaining unchanged.
+
+
+.. code-block:: python
+
+   >>> from quantiphy import Quantity
+   >>> from math import exp
+
+   >>> Vt = 0.025852
+   >>> def cond(v):
+   ...     return Quantity(1e-27 * exp(v/Vt)/Vt, 'Ʊ')
+
+   >>> Quantity.set_prefs(prec=2)
+   >>> for i in range(11):
+   ...     v = Quantity(i/5, 'V')
+   ...     print(f'{v:>6}: {cond(v):>10}, {v:>26}: {cond(v).render(negligible=1e-3):>10}')
+      0 V: 38.7e-27 Ʊ,                        0 V:        0 Ʊ
+   200 mV: 88.6e-24 Ʊ,                     200 mV:        0 Ʊ
+   400 mV:  203e-21 Ʊ,                     400 mV:        0 Ʊ
+   600 mV:     465 aƱ,                     600 mV:        0 Ʊ
+   800 mV:    1.06 pƱ,                     800 mV:        0 Ʊ
+      1 V:    2.44 nƱ,                        1 V:        0 Ʊ
+    1.2 V:    5.58 uƱ,                      1.2 V:        0 Ʊ
+    1.4 V:    12.8 mƱ,                      1.4 V:    12.8 mƱ
+    1.6 V:     29.3 Ʊ,                      1.6 V:     29.3 Ʊ
+    1.8 V:      67 kƱ,                      1.8 V:      67 kƱ
+      2 V:     153 MƱ,                        2 V:     153 MƱ
 
 
 .. index::

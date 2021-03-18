@@ -30,9 +30,9 @@ def test_manual():
         # code used in doctests assumes python3.6
         return
     Quantity.reset_prefs()
-    files = {
+    expected_test_count = {
         '../doc/index.rst': 29,
-        '../doc/user.rst': 361,
+        '../doc/user.rst': 368,
         '../doc/api.rst': 0,
         '../doc/examples.rst': 36,
         '../doc/accessories.rst': 12,
@@ -40,8 +40,8 @@ def test_manual():
     }
     found = glob.glob('../doc/*.rst')
     for f in found:
-        assert f in files, f
-    for path, tests in files.items():
+        assert f in expected_test_count, f
+    for path, tests in expected_test_count.items():
         rv = doctest.testfile(path, optionflags=doctest.ELLIPSIS)
         assert rv.failed == 0, path
         assert rv.attempted == tests, path
