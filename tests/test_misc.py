@@ -850,7 +850,8 @@ def test_negligible():
 
     q=Quantity('-0')
     assert q.render() == '-0'
-    assert q.render(negligible=0) == '0'
+    assert q.render(negligible=0) == '-0'
+    assert q.render(negligible=1e-18) == '0'
 
     v=Quantity('1nV')
     c=Quantity('1fA')
