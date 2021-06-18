@@ -11,7 +11,7 @@ keywords='''
 
 setup(
     name = 'quantiphy',
-    version = '2.13.1',
+    version = '2.14.0',
     description = 'physical quantities (numbers with units)',
     long_description = readme,
     long_description_content_type = 'text/x-rst',
