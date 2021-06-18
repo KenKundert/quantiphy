@@ -8,13 +8,22 @@ Latest development release
 | Version: 2.13.1
 | Released: 2021-02-17
 
+
+2.14 (2021-06-18)
+-----------------
+- Allow primary argument of :meth:`Quantity.is_close` and :meth:`Quantity.add` 
+  to be a string.
+
+
 2.13 (2020-10-13)
 -----------------
 - Allow currency symbols in compound units (ex: $/oz or lbs/$).
 
+
 2.12 (2020-07-25)
 -----------------
 - bug fix release.
+
 
 2.11 (2020-07-19)
 -----------------
@@ -23,6 +32,7 @@ Latest development release
 - Added *only_e_notation* argument to :meth:`Quantity.all_from_conv_fmt()`.
 - Added :meth:`Quantity.reset_prefs()` method.
 
+
 2.10 (2020-03-2)
 ----------------
 - Added *negligible*, *tight_units*, *nan*, and *inf* preferences.
@@ -30,14 +40,17 @@ Latest development release
 - Added *infinity_symbol* attribute.
 - Changed the return values for :meth:`Quantity.is_nan()` and :meth:`Quantity.is_infinite()`.
 
+
 2.9 (2020-01-28)
 ----------------
 - Made :meth:`Quantity.extract()` more forgiving.
 - Support radix and comma processing when converting strings to :class:`Quantity`.
 
+
 2.8 (2020-01-08)
 ----------------
 - Fix nit in installer (setup.py).
+
 
 2.7 (2019-12-17)
 ----------------
@@ -46,10 +59,12 @@ Latest development release
 - support all preferences as class attributes.
 - allow radix and comma to be replaced by adding *radix* and *comma* preferences.
 
+
 2.6 (2019-09-24)
 ----------------
 - now support Quantity arguments with :meth:`Quantity.extract()`.
 - allow plus and minus signs to be replaced with Unicode equivalents.
+
 
 2.5 (2019-01-16)
 ----------------
@@ -60,6 +75,7 @@ Latest development release
 - reformulated exceptions.
 - added support for binary scale factors and :meth:`Quantity.binary()`.
 
+
 2.4 (2018-09-12)
 ----------------
 - fixed bug in format that resulted in several format codes ignoring width
@@ -69,6 +85,7 @@ Latest development release
 - change *show_si* to *form* (argument on :meth:`Quantity.set_prefs()` and :meth:`Quantity.render()` (*show_si* is now obsolete, use *form='si'* instead).
 - added concept of equivalent units for unit conversion to documentation.
 - enhance UnitConversion so that it supports nonlinear conversions.
+
 
 2.3 (2018-03-11)
 ----------------
@@ -89,12 +106,14 @@ Latest development release
   * added :meth:`Quantity.format()` method
   * support any format specifier supported by Python for floats
 
+
 2.2 (2017-11-22)
 ----------------
 - added :meth:`Quantity.scale()`
 - added :meth:`UnitConversion.convert()`
 - added *strip_zeros*
 - added no-op conversions (units change but value stays the same, ex: $ → USD)
+
 
 2.1 (2017-07-30)
 ----------------
@@ -104,6 +123,7 @@ there are a few small feature enhancements.
 - added support for SI standard composite units
 - added support for non-breaking space as spacer
 - removed constraint in :meth:`Quantity.extract()` that names must be identifiers
+
 
 2.0 (2017-07-15)
 ----------------
@@ -129,10 +149,12 @@ and refinements to the API.
 - renamed *strip_dp* option to *strip_radix*
 - added *number_fmt* option
 
+
 1.3 (2017-03-19)
 ----------------
 - reworked constants
 - added unit systems for physical constants
+
 
 1.2 (2017-02-24)
 ----------------
@@ -143,12 +165,13 @@ and refinements to the API.
 - fix some issues in full precision mode
 - ranamed some options, arguments and methods
 
+
 1.1 (2016-11-27)
 ----------------
 - added *known_units* preference.
 - added *get_preference* class method.
 
+
 1.0 (2016-11-26)
 ----------------
 - initial production release.
-

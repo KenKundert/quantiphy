@@ -980,6 +980,7 @@ class Quantity(float):
     # set preferences {{{3
     @classmethod
     def set_prefs(cls, **kwargs):
+        # description {{{4
         """Set class preferences.
 
         Any values not passed in are left alone.
@@ -1308,6 +1309,7 @@ class Quantity(float):
             1.2566 uH/m
 
         """
+        # code {{{4
         cls._initialize_preferences()
         if isinstance(kwargs.get('known_units'), str):
             kwargs['known_units'] = kwargs['known_units'].split()
