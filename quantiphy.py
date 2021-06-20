@@ -525,7 +525,7 @@ UnitConversion('C °C', 'R °R', 5/9, -273.15)
 UnitConversion('K', 'F °F', 5/9, 273.15 - 32*5/9)
 UnitConversion('K', 'R °R', 5/9, 0)
 
-# Distance conversions {{{2
+# Length/Distance conversions {{{2
 UnitConversion('m', 'km', 1000)
 UnitConversion('m', 'cm', 1/100)
 UnitConversion('m', 'mm', 1/1000)
@@ -533,6 +533,7 @@ UnitConversion('m', 'um µm μm micron', 1/1000000)
 UnitConversion('m', 'nm', 1/1000000000)
 UnitConversion('m', 'Å angstrom', 1/10000000000)
 UnitConversion('m', 'mi mile miles', 1609.344)
+UnitConversion('m', 'ft feet', 0.3048)
 UnitConversion('m', 'in inch inches', 0.0254)
 
 # Mass conversions {{{2

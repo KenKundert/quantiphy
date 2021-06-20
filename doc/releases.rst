@@ -8,6 +8,8 @@ Latest development release
 | Version: 2.14.0
 | Released: 2021-06-18
 
+- add feet to the available length/distance unit conversions.
+
 
 2.14 (2021-06-18)
 -----------------
