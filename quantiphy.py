@@ -3121,7 +3121,7 @@ class Quantity(float):
 # Plank's constant {{{2
 add_constant(
     Quantity(
-        '6.626070040e-34',
+        '6.62607015e-34',
         units='J-s',
         name='h',
         desc="Plank's constant"
@@ -3130,7 +3130,7 @@ add_constant(
 )
 add_constant(
     Quantity(
-        '6.626070040e-27',
+        '6.62607015e-27',
         units='erg-s',
         name='h',
         desc="Plank's constant"
@@ -3141,7 +3141,7 @@ add_constant(
 # Reduced Plank's constant {{{2
 add_constant(
     Quantity(
-        '1.054571800e-34',
+        '1.054571817e-34',
         units='J-s',
         name='ħ',
         desc="reduced Plank's constant"
@@ -3151,7 +3151,7 @@ add_constant(
 )
 add_constant(
     Quantity(
-        '1.054571800e-27',
+        '1.054571817e-27',
         units='erg-s',
         name='ħ',
         desc="reduced Plank's constant"
@@ -3163,7 +3163,7 @@ add_constant(
 # Boltzmann's constant {{{2
 add_constant(
     Quantity(
-        '1.38064852e-23',
+        '1.380649e-23',
         units='J/K',
         name='k',
         desc="Boltzmann's constant"
@@ -3172,7 +3172,7 @@ add_constant(
 )
 add_constant(
     Quantity(
-        '1.38064852e-16',
+        '1.380649e-16',
         units='erg/K',
         name='k',
         desc="Boltzmann's constant"
@@ -3183,7 +3183,7 @@ add_constant(
 # Elementary charge {{{2
 add_constant(
     Quantity(
-        '1.6021766208e-19',
+        '1.602176634e-19',
         units='C',
         name='q',
         desc="elementary charge"
@@ -3192,7 +3192,7 @@ add_constant(
 )
 add_constant(
     Quantity(
-        '4.80320425e-10',
+        '4.80320471257e-10',
         units='Fr',
         name='q',
         desc="elementary charge"
@@ -3226,7 +3226,7 @@ add_constant(
 # Permittivity of free space {{{2
 add_constant(
     Quantity(
-        '8.854187817e-12',
+        '8.8541878128e-12',
         units='F/m',
         name='ε₀',
         desc="permittivity of free space"
@@ -3238,7 +3238,7 @@ add_constant(
 # Permeability of free space {{{2
 add_constant(
     Quantity(
-        4e-7*math.pi,
+        1.25663706212e-6,
         units='H/m',
         name='µ₀',
         desc="permeability of free space"
@@ -3250,7 +3250,7 @@ add_constant(
 # Characteristic impedance of free space {{{2
 add_constant(
     Quantity(
-        '376.730313461',
+        '376.730313668',
         units='Ohms',
         name='Z₀',
         desc="characteristic impedance of free space"
