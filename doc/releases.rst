@@ -8,6 +8,8 @@ Latest development release
 | Version: 2.14.1
 | Released: 2021-06-20
 
+- updated predefined physical constants to CODATA 2018 values.
+- switched to more permissive MIT license.
 - add feet to the available length/distance unit conversions.
 
 
