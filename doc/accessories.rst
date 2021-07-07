@@ -3,7 +3,7 @@
 .. index::
     single: accessories
 
-.. _accessories:
+.. _quantiphy_accessories:
 
 Accessories
 ===========

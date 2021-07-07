@@ -611,7 +611,8 @@ In addition, you can use it to directly perform conversions:
     >>> print(str(kpc))
     1 kpc
 
-You can find an example of this usage in :ref:`cryptocurrency example`.
+You can find an example of this usage in :ref:`quantiphy cryptocurrency 
+example`.
 
 When using unit conversions it is important to only convert to units without 
 scale factors (such as those in the first column above) when creating 

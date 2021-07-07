@@ -800,7 +800,7 @@ like the following:
 ..  image:: flicker.svg
 
 .. cryptocurrency example {{{1
-.. _cryptocurrency example:
+.. _quantiphy cryptocurrency example:
 
 Cryptocurrency Example
 ----------------------
