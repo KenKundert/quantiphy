@@ -1,6 +1,9 @@
 QuantiPhy — Physical Quantities
 ===============================
 
+.. image:: https://pepy.tech/badge/quantiphy/month
+    :target: https://pepy.tech/project/quantiphy
+
 .. image:: https://img.shields.io/travis/KenKundert/quantiphy/master.svg
     :target: https://travis-ci.org/KenKundert/quantiphy
 
