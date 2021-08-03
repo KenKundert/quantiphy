@@ -45,6 +45,7 @@ Documentation can be found at https://quantiphy.readthedocs.io.
 # Imports {{{1
 import re
 import math
+import numbers
 from collections import ChainMap
 
 
@@ -1841,7 +1842,7 @@ class Quantity(float):
             desc = data.get('desc')
 
         # perform specified conversion if requested
-        if scale:
+        if scale or isinstance(scale, numbers.Number):
             original = number
             try:
                 number, units = _scale(scale, number, units)
@@ -2223,7 +2224,7 @@ class Quantity(float):
 
             # scale if desired
             number = self.real
-            if scale:
+            if scale or isinstance(scale, numbers.Number):
                 number, units = _scale(scale, number, self.units)
                 if not show_units:
                     units = ''
@@ -2421,7 +2422,7 @@ class Quantity(float):
         # handle fixed point formatting
         if prec == 'full':
             prec = self.full_prec
-        if scale:
+        if scale or isinstance(scale, numbers.Number):
             number, units = _scale(scale, float(self), self.units)
             units = units if show_units else ''
         else:
@@ -2538,7 +2539,7 @@ class Quantity(float):
             return self._label(value, show_label)
 
         # handle scaling
-        if scale:
+        if scale or isinstance(scale, numbers.Number):
             number, units = _scale(scale, float(self), self.units)
             units = units if show_units else ''
         else:
