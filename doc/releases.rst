@@ -5,8 +5,8 @@ Releases
 
 Latest development release
 --------------------------
-| Version: 2.14.2
-| Released: 2021-06-24
+| Version: 2.14.3
+| Released: 2021-08-03
 
 - updated predefined physical constants to CODATA 2018 values.
 - switched to more permissive MIT license.
