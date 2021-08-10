@@ -4,7 +4,7 @@ QuantiPhy — Physical Quantities
 .. image:: https://pepy.tech/badge/quantiphy/month
     :target: https://pepy.tech/project/quantiphy
 
-..  image:: https://github.com/KenKundert//quantiphyactions/workflows/build.yaml/badge.svg
+.. image:: https://github.com/KenKundert/quantiphy/actions/workflows/build.yaml/badge.svg
     :target: https://github.com/KenKundert/quantiphy/actions/workflows/build.yaml
 
 .. image:: https://coveralls.io/repos/github/KenKundert/quantiphy/badge.svg?branch=master
