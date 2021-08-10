@@ -4,11 +4,11 @@ QuantiPhy — Physical Quantities
 .. image:: https://pepy.tech/badge/quantiphy/month
     :target: https://pepy.tech/project/quantiphy
 
-.. image:: https://img.shields.io/travis/KenKundert/quantiphy/master.svg
-    :target: https://travis-ci.org/KenKundert/quantiphy
+..  image:: https://github.com/KenKundert//quantiphyactions/workflows/build.yaml/badge.svg
+    :target: https://github.com/KenKundert/quantiphy/actions/workflows/build.yaml
 
-.. image:: https://img.shields.io/coveralls/KenKundert/quantiphy.svg
-    :target: https://coveralls.io/r/KenKundert/quantiphy
+.. image:: https://coveralls.io/repos/github/KenKundert/quantiphy/badge.svg?branch=master
+    :target: https://coveralls.io/github/KenKundert/quantiphy?branch=master
 
 .. image:: https://img.shields.io/pypi/v/quantiphy.svg
     :target: https://pypi.python.org/pypi/quantiphy
@@ -16,9 +16,6 @@ QuantiPhy — Physical Quantities
 .. image:: https://img.shields.io/pypi/pyversions/quantiphy.svg
     :target: https://pypi.python.org/pypi/quantiphy/
 
-.. IGNORE: pypi statistics are broken and unlikely to be fixed
-    .. image:: https://img.shields.io/pypi/dm/quantiphy.svg
-        :target: https://pypi.python.org/pypi/quantiphy/
 
 | Author: Ken Kundert
 | Version: 2.15.0
