@@ -4,6 +4,9 @@ QuantiPhy — Physical Quantities
 .. image:: https://pepy.tech/badge/quantiphy/month
     :target: https://pepy.tech/project/quantiphy
 
+.. image:: https://img.shields.io/readthedocs/quantiphy.svg
+   :target: https://quantiphy.readthedocs.io/en/latest/?badge=latest
+
 .. image:: https://github.com/KenKundert/quantiphy/actions/workflows/build.yaml/badge.svg
     :target: https://github.com/KenKundert/quantiphy/actions/workflows/build.yaml
 

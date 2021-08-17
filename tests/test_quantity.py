@@ -312,10 +312,10 @@ test_cases = [
     Case('mantis', '1000 MHz', ('1e9', 'Hz'), '1GHz', dict(prec=3, strip_zeros=True)),
 ]
 
-names = set()
 def test_number_recognition():
     Quantity.reset_prefs()
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None)
+    names = set()
     for case in test_cases:
         if not case:
             continue

@@ -20,11 +20,11 @@ setup(
     url = 'https://quantiphy.readthedocs.io',
     download_url = 'https://github.com/kenkundert/quantiphy/tarball/master',
     license = 'MIT',
-    zip_safe = False,
     py_modules = 'quantiphy'.split(),
     install_requires = [],
     tests_require = 'pytest inform rkm_codes'.split(),
     python_requires = '>=3.5',
+    zip_safe = True,
     keywords = keywords.split(),
     classifiers = [
         'Development Status :: 5 - Production/Stable',
