@@ -5,8 +5,8 @@ Releases
 
 Latest development release
 --------------------------
-| Version: 2.15.0
-| Released: 2021-08-03
+| Version: 2.15.1
+| Released: 2021-08-30
 
 - Add support for — as comment character and make it the default.
 
