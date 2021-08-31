@@ -39,18 +39,18 @@ def test_constants():
     assert str(Quantity('μ₀')) == '1.2566 uH/m'  # uses mu
     assert str(Quantity('Z0')) == '376.73 Ohms'
 
-    assert '{:S}'.format(Quantity('h')) == "h = 662.61e-36 J-s -- Plank's constant"
-    assert '{:S}'.format(Quantity('hbar')) == "ħ = 105.46e-36 J-s -- reduced Plank's constant"
-    assert '{:S}'.format(Quantity('ħ')) == "ħ = 105.46e-36 J-s -- reduced Plank's constant"
-    assert '{:S}'.format(Quantity('k')) == "k = 13.806e-24 J/K -- Boltzmann's constant"
-    assert '{:S}'.format(Quantity('q')) == 'q = 160.22e-21 C -- elementary charge'
-    assert '{:S}'.format(Quantity('c')) == 'c = 299.79 Mm/s -- speed of light'
-    assert '{:S}'.format(Quantity('0C')) == '0°C = 273.15 K -- zero degrees Celsius'
-    assert '{:S}'.format(Quantity('eps0')) == 'ε₀ = 8.8542 pF/m -- permittivity of free space'
-    assert '{:S}'.format(Quantity('mu0')) == 'µ₀ = 1.2566 uH/m -- permeability of free space'
-    assert '{:S}'.format(Quantity('µ₀')) == 'µ₀ = 1.2566 uH/m -- permeability of free space'  # uses micro
-    assert '{:S}'.format(Quantity('μ₀')) == 'µ₀ = 1.2566 uH/m -- permeability of free space'  # uses mu
-    assert '{:S}'.format(Quantity('Z0')) == 'Z₀ = 376.73 Ohms -- characteristic impedance of free space'
+    assert '{:S}'.format(Quantity('h')) == "h = 662.61e-36 J-s — Plank's constant"
+    assert '{:S}'.format(Quantity('hbar')) == "ħ = 105.46e-36 J-s — reduced Plank's constant"
+    assert '{:S}'.format(Quantity('ħ')) == "ħ = 105.46e-36 J-s — reduced Plank's constant"
+    assert '{:S}'.format(Quantity('k')) == "k = 13.806e-24 J/K — Boltzmann's constant"
+    assert '{:S}'.format(Quantity('q')) == 'q = 160.22e-21 C — elementary charge'
+    assert '{:S}'.format(Quantity('c')) == 'c = 299.79 Mm/s — speed of light'
+    assert '{:S}'.format(Quantity('0C')) == '0°C = 273.15 K — zero degrees Celsius'
+    assert '{:S}'.format(Quantity('eps0')) == 'ε₀ = 8.8542 pF/m — permittivity of free space'
+    assert '{:S}'.format(Quantity('mu0')) == 'µ₀ = 1.2566 uH/m — permeability of free space'
+    assert '{:S}'.format(Quantity('µ₀')) == 'µ₀ = 1.2566 uH/m — permeability of free space'  # uses micro
+    assert '{:S}'.format(Quantity('μ₀')) == 'µ₀ = 1.2566 uH/m — permeability of free space'  # uses mu
+    assert '{:S}'.format(Quantity('Z0')) == 'Z₀ = 376.73 Ohms — characteristic impedance of free space'
 
     assert Quantity('h').render(prec='full') == '662.607015e-36 J-s'
     assert Quantity('hbar').render(prec='full') == '105.4571817e-36 J-s'
@@ -107,13 +107,13 @@ def test_constants():
     assert isinstance(exception.value, TypeError)
     assert exception.value.args == (None,)
 
-    assert '{:S}'.format(Quantity('h')) == "h = 6.6261e-27 erg-s -- Plank's constant"
-    assert '{:S}'.format(Quantity('hbar')) == "ħ = 1.0546e-27 erg-s -- reduced Plank's constant"
-    assert '{:S}'.format(Quantity('ħ')) == "ħ = 1.0546e-27 erg-s -- reduced Plank's constant"
-    assert '{:S}'.format(Quantity('k')) == "k = 138.06 aerg/K -- Boltzmann's constant"
-    assert '{:S}'.format(Quantity('q')) == 'q = 480.32 pFr -- elementary charge'
-    assert '{:S}'.format(Quantity('c')) == 'c = 299.79 Mm/s -- speed of light'
-    assert '{:S}'.format(Quantity('0C')) == '0°C = 273.15 K -- zero degrees Celsius'
+    assert '{:S}'.format(Quantity('h')) == "h = 6.6261e-27 erg-s — Plank's constant"
+    assert '{:S}'.format(Quantity('hbar')) == "ħ = 1.0546e-27 erg-s — reduced Plank's constant"
+    assert '{:S}'.format(Quantity('ħ')) == "ħ = 1.0546e-27 erg-s — reduced Plank's constant"
+    assert '{:S}'.format(Quantity('k')) == "k = 138.06 aerg/K — Boltzmann's constant"
+    assert '{:S}'.format(Quantity('q')) == 'q = 480.32 pFr — elementary charge'
+    assert '{:S}'.format(Quantity('c')) == 'c = 299.79 Mm/s — speed of light'
+    assert '{:S}'.format(Quantity('0C')) == '0°C = 273.15 K — zero degrees Celsius'
 
     set_unit_system('mks')
     assert Quantity('h').render(prec='full') == '662.607015e-36 J-s'
@@ -143,20 +143,20 @@ def test_constants():
     assert str(Quantity('μ₀')) == '1.2566 uH/m'  # uses mu
     assert str(Quantity('Z0')) == '376.73 Ohms'
 
-    assert '{:S}'.format(Quantity('h')) == "h = 662.61e-36 J-s -- Plank's constant"
-    assert '{:S}'.format(Quantity('hbar')) == "ħ = 105.46e-36 J-s -- reduced Plank's constant"
-    assert '{:S}'.format(Quantity('ħ')) == "ħ = 105.46e-36 J-s -- reduced Plank's constant"
-    assert '{:S}'.format(Quantity('k')) == "k = 13.806e-24 J/K -- Boltzmann's constant"
-    assert '{:S}'.format(Quantity('q')) == 'q = 160.22e-21 C -- elementary charge'
-    assert '{:S}'.format(Quantity('c')) == 'c = 299.79 Mm/s -- speed of light'
-    assert '{:S}'.format(Quantity('0C')) == '0°C = 273.15 K -- zero degrees Celsius'
-    assert '{:S}'.format(Quantity('eps0')) == 'ε₀ = 8.8542 pF/m -- permittivity of free space'
-    assert '{:S}'.format(Quantity('mu0')) == 'µ₀ = 1.2566 uH/m -- permeability of free space'
-    assert '{:S}'.format(Quantity('µ₀')) == 'µ₀ = 1.2566 uH/m -- permeability of free space'  # uses micro
-    assert '{:S}'.format(Quantity('μ₀')) == 'µ₀ = 1.2566 uH/m -- permeability of free space'  # uses mu
-    assert '{:S}'.format(Quantity('Z0')) == 'Z₀ = 376.73 Ohms -- characteristic impedance of free space'
+    assert '{:S}'.format(Quantity('h')) == "h = 662.61e-36 J-s — Plank's constant"
+    assert '{:S}'.format(Quantity('hbar')) == "ħ = 105.46e-36 J-s — reduced Plank's constant"
+    assert '{:S}'.format(Quantity('ħ')) == "ħ = 105.46e-36 J-s — reduced Plank's constant"
+    assert '{:S}'.format(Quantity('k')) == "k = 13.806e-24 J/K — Boltzmann's constant"
+    assert '{:S}'.format(Quantity('q')) == 'q = 160.22e-21 C — elementary charge'
+    assert '{:S}'.format(Quantity('c')) == 'c = 299.79 Mm/s — speed of light'
+    assert '{:S}'.format(Quantity('0C')) == '0°C = 273.15 K — zero degrees Celsius'
+    assert '{:S}'.format(Quantity('eps0')) == 'ε₀ = 8.8542 pF/m — permittivity of free space'
+    assert '{:S}'.format(Quantity('mu0')) == 'µ₀ = 1.2566 uH/m — permeability of free space'
+    assert '{:S}'.format(Quantity('µ₀')) == 'µ₀ = 1.2566 uH/m — permeability of free space'  # uses micro
+    assert '{:S}'.format(Quantity('μ₀')) == 'µ₀ = 1.2566 uH/m — permeability of free space'  # uses mu
+    assert '{:S}'.format(Quantity('Z0')) == 'Z₀ = 376.73 Ohms — characteristic impedance of free space'
 
-    add_constant('f_hy = 1420.405751786 MHz -- Frequency of hydrogen line')
+    add_constant('f_hy = 1420.405751786 MHz — Frequency of hydrogen line')
     assert str(Quantity('f_hy')) == '1.4204 GHz'
 
     add_constant(Quantity('1420.405751786 MHz'), 'hline')

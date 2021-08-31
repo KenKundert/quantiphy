@@ -1,0 +1,3412 @@
+test_number_recognition:
+
+    # some simple cases
+    grange:
+        given: q = Quantity(0)
+        tests:
+            boyfriend:
+                evaluate: q.as_tuple()
+                expected: (0, '')
+            flowerpot:
+                evaluate: str(q)
+                expected: '0'
+
+    waltz:
+        given: q = Quantity('0s')
+        tests:
+            hyena:
+                evaluate: q.as_tuple()
+                expected: (0, 's')
+            suffering:
+                evaluate: str(q)
+                expected: '0 s'
+
+    allay:
+        given: q = Quantity('0 s')
+        tests:
+            stove:
+                evaluate: q.as_tuple()
+                expected: (0, 's')
+            televise:
+                evaluate: str(q)
+                expected: '0 s'
+
+    tribute:
+        given: q = Quantity('$0')
+        tests:
+            redouble:
+                evaluate: q.as_tuple()
+                expected: (0, '$')
+            tanker:
+                evaluate: str(q)
+                expected: '$0'
+
+    lunatic:
+        given: q = Quantity(1)
+        tests:
+            crude:
+                evaluate: q.as_tuple()
+                expected: (1, '')
+            harelip:
+                evaluate: str(q)
+                expected: '1'
+
+    seafront:
+        given: q = Quantity('1s')
+        tests:
+            onward:
+                evaluate: q.as_tuple()
+                expected: (1, 's')
+            surfer:
+                evaluate: str(q)
+                expected: '1 s'
+
+    birthday:
+        given: q = Quantity('1 s')
+        tests:
+            dinghy:
+                evaluate: q.as_tuple()
+                expected: (1, 's')
+            discern:
+                evaluate: str(q)
+                expected: '1 s'
+
+    energy:
+        given: q = Quantity('$1')
+        tests:
+            surveyor:
+                evaluate: q.as_tuple()
+                expected: (1, '$')
+            sorceress:
+                evaluate: str(q)
+                expected: '$1'
+
+    loser:
+        given: q = Quantity('2.')
+        tests:
+            whistle:
+                evaluate: q.as_tuple()
+                expected: (2, '')
+            parcel:
+                evaluate: str(q)
+                expected: '2'
+
+    disprove:
+        given: q = Quantity('2.s')
+        tests:
+            pension:
+                evaluate: q.as_tuple()
+                expected: (2, 's')
+            matchbox:
+                evaluate: str(q)
+                expected: '2 s'
+
+    mixture:
+        given: q = Quantity('2. s')
+        tests:
+            assent:
+                evaluate: q.as_tuple()
+                expected: (2, 's')
+            dockland:
+                evaluate: str(q)
+                expected: '2 s'
+
+    # test all the scale factors
+    quill:
+        given: q = Quantity('1ys')
+        tests:
+            purloin:
+                evaluate: q.as_tuple()
+                expected: (1e-24, 's')
+            whacking:
+                evaluate: str(q)
+                expected: '1e-24 s'
+
+    joust:
+        given: q = Quantity('1zs')
+        tests:
+            marquee:
+                evaluate: q.as_tuple()
+                expected: (1e-21, 's')
+            renew:
+                evaluate: str(q)
+                expected: '1e-21 s'
+
+    streak:
+        given: q = Quantity('1as')
+        tests:
+            ceasefire:
+                evaluate: q.as_tuple()
+                expected: (1e-18, 's')
+            preface:
+                evaluate: str(q)
+                expected: '1 as'
+
+    mutiny:
+        given: q = Quantity('1fs')
+        tests:
+            bootlace:
+                evaluate: q.as_tuple()
+                expected: (1e-15, 's')
+            reprobate:
+                evaluate: str(q)
+                expected: '1 fs'
+
+    banker:
+        given: q = Quantity('1ps')
+        tests:
+            inflict:
+                evaluate: q.as_tuple()
+                expected: (1e-12, 's')
+            frothy:
+                evaluate: str(q)
+                expected: '1 ps'
+
+    conquer:
+        given: q = Quantity('1ns')
+        tests:
+            duplex:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 's')
+            sphinx:
+                evaluate: str(q)
+                expected: '1 ns'
+
+    share:
+        given: q = Quantity('1us')
+        tests:
+            pulse:
+                evaluate: q.as_tuple()
+                expected: (1e-6, 's')
+            scalpel:
+                evaluate: str(q)
+                expected: '1 us'
+
+    resurface:
+        given: q = Quantity('1μs')
+        tests:
+            mistreat:
+                evaluate: q.as_tuple()
+                expected: (1e-6, 's')
+            horseshoe:
+                evaluate: str(q)
+                expected: '1 us'
+
+    scallywag:
+        given: q = Quantity('1µs')
+        tests:
+            orphan:
+                evaluate: q.as_tuple()
+                expected: (1e-6, 's')
+            hijack:
+                evaluate: str(q)
+                expected: '1 us'
+
+    witch:
+        given: q = Quantity('1ms')
+        tests:
+            ordain:
+                evaluate: q.as_tuple()
+                expected: (1e-3, 's')
+            exhale:
+                evaluate: str(q)
+                expected: '1 ms'
+
+    engrave:
+        given: q = Quantity('1cs')
+        tests:
+            misprint:
+                evaluate: q.as_tuple()
+                expected: (10e-3, 's')
+            readjust:
+                evaluate: str(q)
+                expected: '10 ms'
+
+    finance:
+        given: q = Quantity('1_s')
+        tests:
+            noisy:
+                evaluate: q.as_tuple()
+                expected: (1, 's')
+            corrupt:
+                evaluate: str(q)
+                expected: '1 s'
+
+    ecologist:
+        given: q = Quantity('1ks')
+        tests:
+            expense:
+                evaluate: q.as_tuple()
+                expected: (1e3, 's')
+            rustle:
+                evaluate: str(q)
+                expected: '1 ks'
+
+    insulate:
+        given: q = Quantity('1Ks')
+        tests:
+            supervise:
+                evaluate: q.as_tuple()
+                expected: (1e3, 's')
+            trilogy:
+                evaluate: str(q)
+                expected: '1 ks'
+
+    apprehend:
+        given: q = Quantity('1Ms')
+        tests:
+            surcharge:
+                evaluate: q.as_tuple()
+                expected: (1e6, 's')
+            fanatic:
+                evaluate: str(q)
+                expected: '1 Ms'
+
+    hoarding:
+        given: q = Quantity('1Gs')
+        tests:
+            omission:
+                evaluate: q.as_tuple()
+                expected: (1e9, 's')
+            helper:
+                evaluate: str(q)
+                expected: '1 Gs'
+
+    scrum:
+        given: q = Quantity('1Ts')
+        tests:
+            prance:
+                evaluate: q.as_tuple()
+                expected: (1e12, 's')
+            repast:
+                evaluate: str(q)
+                expected: '1 Ts'
+
+    tissue:
+        given: q = Quantity('1Ps')
+        tests:
+            cruet:
+                evaluate: q.as_tuple()
+                expected: (1e15, 's')
+            detonate:
+                evaluate: str(q)
+                expected: '1e15 s'
+
+    panorama:
+        given: q = Quantity('1Es')
+        tests:
+            watermill:
+                evaluate: q.as_tuple()
+                expected: (1e18, 's')
+            courtyard:
+                evaluate: str(q)
+                expected: '1e18 s'
+
+    quest:
+        given: q = Quantity('1Zs')
+        tests:
+            march:
+                evaluate: q.as_tuple()
+                expected: (1e21, 's')
+            hiccup:
+                evaluate: str(q)
+                expected: '1e21 s'
+
+    suture:
+        given: q = Quantity('1Ys')
+        tests:
+            tactician:
+                evaluate: q.as_tuple()
+                expected: (1e24, 's')
+            knock:
+                evaluate: str(q)
+                expected: '1e24 s'
+
+
+    # test zero
+    nickel:
+        given: q = Quantity('0ns')
+        tests:
+            stowaway:
+                evaluate: q.as_tuple()
+                expected: (0, 's')
+            token:
+                evaluate: str(q)
+                expected: '0 s'
+
+    sprinkle:
+        given: q = Quantity('0 ns')
+        tests:
+            gremlin:
+                evaluate: q.as_tuple()
+                expected: (0, 's')
+            straddle:
+                evaluate: str(q)
+                expected: '0 s'
+
+    seclude:
+        given: q = Quantity('00ns')
+        tests:
+            blank:
+                evaluate: q.as_tuple()
+                expected: (0, 's')
+            heckler:
+                evaluate: str(q)
+                expected: '0 s'
+
+    semester:
+        given: q = Quantity('000ns')
+        tests:
+            stuffy:
+                evaluate: q.as_tuple()
+                expected: (0, 's')
+            problem:
+                evaluate: str(q)
+                expected: '0 s'
+
+    jackboot:
+        given: q = Quantity('0.ns')
+        tests:
+            mousetrap:
+                evaluate: q.as_tuple()
+                expected: (0, 's')
+            enroll:
+                evaluate: str(q)
+                expected: '0 s'
+
+    universal:
+        given: q = Quantity('0. ns')
+        tests:
+            scrub:
+                evaluate: q.as_tuple()
+                expected: (0, 's')
+            rating:
+                evaluate: str(q)
+                expected: '0 s'
+
+    abduct:
+        given: q = Quantity('00.ns')
+        tests:
+            brave:
+                evaluate: q.as_tuple()
+                expected: (0, 's')
+            concert:
+                evaluate: str(q)
+                expected: '0 s'
+
+    forehead:
+        given: q = Quantity('000.ns')
+        tests:
+            football:
+                evaluate: q.as_tuple()
+                expected: (0, 's')
+            shudder:
+                evaluate: str(q)
+                expected: '0 s'
+
+    expire:
+        given: q = Quantity('.0ns')
+        tests:
+            troupe:
+                evaluate: q.as_tuple()
+                expected: (0, 's')
+            streaky:
+                evaluate: str(q)
+                expected: '0 s'
+
+    rigidity:
+        given: q = Quantity('.0 ns')
+        tests:
+            duodenum:
+                evaluate: q.as_tuple()
+                expected: (0, 's')
+            vigilante:
+                evaluate: str(q)
+                expected: '0 s'
+
+    inspector:
+        given: q = Quantity('.00ns')
+        tests:
+            teddy:
+                evaluate: q.as_tuple()
+                expected: (0, 's')
+            notation:
+                evaluate: str(q)
+                expected: '0 s'
+
+    gumdrop:
+        given: q = Quantity('.000ns')
+        tests:
+            attendant:
+                evaluate: q.as_tuple()
+                expected: (0, 's')
+            medic:
+                evaluate: str(q)
+                expected: '0 s'
+
+    prairie:
+        given: q = Quantity('0ns')
+        tests:
+            barrow:
+                evaluate: q.as_tuple()
+                expected: (0, 's')
+            subtle:
+                evaluate: str(q)
+                expected: '0 s'
+            permeate:
+                evaluate: q.render(prec='full')
+                expected: '0 s'
+
+    misapply:
+        given: q = Quantity('0 ns')
+        tests:
+            handrail:
+                evaluate: q.as_tuple()
+                expected: (0, 's')
+            folly:
+                evaluate: str(q)
+                expected: '0 s'
+            backpack:
+                evaluate: q.render(prec='full')
+                expected: '0 s'
+
+    avenue:
+        given: q = Quantity('00ns')
+        tests:
+            scepter:
+                evaluate: q.as_tuple()
+                expected: (0, 's')
+            flighty:
+                evaluate: str(q)
+                expected: '0 s'
+            typify:
+                evaluate: q.render(prec='full')
+                expected: '0 s'
+
+    socket:
+        given: q = Quantity('000ns')
+        tests:
+            grandad:
+                evaluate: q.as_tuple()
+                expected: (0, 's')
+            cafeteria:
+                evaluate: str(q)
+                expected: '0 s'
+            boozer:
+                evaluate: q.render(prec='full')
+                expected: '0 s'
+
+    revise:
+        given: q = Quantity('.0ns')
+        tests:
+            voluntary:
+                evaluate: q.as_tuple()
+                expected: (0, 's')
+            mediator:
+                evaluate: str(q)
+                expected: '0 s'
+            atrophy:
+                evaluate: q.render(prec='full')
+                expected: '0 s'
+
+    jerkin:
+        given: q = Quantity('.0 ns')
+        tests:
+            admire:
+                evaluate: q.as_tuple()
+                expected: (0, 's')
+            execute:
+                evaluate: str(q)
+                expected: '0 s'
+            piper:
+                evaluate: q.render(prec='full')
+                expected: '0 s'
+
+    blackhead:
+        given: q = Quantity('.00ns')
+        tests:
+            cavern:
+                evaluate: q.as_tuple()
+                expected: (0, 's')
+            rehash:
+                evaluate: str(q)
+                expected: '0 s'
+            emulsion:
+                evaluate: q.render(prec='full')
+                expected: '0 s'
+
+    fathead:
+        given: q = Quantity('.000ns')
+        tests:
+            reveler:
+                evaluate: q.as_tuple()
+                expected: (0, 's')
+            carbine:
+                evaluate: str(q)
+                expected: '0 s'
+            chirpy:
+                evaluate: q.render(prec='full')
+                expected: '0 s'
+
+
+    # test various forms of the mantissa when using scale factors
+    delicacy:
+        given: q = Quantity('1ns')
+        tests:
+            teacake:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 's')
+            sponge:
+                evaluate: str(q)
+                expected: '1 ns'
+
+    huntsman:
+        given: q = Quantity('1 ns')
+        tests:
+            syllable:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 's')
+            wager:
+                evaluate: str(q)
+                expected: '1 ns'
+
+    weighty:
+        given: q = Quantity('10ns')
+        tests:
+            seller:
+                evaluate: q.as_tuple()
+                expected: (10e-9, 's')
+            antler:
+                evaluate: str(q)
+                expected: '10 ns'
+
+    madrigal:
+        given: q = Quantity('100ns')
+        tests:
+            lining:
+                evaluate: q.as_tuple()
+                expected: (100e-9, 's')
+            tribe:
+                evaluate: str(q)
+                expected: '100 ns'
+
+    comport:
+        given: q = Quantity('.1ns')
+        tests:
+            donation:
+                evaluate: q.as_tuple()
+                expected: (100e-12, 's')
+            hindrance:
+                evaluate: str(q)
+                expected: '100 ps'
+
+    character:
+        given: q = Quantity('.1 ns')
+        tests:
+            tenner:
+                evaluate: q.as_tuple()
+                expected: (100e-12, 's')
+            crust:
+                evaluate: str(q)
+                expected: '100 ps'
+
+    sharpen:
+        given: q = Quantity('.10ns')
+        tests:
+            matter:
+                evaluate: q.as_tuple()
+                expected: (100e-12, 's')
+            abandon:
+                evaluate: str(q)
+                expected: '100 ps'
+
+    resonate:
+        given: q = Quantity('.100ns')
+        tests:
+            waterfall:
+                evaluate: q.as_tuple()
+                expected: (100e-12, 's')
+            gloomy:
+                evaluate: str(q)
+                expected: '100 ps'
+
+    replica:
+        given: q = Quantity('1.ns')
+        tests:
+            trouser:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 's')
+            textile:
+                evaluate: str(q)
+                expected: '1 ns'
+
+    parachute:
+        given: q = Quantity('1. ns')
+        tests:
+            charade:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 's')
+            vampire:
+                evaluate: str(q)
+                expected: '1 ns'
+
+    merger:
+        given: q = Quantity('10.ns')
+        tests:
+            inflate:
+                evaluate: q.as_tuple()
+                expected: (10e-9, 's')
+            arcade:
+                evaluate: str(q)
+                expected: '10 ns'
+
+    grating:
+        given: q = Quantity('100.ns')
+        tests:
+            servant:
+                evaluate: q.as_tuple()
+                expected: (100e-9, 's')
+            effort:
+                evaluate: str(q)
+                expected: '100 ns'
+
+    enjoyment:
+        given: q = Quantity('1.0ns')
+        tests:
+            necktie:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 's')
+            footplate:
+                evaluate: str(q)
+                expected: '1 ns'
+
+    refit:
+        given: q = Quantity('1.0 ns')
+        tests:
+            chance:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 's')
+            waterway:
+                evaluate: str(q)
+                expected: '1 ns'
+
+    thread:
+        given: q = Quantity('10.0ns')
+        tests:
+            minority:
+                evaluate: q.as_tuple()
+                expected: (10e-9, 's')
+            befit:
+                evaluate: str(q)
+                expected: '10 ns'
+
+    upright:
+        given: q = Quantity('100.0ns')
+        tests:
+            unsettle:
+                evaluate: q.as_tuple()
+                expected: (100e-9, 's')
+            stave:
+                evaluate: str(q)
+                expected: '100 ns'
+
+    inscribe:
+        given: q = Quantity('1.00ns')
+        tests:
+            urinal:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 's')
+            grotto:
+                evaluate: str(q)
+                expected: '1 ns'
+
+    warrior:
+        given: q = Quantity('1.00 ns')
+        tests:
+            grove:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 's')
+            monument:
+                evaluate: str(q)
+                expected: '1 ns'
+
+    paranoiac:
+        given: q = Quantity('10.00ns')
+        tests:
+            mystery:
+                evaluate: q.as_tuple()
+                expected: (10e-9, 's')
+            disfavor:
+                evaluate: str(q)
+                expected: '10 ns'
+
+    genie:
+        given: q = Quantity('100.00ns')
+        tests:
+            carousel:
+                evaluate: q.as_tuple()
+                expected: (100e-9, 's')
+            genealogy:
+                evaluate: str(q)
+                expected: '100 ns'
+
+    persimmon:
+        given: q = Quantity('-1.00ns')
+        tests:
+            interval:
+                evaluate: q.as_tuple()
+                expected: (-1e-9, 's')
+            consider:
+                evaluate: str(q)
+                expected: '-1 ns'
+
+    barnacle:
+        given: q = Quantity('-1.00 ns')
+        tests:
+            digress:
+                evaluate: q.as_tuple()
+                expected: (-1e-9, 's')
+            olive:
+                evaluate: str(q)
+                expected: '-1 ns'
+
+    dialog:
+        given: q = Quantity('-10.00ns')
+        tests:
+            nestle:
+                evaluate: q.as_tuple()
+                expected: (-10e-9, 's')
+            monthly:
+                evaluate: str(q)
+                expected: '-10 ns'
+
+    bright:
+        given: q = Quantity('-100.00ns')
+        tests:
+            adjunct:
+                evaluate: q.as_tuple()
+                expected: (-100e-9, 's')
+            obviate:
+                evaluate: str(q)
+                expected: '-100 ns'
+
+    mutate:
+        given: q = Quantity('+1.00ns')
+        tests:
+            catchy:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 's')
+            codify:
+                evaluate: str(q)
+                expected: '1 ns'
+
+    session:
+        given: q = Quantity('+1.00 ns')
+        tests:
+            duffer:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 's')
+            artist:
+                evaluate: str(q)
+                expected: '1 ns'
+
+    capillary:
+        given: q = Quantity('+10.00ns')
+        tests:
+            decibel:
+                evaluate: q.as_tuple()
+                expected: (10e-9, 's')
+            gummy:
+                evaluate: str(q)
+                expected: '10 ns'
+
+    twinkle:
+        given: q = Quantity('+100.00ns')
+        tests:
+            outcrop:
+                evaluate: q.as_tuple()
+                expected: (100e-9, 's')
+            original:
+                evaluate: str(q)
+                expected: '100 ns'
+
+
+    # test various forms of the mantissa when using exponents
+    hairpiece:
+        given: q = Quantity('1e-9s')
+        tests:
+            underside:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 's')
+            starchy:
+                evaluate: str(q)
+                expected: '1 ns'
+
+    marble:
+        given: q = Quantity('10E-9s')
+        tests:
+            picker:
+                evaluate: q.as_tuple()
+                expected: (10e-9, 's')
+            oilcan:
+                evaluate: str(q)
+                expected: '10 ns'
+
+    boomerang:
+        given: q = Quantity('100e-9s')
+        tests:
+            gateau:
+                evaluate: q.as_tuple()
+                expected: (100e-9, 's')
+            chili:
+                evaluate: str(q)
+                expected: '100 ns'
+
+    antiquity:
+        given: q = Quantity('.1e-9s')
+        tests:
+            lampoon:
+                evaluate: q.as_tuple()
+                expected: (100e-12, 's')
+            riddle:
+                evaluate: str(q)
+                expected: '100 ps'
+
+    redhead:
+        given: q = Quantity('.10E-9s')
+        tests:
+            ramrod:
+                evaluate: q.as_tuple()
+                expected: (100e-12, 's')
+            fandango:
+                evaluate: str(q)
+                expected: '100 ps'
+
+    rarity:
+        given: q = Quantity('.100e-9s')
+        tests:
+            theocracy:
+                evaluate: q.as_tuple()
+                expected: (100e-12, 's')
+            tricky:
+                evaluate: str(q)
+                expected: '100 ps'
+
+    latecomer:
+        given: q = Quantity('1.e-9s')
+        tests:
+            duffel:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 's')
+            bungler:
+                evaluate: str(q)
+                expected: '1 ns'
+
+    blackball:
+        given: q = Quantity('10.E-9s')
+        tests:
+            manger:
+                evaluate: q.as_tuple()
+                expected: (10e-9, 's')
+            retailer:
+                evaluate: str(q)
+                expected: '10 ns'
+
+    sweetener:
+        given: q = Quantity('100.e-9s')
+        tests:
+            turning:
+                evaluate: q.as_tuple()
+                expected: (100e-9, 's')
+            crave:
+                evaluate: str(q)
+                expected: '100 ns'
+
+    kidney:
+        given: q = Quantity('1.0E-9s')
+        tests:
+            playpen:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 's')
+            apostle:
+                evaluate: str(q)
+                expected: '1 ns'
+
+    erode:
+        given: q = Quantity('10.0e-9s')
+        tests:
+            deadly:
+                evaluate: q.as_tuple()
+                expected: (10e-9, 's')
+            pummel:
+                evaluate: str(q)
+                expected: '10 ns'
+
+    omelet:
+        given: q = Quantity('100.0E-9s')
+        tests:
+            nitwit:
+                evaluate: q.as_tuple()
+                expected: (100e-9, 's')
+            billfold:
+                evaluate: str(q)
+                expected: '100 ns'
+
+    mealy:
+        given: q = Quantity('1.00e-9s')
+        tests:
+            bicycle:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 's')
+            wrapping:
+                evaluate: str(q)
+                expected: '1 ns'
+
+    chaser:
+        given: q = Quantity('10.00E-9s')
+        tests:
+            volcano:
+                evaluate: q.as_tuple()
+                expected: (10e-9, 's')
+            herald:
+                evaluate: str(q)
+                expected: '10 ns'
+
+    skitter:
+        given: q = Quantity('100.00e-9s')
+        tests:
+            biped:
+                evaluate: q.as_tuple()
+                expected: (100e-9, 's')
+            rebate:
+                evaluate: str(q)
+                expected: '100 ns'
+
+    romantic:
+        given: q = Quantity('-1.00E-9s')
+        tests:
+            realtor:
+                evaluate: q.as_tuple()
+                expected: (-1e-9, 's')
+            pasture:
+                evaluate: str(q)
+                expected: '-1 ns'
+
+    bohemian:
+        given: q = Quantity('-10.00e-9s')
+        tests:
+            stoop:
+                evaluate: q.as_tuple()
+                expected: (-10e-9, 's')
+            weighty:
+                evaluate: str(q)
+                expected: '-10 ns'
+
+    forbid:
+        given: q = Quantity('-100.00E-9s')
+        tests:
+            knapsack:
+                evaluate: q.as_tuple()
+                expected: (-100e-9, 's')
+            grandaddy:
+                evaluate: str(q)
+                expected: '-100 ns'
+
+    quartet:
+        given: q = Quantity('+1.00e-9s')
+        tests:
+            plunger:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 's')
+            fetish:
+                evaluate: str(q)
+                expected: '1 ns'
+
+    presume:
+        given: q = Quantity('+10.00E-9s')
+        tests:
+            dryer:
+                evaluate: q.as_tuple()
+                expected: (10e-9, 's')
+            hamburger:
+                evaluate: str(q)
+                expected: '10 ns'
+
+    trouper:
+        given: q = Quantity('+100.00e-9s')
+        tests:
+            airspeed:
+                evaluate: q.as_tuple()
+                expected: (100e-9, 's')
+            camper:
+                evaluate: str(q)
+                expected: '100 ns'
+
+    particle:
+        given: q = Quantity('+.1E-9s')
+        tests:
+            grubby:
+                evaluate: q.as_tuple()
+                expected: (100e-12, 's')
+            derive:
+                evaluate: str(q)
+                expected: '100 ps'
+
+    defeat:
+        given: q = Quantity('+.10e-9s')
+        tests:
+            squad:
+                evaluate: q.as_tuple()
+                expected: (100e-12, 's')
+            sculpture:
+                evaluate: str(q)
+                expected: '100 ps'
+
+    oxcart:
+        given: q = Quantity('+.100E-9s')
+        tests:
+            builder:
+                evaluate: q.as_tuple()
+                expected: (100e-12, 's')
+            despise:
+                evaluate: str(q)
+                expected: '100 ps'
+
+    creaky:
+        given: q = Quantity('-.1e-9s')
+        tests:
+            shipmate:
+                evaluate: q.as_tuple()
+                expected: (-100e-12, 's')
+            statute:
+                evaluate: str(q)
+                expected: '-100 ps'
+
+    gentleman:
+        given: q = Quantity('-.10E-9s')
+        tests:
+            personage:
+                evaluate: q.as_tuple()
+                expected: (-100e-12, 's')
+            rescue:
+                evaluate: str(q)
+                expected: '-100 ps'
+
+    spangle:
+        given: q = Quantity('-.100e-9s')
+        tests:
+            burglar:
+                evaluate: q.as_tuple()
+                expected: (-100e-12, 's')
+            leapfrog:
+                evaluate: str(q)
+                expected: '-100 ps'
+
+
+    # test various forms of the mantissa alone
+    educate:
+        given: q = Quantity('100000.0s')
+        tests:
+            identity:
+                evaluate: q.as_tuple()
+                expected: (100e3, 's')
+            horrify:
+                evaluate: str(q)
+                expected: '100 ks'
+
+    headline:
+        given: q = Quantity('100000 s')
+        tests:
+            bedevil:
+                evaluate: q.as_tuple()
+                expected: (100e3, 's')
+            snare:
+                evaluate: str(q)
+                expected: '100 ks'
+
+    protein:
+        given: q = Quantity('10000s')
+        tests:
+            entrap:
+                evaluate: q.as_tuple()
+                expected: (10e3, 's')
+            diversion:
+                evaluate: str(q)
+                expected: '10 ks'
+
+    increase:
+        given: q = Quantity('10000.0 s')
+        tests:
+            replenish:
+                evaluate: q.as_tuple()
+                expected: (10e3, 's')
+            nosebleed:
+                evaluate: str(q)
+                expected: '10 ks'
+
+    response:
+        given: q = Quantity('1000.0s')
+        tests:
+            shunt:
+                evaluate: q.as_tuple()
+                expected: (1e3, 's')
+            vestige:
+                evaluate: str(q)
+                expected: '1 ks'
+
+    parodist:
+        given: q = Quantity('1000 s')
+        tests:
+            ballcock:
+                evaluate: q.as_tuple()
+                expected: (1e3, 's')
+            freewheel:
+                evaluate: str(q)
+                expected: '1 ks'
+
+    speck:
+        given: q = Quantity('100s')
+        tests:
+            celebrity:
+                evaluate: q.as_tuple()
+                expected: (100, 's')
+            aircrew:
+                evaluate: str(q)
+                expected: '100 s'
+
+    chihuahua:
+        given: q = Quantity('100.0 s')
+        tests:
+            duplicate:
+                evaluate: q.as_tuple()
+                expected: (100, 's')
+            gleam:
+                evaluate: str(q)
+                expected: '100 s'
+
+    couch:
+        given: q = Quantity('10.0s')
+        tests:
+            toccata:
+                evaluate: q.as_tuple()
+                expected: (10, 's')
+            dangle:
+                evaluate: str(q)
+                expected: '10 s'
+
+    highbrow:
+        given: q = Quantity('10 s')
+        tests:
+            pistol:
+                evaluate: q.as_tuple()
+                expected: (10, 's')
+            innkeeper:
+                evaluate: str(q)
+                expected: '10 s'
+
+    haughty:
+        given: q = Quantity('1s')
+        tests:
+            expose:
+                evaluate: q.as_tuple()
+                expected: (1, 's')
+            chauffeur:
+                evaluate: str(q)
+                expected: '1 s'
+
+    break:
+        given: q = Quantity('1.0 s')
+        tests:
+            doorbell:
+                evaluate: q.as_tuple()
+                expected: (1, 's')
+            author:
+                evaluate: str(q)
+                expected: '1 s'
+
+    gutter:
+        given: q = Quantity('0.1s')
+        tests:
+            finger:
+                evaluate: q.as_tuple()
+                expected: (100e-3, 's')
+            hamster:
+                evaluate: str(q)
+                expected: '100 ms'
+
+    ability:
+        given: q = Quantity('0.1 s')
+        tests:
+            anatomy:
+                evaluate: q.as_tuple()
+                expected: (100e-3, 's')
+            emigrant:
+                evaluate: str(q)
+                expected: '100 ms'
+
+    atone:
+        given: q = Quantity('0.01s')
+        tests:
+            scripture:
+                evaluate: q.as_tuple()
+                expected: (10e-3, 's')
+            pinpoint:
+                evaluate: str(q)
+                expected: '10 ms'
+
+    essential:
+        given: q = Quantity('0.01 s')
+        tests:
+            blackout:
+                evaluate: q.as_tuple()
+                expected: (10e-3, 's')
+            swarm:
+                evaluate: str(q)
+                expected: '10 ms'
+
+    godmother:
+        given: q = Quantity('0.001s')
+        tests:
+            wharf:
+                evaluate: q.as_tuple()
+                expected: (1e-3, 's')
+            filter:
+                evaluate: str(q)
+                expected: '1 ms'
+
+    temper:
+        given: q = Quantity('0.001 s')
+        tests:
+            dukedom:
+                evaluate: q.as_tuple()
+                expected: (1e-3, 's')
+            except:
+                evaluate: str(q)
+                expected: '1 ms'
+
+    verse:
+        given: q = Quantity('0.0001s')
+        tests:
+            outlast:
+                evaluate: q.as_tuple()
+                expected: (100e-6, 's')
+            pilfer:
+                evaluate: str(q)
+                expected: '100 us'
+
+    fifth:
+        given: q = Quantity('0.0001 s')
+        tests:
+            goggle:
+                evaluate: q.as_tuple()
+                expected: (100e-6, 's')
+            emporium:
+                evaluate: str(q)
+                expected: '100 us'
+
+    horsewhip:
+        given: q = Quantity('0.00001s')
+        tests:
+            signature:
+                evaluate: q.as_tuple()
+                expected: (10e-6, 's')
+            nuptial:
+                evaluate: str(q)
+                expected: '10 us'
+
+    larch:
+        given: q = Quantity('0.00001 s')
+        tests:
+            model:
+                evaluate: q.as_tuple()
+                expected: (10e-6, 's')
+            gumdrop:
+                evaluate: str(q)
+                expected: '10 us'
+
+
+    # test various forms of units
+    impute:
+        given: q = Quantity('1nΩ')
+        tests:
+            eyelash:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 'Ω')
+            shaving:
+                evaluate: str(q)
+                expected: '1 nΩ'
+
+    eyesore:
+        given: q = Quantity('1e-9Ω')
+        tests:
+            serviette:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 'Ω')
+            harmonize:
+                evaluate: str(q)
+                expected: '1 nΩ'
+
+    aspirant:
+        given: q = Quantity('1n')
+        tests:
+            creditor:
+                evaluate: q.as_tuple()
+                expected: (1e-9, '')
+            jimmy:
+                evaluate: str(q)
+                expected: '1n'
+
+    delete:
+        given: q = Quantity(1e-9)
+        tests:
+            charlatan:
+                evaluate: q.as_tuple()
+                expected: (1e-9, '')
+            daredevil:
+                evaluate: str(q)
+                expected: '1n'
+
+    flummox:
+        given: q = Quantity('1 nΩ')
+        tests:
+            spindle:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 'Ω')
+            termite:
+                evaluate: str(q)
+                expected: '1 nΩ'
+
+    foster:
+        given: q = Quantity('1 e-9 Ω')
+        error: 1 e-9 Ω: not a valid number.
+
+    deforest:
+        given: q = Quantity('1n Ω')
+        error: 1n Ω: not a valid number.
+
+    fortune:
+        given: q = Quantity('1e-9 Ω')
+        tests:
+            confound:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 'Ω')
+            hearten:
+                evaluate: str(q)
+                expected: '1 nΩ'
+
+    starchy:
+        given: q = Quantity('1nm/s')
+        tests:
+            lance:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 'm/s')
+            mealy:
+                evaluate: str(q)
+                expected: '1 nm/s'
+
+    preamble:
+        given: q = Quantity('1e-9m/s')
+        tests:
+            gatehouse:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 'm/s')
+            overseer:
+                evaluate: str(q)
+                expected: '1 nm/s'
+
+    haversack:
+        given: q = Quantity('1 nm/s')
+        tests:
+            peepshow:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 'm/s')
+            scaly:
+                evaluate: str(q)
+                expected: '1 nm/s'
+
+    sprinter:
+        given: q = Quantity('1e-9 m/s')
+        tests:
+            salesgirl:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 'm/s')
+            grandma:
+                evaluate: str(q)
+                expected: '1 nm/s'
+
+    descend:
+        given: q = Quantity('1nJ-s')
+        tests:
+            castanet:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 'J-s')
+            mustache:
+                evaluate: str(q)
+                expected: '1 nJ-s'
+
+    milieu:
+        given: q = Quantity('1e-9J-s')
+        tests:
+            blindfold:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 'J-s')
+            dingy:
+                evaluate: str(q)
+                expected: '1 nJ-s'
+
+    force:
+        given: q = Quantity('1 nJ-s')
+        tests:
+            crackpot:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 'J-s')
+            diocese:
+                evaluate: str(q)
+                expected: '1 nJ-s'
+
+    athletic:
+        given: q = Quantity('1e-9 J-s')
+        tests:
+            rotate:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 'J-s')
+            queen:
+                evaluate: str(q)
+                expected: '1 nJ-s'
+
+    scaffold:
+        given: q = Quantity('1nm(s^-1)')
+        tests:
+            sharpener:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 'm(s^-1)')
+            smile:
+                evaluate: str(q)
+                expected: '1 nm(s^-1)'
+
+    incur:
+        given: q = Quantity('1e-9m(s^-1)')
+        tests:
+            depress:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 'm(s^-1)')
+            buyer:
+                evaluate: str(q)
+                expected: '1 nm(s^-1)'
+
+    hornet:
+        given: q = Quantity('1 nm(s^-1)')
+        tests:
+            organize:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 'm(s^-1)')
+            corduroy:
+                evaluate: str(q)
+                expected: '1 nm(s^-1)'
+
+    fledgling:
+        given: q = Quantity('1e-9 m(s^-1)')
+        tests:
+            ringer:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 'm(s^-1)')
+            midge:
+                evaluate: str(q)
+                expected: '1 nm(s^-1)'
+
+    amnesty:
+        given: q = Quantity('1nm/s^2')
+        tests:
+            clank:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 'm/s^2')
+            unstring:
+                evaluate: str(q)
+                expected: '1 nm/s^2'
+
+    carpet:
+        given: q = Quantity('1e-9m/s^2')
+        tests:
+            campsite:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 'm/s^2')
+            gender:
+                evaluate: str(q)
+                expected: '1 nm/s^2'
+
+    intrigue:
+        given: q = Quantity('1 nm/s^2')
+        tests:
+            specimen:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 'm/s^2')
+            siphon:
+                evaluate: str(q)
+                expected: '1 nm/s^2'
+
+    picky:
+        given: q = Quantity('1e-9 m/s^2')
+        tests:
+            subgroup:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 'm/s^2')
+            airway:
+                evaluate: str(q)
+                expected: '1 nm/s^2'
+
+    piper:
+        given: q = Quantity('1e-9 √Ω')
+        tests:
+            eyesore:
+                evaluate: q.as_tuple()
+                expected: (1e-9, '√Ω')
+            bifocal:
+                evaluate: str(q)
+                expected: '1 n√Ω'
+
+    fizzle:
+        given: q = Quantity('1e-9 m·s⁻²')
+        tests:
+            jamboree:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 'm·s⁻²')
+            finale:
+                evaluate: str(q)
+                expected: '1 nm·s⁻²'
+
+
+    # test currency
+    bishop:
+        given: q = Quantity('$10K')
+        tests:
+            heroine:
+                evaluate: q.as_tuple()
+                expected: (10e3, '$')
+            comport:
+                evaluate: str(q)
+                expected: '$10k'
+
+    colonnade:
+        given: q = Quantity('$10')
+        tests:
+            reporter:
+                evaluate: q.as_tuple()
+                expected: (10, '$')
+            backside:
+                evaluate: str(q)
+                expected: '$10'
+
+    wizard:
+        given: q = Quantity('$10.00')
+        tests:
+            odyssey:
+                evaluate: q.as_tuple()
+                expected: (10, '$')
+            tarpaulin:
+                evaluate: str(q)
+                expected: '$10'
+
+    stork:
+        given: q = Quantity('$10e9')
+        tests:
+            thinner:
+                evaluate: q.as_tuple()
+                expected: (10e9, '$')
+            ghoul:
+                evaluate: str(q)
+                expected: '$10G'
+
+    walkover:
+        given: q = Quantity('$0.01')
+        tests:
+            segregate:
+                evaluate: q.as_tuple()
+                expected: (10e-3, '$')
+            diphthong:
+                evaluate: str(q)
+                expected: '$10m'
+
+    kinswoman:
+        given: q = Quantity('$.01')
+        tests:
+            muddy:
+                evaluate: q.as_tuple()
+                expected: (10e-3, '$')
+            jolly:
+                evaluate: str(q)
+                expected: '$10m'
+
+    valuable:
+        given: q = Quantity('$1.')
+        tests:
+            footnote:
+                evaluate: q.as_tuple()
+                expected: (1, '$')
+            crossbar:
+                evaluate: str(q)
+                expected: '$1'
+
+    kiddie:
+        given: q = Quantity('-$10K')
+        tests:
+            reprieve:
+                evaluate: q.as_tuple()
+                expected: (-10e3, '$')
+            center:
+                evaluate: str(q)
+                expected: '-$10k'
+
+    breather:
+        given: q = Quantity('-$10')
+        tests:
+            sponger:
+                evaluate: q.as_tuple()
+                expected: (-10, '$')
+            deprecate:
+                evaluate: str(q)
+                expected: '-$10'
+
+    recoil:
+        given: q = Quantity('-$10.00')
+        tests:
+            country:
+                evaluate: q.as_tuple()
+                expected: (-10, '$')
+            reversion:
+                evaluate: str(q)
+                expected: '-$10'
+
+    wrestle:
+        given: q = Quantity('-$10e9')
+        tests:
+            reptile:
+                evaluate: q.as_tuple()
+                expected: (-10e9, '$')
+            garrote:
+                evaluate: str(q)
+                expected: '-$10G'
+
+    theorist:
+        given: q = Quantity('-$0.01')
+        tests:
+            whippet:
+                evaluate: q.as_tuple()
+                expected: (-10e-3, '$')
+            rejoice:
+                evaluate: str(q)
+                expected: '-$10m'
+
+    neurone:
+        given: q = Quantity('-$.01')
+        tests:
+            community:
+                evaluate: q.as_tuple()
+                expected: (-10e-3, '$')
+            clump:
+                evaluate: str(q)
+                expected: '-$10m'
+
+    crevice:
+        given: q = Quantity('-$1.')
+        tests:
+            jelly:
+                evaluate: q.as_tuple()
+                expected: (-1, '$')
+            fable:
+                evaluate: str(q)
+                expected: '-$1'
+
+    bodice:
+        given: q = Quantity('+$10K')
+        tests:
+            constrict:
+                evaluate: q.as_tuple()
+                expected: (10e3, '$')
+            crony:
+                evaluate: str(q)
+                expected: '$10k'
+
+    homicide:
+        given: q = Quantity('+$10')
+        tests:
+            confidant:
+                evaluate: q.as_tuple()
+                expected: (10, '$')
+            internee:
+                evaluate: str(q)
+                expected: '$10'
+
+    plural:
+        given: q = Quantity('+$10.00')
+        tests:
+            tumbler:
+                evaluate: q.as_tuple()
+                expected: (10, '$')
+            kneel:
+                evaluate: str(q)
+                expected: '$10'
+
+    guidebook:
+        given: q = Quantity('+$10e9')
+        tests:
+            inlay:
+                evaluate: q.as_tuple()
+                expected: (10e9, '$')
+            abstract:
+                evaluate: str(q)
+                expected: '$10G'
+
+    weaken:
+        given: q = Quantity('+$0.01')
+        tests:
+            showroom:
+                evaluate: q.as_tuple()
+                expected: (10e-3, '$')
+            consort:
+                evaluate: str(q)
+                expected: '$10m'
+
+    subtlety:
+        given: q = Quantity('+$.01')
+        tests:
+            height:
+                evaluate: q.as_tuple()
+                expected: (10e-3, '$')
+            police:
+                evaluate: str(q)
+                expected: '$10m'
+
+    flywheel:
+        given: q = Quantity('+$1.')
+        tests:
+            tendon:
+                evaluate: q.as_tuple()
+                expected: (1, '$')
+            recover:
+                evaluate: str(q)
+                expected: '$1'
+
+    charmer:
+        given: q = Quantity('$100')
+        tests:
+            tendon:
+                evaluate: q.as_tuple()
+                expected: (100, '$')
+            roommate:
+                evaluate: q.fixed(prec=0, strip_zeros=False, strip_radix=False)
+                expected: '$100.'
+            instep:
+                evaluate: q.fixed(prec=0, strip_zeros=True, strip_radix=False)
+                expected: '$100.'
+            sprinkle:
+                evaluate: q.fixed(prec=0, strip_zeros=False, strip_radix=True)
+                expected: '$100'
+            guild:
+                evaluate: q.fixed(prec=0, strip_zeros=True, strip_radix=True)
+                expected: '$100'
+            invoice:
+                evaluate: q.fixed(prec=2, strip_zeros=False, strip_radix=False)
+                expected: '$100.00'
+            vintage:
+                evaluate: q.fixed(prec=2, strip_zeros=True, strip_radix=False)
+                expected: '$100.'
+            nutrient:
+                evaluate: q.fixed(prec=2, strip_zeros=False, strip_radix=True)
+                expected: '$100.00'
+            shear:
+                evaluate: q.fixed(prec=2, strip_zeros=True, strip_radix=True)
+                expected: '$100'
+
+
+    # test unusual numbers
+    sheathe:
+        given: q = Quantity('inf')
+        tests:
+            daunt:
+                evaluate: q.as_tuple()
+                expected: (float('inf'), '')
+            engraving:
+                evaluate: str(q)
+                expected: 'inf'
+
+    plummet:
+        prefs: {'plus': '＋', 'minus': '−', 'inf': '∞', 'nan': 'nan'}
+        given: q = Quantity('+inf')
+        tests:
+            ditty:
+                evaluate: q.as_tuple()
+                expected: (float('inf'), '')
+            bankroll:
+                evaluate: str(q)
+                expected: '∞'
+
+    joggle:
+        prefs: {'plus': '＋', 'minus': '−', 'inf': '∞', 'nan': 'nan'}
+        given: q = Quantity('-inf')
+        tests:
+            squelch:
+                evaluate: q.as_tuple()
+                expected: (float('-inf'), '')
+            notary:
+                evaluate: str(q)
+                expected: '−∞'
+
+    integrate:
+        given: q = Quantity('inf Hz')
+        tests:
+            sweetmeat:
+                evaluate: q.as_tuple()
+                expected: (float('inf'), 'Hz')
+            wanker:
+                evaluate: str(q)
+                expected: 'inf Hz'
+
+    witter:
+        given: q = Quantity('$inf')
+        tests:
+            solicit:
+                evaluate: q.as_tuple()
+                expected: (float('inf'), '$')
+            admit:
+                evaluate: str(q)
+                expected: '$inf'
+
+    smoker:
+        given: q = Quantity('-inf')
+        tests:
+            warning:
+                evaluate: q.as_tuple()
+                expected: (float('-inf'), '')
+            stifle:
+                evaluate: str(q)
+                expected: '-inf'
+
+    spittoon:
+        given: q = Quantity('-inf Hz')
+        tests:
+            compel:
+                evaluate: q.as_tuple()
+                expected: (float('-inf'), 'Hz')
+            gabble:
+                evaluate: str(q)
+                expected: '-inf Hz'
+
+    outcome:
+        given: q = Quantity('-$inf')
+        tests:
+            criterion:
+                evaluate: q.as_tuple()
+                expected: (float('-inf'), '$')
+            blotch:
+                evaluate: str(q)
+                expected: '-$inf'
+
+    baroness:
+        given: q = Quantity('nan')
+        tests:
+            bereave:
+                evaluate: q.as_tuple()
+                expected: (float('NaN'), '')
+            costing:
+                evaluate: str(q)
+                expected: 'NaN'
+
+    brick:
+        prefs: {'plus': '＋', 'minus': '−', 'inf': '∞', 'nan': 'nan'}
+        given: q = Quantity('+nan')
+        tests:
+            frizzle:
+                evaluate: q.as_tuple()
+                expected: (float('nan'), '')
+            outstrip:
+                evaluate: str(q)
+                expected: 'nan'
+
+    nightgown:
+        prefs: {'plus': '＋', 'minus': '−', 'inf': '∞', 'nan': 'nan'}
+        given: q = Quantity('-nan')
+        tests:
+            boulder:
+                evaluate: q.as_tuple()
+                expected: (float('nan'), '')
+            douse:
+                evaluate: str(q)
+                expected: 'nan'
+
+    province:
+        given: q = Quantity('nan Hz')
+        tests:
+            obeisance:
+                evaluate: q.as_tuple()
+                expected: (float('NaN'), 'Hz')
+            tuxedo:
+                evaluate: str(q)
+                expected: 'NaN Hz'
+
+    infidel:
+        given: q = Quantity('$nan')
+        tests:
+            extradite:
+                evaluate: q.as_tuple()
+                expected: (float('NaN'), '$')
+            earner:
+                evaluate: str(q)
+                expected: '$NaN'
+
+    honey:
+        given: q = Quantity('+nan')
+        tests:
+            nettle:
+                evaluate: q.as_tuple()
+                expected: (float('NaN'), '')
+            satchel:
+                evaluate: str(q)
+                expected: 'NaN'
+
+    frighten:
+        given: q = Quantity('+nan Hz')
+        tests:
+            guidebook:
+                evaluate: q.as_tuple()
+                expected: (float('NaN'), 'Hz')
+            green:
+                evaluate: str(q)
+                expected: 'NaN Hz'
+
+    acrobat:
+        given: q = Quantity('+$nan')
+        tests:
+            bandy:
+                evaluate: q.as_tuple()
+                expected: (float('NaN'), '$')
+            seedcake:
+                evaluate: str(q)
+                expected: '$NaN'
+
+    firefly:
+        given: q = Quantity('INF')
+        tests:
+            triangle:
+                evaluate: q.as_tuple()
+                expected: (float('inf'), '')
+            infirmary:
+                evaluate: str(q)
+                expected: 'inf'
+
+    farmland:
+        given: q = Quantity('INF Hz')
+        tests:
+            benchmark:
+                evaluate: q.as_tuple()
+                expected: (float('inf'), 'Hz')
+            knight:
+                evaluate: str(q)
+                expected: 'inf Hz'
+
+    osteopath:
+        given: q = Quantity('$INF')
+        tests:
+            asterisk:
+                evaluate: q.as_tuple()
+                expected: (float('inf'), '$')
+            outgrowth:
+                evaluate: str(q)
+                expected: '$inf'
+
+    chickpea:
+        given: q = Quantity('-INF')
+        tests:
+            craze:
+                evaluate: q.as_tuple()
+                expected: (float('-inf'), '')
+            heifer:
+                evaluate: str(q)
+                expected: '-inf'
+
+    bawdy:
+        given: q = Quantity('-INF Hz')
+        tests:
+            evoke:
+                evaluate: q.as_tuple()
+                expected: (float('-inf'), 'Hz')
+            lemming:
+                evaluate: str(q)
+                expected: '-inf Hz'
+
+    pursuer:
+        given: q = Quantity('-$INF')
+        tests:
+            amusement:
+                evaluate: q.as_tuple()
+                expected: (float('-inf'), '$')
+            overreach:
+                evaluate: str(q)
+                expected: '-$inf'
+
+    suffuse:
+        given: q = Quantity('NAN')
+        tests:
+            broker:
+                evaluate: q.as_tuple()
+                expected: (float('NaN'), '')
+            copier:
+                evaluate: str(q)
+                expected: 'NaN'
+
+    vacillate:
+        given: q = Quantity('NAN Hz')
+        tests:
+            congress:
+                evaluate: q.as_tuple()
+                expected: (float('NaN'), 'Hz')
+            glare:
+                evaluate: str(q)
+                expected: 'NaN Hz'
+
+    tangerine:
+        given: q = Quantity('$NAN')
+        tests:
+            fender:
+                evaluate: q.as_tuple()
+                expected: (float('NaN'), '$')
+            prelude:
+                evaluate: str(q)
+                expected: '$NaN'
+
+    southward:
+        given: q = Quantity('+NAN')
+        tests:
+            scavenger:
+                evaluate: q.as_tuple()
+                expected: (float('NaN'), '')
+            clinch:
+                evaluate: str(q)
+                expected: 'NaN'
+
+    wander:
+        given: q = Quantity('+NAN Hz')
+        tests:
+            horizon:
+                evaluate: q.as_tuple()
+                expected: (float('NaN'), 'Hz')
+            slough:
+                evaluate: str(q)
+                expected: 'NaN Hz'
+
+    stack:
+        given: q = Quantity('+$NAN')
+        tests:
+            convener:
+                evaluate: q.as_tuple()
+                expected: (float('NaN'), '$')
+            squashy:
+                evaluate: str(q)
+                expected: '$NaN'
+
+    oratory:
+        given: q = Quantity('∞')
+        tests:
+            insurgent:
+                evaluate: q.as_tuple()
+                expected: (float('inf'), '')
+            yardstick:
+                evaluate: str(q)
+                expected: 'inf'
+
+    bundle:
+        given: q = Quantity('∞ Hz')
+        tests:
+            describe:
+                evaluate: q.as_tuple()
+                expected: (float('inf'), 'Hz')
+            recapture:
+                evaluate: str(q)
+                expected: 'inf Hz'
+
+    argot:
+        given: q = Quantity('∞Ω')
+        tests:
+            idler:
+                evaluate: q.as_tuple()
+                expected: (float('inf'), 'Ω')
+            novelty:
+                evaluate: str(q)
+                expected: 'inf Ω'
+
+    unsay:
+        given: q = Quantity('$∞')
+        tests:
+            peeress:
+                evaluate: q.as_tuple()
+                expected: (float('inf'), '$')
+            revile:
+                evaluate: str(q)
+                expected: '$inf'
+
+    bulldoze:
+        given: q = Quantity('-∞')
+        tests:
+            aster:
+                evaluate: q.as_tuple()
+                expected: (float('-inf'), '')
+            filmy:
+                evaluate: str(q)
+                expected: '-inf'
+
+    salivate:
+        given: q = Quantity('-∞ Hz')
+        tests:
+            cherry:
+                evaluate: q.as_tuple()
+                expected: (float('-inf'), 'Hz')
+            column:
+                evaluate: str(q)
+                expected: '-inf Hz'
+
+    endanger:
+        given: q = Quantity('-$∞')
+        tests:
+            bloomer:
+                evaluate: q.as_tuple()
+                expected: (float('-inf'), '$')
+            neutron:
+                evaluate: str(q)
+                expected: '-$inf'
+
+    tweet:
+        given: q = Quantity('+∞')
+        tests:
+            instep:
+                evaluate: q.as_tuple()
+                expected: (float('inf'), '')
+            beaker:
+                evaluate: str(q)
+                expected: 'inf'
+
+    calendar:
+        given: q = Quantity('+∞ Hz')
+        tests:
+            scallywag:
+                evaluate: q.as_tuple()
+                expected: (float('inf'), 'Hz')
+            murmur:
+                evaluate: str(q)
+                expected: 'inf Hz'
+
+    monogram:
+        given: q = Quantity('+$∞')
+        tests:
+            wealthy:
+                evaluate: q.as_tuple()
+                expected: (float('inf'), '$')
+            cortege:
+                evaluate: str(q)
+                expected: '$inf'
+
+    lucky:
+        given: q = Quantity('−100μs')
+        tests:
+            vexation:
+                evaluate: q.as_tuple()
+                expected: (-100e-6, 's')
+            flurry:
+                evaluate: str(q)
+                expected: '-100 us'
+
+    stocking:
+        given: q = Quantity('＋100μs')
+        tests:
+            blubber:
+                evaluate: q.as_tuple()
+                expected: (100e-6, 's')
+            observer:
+                evaluate: str(q)
+                expected: '100 us'
+
+    scrap:
+        given: q = Quantity('−$100M')
+        tests:
+            talent:
+                evaluate: q.as_tuple()
+                expected: (-100e6, '$')
+            golfer:
+                evaluate: str(q)
+                expected: '-$100M'
+
+    companion:
+        given: q = Quantity('＋$100M')
+        tests:
+            blueprint:
+                evaluate: q.as_tuple()
+                expected: (100e6, '$')
+            beaver:
+                evaluate: str(q)
+                expected: '$100M'
+
+
+    # test full precision
+    fiery:
+        given: q = Quantity('3.14159265ns')
+        tests:
+            barrack:
+                evaluate: q.as_tuple()
+                expected: (3.14159265e-9, 's')
+            point:
+                evaluate: q.render(prec='full')
+                expected: '3.14159265 ns'
+
+    magnate:
+        given: q = Quantity('3.14159265 ns')
+        tests:
+            larva:
+                evaluate: q.as_tuple()
+                expected: (3.14159265e-9, 's')
+            birdcage:
+                evaluate: q.render(prec='full')
+                expected: '3.14159265 ns'
+
+    canard:
+        given: q = Quantity('3.141592650ns')
+        tests:
+            breeze:
+                evaluate: q.as_tuple()
+                expected: (3.141592650e-9, 's')
+            pressman:
+                evaluate: q.render(prec='full')
+                expected: '3.14159265 ns'
+
+    clothe:
+        given: q = Quantity('3.1415926500ns')
+        tests:
+            gypsy:
+                evaluate: q.as_tuple()
+                expected: (3.1415926500e-9, 's')
+            pressure:
+                evaluate: q.render(prec='full')
+                expected: '3.14159265 ns'
+
+    texture:
+        given: q = Quantity('.314159265ns')
+        tests:
+            custom:
+                evaluate: q.as_tuple()
+                expected: (0.314159265e-9, 's')
+            caption:
+                evaluate: q.render(prec='full')
+                expected: '314.159265 ps'
+
+    escalate:
+        given: q = Quantity('.314159265 ns')
+        tests:
+            bucketful:
+                evaluate: q.as_tuple()
+                expected: (0.314159265e-9, 's')
+            porcupine:
+                evaluate: q.render(prec='full')
+                expected: '314.159265 ps'
+
+    raise:
+        given: q = Quantity('.3141592650ns')
+        tests:
+            incise:
+                evaluate: q.as_tuple()
+                expected: (0.3141592650e-9, 's')
+            scalp:
+                evaluate: q.render(prec='full')
+                expected: '314.159265 ps'
+
+    campsite:
+        given: q = Quantity('.31415926500ns')
+        tests:
+            windbreak:
+                evaluate: q.as_tuple()
+                expected: (0.31415926500e-9, 's')
+            flaunt:
+                evaluate: q.render(prec='full')
+                expected: '314.159265 ps'
+
+    whodunit:
+        given: q = Quantity('0.314159265ns')
+        tests:
+            superman:
+                evaluate: q.as_tuple()
+                expected: (0.31415926500e-9, 's')
+            brutalize:
+                evaluate: q.render(prec='full')
+                expected: '314.159265 ps'
+
+    limerick:
+        given: q = Quantity('0.314159265 ns')
+        tests:
+            integrate:
+                evaluate: q.as_tuple()
+                expected: (0.31415926500e-9, 's')
+            chutney:
+                evaluate: q.render(prec='full')
+                expected: '314.159265 ps'
+
+    moped:
+        given: q = Quantity('0.3141592650ns')
+        tests:
+            antedate:
+                evaluate: q.as_tuple()
+                expected: (0.31415926500e-9, 's')
+            fusty:
+                evaluate: q.render(prec='full')
+                expected: '314.159265 ps'
+
+    layette:
+        given: q = Quantity('0.31415926500ns')
+        tests:
+            stairway:
+                evaluate: q.as_tuple()
+                expected: (0.31415926500e-9, 's')
+            serpent:
+                evaluate: q.render(prec='full')
+                expected: '314.159265 ps'
+
+    luncheon:
+        given: q = Quantity('.0314159265ns')
+        tests:
+            other:
+                evaluate: q.as_tuple()
+                expected: (.0314159265e-9, 's')
+            expedite:
+                evaluate: q.render(prec='full')
+                expected: '31.4159265 ps'
+
+    abyss:
+        given: q = Quantity('.0314159265 ns')
+        tests:
+            kayak:
+                evaluate: q.as_tuple()
+                expected: (.0314159265e-9, 's')
+            denounce:
+                evaluate: q.render(prec='full')
+                expected: '31.4159265 ps'
+
+    daylight:
+        given: q = Quantity('.03141592650ns')
+        tests:
+            neurone:
+                evaluate: q.as_tuple()
+                expected: (.03141592650e-9, 's')
+            metronome:
+                evaluate: q.render(prec='full', strip_zeros=False)
+                expected: '31.41592650 ps'
+
+    jackpot:
+        given: q = Quantity('.031415926500ns')
+        tests:
+            hairpin:
+                evaluate: q.as_tuple()
+                expected: (.031415926500e-9, 's')
+            vendetta:
+                evaluate: q.render(prec='full', strip_zeros=False)
+                expected: '31.415926500 ps'
+
+    gelding:
+        given: q = Quantity('0.00314159265ns')
+        tests:
+            vouchsafe:
+                evaluate: q.as_tuple()
+                expected: (0.00314159265e-9, 's')
+            bazooka:
+                evaluate: q.render(prec='full')
+                expected: '3.14159265 ps'
+
+    sliver:
+        given: q = Quantity('0.00314159265 ns')
+        tests:
+            beseech:
+                evaluate: q.as_tuple()
+                expected: (0.00314159265e-9, 's')
+            oboist:
+                evaluate: q.render(prec='full')
+                expected: '3.14159265 ps'
+
+    turquoise:
+        given: q = Quantity('0.003141592650ns')
+        tests:
+            armadillo:
+                evaluate: q.as_tuple()
+                expected: (0.003141592650e-9, 's')
+            barrier:
+                evaluate: q.render(prec='full')
+                expected: '3.14159265 ps'
+
+    astonish:
+        given: q = Quantity('0.0031415926500ns')
+        tests:
+            supplier:
+                evaluate: q.as_tuple()
+                expected: (0.0031415926500e-9, 's')
+            president:
+                evaluate: q.render(prec='full')
+                expected: '3.14159265 ps'
+
+    reverie:
+        given: q = Quantity('.000314159265ns')
+        tests:
+            payroll:
+                evaluate: q.as_tuple()
+                expected: (.000314159265e-9, 's')
+            bitchy:
+                evaluate: q.render(prec='full')
+                expected: '314.159265 fs'
+
+    angreal:
+        given: q = Quantity('.000314159265 ns')
+        tests:
+            cynic:
+                evaluate: q.as_tuple()
+                expected: (.000314159265e-9, 's')
+            bookie:
+                evaluate: q.render(prec='full')
+                expected: '314.159265 fs'
+
+    rewire:
+        given: q = Quantity('.0003141592650ns')
+        tests:
+            slope:
+                evaluate: q.as_tuple()
+                expected: (.0003141592650e-9, 's')
+            sport:
+                evaluate: q.render(prec='full', strip_zeros=False)
+                expected: '314.1592650 fs'
+
+    promise:
+        given: q = Quantity('.00031415926500ns')
+        tests:
+            light:
+                evaluate: q.as_tuple()
+                expected: (.00031415926500e-9, 's')
+            unzip:
+                evaluate: q.render(prec='full', strip_zeros=False)
+                expected: '314.15926500 fs'
+
+    harmonica:
+        given: q = Quantity('0.0000314159265 ns')
+        tests:
+            entreaty:
+                evaluate: q.as_tuple()
+                expected: (0.0000314159265e-9, 's')
+            thrifty:
+                evaluate: q.render(prec='full')
+                expected: '31.4159265 fs'
+
+    flashcard:
+        given: q = Quantity('0.0000314159265 ns')
+        tests:
+            anglicize:
+                evaluate: q.as_tuple()
+                expected: (0.0000314159265e-9, 's')
+            amputate:
+                evaluate: q.render(prec='full')
+                expected: '31.4159265 fs'
+
+    sediment:
+        given: q = Quantity('0.00003141592650ns')
+        tests:
+            crass:
+                evaluate: q.as_tuple()
+                expected: (0.00003141592650e-9, 's')
+            elevate:
+                evaluate: q.render(prec='full', strip_zeros=False)
+                expected: '31.41592650 fs'
+
+    cleanser:
+        given: q = Quantity('0.000031415926500ns')
+        tests:
+            structure:
+                evaluate: q.as_tuple()
+                expected: (0.000031415926500e-9, 's')
+            tantrum:
+                evaluate: q.render(prec='full', strip_zeros=False)
+                expected: '31.415926500 fs'
+
+
+    # test preferences
+    chestnut:
+        given: q = Quantity('1 ns')
+        tests:
+            prevail:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 's')
+            sting:
+                evaluate: q.render(strip_radix=True)
+                expected: '1 ns'
+
+    alpha:
+        given: q = Quantity('1 s')
+        tests:
+            letterbox:
+                evaluate: q.as_tuple()
+                expected: (1, 's')
+            globule:
+                evaluate: q.render(strip_radix=True)
+                expected: '1 s'
+
+    parka:
+        given: q = Quantity('1 ns')
+        tests:
+            humerus:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 's')
+            surly:
+                evaluate: q.render(strip_radix=False, show_units=False)
+                expected: '1n'
+
+    walkabout:
+        given: q = Quantity('1 ns')
+        tests:
+            ancestry:
+                evaluate: q.as_tuple()
+                expected: (1e-9, 's')
+            diaper:
+                evaluate: q.render(prec='full', strip_zeros=True, strip_radix=True, show_units=True)
+                expected: '1 ns'
+            bagatelle:
+                evaluate: q.render(prec='full', strip_zeros=True, strip_radix=True, show_units=False)
+                expected: '1n'
+            muffle:
+                evaluate: q.render(prec='full', strip_zeros=True, strip_radix=False, show_units=True)
+                expected: '1 ns'
+            crash:
+                evaluate: q.render(prec='full', strip_zeros=True, strip_radix=False, show_units=False)
+                expected: '1n'
+            stationer:
+                evaluate: q.render(prec='full', strip_zeros=False, strip_radix=True, show_units=True)
+                expected: '1 ns'
+            lovely:
+                evaluate: q.render(prec='full', strip_zeros=False, strip_radix=True, show_units=False)
+                expected: '1n'
+            woman:
+                evaluate: q.render(prec='full', strip_zeros=False, strip_radix=False, show_units=True)
+                expected: '1 ns'
+            potty:
+                evaluate: q.render(prec='full', strip_zeros=False, strip_radix=False, show_units=False)
+                expected: '1n'
+            forgo:
+                evaluate: q.render(prec=0, strip_zeros=True, strip_radix=True, show_units=True)
+                expected: '1 ns'
+            scaly:
+                evaluate: q.render(prec=0, strip_zeros=True, strip_radix=True, show_units=False)
+                expected: '1n'
+            diploma:
+                evaluate: q.render(prec=0, strip_zeros=True, strip_radix=False, show_units=True)
+                expected: '1 ns'
+            christen:
+                evaluate: q.render(prec=0, strip_zeros=True, strip_radix=False, show_units=False)
+                expected: '1n'
+            scuff:
+                evaluate: q.render(prec=0, strip_zeros=False, strip_radix=True, show_units=True)
+                expected: '1 ns'
+            portion:
+                evaluate: q.render(prec=0, strip_zeros=False, strip_radix=True, show_units=False)
+                expected: '1n'
+            cameraman:
+                evaluate: q.render(prec=0, strip_zeros=False, strip_radix=False, show_units=True)
+                expected: '1 ns'
+            indwell:
+                evaluate: q.render(prec=0, strip_zeros=False, strip_radix=False, show_units=False)
+                expected: '1n'
+            propound:
+                evaluate: q.render(prec=1, strip_zeros=True, strip_radix=True, show_units=True)
+                expected: '1 ns'
+            nerve:
+                evaluate: q.render(prec=1, strip_zeros=True, strip_radix=True, show_units=False)
+                expected: '1n'
+            texture:
+                evaluate: q.render(prec=1, strip_zeros=True, strip_radix=False, show_units=True)
+                expected: '1 ns'
+            protector:
+                evaluate: q.render(prec=1, strip_zeros=True, strip_radix=False, show_units=False)
+                expected: '1n'
+            gargle:
+                evaluate: q.render(prec=1, strip_zeros=False, strip_radix=True, show_units=True)
+                expected: '1.0 ns'
+            overflow:
+                evaluate: q.render(prec=1, strip_zeros=False, strip_radix=True, show_units=False)
+                expected: '1.0n'
+            navigate:
+                evaluate: q.render(prec=1, strip_zeros=False, strip_radix=False, show_units=True)
+                expected: '1.0 ns'
+            crazy:
+                evaluate: q.render(prec=1, strip_zeros=False, strip_radix=False, show_units=False)
+                expected: '1.0n'
+
+    substance:
+        given: q = Quantity('10 s')
+        tests:
+            ancestry:
+                evaluate: q.as_tuple()
+                expected: (10, 's')
+            diaper:
+                evaluate: q.render(prec='full', strip_zeros=True, strip_radix=True, show_units=True)
+                expected: '10 s'
+            bagatelle:
+                evaluate: q.render(prec='full', strip_zeros=True, strip_radix=True, show_units=False)
+                expected: '10'
+            muffle:
+                evaluate: q.render(prec='full', strip_zeros=True, strip_radix=False, show_units=True)
+                expected: '10.0 s'
+            crash:
+                evaluate: q.render(prec='full', strip_zeros=True, strip_radix=False, show_units=False)
+                expected: '10.0'
+            stationer:
+                evaluate: q.render(prec='full', strip_zeros=False, strip_radix=True, show_units=True)
+                expected: '10 s'
+            lovely:
+                evaluate: q.render(prec='full', strip_zeros=False, strip_radix=True, show_units=False)
+                expected: '10'
+            woman:
+                evaluate: q.render(prec='full', strip_zeros=False, strip_radix=False, show_units=True)
+                expected: '10. s'
+            potty:
+                evaluate: q.render(prec='full', strip_zeros=False, strip_radix=False, show_units=False)
+                expected: '10.'
+            forgo:
+                evaluate: q.render(prec=0, strip_zeros=True, strip_radix=True, show_units=True)
+                expected: '10 s'
+            scaly:
+                evaluate: q.render(prec=0, strip_zeros=True, strip_radix=True, show_units=False)
+                expected: '10'
+            diploma:
+                evaluate: q.render(prec=0, strip_zeros=True, strip_radix=False, show_units=True)
+                expected: '10.0 s'
+            christen:
+                evaluate: q.render(prec=0, strip_zeros=True, strip_radix=False, show_units=False)
+                expected: '10.0'
+            scuff:
+                evaluate: q.render(prec=0, strip_zeros=False, strip_radix=True, show_units=True)
+                expected: '10 s'
+            portion:
+                evaluate: q.render(prec=0, strip_zeros=False, strip_radix=True, show_units=False)
+                expected: '10'
+            cameraman:
+                evaluate: q.render(prec=0, strip_zeros=False, strip_radix=False, show_units=True)
+                expected: '10. s'
+            indwell:
+                evaluate: q.render(prec=0, strip_zeros=False, strip_radix=False, show_units=False)
+                expected: '10.'
+            propound:
+                evaluate: q.render(prec=1, strip_zeros=True, strip_radix=True, show_units=True)
+                expected: '10 s'
+            nerve:
+                evaluate: q.render(prec=1, strip_zeros=True, strip_radix=True, show_units=False)
+                expected: '10'
+            texture:
+                evaluate: q.render(prec=1, strip_zeros=True, strip_radix=False, show_units=True)
+                expected: '10.0 s'
+            protector:
+                evaluate: q.render(prec=1, strip_zeros=True, strip_radix=False, show_units=False)
+                expected: '10.0'
+            gargle:
+                evaluate: q.render(prec=1, strip_zeros=False, strip_radix=True, show_units=True)
+                expected: '10 s'
+            overflow:
+                evaluate: q.render(prec=1, strip_zeros=False, strip_radix=True, show_units=False)
+                expected: '10'
+            navigate:
+                evaluate: q.render(prec=1, strip_zeros=False, strip_radix=False, show_units=True)
+                expected: '10. s'
+            crazy:
+                evaluate: q.render(prec=1, strip_zeros=False, strip_radix=False, show_units=False)
+                expected: '10.'
+
+    flotation:
+        given: q = Quantity('1420.405751786 MHz')
+        tests:
+            limerick:
+                evaluate: q.as_tuple()
+                expected: (1420.405751786e6, 'Hz')
+            stroke:
+                evaluate: q.render(strip_zeros=False)
+                expected: '1.4204 GHz'
+            inflexion:
+                evaluate: q.render(strip_zeros=True)
+                expected: '1.4204 GHz'
+            squaw:
+                evaluate: q.render(prec=0, strip_zeros=False)
+                expected: '1 GHz'
+            green:
+                evaluate: q.render(prec=0, strip_zeros=True)
+                expected: '1 GHz'
+            cultivate:
+                evaluate: q.render(prec=1, strip_zeros=False)
+                expected: '1.4 GHz'
+            swank:
+                evaluate: q.render(prec=1, strip_zeros=True)
+                expected: '1.4 GHz'
+            subsume:
+                evaluate: q.render(prec=2, strip_zeros=False)
+                expected: '1.42 GHz'
+            policy:
+                evaluate: q.render(prec=2, strip_zeros=True)
+                expected: '1.42 GHz'
+            senator:
+                evaluate: q.render(prec=3, strip_zeros=False)
+                expected: '1.420 GHz'
+            group:
+                evaluate: q.render(prec=3, strip_zeros=True)
+                expected: '1.42 GHz'
+            horseman:
+                evaluate: q.render(prec=4, strip_zeros=False)
+                expected: '1.4204 GHz'
+            white:
+                evaluate: q.render(prec=4, strip_zeros=True)
+                expected: '1.4204 GHz'
+            cordial:
+                evaluate: q.render(prec=5, strip_zeros=False)
+                expected: '1.42041 GHz'
+            smarmy:
+                evaluate: q.render(prec=5, strip_zeros=True)
+                expected: '1.42041 GHz'
+            distress:
+                evaluate: q.render(prec=6, strip_zeros=False)
+                expected: '1.420406 GHz'
+            eulogize:
+                evaluate: q.render(prec=6, strip_zeros=True)
+                expected: '1.420406 GHz'
+            visor:
+                evaluate: q.render(prec=7, strip_zeros=False)
+                expected: '1.4204058 GHz'
+            waver:
+                evaluate: q.render(prec=7, strip_zeros=True)
+                expected: '1.4204058 GHz'
+            brainwave:
+                evaluate: q.render(prec=8, strip_zeros=False)
+                expected: '1.42040575 GHz'
+            theater:
+                evaluate: q.render(prec=8, strip_zeros=True)
+                expected: '1.42040575 GHz'
+            allusion:
+                evaluate: q.render(prec=9, strip_zeros=False)
+                expected: '1.420405752 GHz'
+            bonsai:
+                evaluate: q.render(prec=9, strip_zeros=True)
+                expected: '1.420405752 GHz'
+            falconer:
+                evaluate: q.render(prec=10, strip_zeros=False)
+                expected: '1.4204057518 GHz'
+            tangerine:
+                evaluate: q.render(prec=10, strip_zeros=True)
+                expected: '1.4204057518 GHz'
+            improvise:
+                evaluate: q.render(prec=11, strip_zeros=False)
+                expected: '1.42040575179 GHz'
+            hindrance:
+                evaluate: q.render(prec=11, strip_zeros=True)
+                expected: '1.42040575179 GHz'
+            terminate:
+                evaluate: q.render(prec=12, strip_zeros=False)
+                expected: '1.420405751786 GHz'
+            history:
+                evaluate: q.render(prec=12, strip_zeros=True)
+                expected: '1.420405751786 GHz'
+            voter:
+                evaluate: q.render(prec=13, strip_zeros=False)
+                expected: '1.4204057517860 GHz'
+            shire:
+                evaluate: q.render(prec=13, strip_zeros=True)
+                expected: '1.420405751786 GHz'
+            shrivel:
+                evaluate: q.render(prec='full', strip_zeros=False)
+                expected: '1.420405751786 GHz'
+            habituate:
+                evaluate: q.render(prec='full', strip_zeros=True)
+                expected: '1.420405751786 GHz'
+
+    elixir:
+        prefs: {'spacer': ''}
+        given: q = Quantity('1420.405751786 MHz')
+        tests:
+            maroon:
+                evaluate: q.as_tuple()
+                expected: (1420.405751786e6, 'Hz')
+            countdown:
+                evaluate: str(q)
+                expected: '1.4204GHz'
+
+    movement:
+        prefs: {'spacer': '\u202f'}
+            # unicode narrow non-breaking space
+        given: q = Quantity('1420.405751786 MHz')
+        tests:
+            hoarse:
+                evaluate: q.as_tuple()
+                expected: (1420.405751786e6, 'Hz')
+            quantify:
+                evaluate: str(q)
+                expected: '1.4204 GHz'
+
+    henna:
+        prefs: {'unity_sf': '_', 'spacer': ''}
+        given: q = Quantity('3.141592 Hz')
+        tests:
+            dagger:
+                evaluate: q.as_tuple()
+                expected: (3.141592, 'Hz')
+            windbag:
+                evaluate: str(q)
+                expected: '3.1416_Hz'
+
+    eastward:
+        prefs: {'spacer': '\xa0'}
+            # unicode non-breaking space
+        given: q = Quantity('3.141592 Hz')
+        tests:
+            aperitif:
+                evaluate: q.as_tuple()
+                expected: (3.141592, 'Hz')
+            sugar:
+                evaluate: str(q)
+                expected: '3.1416 Hz'
+
+    string:
+        prefs: {'output_sf': ''}
+        given: q = Quantity('1420.405751786MHz')
+        tests:
+            thatch:
+                evaluate: q.as_tuple()
+                expected: (1420.405751786e6, 'Hz')
+            annex:
+                evaluate: str(q)
+                expected: '1.4204e9 Hz'
+
+    airliner:
+        prefs: {'ignore_sf': True}
+        given: q = Quantity('1ns')
+        tests:
+            amoeba:
+                evaluate: q.as_tuple()
+                expected: (1, 'ns')
+            minute:
+                evaluate: str(q)
+                expected: '1 ns'
+
+    anchorage:
+        given: q = Quantity('1000 MHz')
+        tests:
+            moody:
+                evaluate: q.as_tuple()
+                expected: (1e9, 'Hz')
+            figment:
+                evaluate: q.render(prec=0)
+                expected: '1 GHz'
+            shrewd:
+                evaluate: q.render(prec=0, strip_zeros=False)
+                expected: '1 GHz'
+
+    rinse:
+        given: q = Quantity('1000 MHz')
+        tests:
+            moody:
+                evaluate: q.as_tuple()
+                expected: (1e9, 'Hz')
+            figment:
+                evaluate: q.render(prec=1)
+                expected: '1 GHz'
+            shrewd:
+                evaluate: q.render(prec=1, strip_zeros=False)
+                expected: '1.0 GHz'
+
+    aspen:
+        given: q = Quantity('1000 MHz')
+        tests:
+            moody:
+                evaluate: q.as_tuple()
+                expected: (1e9, 'Hz')
+            figment:
+                evaluate: q.render(prec=2)
+                expected: '1 GHz'
+            shrewd:
+                evaluate: q.render(prec=2, strip_zeros=False)
+                expected: '1.00 GHz'
+
+    cultivate:
+        given: q = Quantity('1000 MHz')
+        tests:
+            moody:
+                evaluate: q.as_tuple()
+                expected: (1e9, 'Hz')
+            figment:
+                evaluate: q.render(prec=3)
+                expected: '1 GHz'
+            shrewd:
+                evaluate: q.render(prec=3, strip_zeros=False)
+                expected: '1.000 GHz'
+
+    calypso:
+        prefs: {'plus': '＋', 'minus': '−', 'inf': '∞', 'nan': 'nan'}
+        given: q = Quantity('+1kHz')
+        tests:
+            mulberry:
+                evaluate: q.as_tuple()
+                expected: (1000, 'Hz')
+            bender:
+                evaluate: str(q)
+                expected: '1 kHz'
+
+    sluice:
+        prefs: {'plus': '＋', 'minus': '−', 'inf': '∞', 'nan': 'nan'}
+        given: q = Quantity('-4.7 kΩ')
+        tests:
+            contest:
+                evaluate: q.as_tuple()
+                expected: (-4700, 'Ω')
+            dabble:
+                evaluate: str(q)
+                expected: '−4.7 kΩ'
+
+
+    # test constants
+    neuron:
+        given: q = Quantity('h')
+        tests:
+            tiptoe:
+                evaluate: q.as_tuple()
+                expected: (662.607015e-36, 'J-s')
+            clink:
+                evaluate: str(q)
+                expected: '662.61e-36 J-s'
+            loser:
+                evaluate: q.render(prec='full')
+                expected: '662.607015e-36 J-s'
+            truckload:
+                evaluate: f'{q:q}'
+                expected: "662.61e-36 J-s"
+            taxicab:
+                evaluate: f'{q:r}'
+                expected: "662.61e-36"
+            thwack:
+                evaluate: f'{q:e}'
+                expected: "6.6261e-34"
+            bugle:
+                evaluate: f'{q:S}'
+                expected: "h = 662.61e-36 J-s"
+
+    romance:
+        given: q = Quantity('ħ')
+        tests:
+            phallus:
+                evaluate: q.as_tuple()
+                expected: (105.4571817e-36, 'J-s')
+            meadow:
+                evaluate: str(q)
+                expected: '105.46e-36 J-s'
+            wiggle:
+                evaluate: q.render(prec='full')
+                expected: '105.4571817e-36 J-s'
+            rifleman:
+                evaluate: f'{q:q}'
+                expected: "105.46e-36 J-s"
+            fairway:
+                evaluate: f'{q:r}'
+                expected: "105.46e-36"
+            borstal:
+                evaluate: f'{q:e}'
+                expected: "1.0546e-34"
+            exigency:
+                evaluate: f'{q:S}'
+                expected: "ħ = 105.46e-36 J-s"
+
+    pottery:
+        given: q = Quantity('hbar')
+        tests:
+            grandee:
+                evaluate: q.as_tuple()
+                expected: (105.4571817e-36, 'J-s')
+            rocker:
+                evaluate: str(q)
+                expected: '105.46e-36 J-s'
+            mismanage:
+                evaluate: q.render(prec='full')
+                expected: '105.4571817e-36 J-s'
+            feeling:
+                evaluate: f'{q:q}'
+                expected: "105.46e-36 J-s"
+            blizzard:
+                evaluate: f'{q:r}'
+                expected: "105.46e-36"
+            shipwreck:
+                evaluate: f'{q:e}'
+                expected: "1.0546e-34"
+            league:
+                evaluate: f'{q:S}'
+                expected: "ħ = 105.46e-36 J-s"
+
+    cream:
+        given: q = Quantity('k')
+        tests:
+            produce:
+                evaluate: q.as_tuple()
+                expected: (13.80649e-24, 'J/K')
+            saint:
+                evaluate: str(q)
+                expected: '13.806e-24 J/K'
+            citizen:
+                evaluate: q.render(prec='full')
+                expected: '13.80649e-24 J/K'
+            factory:
+                evaluate: f'{q:q}'
+                expected: "13.806e-24 J/K"
+            straight:
+                evaluate: f'{q:r}'
+                expected: "13.806e-24"
+            enlighten:
+                evaluate: f'{q:e}'
+                expected: "1.3806e-23"
+            hearse:
+                evaluate: f'{q:S}'
+                expected: "k = 13.806e-24 J/K"
+
+
+    quagmire:
+        given: q = Quantity('q')
+        tests:
+            corpuscle:
+                evaluate: q.as_tuple()
+                expected: (1.602176634e-19, 'C')
+            verify:
+                evaluate: str(q)
+                expected: '160.22e-21 C'
+            warmonger:
+                evaluate: q.render(prec='full')
+                expected: '160.2176634e-21 C'
+            revivify:
+                evaluate: f'{q:q}'
+                expected: "160.22e-21 C"
+            chapter:
+                evaluate: f'{q:r}'
+                expected: "160.22e-21"
+            pursuer:
+                evaluate: f'{q:e}'
+                expected: "1.6022e-19"
+            recession:
+                evaluate: f'{q:S}'
+                expected: "q = 160.22e-21 C"
+
+
+    religion:
+        given: q = Quantity('c')
+        tests:
+            wacky:
+                evaluate: q.as_tuple()
+                expected: (299792458.0, 'm/s')
+            pedant:
+                evaluate: str(q)
+                expected: '299.79 Mm/s'
+            bless:
+                evaluate: q.render(prec='full')
+                expected: '299.792458 Mm/s'
+            clamber:
+                evaluate: f'{q:q}'
+                expected: "299.79 Mm/s"
+            worktop:
+                evaluate: f'{q:r}'
+                expected: "299.79M"
+            instigate:
+                evaluate: f'{q:e}'
+                expected: "2.9979e+08"
+            moonbeam:
+                evaluate: f'{q:S}'
+                expected: "c = 299.79 Mm/s"
+
+    couplet:
+        given: q = Quantity('0°C')
+        tests:
+            hairpiece:
+                evaluate: q.as_tuple()
+                expected: (273.15, 'K')
+            egomaniac:
+                evaluate: str(q)
+                expected: '273.15 K'
+            trollop:
+                evaluate: q.render(prec='full')
+                expected: '273.15 K'
+            handlebar:
+                evaluate: f'{q:q}'
+                expected: "273.15 K"
+            angry:
+                evaluate: f'{q:r}'
+                expected: "273.15"
+            denizen:
+                evaluate: f'{q:e}'
+                expected: "2.7315e+02"
+            fulfill:
+                evaluate: f'{q:S}'
+                expected: "0°C = 273.15 K"
+
+
+    supply:
+        given: q = Quantity('0C')
+        tests:
+            hairpiece:
+                evaluate: q.as_tuple()
+                expected: (273.15, 'K')
+            egomaniac:
+                evaluate: str(q)
+                expected: '273.15 K'
+            trollop:
+                evaluate: q.render(prec='full')
+                expected: '273.15 K'
+            handlebar:
+                evaluate: f'{q:q}'
+                expected: "273.15 K"
+            angry:
+                evaluate: f'{q:r}'
+                expected: "273.15"
+            denizen:
+                evaluate: f'{q:e}'
+                expected: "2.7315e+02"
+            fulfill:
+                evaluate: f'{q:S}'
+                expected: "0°C = 273.15 K"
+
+    sombrero:
+        given: q = Quantity('ε₀')
+        tests:
+            hassle:
+                evaluate: q.as_tuple()
+                expected: (8.8541878128e-12, 'F/m')
+            binding:
+                evaluate: str(q)
+                expected: '8.8542 pF/m'
+            paralyze:
+                evaluate: q.render(prec='full')
+                expected: '8.8541878128 pF/m'
+            quaff:
+                evaluate: f'{q:q}'
+                expected: "8.8542 pF/m"
+            bonfire:
+                evaluate: f'{q:r}'
+                expected: "8.8542p"
+            cicada:
+                evaluate: f'{q:e}'
+                expected: "8.8542e-12"
+            comfy:
+                evaluate: f'{q:S}'
+                expected: "ε₀ = 8.8542 pF/m"
+
+
+    adjudge:
+        given: q = Quantity('eps0')
+        tests:
+            hassle:
+                evaluate: q.as_tuple()
+                expected: (8.8541878128e-12, 'F/m')
+            binding:
+                evaluate: str(q)
+                expected: '8.8542 pF/m'
+            paralyze:
+                evaluate: q.render(prec='full')
+                expected: '8.8541878128 pF/m'
+            quaff:
+                evaluate: f'{q:q}'
+                expected: "8.8542 pF/m"
+            bonfire:
+                evaluate: f'{q:r}'
+                expected: "8.8542p"
+            cicada:
+                evaluate: f'{q:e}'
+                expected: "8.8542e-12"
+            comfy:
+                evaluate: f'{q:S}'
+                expected: "ε₀ = 8.8542 pF/m"
+
+    skirt:
+        given: q = Quantity('µ₀')
+            # uses micro
+        tests:
+            lobby:
+                evaluate: q.as_tuple()
+                expected: (1.25663706212e-06, 'H/m')
+            seashell:
+                evaluate: str(q)
+                expected: '1.2566 uH/m'
+            wader:
+                evaluate: q.render(prec='full')
+                expected: '1.25663706212 uH/m'
+            concierge:
+                evaluate: f'{q:q}'
+                expected: "1.2566 uH/m"
+            forgo:
+                evaluate: f'{q:r}'
+                expected: "1.2566u"
+            weekend:
+                evaluate: f'{q:e}'
+                expected: "1.2566e-06"
+            awaken:
+                evaluate: f'{q:S}'
+                expected: "µ₀ = 1.2566 uH/m"
+
+    introvert:
+        given: q = Quantity('mu0')
+        tests:
+            lobby:
+                evaluate: q.as_tuple()
+                expected: (1.25663706212e-06, 'H/m')
+            seashell:
+                evaluate: str(q)
+                expected: '1.2566 uH/m'
+            wader:
+                evaluate: q.render(prec='full')
+                expected: '1.25663706212 uH/m'
+            concierge:
+                evaluate: f'{q:q}'
+                expected: "1.2566 uH/m"
+            forgo:
+                evaluate: f'{q:r}'
+                expected: "1.2566u"
+            weekend:
+                evaluate: f'{q:e}'
+                expected: "1.2566e-06"
+            awaken:
+                evaluate: f'{q:S}'
+                expected: "µ₀ = 1.2566 uH/m"
+
+    proton:
+        given: q = Quantity('μ₀')
+            # uses mu
+        tests:
+            lobby:
+                evaluate: q.as_tuple()
+                expected: (1.25663706212e-06, 'H/m')
+            seashell:
+                evaluate: str(q)
+                expected: '1.2566 uH/m'
+            wader:
+                evaluate: q.render(prec='full')
+                expected: '1.25663706212 uH/m'
+            concierge:
+                evaluate: f'{q:q}'
+                expected: "1.2566 uH/m"
+            forgo:
+                evaluate: f'{q:r}'
+                expected: "1.2566u"
+            weekend:
+                evaluate: f'{q:e}'
+                expected: "1.2566e-06"
+            awaken:
+                evaluate: f'{q:S}'
+                expected: "µ₀ = 1.2566 uH/m"
+
+    gnash:
+        given: q = Quantity('Z₀')
+        tests:
+            noodle:
+                evaluate: q.as_tuple()
+                expected: (376.730313668, 'Ohms')
+            sharpen:
+                evaluate: str(q)
+                expected: '376.73 Ohms'
+            deferral:
+                evaluate: q.render(prec='full')
+                expected: '376.730313668 Ohms'
+            tense:
+                evaluate: f'{q:q}'
+                expected: '376.73 Ohms'
+            meditate:
+                evaluate: f'{q:r}'
+                expected: '376.73'
+            toenail:
+                evaluate: f'{q:e}'
+                expected: '3.7673e+02'
+            expert:
+                evaluate: f'{q:S}'
+                expected: "Z₀ = 376.73 Ohms"
+
+    mentor:
+        given: q = Quantity('Z0')
+        tests:
+            noodle:
+                evaluate: q.as_tuple()
+                expected: (376.730313668, 'Ohms')
+            sharpen:
+                evaluate: str(q)
+                expected: '376.73 Ohms'
+            deferral:
+                evaluate: q.render(prec='full')
+                expected: '376.730313668 Ohms'
+            tense:
+                evaluate: f'{q:q}'
+                expected: '376.73 Ohms'
+            meditate:
+                evaluate: f'{q:r}'
+                expected: '376.73'
+            toenail:
+                evaluate: f'{q:e}'
+                expected: '3.7673e+02'
+            expert:
+                evaluate: f'{q:S}'
+                expected: "Z₀ = 376.73 Ohms"
+
+    # test scaling
+    segregate:
+        given: q = Quantity(2, scale=(1000, 'g'))
+        tests:
+            messiah:
+                evaluate: q.as_tuple()
+                expected: (2000, 'g')
+            spank:
+                evaluate: str(q)
+                expected: '2 kg'
+
+    bazooka:
+        given: q = Quantity(2, 'g', scale=1000)
+        tests:
+            spunky:
+                evaluate: q.as_tuple()
+                expected: (2000, 'g')
+            guzzle:
+                evaluate: str(q)
+                expected: '2 kg'
+            precede:
+                evaluate: q.render(scale=0.001)
+                expected: '2 g'
+            umpire:
+                evaluate: str(q.scale(0.001))
+                expected: '2 g'
+            quest:
+                evaluate: q.render(scale=(2.2046226218e-3, 'lbs'), form='fixed')
+                expected: '4.4092 lbs'
+            elevator:
+                evaluate: q.render(scale='lbs', form='fixed')
+                expected: '4.4092 lbs'
+            honorific:
+                evaluate: f'{q:plbs}'
+                expected: '4.4092 lbs'
+
+    slake:
+        given: q = Quantity('27°C', scale='K')
+        tests:
+            snort:
+                evaluate: q.as_tuple()
+                expected: (300.15, 'K')
+            marquis:
+                evaluate: str(q)
+                expected: '300.15 K'
+            brash:
+                evaluate: q.render(scale='°R')
+                expected: '540.27 °R'
+            ocean:
+                evaluate: f'{q:p°R}'
+                expected: '540.27 °R'
+
+    launder:
+        given: q = Quantity('27C', scale='°C')
+        tests:
+            blunt:
+                evaluate: q.as_tuple()
+                expected: (27, '°C')
+            stingy:
+                evaluate: str(q)
+                expected: '27 °C'
+
+    # test fixed
+    # test binary
+    # test args (float, model)
+    # test attributes?
+    # test negligible

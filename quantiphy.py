@@ -528,7 +528,7 @@ UnitConversion('C °C', 'C °C')
 UnitConversion('C °C', 'K', 1, -273.15)
 UnitConversion('C °C', 'F °F', 5/9, -32*5/9)
 UnitConversion('C °C', 'R °R', 5/9, -273.15)
-# UnitConversion('K', 'C °C', 1, 273.15) -- redundant
+# UnitConversion('K', 'C °C', 1, 273.15) — redundant
 UnitConversion('K', 'F °F', 5/9, 273.15 - 32*5/9)
 UnitConversion('K', 'R °R', 5/9, 0)
 
@@ -578,11 +578,11 @@ def set_unit_system(unit_system):
         >>> from quantiphy import Quantity, set_unit_system
         >>> set_unit_system('cgs')
         >>> print(Quantity('h').render(show_label='f'))
-        h = 6.6261e-27 erg-s -- Plank's constant
+        h = 6.6261e-27 erg-s — Plank's constant
 
         >>> set_unit_system('mks')
         >>> print(Quantity('h').render(show_label='f'))
-        h = 662.61e-36 J-s -- Plank's constant
+        h = 662.61e-36 J-s — Plank's constant
 
     """
     global _active_constants
@@ -646,9 +646,9 @@ def add_constant(value, alias=None, unit_systems=None):
     Example::
 
         >>> from quantiphy import Quantity, add_constant
-        >>> add_constant('f_hy = 1420.405751786 MHz -- Frequency of hydrogen line')
+        >>> add_constant('f_hy = 1420.405751786 MHz — Frequency of hydrogen line')
         >>> print(Quantity('f_hy').render(show_label='f'))
-        f_hy = 1.4204 GHz -- Frequency of hydrogen line
+        f_hy = 1.4204 GHz — Frequency of hydrogen line
 
     """
     if isinstance(value, str):
@@ -774,7 +774,7 @@ DEFAULTS = dict(
     accept_binary = False,
     assign_rec = r'''
         \A((
-            (\#|--|//).*                             # simple comment
+            (\#|--|//|—).*                           # simple comment
         )|(
             (
                 (?P<name>[^(=:]+?)\s*                # name:  [^(=:]+
@@ -782,7 +782,7 @@ DEFAULTS = dict(
                 [=:]\s*                              #        [=:]
             )?
             (?P<val>.+?)                             # value: .+
-            (\s*(\#|--|//)\s*(?P<desc>.*?))?         # description: (--|//|#) .*
+            (\s*(\#|--|//|—)\s*(?P<desc>.*?))?       # description: (—|--|//|#) .*
         ))\Z
     ''',
     comma = ',',
@@ -794,7 +794,7 @@ DEFAULTS = dict(
     keep_components = True,
     known_units = [],
     label_fmt = '{n} = {v}',
-    label_fmt_full = '{n} = {v} -- {d}',
+    label_fmt_full = '{n} = {v} — {d}',
     map_sf = {},
     minus = '-',
     nan = 'NaN',
@@ -838,7 +838,7 @@ class Quantity(float):
         scale factors and/or units.  For example, the following are all valid:
         '2.5ns', '1.7 MHz', '1e6Ω', '2.8_V', '1e4 m/s', '$10_000', '42', 'ħ',
         etc.  The string may also have name and description if they are provided
-        in a way recognizable by *assign_rec*. For example, 'trise: 10ns --
+        in a way recognizable by *assign_rec*. For example, 'trise: 10ns —
         rise time' or 'trise = 10ns # rise time' would work with the default
         recognizer.
     :type value: real, string or quantity
@@ -1005,15 +1005,17 @@ class Quantity(float):
         :arg str assign_rec:
             Regular expression used to recognize an assignment.  Used in
             constructor and extract(). By default an '=' or ':' separates the
-            name from the value and a '--', '#' or '//' separates the value from
-            the description, if a description is given. So the default
-            recognizes the following forms::
+            name from the value and a '—', '--', '#', or '//' separates the
+            value from the description, if a description is given. So the
+            default recognizes the following forms::
 
                 'vel = 60 m/s'
+                'vel = 60 m/s — velocity'
                 'vel = 60 m/s -- velocity'
                 'vel = 60 m/s # velocity'
                 'vel = 60 m/s // velocity'
                 'vel: 60 m/s'
+                'vel: 60 m/s — velocity'
                 'vel: 60 m/s -- velocity'
                 'vel: 60 m/s # velocity'
                 'vel: 60 m/s // velocity'
@@ -1022,15 +1024,16 @@ class Quantity(float):
             expression using named groups the names *name*, *val* and *desc*.
             For example::
 
-                assign_req = r'(?P<name>.*+) = (?P<val>.*?) -- (?P<desc>.*?)',
+                assign_req = r'(?P<name>.*+) = (?P<val>.*?) — (?P<desc>.*?)',
 
             The regular expression is interpreted using the re.VERBOSE flag.
 
             When used with :meth:`Quantity.extract` there are a few
             more features.
 
-            First, you may also introduce comments using '--', '#', or '//'::
+            First, you may also introduce comments using '—', '--', '#', or '//'::
 
+                '— comment'
                 '-- comment'
                 '# comment'
                 '// comment'
@@ -1038,7 +1041,7 @@ class Quantity(float):
             Second, you can specify an alternate name using by placing in within
             parentheses following the name::
 
-                'wavelength (λ) = 21 cm -- wavelength of hydrogen line'
+                'wavelength (λ) = 21 cm — wavelength of hydrogen line'
 
             In this case, the name attribute for the quantity will be 'λ' and
             the quantity will be filed in the output dictionary using
@@ -1052,8 +1055,8 @@ class Quantity(float):
             quantities, and the constants pi and tau.  For example::
 
                 parameters = Quantity.extract(r'''
-                    Fin = 250MHz -- frequency of input stimulus
-                    Tstop = 10/Fin "s" -- simulation stop time
+                    Fin = 250MHz — frequency of input stimulus
+                    Tstop = 10/Fin "s" — simulation stop time
                 ''')
 
             In this example, the value for *Tstop* is given as an expression
@@ -1132,10 +1135,13 @@ class Quantity(float):
             for the name, value, description, and value as formatted by *label_fmt*.
             Typical value include::
 
-                '{n} = {v} -- {d}'    (default)
+                '{n} = {v} — {d}'    (default)
+                '{n} = {v} -- {d}'
                 '{n} = {v} # {d}'
                 '{n} = {v} // {d}'
+                '{n}: {v} — {d}'
                 '{n}: {v} -- {d}'
+                '{V} — {d}'
                 '{V} -- {d}'
                 '{V:<20}  # {d}'
 
@@ -1165,6 +1171,10 @@ class Quantity(float):
             The text to be used as the minus sign.  By default its value is '-',
             but is sometimes '−' (the unicode minus sign).  You can access the
             Unicode minus sign using :attr:`Quantity.minus_sign`.
+
+            This preference only affects how numbers are rendered.  Both - and
+            the unicode − are always accepted as a minus sign when interpreting
+            strings as numbers.
 
         :arg str nan:
             The text to be used to represent a value that is not-a-number.
@@ -1220,6 +1230,13 @@ class Quantity(float):
             simply eliminate plus signs from numbers.  You can access the
             Unicode full width plus sign using
             :attr:`Quantity.plus_sign`.
+
+            This preference only affects how numbers are rendered.  Both + and
+            the unicode ＋ are always accepted as a plus sign when interpreting
+            strings as numbers.
+
+            *QuantiPhy* currently does not add leading plus signs to either
+            mantissa or exponent, so this setting is ignored.
 
         :arg int prec:
             Default precision  in digits where 0 corresponds to 1 digit.  Must
@@ -1445,6 +1462,9 @@ class Quantity(float):
     # _map_leading_sign {{{2
     def _map_leading_sign(self, value, leading_units=''):
         # maps a leading sign, but only if given
+        if math.isnan(self):
+            # do not display a sign with NaNs
+            return leading_units + value.lstrip('+').lstrip('-')
         if value[0] == '-':
             return self.minus + leading_units + value[1:]
         if value[0] == '+':  # pragma: no cover
@@ -2131,7 +2151,7 @@ class Quantity(float):
             299.7925 Mm/s
             299.792458 Mm/s
             c = 299.79 Mm/s
-            c = 299.79 Mm/s -- speed of light
+            c = 299.79 Mm/s — speed of light
 
             >>> print(
             ...     Tfreeze.render(scale='°F'),
@@ -2370,7 +2390,7 @@ class Quantity(float):
 
         Example::
 
-            >>> t = Quantity('Total = $1000000 -- the total')
+            >>> t = Quantity('Total = $1000000 — the total')
             >>> print(
             ...     t.fixed(),
             ...     t.fixed(show_commas=True),
@@ -2393,7 +2413,7 @@ class Quantity(float):
             ...     t.fixed(show_label='f'), sep=newline)
             $1000000.000000000000
             Total = $1000000
-            Total = $1000000 -- the total
+            Total = $1000000 — the total
 
             >>> print(
             ...     t.fixed(scale=(1/10000, 'BTC')),
@@ -2512,7 +2532,7 @@ class Quantity(float):
 
         Example::
 
-            >>> t = Quantity('mem = 16 GiB -- amount of physical memory', binary=True)
+            >>> t = Quantity('mem = 16 GiB — amount of physical memory', binary=True)
             >>> print(
             ...     t.binary(),
             ...     t.binary(prec=3, strip_zeros=False),
@@ -2695,7 +2715,7 @@ class Quantity(float):
 
         If::
 
-           q = Quantity('f = 1420.405751786 MHz -- hydrogen line')
+           q = Quantity('f = 1420.405751786 MHz — hydrogen line')
 
         then::
 
@@ -2812,12 +2832,12 @@ class Quantity(float):
             line.  Each is parsed by *assign_rec*. By default, the lines are
             assumed to be of the form::
 
-                [<name> [(<qname>)] = <value>] [-- <description>]
+                [<name> [(<qname>)] = <value>] [— <description>]
 
-            where '=' may be replaced by ':' and '--' may be replaced by '//' or
-            '#'.  In addition, bracket delimit optional fields and parentheses
-            represent literal parentheses.  Each of the fields are allowed be
-            largely arbitrary strings.
+            where '=' may be replaced by ':' and '—' (the em-dash) may be
+            replaced by '--', '//' or '#'.  In addition, brackets delimit
+            optional fields and parentheses represent literal parentheses.  Each
+            of the fields are allowed be largely arbitrary strings.
 
             The brackets indicate that the name/value pair and the description
             is optional.  However, <name> must be given if <value> is given.
@@ -2853,6 +2873,7 @@ class Quantity(float):
             So with the default *assign_rec*, lines with the following form are
             ignored::
 
+                — comment
                 -- comment
                 # comment
                 // comment
@@ -2880,18 +2901,18 @@ class Quantity(float):
         Example::
 
             >>> sagan_frequencies = r'''
-            ...     -- Carl Sagan's SETI frequencies of high interest
+            ...     — Carl Sagan's SETI frequencies of high interest
             ...
-            ...     f_hy = 1420.405751786 MHz -- Hydrogen line frequency
-            ...     f_sagan1 = π*f_hy "Hz" -- Sagan's first frequency
-            ...     f_sagan2 = τ*f_hy "Hz" -- Sagan's second frequency
+            ...     f_hy = 1420.405751786 MHz — Hydrogen line frequency
+            ...     f_sagan1 = π*f_hy "Hz" — Sagan's first frequency
+            ...     f_sagan2 = τ*f_hy "Hz" — Sagan's second frequency
             ... '''
             >>> freqs = Quantity.extract(sagan_frequencies)
             >>> for f in freqs.values():
             ...     print(f.render(show_label='f'))
-            f_hy = 1.4204 GHz -- Hydrogen line frequency
-            f_sagan1 = 4.4623 GHz -- Sagan's first frequency
-            f_sagan2 = 8.9247 GHz -- Sagan's second frequency
+            f_hy = 1.4204 GHz — Hydrogen line frequency
+            f_sagan1 = 4.4623 GHz — Sagan's first frequency
+            f_sagan2 = 8.9247 GHz — Sagan's second frequency
 
             >>> globals().update(freqs)
             >>> print(f_hy, f_sagan1, f_sagan2, sep=newline)
@@ -2986,9 +3007,9 @@ class Quantity(float):
             ...         Quantity('mu0').render(form='eng'),
             ...         sep=newline,
             ...     )
-            k = 13.806×10⁻²⁴ J/K -- Boltzmann's constant
-            µ₀ = 1.2566 µH/m -- permeability of free space
-            µ₀ = 1.2566×10⁻⁶ H/m -- permeability of free space
+            k = 13.806×10⁻²⁴ J/K — Boltzmann's constant
+            µ₀ = 1.2566 µH/m — permeability of free space
+            µ₀ = 1.2566×10⁻⁶ H/m — permeability of free space
 
         """
         mapped = sf.translate(Quantity._SCI_NOTATION_MAPPER)
@@ -3005,7 +3026,7 @@ class Quantity(float):
 
             >>> with Quantity.prefs(map_sf=Quantity.map_sf_to_greek):
             ...     print(Quantity('mu0').render(show_label='f'))
-            µ₀ = 1.2566 µH/m -- permeability of free space
+            µ₀ = 1.2566 µH/m — permeability of free space
 
         """
         # this could just as easily be a simple dictionary, but implement it as

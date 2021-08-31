@@ -258,15 +258,17 @@ When specifying the value as a string you may also give a name and description,
 and if you do they become available as the attributes *name* and *desc*.  This 
 conversion is under the control of the *assign_rec* preference.  The default 
 version of *assign_rec* accepts either '=' or ':' to separate the name from the 
-value, and either '--', '#', or '//' to separate the value from the description 
-if a description is given. Thus, by default *QuantiPhy* recognizes 
+value, and either '—', '--', '#', or '//' to separate the value from the 
+description if a description is given. Thus, by default *QuantiPhy* recognizes 
 specifications of the following forms::
 
     <name> = <value>
+    <name> = <value> — <description>
     <name> = <value> -- <description>
     <name> = <value> # <description>
     <name> = <value> // <description>
     <name>: <value>
+    <name>: <value> — <description>
     <name>: <value> -- <description>
     <name>: <value> # <description>
     <name>: <value> // <description>
@@ -309,8 +311,8 @@ units are inherited. For example:
     Fin = 100 MHz
 
     >>> freq = Quantity(100e6, 'Fin Hz input frequency')
-    >>> print(f'{freq.name} = {freq} -- {freq.desc}')
-    Fin = 100 MHz -- input frequency
+    >>> print(f'{freq.name} = {freq} — {freq.desc}')
+    Fin = 100 MHz — input frequency
 
 If the model contains units, those units are only used if the value does not 
 have units. The same is true for the description. For example:
@@ -337,8 +339,8 @@ arguments.  For example:
     ...     10*period, period, name='output period',
     ...     desc='period at output of frequency divider'
     ... )
-    >>> print(f'{out_period.name} = {out_period} -- {out_period.desc}')
-    output period = 100 ns -- period at output of frequency divider
+    >>> print(f'{out_period.name} = {out_period} — {out_period.desc}')
+    output period = 100 ns — period at output of frequency divider
 
 In this the value is ``10*period``, which is a float and so has no name, units, 
 or description attributes, but the model is ``period`` that has all three 
@@ -395,8 +397,8 @@ name, or description.
     >>> out_period.units = 's'
     >>> out_period.name = 'output period'
     >>> out_period.desc = 'period at output of frequency divider'
-    >>> print(f'{out_period.name} = {out_period} -- {out_period.desc}')
-    output period = 100 ns -- period at output of frequency divider
+    >>> print(f'{out_period.name} = {out_period} — {out_period.desc}')
+    output period = 100 ns — period at output of frequency divider
 
 In addition, you can also override the preferences with attributes:
 
@@ -859,11 +861,11 @@ if *show_desc* is True and *label_fmt* otherwise.
     'Fin = 100 MHz'
 
     >>> freq.render(show_label='f')
-    'Fin = 100 MHz -- input frequency'
+    'Fin = 100 MHz — input frequency'
 
     >>> Quantity.set_prefs(show_desc=True)
     >>> freq.render(show_label=True)
-    'Fin = 100 MHz -- input frequency'
+    'Fin = 100 MHz — input frequency'
 
     >>> freq.render(show_label='a')
     'Fin = 100 MHz'
@@ -1076,25 +1078,25 @@ Here is an example of these format types:
 
 .. code-block:: python
 
-    >>> h_line = Quantity('f = 1420.405751786 MHz -- hydrogen line')
+    >>> h_line = Quantity('f = 1420.405751786 MHz — hydrogen line')
     >>> for f in 'sSpPqQrRbBeEfFgGund':
     ...     print(f + ':', h_line.format(f))
     s: 1.4204 GHz
-    S: f = 1.4204 GHz -- hydrogen line
+    S: f = 1.4204 GHz — hydrogen line
     p: 1420405751.786 Hz
-    P: f = 1420405751.786 Hz -- hydrogen line
+    P: f = 1420405751.786 Hz — hydrogen line
     q: 1.4204 GHz
-    Q: f = 1.4204 GHz -- hydrogen line
+    Q: f = 1.4204 GHz — hydrogen line
     r: 1.4204G
-    R: f = 1.4204G -- hydrogen line
+    R: f = 1.4204G — hydrogen line
     b: 1.3229 GiHz
-    B: f = 1.3229 GiHz -- hydrogen line
+    B: f = 1.3229 GiHz — hydrogen line
     e: 1.4204e+09
-    E: f = 1.4204e+09 -- hydrogen line
+    E: f = 1.4204e+09 — hydrogen line
     f: 1420405751.786
-    F: f = 1420405751.786 -- hydrogen line
+    F: f = 1420405751.786 — hydrogen line
     g: 1.4204e+09
-    G: f = 1.4204e+09 -- hydrogen line
+    G: f = 1.4204e+09 — hydrogen line
     u: Hz
     n: f
     d: hydrogen line
@@ -1224,7 +1226,7 @@ is used if the quantity has a description.
     trise = 10 ns
 
     >>> print('{:S}'.format(freq))
-    Fin = 100 MHz -- input frequency
+    Fin = 100 MHz — input frequency
 
 Finally, you can add units after the format code, which causes the number to be 
 scaled to those units if the transformation represents a known unit conversion.
@@ -1324,7 +1326,7 @@ You can create your own constants and unit systems using
 
     >>> hy_wavelength = Quantity('λₕ')
     >>> print(hy_wavelength.render(show_label=True))
-    λₕ = 211.06 mm -- wavelength of hydrogen line
+    λₕ = 211.06 mm — wavelength of hydrogen line
 
 In this case is the name given in the quantity is used when creating the 
 constant.  You can also specify an alias as an argument to *add_constant*.
@@ -1338,7 +1340,7 @@ constant.  You can also specify an alias as an argument to *add_constant*.
 
     >>> hy_wavelength = Quantity('lambda h')
     >>> print(hy_wavelength.render(show_label=True))
-    λₕ = 211.06 mm -- wavelength of hydrogen line
+    λₕ = 211.06 mm — wavelength of hydrogen line
 
 It is not necessary to specify both the name and the alias, one is sufficient; 
 the constant is accessible using either.  Notice that the alias does not 
@@ -1472,7 +1474,7 @@ quantity.
 
     >>> hy_wavelength.show_label = True
     >>> print(hy_wavelength)
-    λₕ = 211.06 mm -- wavelength of hydrogen line
+    λₕ = 211.06 mm — wavelength of hydrogen line
 
 This is often the way to go with quantities that have :index:`logarithmic units`
 such as decibels (:index:`dB`) or shannons (Sh) (or the related bit, digits, 
@@ -1872,9 +1874,9 @@ a dictionary.  For example:
 .. code-block:: python
 
     >>> design_parameters = '''
-    ...     Fref (fₒ) = 156 MHz  -- Reference frequency
-    ...     Kdet = 88.3 uA       -- Gain of phase detector
-    ...     Kvco = 9.07 GHz/V    -- Gain of VCO
+    ...     Fref (fₒ) = 156 MHz  — Reference frequency
+    ...     Kdet = 88.3 uA       — Gain of phase detector
+    ...     Kvco = 9.07 GHz/V    — Gain of VCO
     ... '''
     >>> quantities = Quantity.extract(design_parameters)
 
@@ -1895,10 +1897,10 @@ through *assign_rec* to determine if it is recognized as an assignment.  If it
 is recognized, the *assign_rec* named fields (*name*, *qname*, *val*, and 
 *desc*) are used when creating the quantity.  The default recognizer allows you 
 to separate the name from the value with either '=' or ':'. It allows you to 
-separate the value from the description using '--', '//', or '#'. These 
+separate the value from the description using '—', '--', '//', or '#'. These 
 substrings are also used to introduce comments, so you could start a line with 
-'#' and it would be treated as a comment.
-If the line is not recognized, then it is ignored.
+'#' and it would be treated as a comment.  If the line is not recognized, then 
+it is ignored.
 
 In this example, the first line is nonconforming and so is ignored. The second 
 *Kvdo* line is a comment, the comment character and anything beyond is ignored.  
@@ -1909,12 +1911,12 @@ Finally, empty lines are ignored.
     >>> design_parameters = '''
     ...     PLL Design Parameters
     ...
-    ...     Fref = 156 MHz      -- Reference frequency
-    ...     Kdet = 88.3 uA      -- Gain of phase detector
-    ...     Kvco = 9.07 GHz/V   -- Gain of VCO
-    ...     -- Kvco = 5 GHz/V     -- Gain of VCO
-    ...     N = 128             -- Divide ratio
-    ...     Fout = N*Fref "Hz"  -- Output Frequency
+    ...     Fref = 156 MHz      — Reference frequency
+    ...     Kdet = 88.3 uA      — Gain of phase detector
+    ...     Kvco = 9.07 GHz/V   — Gain of VCO
+    ...     // Kvco = 5 GHz/V     — Gain of VCO
+    ...     N = 128             — Divide ratio
+    ...     Fout = N*Fref "Hz"  — Output Frequency
     ... '''
     >>> globals().update(Quantity.extract(design_parameters))
 
@@ -1949,7 +1951,7 @@ displays the name and description by default.
     >>> class VerboseQuantity(Quantity):
     ...    show_label = 'f'
     ...    label_fmt = '{n} = {v}'
-    ...    label_fmt_full = '{V:<18} -- {d}'
+    ...    label_fmt_full = '{V:<18} — {d}'
 
     >>> filename = '.parameters'
     >>> try:
@@ -1961,11 +1963,11 @@ displays the name and description by default.
     ...     fatal(e, culprit=filename)
 
     >>> print(Fref, Kdet, Kvco, N, Fout, sep='\n')
-    Fref = 156 MHz     -- Reference frequency
-    Kdet = 88.3 uA     -- Gain of phase detector (Imax)
-    Kvco = 9.07 GHz/V  -- Gain of VCO
-    N = 128            -- Divide ratio
-    Fout = 19.968 GHz  -- Output Frequency
+    Fref = 156 MHz     — Reference frequency
+    Kdet = 88.3 uA     — Gain of phase detector (Imax)
+    Kvco = 9.07 GHz/V  — Gain of VCO
+    N = 128            — Divide ratio
+    Fout = 19.968 GHz  — Output Frequency
 
 With :meth:`Quantity.extract()` the values of quantities can be given as 
 a expression that contains previously defined quantities (or :ref:`physical 
@@ -1980,18 +1982,18 @@ used in your expressions.  For example:
     >>> __doc__ = """
     ... Simulates a second-order ΔΣ modulator with the following parameter values:
     ...
-    ...     Fclk = Fxtal/4 "Hz"                  -- clock frequency
-    ...     Fin = 200kHz                         -- input frequency
-    ...     Vin = 950mV                          -- input voltage amplitude (peak)
-    ...     gain1 = 0.5V/V                       -- gain of first integrator
-    ...     gain2 = 0.5V/V                       -- gain of second integrator
-    ...     Vmax = 1V                            -- quantizer maximum input voltage
-    ...     Vmin = -1V                           -- quantizer minimum input voltage
-    ...     levels = 5                           -- quantizer output levels
-    ...     Tstop = 2/Fin "s"                    -- simulation stop time
-    ...     Tstart = -1/Fin 's'                  -- initial transient interval (discarded)
-    ...     file_name = 'out.wave'               -- output filename
-    ...     sim_name = f'{Fclk:q} ΔΣ Modulator'  -- simulation name
+    ...     Fclk = Fxtal/4 "Hz"                  — clock frequency
+    ...     Fin = 200kHz                         — input frequency
+    ...     Vin = 950mV                          — input voltage amplitude (peak)
+    ...     gain1 = 0.5V/V                       — gain of first integrator
+    ...     gain2 = 0.5V/V                       — gain of second integrator
+    ...     Vmax = 1V                            — quantizer maximum input voltage
+    ...     Vmin = -1V                           — quantizer minimum input voltage
+    ...     levels = 5                           — quantizer output levels
+    ...     Tstop = 2/Fin "s"                    — simulation stop time
+    ...     Tstart = -1/Fin 's'                  — initial transient interval (discarded)
+    ...     file_name = 'out.wave'               — output filename
+    ...     sim_name = f'{Fclk:q} ΔΣ Modulator'  — simulation name
     ...
     ... The values given above are used in the simulation; no further
     ... modification of the code given below is required when changing
@@ -2006,7 +2008,7 @@ used in your expressions.  For example:
 
     >>> with Quantity.prefs(
     ...     label_fmt = '{n} = {v}',
-    ...     label_fmt_full = '{V:<18}  -- {d}',
+    ...     label_fmt_full = '{V:<18} ­— {d}',
     ...     show_label = 'f',
     ... ):
     ...     print('Simulation parameters:')
@@ -2016,16 +2018,16 @@ used in your expressions.  For example:
     ...         except ValueError:
     ...             print(f'    {k} = {v!s}')
     Simulation parameters:
-        Fclk = 50 MHz       -- clock frequency
-        Fin = 200 kHz       -- input frequency
-        Vin = 950 mV        -- input voltage amplitude (peak)
-        gain1 = 500 mV/V    -- gain of first integrator
-        gain2 = 500 mV/V    -- gain of second integrator
-        Vmax = 1 V          -- quantizer maximum input voltage
-        Vmin = -1 V         -- quantizer minimum input voltage
-        levels = 5          -- quantizer output levels
-        Tstop = 10 us       -- simulation stop time
-        Tstart = -5 us      -- initial transient interval (discarded)
+        Fclk = 50 MHz      ­— clock frequency
+        Fin = 200 kHz      ­— input frequency
+        Vin = 950 mV       ­— input voltage amplitude (peak)
+        gain1 = 500 mV/V   ­— gain of first integrator
+        gain2 = 500 mV/V   ­— gain of second integrator
+        Vmax = 1 V         ­— quantizer maximum input voltage
+        Vmin = -1 V        ­— quantizer minimum input voltage
+        levels = 5         ­— quantizer output levels
+        Tstop = 10 us      ­— simulation stop time
+        Tstart = -5 us     ­— initial transient interval (discarded)
         file_name = out.wave
         sim_name = 50 MHz ΔΣ Modulator
 

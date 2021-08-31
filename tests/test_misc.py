@@ -78,18 +78,18 @@ def test_misc():
     assert q.is_infinite() == 'inf'
 
     # check the various formats for assignment recognition
-    q = Quantity('f_hy = 1420405751.786 Hz -- frequency of hydrogen line')
-    assert q.render(show_label='f') == 'f_hy = 1.4204 GHz -- frequency of hydrogen line'
+    q = Quantity('f_hy = 1420405751.786 Hz — frequency of hydrogen line')
+    assert q.render(show_label='f') == 'f_hy = 1.4204 GHz — frequency of hydrogen line'
     assert q.name == 'f_hy'
     assert q.desc == 'frequency of hydrogen line'
 
     q = Quantity('f_hy: 1420405751.786 Hz # frequency of hydrogen line')
-    assert q.render(show_label='f') == 'f_hy = 1.4204 GHz -- frequency of hydrogen line'
+    assert q.render(show_label='f') == 'f_hy = 1.4204 GHz — frequency of hydrogen line'
     assert q.name == 'f_hy'
     assert q.desc == 'frequency of hydrogen line'
 
     q = Quantity('f_hy = 1420405751.786 Hz // frequency of hydrogen line')
-    assert q.render(show_label='f') == 'f_hy = 1.4204 GHz -- frequency of hydrogen line'
+    assert q.render(show_label='f') == 'f_hy = 1.4204 GHz — frequency of hydrogen line'
     assert q.name == 'f_hy'
     assert q.desc == 'frequency of hydrogen line'
 
@@ -246,7 +246,7 @@ def test_misc2():
     Derived.set_prefs(prec=None)
     assert mu.render() == '1.2566 uH/m'
 
-    q = Quantity('Tclk = 10ns -- clock period')
+    q = Quantity('Tclk = 10ns — clock period')
     assert q.render(show_label=True) == 'Tclk = 10 ns  # clock period'
 
     q = Quantity('Tclk = 10ns')
@@ -256,7 +256,7 @@ def test_misc2():
     assert q.is_close('10ns') is True
     assert q.is_close('10.01ns') is False
 
-    add_constant(Quantity('F_hy = 1420405751.786 Hz -- frequency of hydrogen line'))
+    add_constant(Quantity('F_hy = 1420405751.786 Hz — frequency of hydrogen line'))
     h_line = Quantity('F_hy')
     assert h_line.render(show_label=True) == 'F_hy = 1.4204 GHz  # frequency of hydrogen line'
 
@@ -313,7 +313,7 @@ def test_misc2():
     assert Quantity.get_pref('map_sf') == {}
 
     Quantity.set_prefs(label_fmt_full='{V:<18}  # {d}', label_fmt='{n} = {v}', show_desc=True)
-    T = Quantity('T = 300K -- ambient temperature', ignore_sf=True)
+    T = Quantity('T = 300K — ambient temperature', ignore_sf=True)
     k = Quantity('k')
     q = Quantity('q')
     Vt = Quantity(k*T/q, 'Vt V thermal voltage')
@@ -378,11 +378,11 @@ def test_misc2():
     # composite units
     q = Quantity('3.45e6 m·s⁻²')
     assert q.render() == '3.45 Mm·s⁻²'
-    q = Quantity('accel = 3.45e6 m·s⁻² -- acceleration')
+    q = Quantity('accel = 3.45e6 m·s⁻² — acceleration')
     assert q.render() == '3.45 Mm·s⁻²'
-    q = Quantity('Vn = 3.45nV/√Hz -- Input referred RMS noise voltage')
+    q = Quantity('Vn = 3.45nV/√Hz — Input referred RMS noise voltage')
     assert q.render() == '3.45 nV/√Hz'
-    q = Quantity('Vn² = 11.902aV²/Hz -- Input referred noise power')
+    q = Quantity('Vn² = 11.902aV²/Hz — Input referred noise power')
     assert q.render() == '11.902 aV²/Hz'
 
     processed = Quantity.all_from_si_fmt('0s', form='si')
@@ -463,7 +463,7 @@ def test_misc2():
     assert c.render() == '299.79 Mm/s'
     assert c.render(show_label=False) == '299.79 Mm/s'
     assert c.render(show_label=True) == 'c = 299.79 Mm/s'
-    assert c.render(show_label='f') == 'c = 299.79 Mm/s -- speed of light'
+    assert c.render(show_label='f') == 'c = 299.79 Mm/s — speed of light'
     assert c.render(show_label='a') == 'c = 299.79 Mm/s'
     Quantity.set_prefs(show_label=True)
     assert str(c) == 'c = 299.79 Mm/s'
@@ -472,19 +472,19 @@ def test_misc2():
     assert c.render() == 'c = 299.79 Mm/s'
     assert c.render(show_label=False) == '299.79 Mm/s'
     assert c.render(show_label=True) == 'c = 299.79 Mm/s'
-    assert c.render(show_label='f') == 'c = 299.79 Mm/s -- speed of light'
+    assert c.render(show_label='f') == 'c = 299.79 Mm/s — speed of light'
     assert c.render(show_label='a') == 'c = 299.79 Mm/s'
     Quantity.set_prefs(show_label='f')
-    assert str(c) == 'c = 299.79 Mm/s -- speed of light'
+    assert str(c) == 'c = 299.79 Mm/s — speed of light'
     assert '{:s}'.format(c) == '299.79 Mm/s'
-    assert '{:S}'.format(c) == 'c = 299.79 Mm/s -- speed of light'
-    assert c.render() == 'c = 299.79 Mm/s -- speed of light'
+    assert '{:S}'.format(c) == 'c = 299.79 Mm/s — speed of light'
+    assert c.render() == 'c = 299.79 Mm/s — speed of light'
     assert c.render(show_label=False) == '299.79 Mm/s'
-    assert c.render(show_label=True) == 'c = 299.79 Mm/s -- speed of light'
-    assert c.render(show_label='f') == 'c = 299.79 Mm/s -- speed of light'
+    assert c.render(show_label=True) == 'c = 299.79 Mm/s — speed of light'
+    assert c.render(show_label='f') == 'c = 299.79 Mm/s — speed of light'
     assert c.render(show_label='a') == 'c = 299.79 Mm/s'
 
-    Quantity.set_prefs(label_fmt='{n}: {v}', label_fmt_full='{n}: {v} -- {d}')
+    Quantity.set_prefs(label_fmt='{n}: {v}', label_fmt_full='{n}: {v} — {d}')
     Quantity.set_prefs(show_label=False, show_desc=False)
     assert str(c) == '299.79 Mm/s'
     assert '{:s}'.format(c) == '299.79 Mm/s'
@@ -492,7 +492,7 @@ def test_misc2():
     assert c.render() == '299.79 Mm/s'
     assert c.render(show_label=False) == '299.79 Mm/s'
     assert c.render(show_label=True) == 'c: 299.79 Mm/s'
-    assert c.render(show_label='f') == 'c: 299.79 Mm/s -- speed of light'
+    assert c.render(show_label='f') == 'c: 299.79 Mm/s — speed of light'
     assert c.render(show_label='a') == 'c: 299.79 Mm/s'
     Quantity.set_prefs(show_label=True)
     assert str(c) == 'c: 299.79 Mm/s'
@@ -501,16 +501,16 @@ def test_misc2():
     assert c.render() == 'c: 299.79 Mm/s'
     assert c.render(show_label=False) == '299.79 Mm/s'
     assert c.render(show_label=True) == 'c: 299.79 Mm/s'
-    assert c.render(show_label='f') == 'c: 299.79 Mm/s -- speed of light'
+    assert c.render(show_label='f') == 'c: 299.79 Mm/s — speed of light'
     assert c.render(show_label='a') == 'c: 299.79 Mm/s'
     Quantity.set_prefs(show_label='f')
-    assert str(c) == 'c: 299.79 Mm/s -- speed of light'
+    assert str(c) == 'c: 299.79 Mm/s — speed of light'
     assert '{:s}'.format(c) == '299.79 Mm/s'
-    assert '{:S}'.format(c) == 'c: 299.79 Mm/s -- speed of light'
-    assert c.render() == 'c: 299.79 Mm/s -- speed of light'
+    assert '{:S}'.format(c) == 'c: 299.79 Mm/s — speed of light'
+    assert c.render() == 'c: 299.79 Mm/s — speed of light'
     assert c.render(show_label=False) == '299.79 Mm/s'
-    assert c.render(show_label=True) == 'c: 299.79 Mm/s -- speed of light'
-    assert c.render(show_label='f') == 'c: 299.79 Mm/s -- speed of light'
+    assert c.render(show_label=True) == 'c: 299.79 Mm/s — speed of light'
+    assert c.render(show_label='f') == 'c: 299.79 Mm/s — speed of light'
     assert c.render(show_label='a') == 'c: 299.79 Mm/s'
 
     Quantity.set_prefs(label_fmt='{n}: {v}', label_fmt_full='{V} // {d}')
