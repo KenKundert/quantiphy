@@ -22,7 +22,6 @@ setup(
     license = 'MIT',
     py_modules = 'quantiphy'.split(),
     install_requires = [],
-    tests_require = 'pytest inform rkm_codes parametrize_from_file voluptuous'.split(),
     python_requires = '>=3.5',
     zip_safe = True,
     keywords = keywords.split(),
