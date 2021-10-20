@@ -23,7 +23,8 @@ def test_quantiphy():
     Quantity.reset_prefs()
     rv = doctest.testfile('../quantiphy.py', optionflags=doctest.ELLIPSIS)
     assert rv.failed == 0
-    assert rv.attempted == 97
+    assert rv.attempted == 100
+        # this target should be undated when the number of doctests change
 
 def test_manual():
     if sys.version_info < (3, 6):

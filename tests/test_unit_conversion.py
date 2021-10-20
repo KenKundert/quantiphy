@@ -283,10 +283,10 @@ def test_add():
     except TypeError:
         assert True
 
-def test_coversion():
+def test_linear_conversion():
     Quantity.reset_prefs()
     conversion = UnitConversion('USD', 'BTC', 100000)
-    assert str(conversion) == 'USD = 100000*BTC'
+    assert str(conversion) == 'USD 〜 100000*BTC'
 
     result = conversion.convert(1, 'BTC', 'USD')
     assert str(result) == '100 kUSD'
@@ -316,8 +316,10 @@ def test_coversion():
     dollar = conversion.convert(bitcoin)
     assert str(dollar) == '200 kUSD'
 
+
+def test_affine_conversion():
     conversion = UnitConversion('F', 'C', 1.8, 32)
-    assert str(conversion) == 'F = 1.8*C + 32'
+    assert str(conversion) == 'F 〜 1.8*C + 32'
 
     result = conversion.convert(0, 'C', 'F')
     assert str(result) == '32 F'
@@ -347,7 +349,7 @@ def test_coversion():
     assert isinstance(exception.value, KeyError)
     assert exception.value.args == ('X',)
 
-def test_func():
+def test_func_converters():
     Quantity.reset_prefs()
 
     def from_dB(value):
@@ -357,12 +359,12 @@ def test_func():
         return 20*math.log10(value)
 
     vconverter = UnitConversion('V', 'dBV', from_dB, to_dB)
-    assert str(vconverter) == 'V = from_dB(dBV), dBV = to_dB(V)'
+    assert str(vconverter) == 'V 〜 from_dB(dBV), dBV 〜 to_dB(V)'
     assert str(vconverter.convert(Quantity('100mV'))) == '-20 dBV'
     assert str(vconverter.convert(Quantity('-20dBV'))) == '100 mV'
 
     aconverter = UnitConversion('A', 'dBA', from_dB, to_dB)
-    assert str(aconverter) == 'A = from_dB(dBA), dBA = to_dB(A)'
+    assert str(aconverter) == 'A 〜 from_dB(dBA), dBA 〜 to_dB(A)'
     assert str(aconverter.convert(Quantity('100mA'))) == '-20 dBA'
     assert str(aconverter.convert(Quantity('-20dBA'))) == '100 mA'
 

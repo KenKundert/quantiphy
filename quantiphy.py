@@ -59,7 +59,7 @@ def _named_regex(name, regex):
 def _scale(scale, number, units):
     if isinstance(scale, str):
         # if scale is string, it contains the units to convert from
-        number = convert_units(scale, units, number)
+        number = _convert_units(scale, units, number)
         units = scale
     else:
         try:
@@ -234,8 +234,11 @@ class IncompatiblePreferences(QuantiPhyError, ValueError):
 _unit_conversions = {}
 
 
-# convert_units() {{{2
-def convert_units(to_units, from_units, value):
+# _convert_units() {{{2
+def _convert_units(to_units, from_units, value):
+    # not intended to be used by the user; if you want this functionality,
+    # simply use: Quantity(value, from_units).scale(to_units).
+
     if to_units == from_units:
         return value
     try:
@@ -314,7 +317,7 @@ class UnitConversion(object):
     you can convert it to a string to get a summary of the conversion::
 
         >>> print(str(m2pc))
-        m = 3.0857e+16*pc
+        m 〜 3.0857e+16*pc
 
     The act of creating this unit conversion establishes a conversion between
     meters (m) and parsecs (parsec, pc) that is accessible when creating or
@@ -338,7 +341,7 @@ class UnitConversion(object):
 
         >>> conversion = UnitConversion('F', 'C', 1.8, 32)
         >>> print(str(conversion))
-        F = 1.8*C + 32
+        F 〜 1.8*C + 32
 
     You can also use functions to perform the conversions, which is appropriate
     when the conversion is nonlinear (cannot be described with a slope and
@@ -354,7 +357,12 @@ class UnitConversion(object):
         ...     return 20*log10(value)
 
         >>> converter = UnitConversion('V', 'dBV', from_dB, to_dB)
+        >>> print(str(converter))
+        V 〜 from_dB(dBV), dBV 〜 to_dB(V)
+
         >>> converter = UnitConversion('A', 'dBA', from_dB, to_dB)
+        >>> print(str(converter))
+        A 〜 from_dB(dBA), dBA 〜 to_dB(A)
 
         >>> print('{:pdBV}, {:pdBV}'.format(Quantity('100mV'), Quantity('10V')))
         -20 dBV, 20 dBV
@@ -376,6 +384,7 @@ class UnitConversion(object):
         self.from_units = from_units.split() if isinstance(from_units, str) else from_units
         self.slope = slope
         self.intercept = intercept
+
         if callable(slope) or callable(intercept):
             # the slope and intercept arguments are actually the forward and
             # reverse conversion functions.
@@ -450,6 +459,9 @@ class UnitConversion(object):
 
         Example::
 
+            >>> print(str(m2pc))
+            m 〜 3.0857e+16*pc
+
             >>> m = m2pc.convert()
             >>> print(str(m))
             30.857e15 m
@@ -509,16 +521,16 @@ class UnitConversion(object):
     def __str__(self):
         if callable(self.slope) or callable(self.intercept):
             # using functions to do the conversion, have no good description
-            return '{} = {}({}), {} = {}({})'.format(
+            return '{} 〜 {}({}), {} 〜 {}({})'.format(
                 self.to_units[0], self.slope.__name__, self.from_units[0],
                 self.from_units[0], self.intercept.__name__, self.to_units[0]
             )
         if self.intercept:
-            return '{} = {}*{} + {}'.format(
+            return '{} 〜 {}*{} + {}'.format(
                 self.to_units[0], self.slope, self.from_units[0],
                 Quantity(self.intercept, self.to_units[0]).render(show_units=False)
             )
-        return '{} = {}*{}'.format(
+        return '{} 〜 {}*{}'.format(
             self.to_units[0], self.slope, self.from_units[0]
         )
 
