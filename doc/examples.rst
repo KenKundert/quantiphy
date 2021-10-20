@@ -347,9 +347,9 @@ satisfy the testing framework that tests the code found in this documentation;
 normally the return value is discarded.
 
 Another example of using *QuantiPhy* to implement casual time units is the 
-*remind* script, which notifies you as reminder after the specified amount of 
-time has past. You can find `remind <https://github.com/KenKundert/remind>`_ on 
-GitHub.
+*remind* script, which reminds you to do something after a specified amount of 
+time has passed. You can find `remind <https://github.com/KenKundert/remind>`_ 
+on GitHub.
 
 .. hide the following
 
