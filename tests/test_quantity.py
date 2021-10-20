@@ -1,6 +1,6 @@
 # encoding: utf8
 
-from parametrize_from_file import parametrize_from_file, Namespace
+from parametrize_from_file import parametrize, Namespace
 import pytest
 from functools import partial
 from voluptuous import Schema, Optional, Required
@@ -11,10 +11,7 @@ Quantity.reset_prefs()
 def name_from_dict_keys(cases):
     return [{**v, 'name': k} for k,v in cases.items()]
 
-parametrize_from_file = partial(
-    parametrize_from_file,
-    preprocess = name_from_dict_keys
-)
+parametrize_from_file = partial(parametrize, preprocess=name_from_dict_keys)
 
 with_quantiphy = Namespace('from quantiphy import Quantity')
 

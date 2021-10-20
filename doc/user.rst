@@ -2124,7 +2124,7 @@ determine if they are close.
 
 :meth:`Quantity.is_close()` returns true if the units match and if:
 
-| abs(*a* - *b*) <= max(reltol * max(abs(*a*), abs(*b*)), abstol)
+|     abs(*a* - *b*) <= max(reltol * max(abs(*a*), abs(*b*)), abstol)
 
 where *a* and *b* represent *other* and the numeric value of the underlying 
 quantity.
