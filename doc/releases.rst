@@ -8,6 +8,9 @@ Latest development release
 | Version: 2.15.1
 | Released: 2021-08-30
 
+
+2.16 (2021-12-14)
+-----------------
 - Add support for — as comment character and make it the default.
 
 
