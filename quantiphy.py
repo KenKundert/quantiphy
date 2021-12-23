@@ -57,6 +57,13 @@ def _named_regex(name, regex):
 
 # _scale {{{2
 def _scale(scale, number, units):
+    # allow subclasss of Quantity that has units to be the scale
+    try:
+        if issubclass(scale, Quantity):
+            scale = scale.units
+    except TypeError:
+        pass
+
     if isinstance(scale, str):
         # if scale is string, it contains the units to convert from
         number = _convert_units(scale, units, number)
@@ -228,345 +235,6 @@ class IncompatiblePreferences(QuantiPhyError, ValueError):
     """
     Two preferences are not compatible
     """
-
-
-# Unit Conversions {{{1
-_unit_conversions = {}
-
-
-# _convert_units() {{{2
-def _convert_units(to_units, from_units, value):
-    # not intended to be used by the user; if you want this functionality,
-    # simply use: Quantity(value, from_units).scale(to_units).
-
-    if to_units == from_units:
-        return value
-    try:
-        return _unit_conversions[(to_units, from_units)](value)
-    except KeyError:
-        raise UnknownConversion(to_units, from_units)
-
-
-# UnitConversion class {{{2
-class UnitConversion(object):
-    """
-    Creates a unit converter.
-
-    Just the creation of the converter is sufficient to make it available to
-    :class:`Quantity` (the :class:`UnitConversion` object itself is normally
-    discarded). Once created, it is automatically employed by :class:`Quantity`
-    when a conversion is requested with the given units. A forward conversion is
-    performed if the from and to units match, and a reversion conversion is
-    performed if they are swapped. A no-op conversion is performed when
-    converting one from-unit to another or from one to-unit to another.
-
-    :arg to_units:
-        A collection of units. If given as a single string it is split.
-    :type to_units: string or list of strings
-
-    :arg from_units:
-        A collection of units. If given as a single string it is split.
-    :type from_units: string or list of strings
-
-    :arg float slope:
-        Scale factor for conversion.  You may also pass a function as an
-        argument, in which case it is used to perform forward conversions.
-        In this case, *intercept* should also be passed a callable.
-
-    :arg float intercept:
-        Conversion offset.  You may also pass a function as an argument, in
-        which case it is used to perform reverse conversions.  In this case,
-        *slope* should also be passed a callable.
-
-    **Forward Conversion**:
-    The following conversion is applied if the given units are among the
-    *from_units* and the desired units are among the *to_units*:
-
-        *new_value* = *given_value* * *slope* + *intercept*
-
-    Or, if *slope* is callable:
-
-        *new_value* = *slope* (*given_value*)
-
-    In this case the name *slope* is misleading.
-
-    **Reverse Conversion**:
-    The following conversion is applied if the given units are among
-    the *to_units* and the desired units are among the *from_units*:
-
-        *new_value* = (*given_value* - *intercept*)/*slope*
-
-    Or, if *intercept* is callable:
-
-        *new_value* = *intercept* (*given_value*)
-
-    In this case the name *intercept* is misleading.
-
-    **No-Op Conversion**:
-    The following conversion is applied if the given and desired units are both
-    found among the from-units or are both found among the to-units.
-
-        *new_value* = *given_value*
-
-    Example::
-
-        >>> from quantiphy import Quantity, UnitConversion
-        >>> m2pc = UnitConversion('m', 'pc parsec', 3.0857e16)
-
-    Normally one simply discards the return value of UnitConversion, but if kept
-    you can convert it to a string to get a summary of the conversion::
-
-        >>> print(str(m2pc))
-        m 〜 3.0857e+16*pc
-
-    The act of creating this unit conversion establishes a conversion between
-    meters (m) and parsecs (parsec, pc) that is accessible when creating or
-    rendering quantities and can go both ways::
-
-        >>> d_sol = Quantity('5 μpc', scale='m')  # forward conversion
-        >>> print(d_sol)
-        154.28 Gm
-
-        >>> d_ac = Quantity(1.339848, units='pc') # reverse conversion
-        >>> print(d_ac.render(scale='m'))
-        41.344e15 m
-
-        >>> d_ac = Quantity(1.339848, units='pc') # no-op conversion
-        >>> print(f'{d_ac:qparsec}')
-        1.3398 parsec
-
-    The conversion can employ both a slope and an intercept, and if you convert
-    the converter object to a string, it summarizes the conversion, which can
-    help you avoid mistakes::
-
-        >>> conversion = UnitConversion('F', 'C', 1.8, 32)
-        >>> print(str(conversion))
-        F 〜 1.8*C + 32
-
-    You can also use functions to perform the conversions, which is appropriate
-    when the conversion is nonlinear (cannot be described with a slope and
-    intercept).  For example::
-
-        >>> from quantiphy import UnitConversion, Quantity
-        >>> from math import log10
-
-        >>> def from_dB(value):
-        ...     return 10**(value/20)
-
-        >>> def to_dB(value):
-        ...     return 20*log10(value)
-
-        >>> converter = UnitConversion('V', 'dBV', from_dB, to_dB)
-        >>> print(str(converter))
-        V 〜 from_dB(dBV), dBV 〜 to_dB(V)
-
-        >>> converter = UnitConversion('A', 'dBA', from_dB, to_dB)
-        >>> print(str(converter))
-        A 〜 from_dB(dBA), dBA 〜 to_dB(A)
-
-        >>> print('{:pdBV}, {:pdBV}'.format(Quantity('100mV'), Quantity('10V')))
-        -20 dBV, 20 dBV
-
-        >>> print('{:qV}, {:qV}'.format(Quantity('-20 dBV'), Quantity('20 dBV')))
-        100 mV, 10 V
-
-        >>> print('{:pdBA}, {:pdBA}'.format(Quantity('100mA'), Quantity('10A')))
-        -20 dBA, 20 dBA
-
-        >>> print('{:qA}, {:qA}'.format(Quantity('-20 dBA'), Quantity('20 dBA')))
-        100 mA, 10 A
-
-    """
-
-    # constructor {{{3
-    def __init__(self, to_units, from_units, slope=1, intercept=0):
-        self.to_units = to_units.split() if isinstance(to_units, str) else to_units
-        self.from_units = from_units.split() if isinstance(from_units, str) else from_units
-        self.slope = slope
-        self.intercept = intercept
-
-        if callable(slope) or callable(intercept):
-            # the slope and intercept arguments are actually the forward and
-            # reverse conversion functions.
-            _forward = slope
-            _reverse = intercept
-        else:
-            _forward = self._forward
-            _reverse = self._reverse
-
-        # add to known unit conversion
-        for to in self.to_units:
-            for frm in self.from_units:
-                _unit_conversions[(to, frm)] = _forward
-                _unit_conversions[(frm, to)] = _reverse
-
-        # add no-op converters to allow a from-units to be converted to another
-        for u1 in self.from_units:
-            for u2 in self.from_units:
-                if u1 != u2:
-                    _unit_conversions[(u1, u2)] = self._no_op
-
-        # add no-op converters to allow a to-units to be converted to another
-        for u1 in self.to_units:
-            for u2 in self.to_units:
-                if u1 != u2:
-                    _unit_conversions[(u1, u2)] = self._no_op
-
-    # forward conversion {{{3
-    def _forward(self, value):
-        return value*self.slope + self.intercept
-
-    # reverse conversion {{{3
-    def _reverse(self, value):
-        return (value - self.intercept)/self.slope
-
-    # no conversion {{{3
-    def _no_op(self, value):
-        return value
-
-    # convert {{{3
-    def convert(self, value=1, from_units=None, to_units=None):
-        """Convert value to quantity with new units.
-
-        A convenience method. Normally it is not needed because once created, a
-        unit conversion becomes directly accessible to quantities and can be
-        used both when creating or rendering the quantity.
-
-        :arg value:
-            The value to convert. May be a real number or a quantity.
-            Alternately, may simply be a string, in which case it is taken to be
-            the from_units. If the value is not given it is taken to be 1.
-        :type arg: real or string or Quantity
-
-        :arg str from_units:
-            The units to convert from.
-            If not given, the class's first from_units are used.
-
-        :arg str to_units:
-            The units to convert to.
-            If not given, the class's first to_units are used.
-
-        If the from_units were found among the class's from_units, and the
-        to_units were found among the class's to_units, then a forward
-        conversion is performed.
-
-        If the from_units were found among the class's to_units, and the
-        to_units were found among the class's from_units, then a reverse
-        conversion is performed.
-
-        :raises UnknownConversion(QuantiPhyError, KeyError):
-            The given units are not supported by the underlying class.
-
-        Example::
-
-            >>> print(str(m2pc))
-            m 〜 3.0857e+16*pc
-
-            >>> m = m2pc.convert()
-            >>> print(str(m))
-            30.857e15 m
-
-            >>> pc = m2pc.convert(m)
-            >>> print(str(pc))
-            1 pc
-
-            >>> m = m2pc.convert(pc)
-            >>> print(str(m))
-            30.857e15 m
-
-            >>> m2pc.convert(30.857e15, 'm')
-            Quantity('1 pc')
-
-            >>> m2pc.convert(1000, 'pc')
-            Quantity('30.857e18 m')
-
-            >>> m2pc.convert('pc')
-            Quantity('30.857e15 m')
-
-        """
-        if isinstance(value, str):
-            if not from_units:
-                from_units = value
-            value = 1
-        if from_units is None:
-            try:
-                from_units = value.units
-            except AttributeError:
-                pass
-
-        if callable(self.slope) or callable(self.intercept):
-            # the slope and intercept arguments are actually the forward and
-            # reverse conversion functions.
-            _forward = self.slope
-            _reverse = self.intercept
-        else:
-            _forward = self._forward
-            _reverse = self._reverse
-
-        if to_units in self.to_units:
-            return Quantity(_forward(value), to_units)
-        if to_units in self.from_units:
-            return Quantity(_reverse(value), to_units)
-        if not from_units:
-            return Quantity(_forward(value), self.to_units[0])
-        if from_units in self.from_units:
-            return Quantity(_forward(value), self.to_units[0])
-        if from_units in self.to_units:
-            return Quantity(_reverse(value), self.from_units[0])
-        if to_units:
-            raise UnknownConversion(to_units, direction='to')
-        raise UnknownConversion(from_units, direction='from')
-
-    # __str__ {{{3
-    def __str__(self):
-        if callable(self.slope) or callable(self.intercept):
-            # using functions to do the conversion, have no good description
-            return '{} 〜 {}({}), {} 〜 {}({})'.format(
-                self.to_units[0], self.slope.__name__, self.from_units[0],
-                self.from_units[0], self.intercept.__name__, self.to_units[0]
-            )
-        if self.intercept:
-            return '{} 〜 {}*{} + {}'.format(
-                self.to_units[0], self.slope, self.from_units[0],
-                Quantity(self.intercept, self.to_units[0]).render(show_units=False)
-            )
-        return '{} 〜 {}*{}'.format(
-            self.to_units[0], self.slope, self.from_units[0]
-        )
-
-
-# Temperature conversions {{{2
-UnitConversion('C °C', 'C °C')
-UnitConversion('C °C', 'K', 1, -273.15)
-UnitConversion('C °C', 'F °F', 5/9, -32*5/9)
-UnitConversion('C °C', 'R °R', 5/9, -273.15)
-# UnitConversion('K', 'C °C', 1, 273.15) — redundant
-UnitConversion('K', 'F °F', 5/9, 273.15 - 32*5/9)
-UnitConversion('K', 'R °R', 5/9, 0)
-
-# Length/Distance conversions {{{2
-UnitConversion('m', 'km', 1000)
-UnitConversion('m', 'cm', 1/100)
-UnitConversion('m', 'mm', 1/1000)
-UnitConversion('m', 'um µm μm micron', 1/1000000)
-UnitConversion('m', 'nm', 1/1000000000)
-UnitConversion('m', 'Å angstrom', 1/10000000000)
-UnitConversion('m', 'mi mile miles', 1609.344)
-UnitConversion('m', 'ft feet', 0.3048)
-UnitConversion('m', 'in inch inches', 0.0254)
-
-# Mass conversions {{{2
-UnitConversion('g', 'lb lbs', 453.59237)
-UnitConversion('g', 'oz', 28.34952)
-
-# Time conversions {{{2
-UnitConversion('s', 'sec second seconds')
-UnitConversion('s', 'min minute minutes', 60)
-UnitConversion('s', 'hr hour hours', 3600)
-UnitConversion('s', 'day days', 86400)
-
-# Bit conversions {{{2
-UnitConversion('b', 'B', 8)
 
 
 # Constants {{{1
@@ -1994,9 +1662,14 @@ class Quantity(float):
               conversion, which is applied to create the new value.
             - If a quantity, the units are ignored and the scale is treated as
               if were specified as a unitless float.
+            - If a subclass of :class:`Quantity` that includes units, the units
+              are taken to the be desired units and the behavior is the same as
+              if a string were given, except that *cls* defaults to the given
+              subclass.
         :arg class cls:
             Class to use for return value. If not given, the class of self is
-            used.
+            used unless scale is a subclass of :class:`Quantity`, in which case
+            *scale* is used.
         :type scale: real, pair, function, string, or quantity
 
         :raises UnknownConversion(QuantiPhyError, KeyError):
@@ -2012,6 +1685,14 @@ class Quantity(float):
             212 °F
 
         """
+
+        # if subclasss of Quantity is passed as scale, use as cls if not given
+        try:
+            if issubclass(scale, Quantity) and not cls:
+                cls = scale
+        except TypeError:
+            pass
+
         number, units = _scale(scale, self.real, self.units)
         if not cls:
             cls = self.__class__
@@ -3300,3 +2981,357 @@ add_constant(
     alias='Z0',
     unit_systems='mks'
 )
+
+
+# Unit Conversions {{{1
+_unit_conversions = {}
+
+
+# _convert_units() {{{2
+def _convert_units(to_units, from_units, value):
+    # not intended to be used by the user; if you want this functionality,
+    # simply use: Quantity(value, from_units).scale(to_units).
+
+    if to_units == from_units:
+        return value
+    try:
+        return _unit_conversions[(to_units, from_units)](value)
+    except KeyError:
+        raise UnknownConversion(to_units, from_units)
+
+
+# UnitConversion class {{{2
+class UnitConversion(object):
+    """
+    Creates a unit converter.
+
+    Just the creation of the converter is sufficient to make it available to
+    :class:`Quantity` (the :class:`UnitConversion` object itself is normally
+    discarded). Once created, it is automatically employed by :class:`Quantity`
+    when a conversion is requested with the given units. A forward conversion is
+    performed if the from and to units match, and a reversion conversion is
+    performed if they are swapped. A no-op conversion is performed when
+    converting one from-unit to another or from one to-unit to another.
+
+    :arg to_units:
+        A collection of units. If given as a single string it is split.
+        May also be a subclass of :class:`Quantity` if units are defined.
+    :type to_units: string or list of strings
+
+    :arg from_units:
+        A collection of units. If given as a single string it is split.
+        May also be a subclass of :class:`Quantity` if units are defined.
+    :type from_units: string or list of strings
+
+    :arg float slope:
+        Scale factor for conversion.  You may also pass a function as an
+        argument, in which case it is used to perform forward conversions.
+        In this case, *intercept* should also be passed a callable.
+
+    :arg float intercept:
+        Conversion offset.  You may also pass a function as an argument, in
+        which case it is used to perform reverse conversions.  In this case,
+        *slope* should also be passed a callable.
+
+    **Forward Conversion**:
+    The following conversion is applied if the given units are among the
+    *from_units* and the desired units are among the *to_units*:
+
+        *new_value* = *given_value* * *slope* + *intercept*
+
+    Or, if *slope* is callable:
+
+        *new_value* = *slope* (*given_value*)
+
+    In this case the name *slope* is misleading.
+
+    **Reverse Conversion**:
+    The following conversion is applied if the given units are among
+    the *to_units* and the desired units are among the *from_units*:
+
+        *new_value* = (*given_value* - *intercept*)/*slope*
+
+    Or, if *intercept* is callable:
+
+        *new_value* = *intercept* (*given_value*)
+
+    In this case the name *intercept* is misleading.
+
+    **No-Op Conversion**:
+    The following conversion is applied if the given and desired units are both
+    found among the from-units or are both found among the to-units.
+
+        *new_value* = *given_value*
+
+    Example::
+
+        >>> from quantiphy import Quantity, UnitConversion
+        >>> m2pc = UnitConversion('m', 'pc parsec', 3.0857e16)
+
+    Normally one simply discards the return value of UnitConversion, but if kept
+    you can convert it to a string to get a summary of the conversion::
+
+        >>> print(str(m2pc))
+        m ← 3.0857e+16*pc
+
+    The act of creating this unit conversion establishes a conversion between
+    meters (m) and parsecs (parsec, pc) that is accessible when creating or
+    rendering quantities and can go both ways::
+
+        >>> d_sol = Quantity('5 μpc', scale='m')  # forward conversion
+        >>> print(d_sol)
+        154.28 Gm
+
+        >>> d_ac = Quantity(1.339848, units='pc') # reverse conversion
+        >>> print(d_ac.render(scale='m'))
+        41.344e15 m
+
+        >>> d_ac = Quantity(1.339848, units='pc') # no-op conversion
+        >>> print(f'{d_ac:qparsec}')
+        1.3398 parsec
+
+    The conversion can employ both a slope and an intercept, and if you convert
+    the converter object to a string, it summarizes the conversion, which can
+    help you avoid mistakes::
+
+        >>> conversion = UnitConversion('F', 'C', 1.8, 32)
+        >>> print(str(conversion))
+        F ← 1.8*C + 32
+
+    You can also use functions to perform the conversions, which is appropriate
+    when the conversion is nonlinear (cannot be described with a slope and
+    intercept).  For example::
+
+        >>> from quantiphy import UnitConversion, Quantity
+        >>> from math import log10
+
+        >>> def from_dB(value):
+        ...     return 10**(value/20)
+
+        >>> def to_dB(value):
+        ...     return 20*log10(value)
+
+        >>> converter = UnitConversion('V', 'dBV', from_dB, to_dB)
+        >>> print(str(converter))
+        V ← from_dB(dBV), dBV ← to_dB(V)
+
+        >>> converter = UnitConversion('A', 'dBA', from_dB, to_dB)
+        >>> print(str(converter))
+        A ← from_dB(dBA), dBA ← to_dB(A)
+
+        >>> print('{:pdBV}, {:pdBV}'.format(Quantity('100mV'), Quantity('10V')))
+        -20 dBV, 20 dBV
+
+        >>> print('{:qV}, {:qV}'.format(Quantity('-20 dBV'), Quantity('20 dBV')))
+        100 mV, 10 V
+
+        >>> print('{:pdBA}, {:pdBA}'.format(Quantity('100mA'), Quantity('10A')))
+        -20 dBA, 20 dBA
+
+        >>> print('{:qA}, {:qA}'.format(Quantity('-20 dBA'), Quantity('20 dBA')))
+        100 mA, 10 A
+
+    """
+
+    # constructor {{{3
+    def __init__(self, to_units, from_units, slope=1, intercept=0):
+        # convert units to lists
+        # allow units to be a subclasss of Quantity that has units
+        try:
+            if issubclass(to_units, Quantity):
+                self.to_units = [to_units.units]
+        except TypeError:
+            self.to_units = to_units.split() if isinstance(to_units, str) else to_units
+
+        try:
+            if issubclass(from_units, Quantity):
+                self.from_units = [from_units.units]
+        except TypeError:
+            self.from_units = from_units.split() if isinstance(from_units, str) else from_units
+
+        # convert units to lists and save values
+        self.slope = slope
+        self.intercept = intercept
+
+        if callable(slope) or callable(intercept):
+            # the slope and intercept arguments are actually the forward and
+            # reverse conversion functions.
+            _forward = slope
+            _reverse = intercept
+        else:
+            _forward = self._forward
+            _reverse = self._reverse
+
+        # add to known unit conversion
+        for to in self.to_units:
+            for frm in self.from_units:
+                _unit_conversions[(to, frm)] = _forward
+                _unit_conversions[(frm, to)] = _reverse
+
+        # add no-op converters to allow a from-units to be converted to another
+        for u1 in self.from_units:
+            for u2 in self.from_units:
+                if u1 != u2:
+                    _unit_conversions[(u1, u2)] = self._no_op
+
+        # add no-op converters to allow a to-units to be converted to another
+        for u1 in self.to_units:
+            for u2 in self.to_units:
+                if u1 != u2:
+                    _unit_conversions[(u1, u2)] = self._no_op
+
+    # forward conversion {{{3
+    def _forward(self, value):
+        return value*self.slope + self.intercept
+
+    # reverse conversion {{{3
+    def _reverse(self, value):
+        return (value - self.intercept)/self.slope
+
+    # no conversion {{{3
+    def _no_op(self, value):
+        return value
+
+    # convert {{{3
+    def convert(self, value=1, from_units=None, to_units=None):
+        """Convert value to quantity with new units.
+
+        A convenience method. Normally it is not needed because once created, a
+        unit conversion becomes directly accessible to quantities and can be
+        used both when creating or rendering the quantity.
+
+        :arg value:
+            The value to convert. May be a real number or a quantity.
+            Alternately, may simply be a string, in which case it is taken to be
+            the from_units. If the value is not given it is taken to be 1.
+        :type arg: real or string or Quantity
+
+        :arg str from_units:
+            The units to convert from.
+            If not given, the class's first from_units are used.
+
+        :arg str to_units:
+            The units to convert to.
+            If not given, the class's first to_units are used.
+
+        If the from_units were found among the class's from_units, and the
+        to_units were found among the class's to_units, then a forward
+        conversion is performed.
+
+        If the from_units were found among the class's to_units, and the
+        to_units were found among the class's from_units, then a reverse
+        conversion is performed.
+
+        :raises UnknownConversion(QuantiPhyError, KeyError):
+            The given units are not supported by the underlying class.
+
+        Example::
+
+            >>> print(str(m2pc))
+            m ← 3.0857e+16*pc
+
+            >>> m = m2pc.convert()
+            >>> print(str(m))
+            30.857e15 m
+
+            >>> pc = m2pc.convert(m)
+            >>> print(str(pc))
+            1 pc
+
+            >>> m = m2pc.convert(pc)
+            >>> print(str(m))
+            30.857e15 m
+
+            >>> m2pc.convert(30.857e15, 'm')
+            Quantity('1 pc')
+
+            >>> m2pc.convert(1000, 'pc')
+            Quantity('30.857e18 m')
+
+            >>> m2pc.convert('pc')
+            Quantity('30.857e15 m')
+
+        """
+        if isinstance(value, str):
+            if not from_units:
+                from_units = value
+            value = 1
+        if from_units is None:
+            try:
+                from_units = value.units
+            except AttributeError:
+                pass
+
+        if callable(self.slope) or callable(self.intercept):
+            # the slope and intercept arguments are actually the forward and
+            # reverse conversion functions.
+            _forward = self.slope
+            _reverse = self.intercept
+        else:
+            _forward = self._forward
+            _reverse = self._reverse
+
+        if to_units in self.to_units:
+            return Quantity(_forward(value), to_units)
+        if to_units in self.from_units:
+            return Quantity(_reverse(value), to_units)
+        if not from_units:
+            return Quantity(_forward(value), self.to_units[0])
+        if from_units in self.from_units:
+            return Quantity(_forward(value), self.to_units[0])
+        if from_units in self.to_units:
+            return Quantity(_reverse(value), self.from_units[0])
+        if to_units:
+            raise UnknownConversion(to_units, direction='to')
+        raise UnknownConversion(from_units, direction='from')
+
+    # __str__ {{{3
+    def __str__(self):
+        if callable(self.slope) or callable(self.intercept):
+            # using functions to do the conversion, have no good description
+            return '{} ← {}({}), {} ← {}({})'.format(
+                self.to_units[0], self.slope.__name__, self.from_units[0],
+                self.from_units[0], self.intercept.__name__, self.to_units[0]
+            )
+        if self.intercept:
+            return '{} ← {}*{} + {}'.format(
+                self.to_units[0], self.slope, self.from_units[0],
+                Quantity(self.intercept, self.to_units[0]).render(show_units=False)
+            )
+        return '{} ← {}*{}'.format(
+            self.to_units[0], self.slope, self.from_units[0]
+        )
+
+
+# Temperature conversions {{{2
+UnitConversion('C °C', 'C °C')
+UnitConversion('C °C', 'K', 1, -273.15)
+UnitConversion('C °C', 'F °F', 5/9, -32*5/9)
+UnitConversion('C °C', 'R °R', 5/9, -273.15)
+# UnitConversion('K', 'C °C', 1, 273.15) — redundant
+UnitConversion('K', 'F °F', 5/9, 273.15 - 32*5/9)
+UnitConversion('K', 'R °R', 5/9, 0)
+
+# Length/Distance conversions {{{2
+UnitConversion('m', 'km', 1000)
+UnitConversion('m', 'cm', 1/100)
+UnitConversion('m', 'mm', 1/1000)
+UnitConversion('m', 'um µm μm micron', 1/1000000)
+UnitConversion('m', 'nm', 1/1000000000)
+UnitConversion('m', 'Å angstrom', 1/10000000000)
+UnitConversion('m', 'mi mile miles', 1609.344)
+UnitConversion('m', 'ft feet', 0.3048)
+UnitConversion('m', 'in inch inches', 0.0254)
+
+# Mass conversions {{{2
+UnitConversion('g', 'lb lbs', 453.59237)
+UnitConversion('g', 'oz', 28.34952)
+
+# Time conversions {{{2
+UnitConversion('s', 'sec second seconds')
+UnitConversion('s', 'min minute minutes', 60)
+UnitConversion('s', 'hr hour hours', 3600)
+UnitConversion('s', 'day days', 86400)
+
+# Bit conversions {{{2
+UnitConversion('b', 'B', 8)

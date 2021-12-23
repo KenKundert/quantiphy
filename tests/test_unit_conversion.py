@@ -286,7 +286,7 @@ def test_add():
 def test_linear_conversion():
     Quantity.reset_prefs()
     conversion = UnitConversion('USD', 'BTC', 100000)
-    assert str(conversion) == 'USD 〜 100000*BTC'
+    assert str(conversion) == 'USD ← 100000*BTC'
 
     result = conversion.convert(1, 'BTC', 'USD')
     assert str(result) == '100 kUSD'
@@ -319,7 +319,7 @@ def test_linear_conversion():
 
 def test_affine_conversion():
     conversion = UnitConversion('F', 'C', 1.8, 32)
-    assert str(conversion) == 'F 〜 1.8*C + 32'
+    assert str(conversion) == 'F ← 1.8*C + 32'
 
     result = conversion.convert(0, 'C', 'F')
     assert str(result) == '32 F'
@@ -359,12 +359,12 @@ def test_func_converters():
         return 20*math.log10(value)
 
     vconverter = UnitConversion('V', 'dBV', from_dB, to_dB)
-    assert str(vconverter) == 'V 〜 from_dB(dBV), dBV 〜 to_dB(V)'
+    assert str(vconverter) == 'V ← from_dB(dBV), dBV ← to_dB(V)'
     assert str(vconverter.convert(Quantity('100mV'))) == '-20 dBV'
     assert str(vconverter.convert(Quantity('-20dBV'))) == '100 mV'
 
     aconverter = UnitConversion('A', 'dBA', from_dB, to_dB)
-    assert str(aconverter) == 'A 〜 from_dB(dBA), dBA 〜 to_dB(A)'
+    assert str(aconverter) == 'A ← from_dB(dBA), dBA ← to_dB(A)'
     assert str(aconverter.convert(Quantity('100mA'))) == '-20 dBA'
     assert str(aconverter.convert(Quantity('-20dBA'))) == '100 mA'
 
@@ -377,6 +377,31 @@ def test_func_converters():
     assert '{:pdBA}'.format(Quantity('10A')) == '20 dBA'
     assert '{:pA}'.format(Quantity('-20 dBA')) == '0.1 A'
     assert '{:pA}'.format(Quantity('20 dBA')) == '10 A'
+
+
+def test_subclass_conversion():
+    Quantity.reset_prefs()
+
+    class Bitcoin(Quantity):
+        units = 'BTC'
+        form = 'fixed'
+        prec = 2
+        show_commas = True
+
+    class Satoshi(Quantity):
+        units = 'sat'
+        form = 'fixed'
+        prec = 3
+        show_commas = True
+
+    conversion = UnitConversion(Bitcoin, Satoshi, 1e-8)
+    assert str(conversion) == 'BTC ← 1e-08*sat'
+
+    result = conversion.convert(1, 'BTC', 'sat')
+    assert str(result) == '100 Msat'
+
+    result = conversion.convert(1, 'sat', 'BTC')
+    assert str(result) == '10 nBTC'
 
 
 if __name__ == '__main__':

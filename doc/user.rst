@@ -599,7 +599,7 @@ a sanity check:
 .. code-block:: python
 
     >>> print(str(m2pc))
-    m 〜 3.0857e+16*pc
+    m ← 3.0857e+16*pc
 
 In addition, you can use it to directly perform conversions:
 

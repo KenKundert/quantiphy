@@ -3,7 +3,7 @@
 from textwrap import dedent
 import pytest
 from quantiphy import (
-    Quantity, add_constant,
+    Quantity, UnitConversion, add_constant,
     QuantiPhyError, IncompatibleUnits, UnknownPreference, UnknownConversion,
     UnknownUnitSystem, InvalidRecognizer, UnknownFormatKey, UnknownScaleFactor,
     InvalidNumber, ExpectedQuantity, MissingName,
@@ -804,6 +804,12 @@ def test_scale():
         minus = Quantity.minus_sign
         strip_zeros = False
 
+    class Cents(Dollars):
+        units = '¢'
+        prec = 0
+
+    print(UnitConversion(Dollars, Cents, 0.01))
+
     total = Dollars(1)
     assert str(total) == '$1.00'
     total = total.scale(1000000)
@@ -812,12 +818,16 @@ def test_scale():
     class WholeDollars(Dollars):
         prec = 0
 
-    total = WholeDollars(1)
-    assert str(total) == '$1'
+    total = WholeDollars(20)
+    assert str(total) == '$20'
     total = total.scale(1000000)
-    assert str(total) == '$1,000,000'
+    assert str(total) == '$20,000,000'
     total = total.scale(5, Dollars)
-    assert str(total) == '$5,000,000.00'
+    assert str(total) == '$100,000,000.00'
+
+    total = total.scale(Cents)
+    assert str(total) == '10,000,000,000 ¢'
+    assert type(total) == Cents
 
 def test_negligible():
     Quantity.reset_prefs()

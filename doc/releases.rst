@@ -8,6 +8,7 @@ Latest development release
 | Version: 2.16.0
 | Released: 2021-12-14
 
+- Allow :class:`Quantity` subclasses to be used in scaling if they have units.
 
 2.16 (2021-12-14)
 -----------------
