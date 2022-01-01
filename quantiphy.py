@@ -22,7 +22,7 @@ Documentation can be found at https://quantiphy.readthedocs.io.
 """
 
 # MIT License {{{1
-# Copyright (C) 2016-2021 Kenneth S. Kundert
+# Copyright (C) 2016-2022 Kenneth S. Kundert
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
