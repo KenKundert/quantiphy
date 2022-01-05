@@ -8,7 +8,10 @@ Latest development release
 | Version: 2.16.1
 | Released: 2021-12-23
 
+- Refine the list of currency symbols.
+- Allows currency symbols to be given before or after the underlying number.
 - Allow :class:`Quantity` subclasses to be used in scaling if they have units.
+
 
 2.16 (2021-12-14)
 -----------------

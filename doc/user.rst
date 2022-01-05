@@ -546,7 +546,7 @@ QuantiPhy* provides a collection of pre-defined converters for common units:
 
 ====== ================================================================
 K:     K, F °F, R °R
-C, °C: K, C °C, F °F, R °R
+C °C:  K, C °C, F °F, R °R
 m:     km, m, cm, mm, um μm micron, nm, Å angstrom, mi mile miles,
        in inch inches
 g:     oz, lb lbs

@@ -1,6 +1,6 @@
 test_number_recognition:
 
-    # some simple cases
+    # some simple cases {{{1
     grange:
         given: q = Quantity(0)
         tests:
@@ -111,7 +111,7 @@ test_number_recognition:
                 evaluate: str(q)
                 expected: '2 s'
 
-    # test all the scale factors
+    # test all the scale factors {{{1
     quill:
         given: q = Quantity('1ys')
         tests:
@@ -323,7 +323,7 @@ test_number_recognition:
                 expected: '1e24 s'
 
 
-    # test zero
+    # test zero {{{1
     nickel:
         given: q = Quantity('0ns')
         tests:
@@ -549,7 +549,7 @@ test_number_recognition:
                 expected: '0 s'
 
 
-    # test various forms of the mantissa when using scale factors
+    # test various forms of the mantissa when using scale factors {{{1
     delicacy:
         given: q = Quantity('1ns')
         tests:
@@ -831,7 +831,7 @@ test_number_recognition:
                 expected: '100 ns'
 
 
-    # test various forms of the mantissa when using exponents
+    # test various forms of the mantissa when using exponents {{{1
     hairpiece:
         given: q = Quantity('1e-9s')
         tests:
@@ -1103,7 +1103,7 @@ test_number_recognition:
                 expected: '-100 ps'
 
 
-    # test various forms of the mantissa alone
+    # test various forms of the mantissa alone {{{1
     educate:
         given: q = Quantity('100000.0s')
         tests:
@@ -1325,7 +1325,7 @@ test_number_recognition:
                 expected: '10 us'
 
 
-    # test various forms of units
+    # test various forms of units {{{1
     impute:
         given: q = Quantity('1nΩ')
         tests:
@@ -1575,7 +1575,7 @@ test_number_recognition:
                 expected: '1 nm·s⁻²'
 
 
-    # test currency
+    # test currency {{{1
     bishop:
         given: q = Quantity('$10K')
         tests:
@@ -1817,8 +1817,68 @@ test_number_recognition:
                 evaluate: q.fixed(prec=2, strip_zeros=True, strip_radix=True)
                 expected: '$100'
 
+    retina:
+        given: q = Quantity('Ƀ1.4')
+        tests:
+            tendon:
+                evaluate: q.as_tuple()
+                expected: (1.4, 'Ƀ')
+            recover:
+                evaluate: str(q)
+                expected: 'Ƀ1.4'
 
-    # test unusual numbers
+    curly:
+        given: q = Quantity('₿1.4')
+        tests:
+            tendon:
+                evaluate: q.as_tuple()
+                expected: (1.4, '₿')
+            recover:
+                evaluate: str(q)
+                expected: '₿1.4'
+
+    blaze:
+        given: q = Quantity('1.4 ș')
+        tests:
+            tendon:
+                evaluate: q.as_tuple()
+                expected: (1.4, 'ș')
+            recover:
+                evaluate: str(q)
+                expected: '1.4 ș'
+
+    splendor:
+        given: q = Quantity('1.4 ¢')
+        tests:
+            tendon:
+                evaluate: q.as_tuple()
+                expected: (1.4, '¢')
+            recover:
+                evaluate: str(q)
+                expected: '1.4 ¢'
+
+    brassy:
+        given: q = Quantity('1.4Ƀ')
+        tests:
+            tendon:
+                evaluate: q.as_tuple()
+                expected: (1.4, 'Ƀ')
+            recover:
+                evaluate: str(q)
+                expected: 'Ƀ1.4'
+
+    backlog:
+        given: q = Quantity('1.4 ₿')
+        tests:
+            tendon:
+                evaluate: q.as_tuple()
+                expected: (1.4, '₿')
+            recover:
+                evaluate: str(q)
+                expected: '₿1.4'
+
+
+    # test unusual numbers {{{1
     sheathe:
         given: q = Quantity('inf')
         tests:
@@ -2244,7 +2304,7 @@ test_number_recognition:
                 expected: '$100M'
 
 
-    # test full precision
+    # test full precision {{{1
     fiery:
         given: q = Quantity('3.14159265ns')
         tests:
@@ -2526,7 +2586,7 @@ test_number_recognition:
                 expected: '31.415926500 fs'
 
 
-    # test preferences
+    # test preferences {{{1
     chestnut:
         given: q = Quantity('1 ns')
         tests:
@@ -2961,7 +3021,7 @@ test_number_recognition:
                 expected: '−4.7 kΩ'
 
 
-    # test constants
+    # test constants {{{1
     neuron:
         given: q = Quantity('h')
         tests:
@@ -3343,7 +3403,7 @@ test_number_recognition:
                 evaluate: f'{q:S}'
                 expected: "Z₀ = 376.73 Ohms"
 
-    # test scaling
+    # test scaling {{{1
     segregate:
         given: q = Quantity(2, scale=(1000, 'g'))
         tests:

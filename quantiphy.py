@@ -428,12 +428,12 @@ SMALL_SCALE_FACTORS = 'munpfazy'
     # These must be given in order, one for every three decades.
 
 # Supported currency symbols (these go on left side of number)
-CURRENCY_SYMBOLS = '$€¥£₩₺₽₹ɃΞȄ'
+CURRENCY_SYMBOLS = '$€¥£₩₺₽₹Ƀ₿Ξ'
 
 # Unit symbols that are not simple letters.
 # Do not include % as it will be picked up when converting text to numbers,
 # which is generally not desired (you would end up converting 0.001% to 1m%).
-UNIT_SYMBOLS = '°ÅΩƱΩ℧'
+UNIT_SYMBOLS = '°ÅΩƱΩ℧¢$€¥£₩₺₽₹Ƀ₿șΞ'
 
 # Regular expression for recognizing and decomposing string .format method codes
 FORMAT_SPEC = re.compile(r'''\A
@@ -446,7 +446,7 @@ FORMAT_SPEC = re.compile(r'''\A
         ([qpPQrRbBusSeEfFgGdn])         # format
         ([a-zA-Z%{us}{cs}][-^/()\w]*)?  # units
     )?
-\Z'''.format(cs=CURRENCY_SYMBOLS, us=UNIT_SYMBOLS), re.VERBOSE)
+\Z'''.format(cs=re.escape(CURRENCY_SYMBOLS), us=re.escape(UNIT_SYMBOLS)), re.VERBOSE)
 
 # Defaults {{{1
 DEFAULTS = dict(
@@ -1244,8 +1244,8 @@ class Quantity(float):
         currency = _named_regex('currency', '[%s]' % CURRENCY_SYMBOLS)
         units = _named_regex(
             r'units', r'(?:[a-zA-Z%√{us}{cur}][-^/()\w·⁻⁰¹²³⁴⁵⁶⁷⁸⁹√{us}{cur}]*)?'.format(
-                us = UNIT_SYMBOLS,
-                cur = CURRENCY_SYMBOLS,
+                us = re.escape(UNIT_SYMBOLS),
+                cur = re.escape(CURRENCY_SYMBOLS),
             )
             # examples: Ohms, V/A, J-s, m/s^2, H/(m-s), Ω, %, m·s⁻², V/√Hz
             # leading char must be letter to avoid 1.0E-9s -> (1e18, '-9s')
@@ -1391,10 +1391,10 @@ class Quantity(float):
         ]
 
         # numbers embedded in text {{{3
-        smpl_units = '[a-zA-Z_{us}]*'.format(us=UNIT_SYMBOLS)
+        smpl_units = '[a-zA-Z_{us}]*'.format(us=re.escape(UNIT_SYMBOLS))
             # may only contain alphabetic characters, ex: V, A, _Ohms, etc.
             # or obvious unicode units, ex: °ÅΩƱ
-        sf_or_units = '[a-zA-Z_µ{us}]+'.format(us=UNIT_SYMBOLS)
+        sf_or_units = '[a-zA-Z_µ{us}]+'.format(us=re.escape(UNIT_SYMBOLS))
             # must match units or scale factors: add µ, make non-optional
         space = '[   ]?'  # optional non-breaking space (do not use a normal space)
         left_delimit = r'(?:\A|(?<=[^a-zA-Z0-9_.]))'
