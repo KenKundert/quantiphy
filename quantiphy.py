@@ -361,8 +361,8 @@ def add_constant(value, alias=None, unit_systems=None):
 
 
 # Globals {{{1
-__version__ = '2.16.1'
-__released__ = '2021-12-23'
+__version__ = '2.17.0'
+__released__ = '2022-01-04'
 __all__ = '''
     QuantiPhyError
     ExpectedQuantity
