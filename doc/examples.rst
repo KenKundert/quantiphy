@@ -799,6 +799,7 @@ like the following:
 
 ..  image:: flicker.svg
 
+
 .. cryptocurrency example {{{1
 .. _quantiphy cryptocurrency example:
 

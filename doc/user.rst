@@ -544,15 +544,16 @@ consistent units.  For example:
 
 QuantiPhy* provides a collection of pre-defined converters for common units:
 
-====== ================================================================
-K:     K, F °F, R °R
-C °C:  K, C °C, F °F, R °R
-m:     km, m, cm, mm, um μm micron, nm, Å angstrom, mi mile miles,
-       in inch inches
-g:     oz, lb lbs
-s:     sec second seconds, min minute minutes, hour hours hr, day days
-b:     B
-====== ================================================================
+=========== ================================================================
+C °C        K, F °F, R °R
+K           C °C, F °F, R °R
+m           km, m, cm, mm, um μm micron, nm, Å angstrom, mi mile miles,
+            in inch inches
+g           kg, mg, ug μg, ng, oz, lb lbs
+s           sec second seconds, min minute minutes, hour hours hr, day days
+b           B
+BTC btc Ƀ ₿ sat sats ș
+=========== ================================================================
 
 The conversions can occur between a pair of units, one from the first column and 
 one from the second. They do not occur when both units are only in the second 

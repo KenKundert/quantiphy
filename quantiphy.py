@@ -3304,7 +3304,6 @@ class UnitConversion(object):
 
 
 # Temperature conversions {{{2
-UnitConversion('C °C', 'C °C')
 UnitConversion('C °C', 'K', 1, -273.15)
 UnitConversion('C °C', 'F °F', 5/9, -32*5/9)
 UnitConversion('C °C', 'R °R', 5/9, -273.15)
@@ -3326,6 +3325,10 @@ UnitConversion('m', 'in inch inches', 0.0254)
 # Mass conversions {{{2
 UnitConversion('g', 'lb lbs', 453.59237)
 UnitConversion('g', 'oz', 28.34952)
+UnitConversion('g', 'kg', 1000)
+UnitConversion('g', 'mg', 1/1000)
+UnitConversion('g', 'ug µg μg', 1/1000000)
+UnitConversion('g', 'ng', 1/1000000000)
 
 # Time conversions {{{2
 UnitConversion('s', 'sec second seconds')
@@ -3335,3 +3338,6 @@ UnitConversion('s', 'day days', 86400)
 
 # Bit conversions {{{2
 UnitConversion('b', 'B', 8)
+
+# Bitcoin conversions {{{2
+UnitConversion(['sat', 'sats', 'ș'], ['BTC', 'btc', 'Ƀ', '₿'], 1e8)
