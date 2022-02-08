@@ -44,9 +44,9 @@ science and engineering. SI scale factors make it possible to cleanly represent
 both very large and very small quantities in a form that is both easy to read 
 and write.  While generally better for humans, no general programming language 
 provides direct support for reading or writing quantities with SI scale factors, 
-making it difficult to write software that communicates effectively with humans.  
-*QuantiPhy* addresses this deficiency, making it natural and simple to both 
-input and output physical quantities.
+making it difficult to write numerical software that communicates effectively 
+with people.  *QuantiPhy* addresses this deficiency, making it natural and 
+simple to both input and output physical quantities.
 
 
 Features
@@ -72,13 +72,21 @@ quantities (`alternatives <https://kdavies4.github.io/natu/seealso.html>`_).
 However, as a rule, they focus on the units rather than the scale factors. In 
 particular, they build a system of units that you are expected to use throughout 
 your calculations.  These packages demand a high level of commitment from their 
-users and in turn provide unit consistency and built-in unit conversions.  In 
-contrast, *QuantiPhy* treats units basically as documentation.  They are simply 
-strings that are attached to quantities largely so they can be presented to the 
-user when the values are printed. As such, *QuantiPhy* is a light-weight package 
-that demands little from the user. It is used when inputting and outputting 
-values, and then only when it provides value. As a result, it provides 
-a simplicity in use that cannot be matched by the other packages.
+users and in turn provide unit consistency and built-in unit conversions.
+
+In contrast, *QuantiPhy* treats units basically as documentation.  They are 
+simply strings that are attached to quantities largely so they can be presented 
+to the user when the values are printed. As such, *QuantiPhy* is a light-weight 
+package that demands little from the user.  It is used when inputting and 
+outputting values, and then only when it provides value.  As a result, it 
+provides a simplicity in use that cannot be matched by the other packages.
+
+In addition, these alternative packages generally build their unit systems upon 
+the `SI base units <https://en.wikipedia.org/wiki/SI_base_unit>`_, which tends 
+to restrict usage to physical quantities with static conversion factors.  They 
+are less suited to non-physical quantities or conversion factors that change 
+dynamically, such as with currencies.  *QuantiPhy* gracefully handles all of 
+these cases.
 
 
 Quick Start
