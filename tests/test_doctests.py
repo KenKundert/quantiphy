@@ -14,7 +14,7 @@ def test_README():
     Quantity.reset_prefs()
     rv = doctest.testfile('../README.rst', optionflags=doctest.ELLIPSIS)
     assert rv.failed == 0
-    assert rv.attempted == 27
+    assert rv.attempted == 29
 
 def test_quantiphy():
     if sys.version_info < (3, 6):

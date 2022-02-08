@@ -164,7 +164,7 @@ scale factors or exponents:
 
 .. code-block:: python
 
-   >>> print(cost.fixed(prec=2, show_commas=True, strip_zeros=False))
+   >>> cost.fixed(prec=2, show_commas=True, strip_zeros=False)
    '$11,200,000.00'
 
 You can use the string format method or the new format strings to flexibly 
@@ -181,7 +181,7 @@ incorporate quantity values into strings:
    >>> f'❬{Fhy:<15.6}❭'
    '❬1.420406 GHz   ❭'
 
-   >>> f'«{Fhy:>15.6}❭'
+   >>> f'❬{Fhy:>15.6}❭'
    '❬   1.420406 GHz❭'
 
    >>> f'{cost:#,.2P}'
