@@ -89,7 +89,7 @@ You can find the documentation on `ReadTheDocs
 
    pip3 install --user quantiphy
 
-Requires Python 3.5 or newer.  If you using an earlier version of Python,
+Requires Python 3.6 or newer.  If you using an earlier version of Python,
 install version 2.10 of *QuantiPhy*.
 
 You can find the full documentation `here <https://quantiphy.readthedocs.io>`_.
@@ -140,7 +140,7 @@ the quantity:
    >>> str(Tboil)
    '100 °C'
 
-You can use the render method to flexibly convert the quantity to a string:
+You can use the *render* method to flexibly convert the quantity to a string:
 
 .. code-block:: python
 
@@ -159,6 +159,14 @@ You can use the render method to flexibly convert the quantity to a string:
    >>> Tboil.render(scale='°F')
    '212 °F'
 
+The *fixed* method is a variant that specializes in rendering numbers without 
+scale factors or exponents:
+
+.. code-block:: python
+
+   >>> print(cost.fixed(prec=2, show_commas=True, strip_zeros=False))
+   '$11,200,000.00'
+
 You can use the string format method or the new format strings to flexibly 
 incorporate quantity values into strings:
 
@@ -170,11 +178,14 @@ incorporate quantity values into strings:
    >>> f'{Fhy:.6}'
    '1.420406 GHz'
 
-   >>> f'«{Fhy:<15.6}»'
-   '«1.420406 GHz   »'
+   >>> f'❬{Fhy:<15.6}❭'
+   '❬1.420406 GHz   ❭'
 
-   >>> f'«{Fhy:>15.6}»'
-   '«   1.420406 GHz»'
+   >>> f'«{Fhy:>15.6}❭'
+   '❬   1.420406 GHz❭'
+
+   >>> f'{cost:#,.2P}'
+   '$11,200,000.00'
 
    >>> f'Boiling point of water: {Tboil:s}'
    'Boiling point of water: 100 °C'
