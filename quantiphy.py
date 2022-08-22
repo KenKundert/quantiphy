@@ -363,7 +363,7 @@ def add_constant(value, alias=None, unit_systems=None):
 
 
 # Globals {{{1
-__version__ = '2.17.1-beta.0'
+__version__ = '2.17.1-beta.1'
 __released__ = '2022-08-22'
 __all__ = '''
     QuantiPhyError
