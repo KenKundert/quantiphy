@@ -5,8 +5,8 @@ Releases
 
 Latest development release
 --------------------------
-| Version: 2.17.0
-| Released: 2022-01-04
+| Version: 2.17.1-beta.0
+| Released: 2022-08-22
 
 - Support parameterized unit conversions (such as molarity).
 - Allow % to act as a scale factor.
