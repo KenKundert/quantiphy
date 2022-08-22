@@ -395,7 +395,7 @@ def test_misc2():
     assert Quantity('10m').render(form='eng') == '10e-3'
     with pytest.raises(ValueError) as exception:
         Quantity.set_prefs(input_sf='GMkwq', unity_sf='_', spacer='')
-    assert str(exception.value) == 'q, w: unknown scale factors.'
+    assert str(exception.value) == 'q, w: unknown scale factor.'
     assert isinstance(exception.value, UnknownScaleFactor)
     assert isinstance(exception.value, QuantiPhyError)
     assert isinstance(exception.value, ValueError)
@@ -409,7 +409,7 @@ def test_misc2():
     Quantity.input_sf = 'GMkwq'
     with pytest.raises(ValueError) as exception:
         Quantity('10m')
-    assert str(exception.value) == 'q, w: unknown scale factors.'
+    assert str(exception.value) == 'q, w: unknown scale factor.'
     assert isinstance(exception.value, UnknownScaleFactor)
     assert isinstance(exception.value, QuantiPhyError)
     assert isinstance(exception.value, ValueError)
@@ -944,6 +944,19 @@ def test_prefs_defaults():
     assert Quantity.get_pref('map_sf') == dict(k='K')
 
     Quantity.set_prefs(spacer=None, map_sf=None)
+
+def test_percent():
+    # by default QuantiPhy treats % as a tight unit
+
+    assert '%' not in Quantity.get_pref('input_sf')
+    assert Quantity('10%').render() == '10%'
+    assert Quantity('10%Δ').render() == '10 %Δ'
+
+    # but by adding it to input_sf it is treated as a scale factor
+    with Quantity.prefs(input_sf = Quantity.get_pref('input_sf') + '%'):
+        assert '%' in Quantity.get_pref('input_sf')
+        assert Quantity('10%').render() == '100m'
+        assert Quantity('10%Δ').render() == '100 mΔ'
 
 if __name__ == '__main__':
     # As a debugging aid allow the tests to be run on their own, outside pytest.

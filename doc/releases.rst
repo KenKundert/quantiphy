@@ -8,6 +8,13 @@ Latest development release
 | Version: 2.17.0
 | Released: 2022-01-04
 
+- Support parameterized unit conversions (such as molarity).
+- Allow % to act as a scale factor.
+- First argument of scaling functions are now guaranteed to be quantities.
+- Added :func:`UnitConversion.fixture` decorator function.
+- Added :meth:`UnitConversion.activate` method (allows overridden converters to 
+  be re-activated).
+
 
 2.17 (2022-04-04)
 -----------------

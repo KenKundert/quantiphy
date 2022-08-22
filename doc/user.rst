@@ -360,11 +360,11 @@ scale factors are found.
     >>> print(bytes)
     1.024 kB
 
-Finally, you can also specify *scale* and *ignore_sf* as named arguments.  
-*scale* allows you to scale the value or convert it to different units. It is 
-described :ref:`in a bit <scaling upon creation>`. *ignore_sf* indicates that 
-any scale factors should be ignored. This is :ref:`one way <ambiguity>` of 
-handling units whose name starts with a scale factor character. For example:
+You can also specify *scale* and *ignore_sf* as named arguments.  *scale* allows 
+you to scale the value or convert it to different units. It is described 
+:ref:`in a bit <scaling upon creation>`. *ignore_sf* indicates that any scale 
+factors should be ignored. This is :ref:`one way <ambiguity>` of handling units 
+whose name starts with a scale factor character.  For example:
 
 .. code-block:: python
 
@@ -384,12 +384,17 @@ handling units whose name starts with a scale factor character. For example:
     >>> print(t, t.real, t.units, sep=', ')
     1 min, 1.0, min
 
+Finally, you can also specify conversion parameters using *params*.  These 
+values are ignored by *QuantiPhy* except that they are made available to any 
+:class:`UnitConversion` conversion functions as a way of implementing 
+parameterized conversions.
+
 
 Quantity Attributes
 """""""""""""""""""
 
-Finally, you can overwrite :class:`Quantity` attributes to override the units, 
-name, or description.
+You can overwrite :class:`Quantity` attributes to override the units, name, or 
+description.
 
 .. code-block:: python
 
@@ -497,10 +502,17 @@ conversion is :index:`not linear <dB>`:
 .. code-block:: python
 
     >>> def from_dB(value, units=''):
-    ...     return 10**(value/20), units[2:]
+    ...     return 10**(value/20), value.units[2:]
 
     >>> Quantity('-100 dBV', scale=from_dB)
     Quantity('10 uV')
+
+.. notice:
+
+   Since version 2.18 the first argument, in this case *value*, is guaranteed to 
+   be a :class:`Quantity` that contains both the units and any parameters needed 
+   during the conversion.  As such, the second argument, *units*, is not longer 
+   needed and will eventually be removed.
 
 The conversion can also often occur if you simply state the units you wish the 
 quantity to have:
@@ -542,7 +554,7 @@ consistent units.  For example:
     220.46 lb
     210 lb
 
-QuantiPhy* provides a collection of pre-defined converters for common units:
+QuantiPhy* provides a collection of predefined converters for common units:
 
 =========== ================================================================
 C °C        K, F °F, R °R
@@ -947,12 +959,19 @@ performed.
 .. code-block:: python
 
     >>> import math
-    >>> def to_dB(value, units):
-    ...     return 20*math.log10(value), 'dB'+units
+    >>> def to_dB(value, units=''):
+    ...     return 20*math.log10(value), 'dB'+value.units
 
     >>> T = Quantity('100mV')
     >>> print(T.render(scale=to_dB))
     -20 dBV
+
+.. notice:
+
+   Since version 2.18 the first argument, in this case *value*, is guaranteed to 
+   be a :class:`Quantity` that contains both the units and any parameters needed 
+   during the conversion.  As such, the second argument, *units*, is not longer 
+   needed and will eventually be removed.
 
 Finally, you can also use either the built-in converters or the converters you 
 created to do the conversion simply based on the units:
@@ -1769,6 +1788,26 @@ know exactly when you will be converting a temperature to a quantity, you can
 specify *ignore_sf* for that specific conversion. The effect is the same either 
 way, 'K' is interpreted as a unit rather than a scale factor.
 
+Percentages are a special case.  *QuantiPhy* can treat the % character as either 
+a unit or a scale factor (0.01).  By default it is treated as a unit:
+
+..  code-block:: python
+
+    >>> tolerance = Quantity('10%')
+    >>> change = Quantity('10%Δ')
+    >>> print(tolerance.as_tuple(), change.as_tuple(),)
+    (10.0, '%') (10.0, '%Δ')
+
+If, however, you add % as a known scale factor, it then acts as a scale factor.
+
+    >>> with Quantity.prefs(input_sf = Quantity.get_pref('input_sf') + '%'):
+    ...     tolerance = Quantity('10%')
+    ...     change = Quantity('10%Δ')
+    ...     print(tolerance.as_tuple(), change.as_tuple(),)
+    (0.1, '') (0.1, 'Δ')
+
+In general you cannot simply add to the list of known scale factors, the %
+character is an exception as *QuantiPhy* knows about it but disables by default.
 
 .. index::
    single: tabular data

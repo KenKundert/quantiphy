@@ -51,9 +51,13 @@ def test_simple_scaling():
         assert q.render(scale=lambda v, u: (0.0022046*v, 'lbs')) == '2.2046 lbs'
 
         def dB(v, u):
+            assert isinstance(v, Quantity)
+            assert v.units == u
             return 20*math.log(v, 10), 'dB'+u
 
         def adB(v, u):
+            assert isinstance(v, Quantity)
+            assert v.units == u
             return pow(10, v/20), u[2:] if u.startswith('dB') else u
 
         q=Quantity('-40 dBV', scale=adB)
@@ -353,9 +357,11 @@ def test_func_converters():
     Quantity.reset_prefs()
 
     def from_dB(value):
+        assert isinstance(value, Quantity)
         return 10**(value/20)
 
     def to_dB(value):
+        assert isinstance(value, Quantity)
         return 20*math.log10(value)
 
     vconverter = UnitConversion('V', 'dBV', from_dB, to_dB)
@@ -402,6 +408,139 @@ def test_subclass_conversion():
 
     result = conversion.convert(1, 'sat', 'BTC')
     assert str(result) == '10 nBTC'
+
+
+def test_parameterized_cconverters():
+
+    # one parameter case
+    @UnitConversion.fixture
+    def from_molarity(M, mw):
+        assert isinstance(M, Quantity)
+        assert M.units == 'M'
+        return M * mw
+
+    @UnitConversion.fixture
+    def to_molarity(g_L, mw):
+        assert isinstance(g_L, Quantity)
+        assert g_L.units == 'g/L'
+        return g_L / mw
+
+    conv = UnitConversion('g/L', 'M', from_molarity, to_molarity)
+
+    # scalar params
+    KCl_M = Quantity('1.2 mg/L', scale='M', params=74.55)
+    assert KCl_M.render() == '16.097 uM'
+    assert KCl_M.render(scale='g/L') == '1.2 mg/L'
+    assert str(KCl_M.scale('g/L')) == '1.2 mg/L'
+
+    NaCl_M = Quantity('5.0 mg/L', scale='M', params=58.44277)
+    assert NaCl_M.render() == '85.554 uM'
+    assert NaCl_M.render(scale='g/L') == '5 mg/L'
+    assert str(NaCl_M.scale('g/L')) == '5 mg/L'
+
+    # params as tuple
+    KCl_M = Quantity('1.2 mg/L', scale='M', params=(74.55,))
+    assert KCl_M.render() == '16.097 uM'
+    assert KCl_M.render(scale='g/L') == '1.2 mg/L'
+    assert str(KCl_M.scale('g/L')) == '1.2 mg/L'
+
+    NaCl_M = Quantity('5.0 mg/L', scale='M', params=(58.44277,))
+    assert NaCl_M.render() == '85.554 uM'
+    assert NaCl_M.render(scale='g/L') == '5 mg/L'
+    assert str(NaCl_M.scale('g/L')) == '5 mg/L'
+
+    # params as dict
+    KCl_M = Quantity('1.2 mg/L', scale='M', params=dict(mw=74.55))
+    assert KCl_M.render() == '16.097 uM'
+    assert KCl_M.render(scale='g/L') == '1.2 mg/L'
+    assert str(KCl_M.scale('g/L')) == '1.2 mg/L'
+
+    NaCl_M = Quantity('5.0 mg/L', scale='M', params=dict(mw=58.44277))
+    assert NaCl_M.render() == '85.554 uM'
+    assert NaCl_M.render(scale='g/L') == '5 mg/L'
+    assert str(NaCl_M.scale('g/L')) == '5 mg/L'
+
+    # two parameter case
+    @UnitConversion.fixture
+    def to_grams(molarity, vol, mw):
+        assert isinstance(molarity, Quantity)
+        assert molarity.units == 'M'
+        return molarity*vol*mw
+
+    @UnitConversion.fixture
+    def to_molarity(mass, vol, mw):
+        assert isinstance(mass, Quantity)
+        assert mass.units == 'g'
+        moles = mass/mw
+        return moles/vol
+
+    conv = UnitConversion('g', 'M', to_grams, to_molarity)
+
+    # params as tuple
+    KCl_M = Quantity('1.2 g', scale='M', params=(0.25, 74.55))
+    assert KCl_M.render() == '64.386 mM'
+    assert KCl_M.render(scale='g') == '1.2 g'
+    assert str(KCl_M.scale('g')) == '1.2 g'
+
+    NaCl_M = Quantity('5.0 g', scale='M', params=(0.25, 58.44277))
+    assert NaCl_M.render() == '342.22 mM'
+    assert NaCl_M.render(scale='g') == '5 g'
+    assert str(NaCl_M.scale('g')) == '5 g'
+
+    # params as dict
+    KCl_M = Quantity('1.2 g', scale='M', params=dict(mw=74.55, vol=0.250))
+    assert KCl_M.render() == '64.386 mM'
+    assert KCl_M.render(scale='g') == '1.2 g'
+    assert str(KCl_M.scale('g')) == '1.2 g'
+
+    NaCl_M = Quantity('5.0 g', scale='M', params=dict(mw=58.44277, vol=0.250))
+    assert NaCl_M.render() == '342.22 mM'
+    assert NaCl_M.render(scale='g') == '5 g'
+    assert str(NaCl_M.scale('g')) == '5 g'
+
+
+def test_reactivated_cconverters():
+
+    def molarity(mass, H2O, molar_mass):
+        # mass in g, H2O in lm, molar_mass in g/mol
+        moles = mass/molar_mass
+        return 1000*moles/H2O
+
+    g2M_KCl = UnitConversion('M', 'g', molarity(1, 250, 74.55))
+    g2M_NaCl = UnitConversion('M', 'g', molarity(1, 250, 58.44277))
+
+    g2M_KCl.activate()
+    mass = Quantity('1.2 g')
+    assert mass.render() == '1.2 g'
+    assert mass.render(scale='M') == '64.386 mM'
+    molarity = Quantity('64.386 mM')
+    assert molarity.render() == '64.386 mM'
+    assert molarity.render(scale='g') == '1.2 g'
+
+    g2M_NaCl.activate()
+    mass = Quantity('5.0 g')
+    assert mass.render() == '5 g'
+    assert mass.render(scale='M') == '342.22 mM'
+    molarity = Quantity('342.22 mM')
+    assert molarity.render() == '342.22 mM'
+    assert molarity.render(scale='g', prec=2) == '5 g'
+
+    g2M_KCl.activate()
+    mass = Quantity('1.2 g')
+    assert mass.render() == '1.2 g'
+    assert mass.render(scale='M') == '64.386 mM'
+    molarity = Quantity('64.386 mM')
+    assert molarity.render() == '64.386 mM'
+    assert molarity.render(scale='g') == '1.2 g'
+
+    g2M_NaCl.activate()
+    mass = Quantity('5.0 g')
+    assert mass.render() == '5 g'
+    assert mass.render(scale='M') == '342.22 mM'
+    molarity = Quantity('342.22 mM')
+    assert molarity.render() == '342.22 mM'
+    assert molarity.render(scale='g', prec=2) == '5 g'
+
 
 
 if __name__ == '__main__':

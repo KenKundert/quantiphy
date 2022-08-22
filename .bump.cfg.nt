@@ -1,0 +1,22 @@
+major: 2
+minor: 17
+patch: 0
+revision: 0
+type: release
+files:
+    setup.py:
+        version: version
+    quantiphy.py:
+        version: __version__
+        date: __released__
+    README.rst:
+        version: Version
+        date: Released
+    doc/index.rst:
+        version: Version
+        date: Released
+    doc/conf.py:
+        version: release
+    doc/releases.rst:
+        version: Version
+        date: Released
