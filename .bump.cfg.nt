@@ -2,7 +2,7 @@ major: 2
 minor: 18
 patch: 0
 revision: 0
-type: beta
+type: release
 files:
     setup.py:
         version: version
