@@ -21,7 +21,6 @@ setup(
     download_url = 'https://github.com/kenkundert/quantiphy/tarball/master',
     license = 'MIT',
     py_modules = 'quantiphy'.split(),
-    install_requires = [],
     python_requires = '>=3.6',
     zip_safe = True,
     keywords = keywords.split(),
