@@ -1,0 +1,41 @@
+[project]
+name = "quantiphy"
+version = "2.18.0"
+description = "physical quantities (numbers with units)"
+readme = "README.rst"
+license = {file = "LICENSE"}
+keywords = [
+    "quantities",
+    "physical quantity",
+    "units",
+    "SI scale factors",
+    "engineering notation",
+    "mks",
+    "cgs"
+]
+authors = [
+    {name = "Ken Kundert"},
+    {email = "quantiphy@nurdletech.com"}
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Topic :: Utilities",
+    "Topic :: Scientific/Engineering",
+]
+requires-python = ">=3.6"
+
+[project.urls]
+homepage = "https://quantiphy.readthedocs.io"
+documentation = "quantiphy.readthedocs.io"
+repository = "https://github.com/kenkundert/quantiphy"
+changelog = "https://github.com/kenkundert/quantiphy/doc/releases.html"
+
+[build-system]
+requires = ["flit_core >=2,<4"]
+build-backend = "flit_core.buildapi"

@@ -677,10 +677,10 @@ the new value to create a new Quantity. For example:
     8.9247 GHz
 
     >>> type(h_line)
-    <class 'quantiphy.Quantity'>
+    <class 'quantiphy.quantiphy.Quantity'>
 
     >>> type(sagan)
-    <class 'quantiphy.Quantity'>
+    <class 'quantiphy.quantiphy.Quantity'>
 
 Any value that can be passed to the *scale* argument for :class:`Quantity` or 
 :meth:`Quantity.render` can be passed to the *scale* method.  Specifically, the 
@@ -773,13 +773,13 @@ numeric value:
     8.9247 GHz
 
     >>> type(h_line)
-    <class 'quantiphy.Quantity'>
+    <class 'quantiphy.quantiphy.Quantity'>
 
     >>> type(second_sagan_freq)
     <class 'float'>
 
     >>> type(sagan2)
-    <class 'quantiphy.Quantity'>
+    <class 'quantiphy.quantiphy.Quantity'>
 
 Notice that when performing arithmetic operations on quantities the units 
 are completely ignored and do not propagate in any way to the newly computed 
