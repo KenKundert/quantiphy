@@ -4,9 +4,9 @@ patch: 0
 revision: 0
 type: release
 files:
-    setup.py:
+    pyproject.toml:
         version: version
-    quantiphy.py:
+    quantiphy/quantiphy.py:
         version: __version__
         date: __released__
     README.rst:
