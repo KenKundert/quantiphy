@@ -32,9 +32,9 @@ requires-python = ">=3.6"
 
 [project.urls]
 homepage = "https://quantiphy.readthedocs.io"
-documentation = "quantiphy.readthedocs.io"
+documentation = "https://quantiphy.readthedocs.io"
 repository = "https://github.com/kenkundert/quantiphy"
-changelog = "https://github.com/kenkundert/quantiphy/doc/releases.html"
+changelog = "https://github.com/KenKundert/quantiphy/blob/master/doc/releases.rst"
 
 [build-system]
 requires = ["flit_core >=2,<4"]

@@ -21,7 +21,7 @@ def test_quantiphy():
         # code used in doctests assumes python3.6
         return
     Quantity.reset_prefs()
-    rv = doctest.testfile('../src/quantiphy/quantiphy.py', optionflags=doctest.ELLIPSIS)
+    rv = doctest.testfile('../quantiphy/quantiphy.py', optionflags=doctest.ELLIPSIS)
     assert rv.failed == 0
     assert rv.attempted == 119
         # this target should be updated when the number of doctests change
