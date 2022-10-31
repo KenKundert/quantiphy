@@ -41,8 +41,8 @@ def test_format():
 
     with pytest.raises(ValueError) as exception:
         q = Quantity('1ns')
-        '{:z}'.format(q)
-    assert exception.value.args[0] == "Unknown format code 'z' for object of type 'float'"
+        print('{:x}'.format(q))
+    assert exception.value.args[0] == "Unknown format code 'x' for object of type 'float'"
 
 def test_full_format():
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None, show_desc=False)
