@@ -11,6 +11,7 @@ Quantities
 .. autoclass:: Quantity
    :members:
 
+.. ignore the following (there is only one method, so no need for TOC)
    .. autoclasstoc::
 
 
