@@ -825,7 +825,8 @@ following scale factors could be used:
 
 However, only the scale factors listed in the *output_sf* preference are 
 actually used, and by default that is set to 'TGMkmunpfa', which avoids the more
-uncommon scale factors.
+uncommon scale factors.  You can set *output_sf* to *Quantity.all_sf* to output 
+all known scale factors.
 
 The :meth:`Quantity.render` method allows you to control the process of 
 converting a quantity to a string. For example:

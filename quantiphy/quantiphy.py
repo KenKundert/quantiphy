@@ -369,30 +369,36 @@ __released__ = '2022-08-31'
 # These mappings are only used when reading numbers
 # The key for these mappings must be a single character
 MAPPINGS = {
-    'Y': 'e24',
-    'Z': 'e21',
-    'E': 'e18',
-    'P': 'e15',
-    'T': 'e12',
-    'G': 'e9',
-    'M': 'e6',
-    'K': 'e3',
-    'k': 'e3',
-    '_': 'e0',
-    'c': 'e-2',  # only available for input, not used in output
-    '%': 'e-2',  # potentially available for input, not used in output
-    'm': 'e-3',
-    'u': 'e-6',
-    'µ': 'e-6',  # micro
-    'μ': 'e-6',  # greek mu
-    'n': 'e-9',
-    'p': 'e-12',
-    'f': 'e-15',
-    'a': 'e-18',
-    'z': 'e-21',
-    'y': 'e-24',
+    'Q': 'e30',  # quetta
+    'R': 'e27',  # ronna
+    'Y': 'e24',  # yotta
+    'Z': 'e21',  # zetta
+    'E': 'e18',  # exa
+    'P': 'e15',  # peta
+    'T': 'e12',  # tera
+    'G': 'e9',   # giga
+    'M': 'e6',   # mega
+    'K': 'e3',   # kilo
+    'k': 'e3',   # kilo
+    '_': 'e0',   # unity
+    'c': 'e-2',  # centi, only available for input, not used in output
+    '%': 'e-2',  # percent, potentially available for input, not used in output
+    'm': 'e-3',  # milli
+    'u': 'e-6',  # micro (ASCII)
+    'µ': 'e-6',  # micro (unicode micro)
+    'μ': 'e-6',  # micro (unicode greek mu)
+    'n': 'e-9',  # nano
+    'p': 'e-12', # pico
+    'f': 'e-15', # femto
+    'a': 'e-18', # ato
+    'z': 'e-21', # zepto
+    'y': 'e-24', # yocto
+    'r': 'e-27', # ronto
+    'q': 'e-30', # quecto
 }
 BINARY_MAPPINGS = {
+    'Qi': 1024*1024*1024*1024*1024*1024*1024*1024*1024*1024,
+    'Ri': 1024*1024*1024*1024*1024*1024*1024*1024*1024,
     'Yi': 1024*1024*1024*1024*1024*1024*1024*1024,
     'Zi': 1024*1024*1024*1024*1024*1024*1024,
     'Ei': 1024*1024*1024*1024*1024*1024,
@@ -617,6 +623,7 @@ class Quantity(float):
     plus_sign = '＋'
     minus_sign = '−'
     infinity_symbol = '∞'
+    all_sf = 'QRYZEPTGMkmunpfazyrq'
 
     # preferences {{{2
     _initialized = False
@@ -2262,7 +2269,7 @@ class Quantity(float):
             base = log(abs(number), 2)//10
             if base < 0:
                 raise IndexError
-            sf = ('_KMGTPEZY'[int(base)] + 'i')
+            sf = ('_KMGTPEZYRQ'[int(base)] + 'i')
             sf = sf.replace('_i', self.unity_sf)
             num = '{number:0.{prec}e}'.format(
                 number=(number / (2**(10*base))), prec=prec
