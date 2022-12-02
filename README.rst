@@ -21,8 +21,8 @@ QuantiPhy — Physical Quantities
 
 
 | Author: Ken Kundert
-| Version: 2.18.0
-| Released: 2022-08-31
+| Version: 2.18.1
+| Released: 2022-12-01
 |
 
 
