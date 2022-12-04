@@ -5,8 +5,8 @@ Releases
 
 Latest development release
 --------------------------
-| Version: 2.18.1
-| Released: 2022-12-01
+| Version: 2.18.2
+| Released: 2022-12-04
 
 - Add new standard SI scale factors (*Q*, *R*, *r*, *q*).
 
