@@ -53,7 +53,7 @@ from collections.abc import Mapping, Iterable
 # Helpers {{{1
 # _named_regex {{{2
 def _named_regex(name, regex):
-    return '(?P<%s>%s)' % (name, regex)
+    return f"(?P<{name}>{regex})"
 
 
 # _scale {{{2
@@ -411,11 +411,11 @@ BINARY_MAPPINGS = {
 }
 
 # These mappings are only used when writing numbers
-BIG_SCALE_FACTORS = 'kMGTPEZY'
+BIG_SCALE_FACTORS = 'kMGTPEZYRQ'
     # These must be given in order, one for every three decades.
     # Use k rather than K, because K looks like a temperature when used alone.
 
-SMALL_SCALE_FACTORS = 'munpfazy'
+SMALL_SCALE_FACTORS = 'munpfazyrq'
     # These must be given in order, one for every three decades.
 
 # Supported currency symbols (these go on left side of number)
@@ -890,8 +890,9 @@ class Quantity(float):
         :arg str output_sf:
             Which scale factors to output, generally one would only use familiar
             scale factors. The default is 'TGMkmunpfa', which gets rid or the
-            very large ('YZEP') and very small ('zy') scale factors that many
-            people do not recognize.
+            very large ('QRYZEP') and very small ('zyrq') scale factors that many
+            people do not recognize.  You can set this to *Quantity.all_sf* to 
+            configure *Quantity* to use all available output scale factors.
 
         :arg str radix:
             The character to be used as the radix.  By default it is '.'.
@@ -1234,9 +1235,9 @@ class Quantity(float):
             ),  # leading or trailing digits are optional, but not both
         )
         exponent = _named_regex('exp', '[eE][-+]?[0-9]+')
-        scale_factor = _named_regex('sf', '[%s]' % input_sf)
-        binary_scale_factor = _named_regex('sf', '%s' % '|'.join(BINARY_MAPPINGS))
-        currency = _named_regex('currency', '[%s]' % CURRENCY_SYMBOLS)
+        scale_factor = _named_regex('sf', f'[{input_sf}]')
+        binary_scale_factor = _named_regex('sf', '|'.join(BINARY_MAPPINGS))
+        currency = _named_regex('currency', f'[{CURRENCY_SYMBOLS}]')
         units = _named_regex(
             r'units', r'(?:[a-zA-Z%√{us}{cur}][-^/()\w·⁻⁰¹²³⁴⁵⁶⁷⁸⁹√{us}{cur}]*)?'.format(
                 us = re.escape(UNIT_SYMBOLS),
@@ -1942,7 +1943,7 @@ class Quantity(float):
                     units = ''
 
             # get components of number
-            number = "%.*e" % (prec, number)
+            number = f"{number.real:.{prec}e}"
             mantissa, exp = number.split("e")
             sign = '-' if mantissa[0] == '-' else ''
             mantissa = mantissa.lstrip('-')

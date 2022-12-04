@@ -412,6 +412,36 @@ def test_subclass_conversion():
 
 def test_parameterized_cconverters():
 
+    # zero parameter case
+    @UnitConversion.fixture
+    def to_dB(v):
+        assert isinstance(v, Quantity)
+        return 20*math.log(v, 10)  #, 'dB'+v.units
+
+    @UnitConversion.fixture
+    def from_dB(v):
+        assert isinstance(v, Quantity)
+        return pow(10, v/20)  #, v.units[2:] if v.units.startswith('dB') else v.units
+
+    conv = UnitConversion('V', 'dBV', from_dB, to_dB)
+    conv = UnitConversion('A', 'dBA', from_dB, to_dB)
+
+    gain = Quantity('100V')
+    assert gain.render() == '100 V'
+    assert gain.render(scale='dBV') == '40 dBV'
+
+    gain = Quantity('-40dBV')
+    assert gain.render() == '-40 dBV'
+    assert gain.render(scale='V') == '10 mV'
+
+    gain = Quantity('100A')
+    assert gain.render() == '100 A'
+    assert gain.render(scale='dBA') == '40 dBA'
+
+    gain = Quantity('-40dBA')
+    assert gain.render() == '-40 dBA'
+    assert gain.render(scale='A') == '10 mA'
+
     # one parameter case
     @UnitConversion.fixture
     def from_molarity(M, mw):
