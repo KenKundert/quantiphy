@@ -36,7 +36,7 @@ def test_format():
     assert '{:#.0q}'.format(q) == '1 GHz'
     assert '{:#.0p}'.format(q) == '1420405752. Hz'
 
-    q=Quantity('2ns')
+    q = Quantity('2ns')
     assert float(q) == 2e-9
 
     with pytest.raises(ValueError) as exception:
@@ -47,7 +47,7 @@ def test_format():
 def test_full_format():
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None, show_desc=False)
     Quantity.set_prefs(prec='full')
-    q=Quantity('f = 1420.405751786 MHz -- frequency of hydrogen line')
+    q = Quantity('f = 1420.405751786 MHz -- frequency of hydrogen line')
     assert '{}'.format(q) == '1.420405751786 GHz'
     assert '{:.8}'.format(q) == '1.42040575 GHz'
     assert '{:.8s}'.format(q) == '1.42040575 GHz'
@@ -82,11 +82,14 @@ def test_full_format():
         1.234567 +1.234567 -1.234567
         $1.234567 +$1.234567 -$1.234567
         1.234567_V +1.234567_V -1.234567_V
+        -0 -0.0000 -0.0_s -$0.00
     '''
     for given in values.split():
         expected = given.lstrip('+').replace('_', ' ')
         q = Quantity(given)
-        assert q.render(form='si', prec='full', strip_zeros=False) == expected
+        if q == 0 and expected[0] == '-':
+            expected = expected[1:]
+        assert q.render(form='si', prec='full', strip_zeros=False) == expected, given
 
     q=Quantity('2ns')
     assert float(q) == 2e-9

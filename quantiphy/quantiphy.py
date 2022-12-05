@@ -1914,17 +1914,17 @@ class Quantity(float):
             # strip off leading zeros and break into components
             whole, frac = mantissa.lstrip('0').split('.')
             if whole == '':
-                # no whole part, remove leading zeros from fractional part
+                # no whole part
+                # normalize by removing leading zeros from fractional part
                 orig_len = len(frac)
-                frac = frac.lstrip('0')
-                if frac:
-                    whole = frac[:1]
-                    frac = frac[1:]
+                frac_stripped = frac.lstrip('0')
+                if frac_stripped:
+                    whole = frac_stripped[:1]
+                    frac = frac_stripped[1:]
                     exp -= orig_len - len(frac)
                 else:
                     # stripping off zeros left us with nothing, this must be 0
                     whole = '0'
-                    frac = ''
                     exp = 0
             # normalize the mantissa
             mantissa = whole[0] + '.' + whole[1:] + frac
@@ -1948,6 +1948,10 @@ class Quantity(float):
             sign = '-' if mantissa[0] == '-' else ''
             mantissa = mantissa.lstrip('-')
             exp = int(exp)
+
+        # eliminate sign if mantissa is 0
+        if mantissa.strip('0') == '.':
+            sign = ''
 
         # zero out negligible values {{{3
         if negligible is not False:

@@ -44,38 +44,75 @@ def test_misc():
 
     q = Quantity('1420405751.786 Hz')
     assert q.is_nan() is None
+    assert q.is_infinite() is None
 
-    q = Quantity('1420405751.786 Hz')
+    q = Quantity('NaN')
+    assert q.is_nan() == 'NaN'
     assert q.is_infinite() is None
 
     q = Quantity('NaN Hz')
     assert q.is_nan() == 'NaN'
+    assert q.is_infinite() is None
 
     q = Quantity('NaN Hz')
     q.nan = 'nan'
     assert q.is_nan() == 'nan'
-
-    q = Quantity('NaN Hz')
     assert q.is_infinite() is None
+
+    q = Quantity('inf')
+    assert q.is_nan() is None
+    assert q.is_infinite() == 'inf'
+
+    q = Quantity('+inf')
+    assert q.is_nan() is None
+    assert q.is_infinite() == '+inf'
+
+    q = Quantity('-inf')
+    assert q.is_nan() is None
+    assert q.is_infinite() == '-inf'
 
     q = Quantity('inf Hz')
     assert q.is_nan() is None
-
-    q = Quantity('inf Hz')
     assert q.is_infinite() == 'inf'
 
     q = Quantity('inf Hz')
     q.inf = '∞'
+    assert q.is_nan() is None
     assert q.is_infinite() == '∞'
 
+    q = Quantity('+inf Hz')
+    q.inf = '∞'
+    assert q.is_nan() is None
+    assert q.is_infinite() == '+∞'
+
+    q = Quantity('-inf Hz')
+    q.inf = '∞'
+    assert q.is_nan() is None
+    assert q.is_infinite() == '-∞'
+
     q = Quantity('∞ Hz')
+    assert q.is_nan() is None
     assert q.is_infinite() == 'inf'
 
     q = Quantity('$∞')
+    assert q.is_nan() is None
     assert q.is_infinite() == 'inf'
 
     q = Quantity('∞Ω')
+    assert q.is_nan() is None
     assert q.is_infinite() == 'inf'
+
+    q = Quantity('∞')
+    assert q.is_nan() is None
+    assert q.is_infinite() == 'inf'
+
+    q = Quantity('+∞')
+    assert q.is_nan() is None
+    assert q.is_infinite() == '+inf'
+
+    q = Quantity('-∞')
+    assert q.is_nan() is None
+    assert q.is_infinite() == '-inf'
 
     # check the various formats for assignment recognition
     q = Quantity('f_hy = 1420405751.786 Hz — frequency of hydrogen line')
@@ -859,8 +896,8 @@ def test_negligible():
         assert nf.render(negligible=1e-6) == '0 V'
 
     q=Quantity('-0')
-    assert q.render() == '-0'
-    assert q.render(negligible=0) == '-0'
+    assert q.render() == '0'
+    assert q.render(negligible=0) == '0'
     assert q.render(negligible=1e-18) == '0'
 
     v=Quantity('1nV')
