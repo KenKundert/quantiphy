@@ -57,32 +57,38 @@ def _named_regex(name, regex):
 
 
 # _scale {{{2
-def _scale(scale, number, units):
-    assert isinstance(number, Quantity)
+def _scale(scale, unscaled):
+    # computes scaled number and units from:
+    #     scale (what you want) scale is scaling factor or function, or to_units
+    #     unscaled (what you have), a quantity
+
     # allow subclasss of Quantity that has units to be the scale
     try:
         if issubclass(scale, Quantity):
             scale = scale.units
     except TypeError:
-        pass
+        pass  # occurs if scale is not a class
 
+    # if scale is string, it contains the units to convert to
     if isinstance(scale, str):
-        # if scale is string, it contains the units to convert from
-        number = _convert_units(scale, units, number)
-        units = scale
+        scaled = _convert_units(scale, unscaled.units, unscaled)
+        to_units = scale
     else:
+        # otherwise, it might be a function
         try:
-            # otherwise, it might be a function
-            number, units = scale(number, units)
+            scaled, to_units = scale(unscaled, unscaled.units)
+                 # passing units as second argument is redundant, deprecated
         except TypeError:
+            # otherwise, assume it is a scale factor
             try:
-                # otherwise, assume it is a scale factor and units
-                multiplier, units = scale
+                # might be a tuple containing scale factor and units
+                multiplier, to_units = scale
             except TypeError:
                 # otherwise, assume it is just a scale factor
                 multiplier = scale
-            number *= multiplier
-    return number, units
+                to_units = unscaled.units
+            scaled = multiplier * unscaled
+    return scaled, to_units
 
 
 # Exceptions {{{1
@@ -135,8 +141,8 @@ class QuantiPhyError(Exception):
     def __repr__(self):
         name = self.__class__.__name__
         kwargs = ['{!s}={!r}'.format(k, v) for k, v in self.kwargs.items()]
-        args = ', '.join(repr(a) for a in list(self.args) + kwargs)
-        return '{}({})'.format(name, args)
+        args = [repr(a) for a in list(self.args)]
+        return '{}({})'.format(name, ', '.join(a for a in args + kwargs))
 
 
 # ExpectedQuantity {{{2
@@ -153,7 +159,7 @@ class IncompatibleUnits(QuantiPhyError, TypeError):
     """
     The units of the contribution do not match those of the underlying quantity.
     """
-    _template = '{}: incompatible units.'
+    _template = 'incompatible units ({} and {}).'
 
 
 # InvalidNumber {{{2
@@ -161,7 +167,7 @@ class InvalidNumber(QuantiPhyError, ValueError, TypeError):
     """
     The value given could not be converted to a number.
     """
-    _template = "{}: not a valid number."
+    _template = "{!r}: not a valid number."
 
 
 # InvalidRecognizer {{{2
@@ -218,10 +224,11 @@ class UnknownPreference(QuantiPhyError, KeyError):
 class UnknownScaleFactor(QuantiPhyError, ValueError):
     """
     The *input_sf* preference gives the list of scale factors that should be
-    accepted. This exception is raised if *input_sf* contains an unknown scale
-    factor.
+    accepted on a number. The *output_sf* preference gives the list of scale
+    factors that should be used when rendering numbers. This exception is raised
+    if *input_sf* or *output_sf* contains an unknown scale factor.
     """
-    _template = "unknown scale factor."
+    _template = "{culprit}: unknown scale factor: {combined}."
 
 
 # UnknownUnitSystem {{{2
@@ -461,7 +468,7 @@ DEFAULTS = dict(
     full_prec = 12,
     ignore_sf = False,
     inf = 'inf',
-    input_sf = ''.join(sf for sf in MAPPINGS if sf != '%'),
+    input_sf = ''.join(sf for sf in MAPPINGS if sf not in '%'),
     keep_components = True,
     known_units = [],
     label_fmt = '{n} = {v}',
@@ -487,6 +494,7 @@ DEFAULTS = dict(
     unity_sf = '',
 )
 
+# Constants {{{1
 # These constants are available to expressions in extract strings.
 CONSTANTS = {
     'pi': math.pi,
@@ -553,6 +561,9 @@ class Quantity(float):
     :arg bool binary:
         Allow use of binary scale factors (Ki, Mi, Gi, Ti, Pi, Ei, Zi, Yi).
 
+    :arg params:
+        Parameters to be used in scaling. May be scalar, tuple, or dictionary.
+
     :raises UnknownConversion(QuantiPhyError, KeyError):
         A unit conversion was requested and there is no corresponding unit
         converter.
@@ -562,7 +573,7 @@ class Quantity(float):
         the value (*val*).
 
     :raises UnknownScaleFactor(QuantiPhyError, ValueError):
-        Unknown scale factor.
+        Unknown scale factor or factors.
 
     :raises InvalidNumber(QuantiPhyError, ValueError, TypeError):
         Not a valid number.
@@ -991,7 +1002,7 @@ class Quantity(float):
             Unknown preference.
 
         :raises UnknownScaleFactor(QuantiPhyError, ValueError):
-            Unknown scale factor.
+            Unknown scale factor or factors.
 
         Example::
 
@@ -1019,16 +1030,24 @@ class Quantity(float):
                 try:
                     del cls._preferences[k]
                 except KeyError:
-                    # This occurs if pref is not set in first member of chain
-                    # could pass, explicitly set to default, or raise
-                    # pass does not work with context managers, ends up being a
-                    # no-op. raise also does not work with context managers, as
+                    # This occurs if pref is not set in first member of chain.
+                    # Could pass, explicitly set to default, or raise.
+                    # Pass does not work with context managers, ends up being a
+                    # no-op. Raise also does not work with context managers, as
                     # the user can do nothing to avoid the exception.
                     cls._preferences[k] = DEFAULTS[k]
             else:
                 cls._preferences[k] = v
         if 'input_sf' in kwargs:
             cls._initialize_recognizers()
+        if 'output_sf' in kwargs:
+            unknown_sf = set(cls.get_pref('output_sf')) - set(MAPPINGS.keys())
+            if unknown_sf:
+                raise UnknownScaleFactor(
+                    *sorted(unknown_sf),
+                    combined = ", ".join(sorted(unknown_sf)),
+                    culprit = "output_sf"
+                )
 
     # get preference {{{3
     @classmethod
@@ -1100,7 +1119,7 @@ class Quantity(float):
             Unknown preference.
 
         :raises UnknownScaleFactor(QuantiPhyError, ValueError):
-            Unknown scale factor.
+            Unknown scale factor or factors.
         """
         return cls._ContextManager(cls, kwargs)
 
@@ -1217,7 +1236,11 @@ class Quantity(float):
             input_sf = cls.get_pref('input_sf')
             unknown_sf = set(input_sf) - set(known_sf)
             if unknown_sf:
-                raise UnknownScaleFactor(*sorted(unknown_sf))
+                raise UnknownScaleFactor(
+                    *sorted(unknown_sf),
+                    combined = ", ".join(sorted(unknown_sf)),
+                    culprit = "input_sf"
+                )
         cls._provisioned_input_sf = input_sf
 
         def fix_sign(num):
@@ -1419,32 +1442,33 @@ class Quantity(float):
         cls, value, model=None, *, units=None, scale=None,
         name=None, desc=None, ignore_sf=None, binary=None, params=None
     ):
+        # preliminaries {{{3
         if ignore_sf is None:
             ignore_sf = cls.get_pref('ignore_sf')
         if binary is None:
             binary = cls.get_pref('accept_binary')
-        data = {}
+        attributes = {}
 
         # initialize Quantity if required
         if cls._provisioned_input_sf != cls.get_pref('input_sf'):
             cls._initialize_recognizers()
 
-        # process model to get values for name, units, and desc if available
+        # process model to get values for name, units, and desc {{{3
         if model:
             if isinstance(model, str):
                 components = model.split(None, 2)
                 if len(components) == 1:
-                    data['units'] = components[0]
+                    attributes['units'] = components[0]
                 else:
-                    data['name'] = components[0]
-                    data['units'] = components[1]
+                    attributes['name'] = components[0]
+                    attributes['units'] = components[1]
                     if len(components) == 3:
-                        data['desc'] = components[2]
+                        attributes['desc'] = components[2]
             else:
-                # data['name'] = getattr(model, 'name', '')
-                data['units'] = getattr(model, 'units', '')
-                # data['desc'] = getattr(model, 'desc', '')
+                attributes['units'] = getattr(model, 'units', '')
 
+        # define recognizers {{{3
+        # recognize_number {{{4
         def recognize_number(value, ignore_sf):
             comma = cls.get_pref('comma')
             radix = cls.get_pref('radix')
@@ -1484,6 +1508,7 @@ class Quantity(float):
                     return number, units, mantissa, sf
             raise InvalidNumber(value)
 
+        # recognize_all {{{4
         def recognize_all(value):
             try:
                 number, u, mantissa, sf = recognize_number(value, ignore_sf)
@@ -1502,16 +1527,16 @@ class Quantity(float):
                     d = args.get('desc', '')
                     number, u, mantissa, sf = recognize_number(val, ignore_sf)
                     if n:
-                        data['name'] = n.strip()
+                        attributes['name'] = n.strip()
                     if d:
-                        data['desc'] = d.strip()
+                        attributes['desc'] = d.strip()
                 else:
                     raise
             if u:
-                data['units'] = u
+                attributes['units'] = u
             return number, mantissa, sf
 
-        # process the value
+        # process the value {{{3
         if isinstance(value, str) and value in _active_constants:
             value = _active_constants[value]
         if isinstance(value, Quantity):
@@ -1519,36 +1544,45 @@ class Quantity(float):
             mantissa = getattr(value, '_mantissa', None)
             sf = getattr(value, '_scale_factor', None)
             if value.units:
-                data['units'] = value.units
+                attributes['units'] = value.units
             if value.name:
-                data['name'] = value.name
+                attributes['name'] = value.name
             if value.desc:
-                data['desc'] = value.desc
+                attributes['desc'] = value.desc
         elif isinstance(value, str):
             number, mantissa, sf = recognize_all(value)
         else:
             number = value
 
-        # resolve units, name and description
+        # resolve units, name and description {{{3
         if not units:
-            units = data.get('units')
+            units = attributes.get('units')
         if not name:
-            name = data.get('name')
+            name = attributes.get('name')
         if not desc:
-            desc = data.get('desc')
+            desc = attributes.get('desc')
 
-        # perform specified conversion if requested
+        # perform scaling {{{3
+        # scaling can either be explicitly requested using scale parameter
+        original = number
         if scale or isinstance(scale, numbers.Number):
-            original = number
             try:
-                number, units = _scale(scale, Quantity(number, units=units, params=params), units)
+                unscaled = Quantity(number, units, params=params)
+                number, units = _scale(scale, unscaled)
+                mantissa = None
             except TypeError:
                 raise InvalidNumber(number)
-            if original != number:
-                # must erase mantissa which is not out of date
-                mantissa = None
 
-        # create the underlying data structure and add attributes as appropriate
+        # and scaling can be implied by specifying units on the class itself
+        if cls.units and cls.units != units:
+            if units:
+                unscaled = Quantity(number, units, params=params)
+                number, units = _scale(cls.units, unscaled)
+                mantissa = None
+            else:
+                units = cls.units
+
+        # create the underlying data structure and add attributes {{{3
         try:
             self = float.__new__(cls, number)
         except TypeError:
@@ -1604,16 +1638,11 @@ class Quantity(float):
 
             >>> nan = Quantity('-nan Hz')
             >>> nan.is_nan()
-            '-NaN'
+            'NaN'
 
         """
-        try:
-            value = self._mantissa
-        except AttributeError:
-            value = str(self.real)
-        sign, nan, _ = value.lower().partition('nan')
-        if nan == 'nan':
-            return sign + self.nan
+        if math.isnan(self.real):
+            return self.nan
 
     # as_tuple() {{{2
     def as_tuple(self):
@@ -1652,9 +1681,11 @@ class Quantity(float):
             - If a tuple, the first value, a float, is treated as a scale factor
               and the second value, a string, is taken to be the units of the
               new quantity.
-            - If a function, it takes two arguments, the value and the units of
-              the quantity and it returns two values, the value and units of
-              the new value.
+            - If a function, it takes two arguments, the value to be scaled and
+              its units.  The value is guaranteed to be a Quantity that includes
+              the units, so the second argument is not redundant and will
+              eventually be deprecated.  It returns two values, the value and
+              units of the new value.
             - If a string, it is taken to the be desired units. This value along
               with the units of the quantity are used to select a known unit
               conversion, which is applied to create the new value.
@@ -1691,10 +1722,13 @@ class Quantity(float):
         except TypeError:
             pass
 
-        number, units = _scale(scale, self, self.units)
+        number, units = _scale(scale, self)
         if not cls:
-            cls = self.__class__
-        new = cls(number, units)
+            if units == self.units:
+                cls = self.__class__
+            else:
+                cls = Quantity
+        new = cls(number, units, params=getattr(self, 'params', None))
         new._inherit_attributes(self)
         return new
 
@@ -1938,7 +1972,7 @@ class Quantity(float):
             # scale if desired
             number = self
             if scale or isinstance(scale, numbers.Number):
-                number, units = _scale(scale, number, self.units)
+                number, units = _scale(scale, number)
                 if not show_units:
                     units = ''
 
@@ -2008,7 +2042,7 @@ class Quantity(float):
         # remove trailing decimal point {{{3
         if sf or strip_radix:  # could also add 'or units'
             mantissa = mantissa.rstrip('.')
-        elif strip_zeros:
+        elif not strip_zeros:
             # a trailing radix is not very attractive, so add a zero except if
             # strip_zeros is set, which is where we are trying to retain the
             # number of digits specified by prec to convey the number of
@@ -2143,7 +2177,7 @@ class Quantity(float):
         if prec == 'full':
             prec = self.full_prec
         if scale or isinstance(scale, numbers.Number):
-            number, units = _scale(scale, self, self.units)
+            number, units = _scale(scale, self)
             units = units if show_units else ''
         else:
             number = float(self)
@@ -2263,7 +2297,7 @@ class Quantity(float):
 
         # handle scaling
         if scale or isinstance(scale, numbers.Number):
-            number, units = _scale(scale, self, self.units)
+            number, units = _scale(scale, self)
             units = units if show_units else ''
         else:
             number = float(self)
@@ -2381,8 +2415,15 @@ class Quantity(float):
     # __repr__() {{{2
     def __repr__(self):
         form = 'eng' if self.ignore_sf else 'si'
-        return 'Quantity({!r})'.format(
-            self.render(form=form, show_units=True, prec='full', negligible=-1)
+        return '{}({!r})'.format(
+            self.__class__.__name__,
+            self.render(
+                form = form,
+                show_units = True,
+                prec = 'full',
+                negligible = -1,
+                strip_zeros = True
+            )
         )
 
     # format() {{{2
@@ -2459,6 +2500,8 @@ class Quantity(float):
                     value = getattr(self, 'name', '')
                 elif ftype == 'd':
                     value = getattr(self, 'desc', '')
+                else:  # pragma: no cover
+                    raise NotImplementedError
                 return '{0:{1}{2}s}'.format(value, align, width)
             label = ftype.isupper()
             ftype = ftype.lower()
@@ -3005,9 +3048,8 @@ _unit_conversions = {}
 
 # _convert_units() {{{2
 def _convert_units(to_units, from_units, value):
-    # not intended to be used by the user; if you want this functionality,
+    # Not intended to be used by the user.  If you want this functionality,
     # simply use: Quantity(value, from_units).scale(to_units).
-
     if to_units == from_units:
         return value
     try:
@@ -3033,7 +3075,7 @@ class UnitConversion(object):
     :arg to_units:
         A collection of units. If given as a single string it is split.
         May also be a subclass of :class:`Quantity` if units are defined.
-    :type to_units: string or list of strings
+    :type to_units: string, list of strings, or Quantity
 
     :arg from_units:
         A collection of units. If given as a single string it is split.
@@ -3049,6 +3091,9 @@ class UnitConversion(object):
         Conversion offset.  You may also pass a function as an argument, in
         which case it is used to perform reverse conversions.  In this case,
         *slope* should also be passed a callable.
+
+    :raises UnknownConversion(QuantiPhyError, KeyError):
+        The given unit pair is not associated with a conversion.
 
     **Forward Conversion**:
     The following conversion is applied if the given units are among the
@@ -3148,23 +3193,28 @@ class UnitConversion(object):
         >>> print('{:qA}, {:qA}'.format(Quantity('-20 dBA'), Quantity('20 dBA')))
         100 mA, 10 A
 
+    Parameterized unit conversion functions are also supported (see
+    :meth:`UnitConversion.fixture`).
+
     """
 
     # constructor {{{3
     def __init__(self, to_units, from_units, slope=1, intercept=0):
         # convert units to lists
-        # allow units to be a subclasss of Quantity that has units
+        # allow units to be a subclass of Quantity that has units
         try:
-            if issubclass(to_units, Quantity):
-                self.to_units = [to_units.units]
-        except TypeError:
+            self.to_units = [to_units.units]
+        except AttributeError:
             self.to_units = to_units.split() if isinstance(to_units, str) else to_units
+            if not self.to_units:
+                self.to_units = ['']
 
         try:
-            if issubclass(from_units, Quantity):
-                self.from_units = [from_units.units]
-        except TypeError:
+            self.from_units = [from_units.units]
+        except AttributeError:
             self.from_units = from_units.split() if isinstance(from_units, str) else from_units
+            if not self.from_units:
+                self.from_units = ['']
 
         # convert units to lists and save values
         self.slope = slope
@@ -3285,37 +3335,41 @@ class UnitConversion(object):
         """
         # code {{{4
         if isinstance(value, str):
-            if not from_units:
-                from_units = value
+            from_units = value
             value = 1
-        if from_units is None:
-            try:
+
+        if hasattr(value, 'units'):
+            if from_units is None:
                 from_units = value.units
-            except AttributeError:
-                pass
+            else:
+                if from_units in self.from_units and value.units in self.from_units:
+                    pass
+                elif from_units in self.to_units and value.units in self.to_units:
+                    pass
+                else:
+                    raise IncompatibleUnits(value.units, from_units)
 
-        if callable(self.slope) or callable(self.intercept):
-            # the slope and intercept arguments are actually the forward and
-            # reverse conversion functions.
-            _forward = self.slope
-            _reverse = self.intercept
-        else:
-            _forward = self._forward
-            _reverse = self._reverse
+        if to_units is None and from_units is None:
+            to_units = self.to_units[0]
+            from_units = self.from_units[0]
+        elif to_units is None:
+            if from_units in self.from_units:
+                to_units = self.to_units[0]
+            else:
+                to_units = self.from_units[0]
+        elif from_units is None:
+            if to_units in self.to_units:
+                from_units = self.from_units[0]
+            else:
+                from_units = self.to_units[0]
 
-        if to_units in self.to_units:
-            return Quantity(_forward(value), to_units)
-        if to_units in self.from_units:
-            return Quantity(_reverse(value), to_units)
-        if not from_units:
-            return Quantity(_forward(value), self.to_units[0])
-        if from_units in self.from_units:
-            return Quantity(_forward(value), self.to_units[0])
-        if from_units in self.to_units:
-            return Quantity(_reverse(value), self.from_units[0])
-        if to_units:
+        if to_units not in self.to_units + self.from_units:
             raise UnknownConversion(to_units, direction='to')
-        raise UnknownConversion(from_units, direction='from')
+        if from_units not in self.to_units + self.from_units:
+            raise UnknownConversion(from_units, direction='from')
+
+        converted = _convert_units(to_units, from_units, value)
+        return Quantity(converted, units=to_units)
 
     # fixture() {{{3
     @staticmethod
@@ -3323,7 +3377,7 @@ class UnitConversion(object):
         # description {{{4
         """
         A decorator fixture for unit conversion functions that can be used when
-        creating parameterized unit conversions.
+        creating parametrized unit conversions.
 
         Creates an argument list for the decorated function based on the type of
         value given for the *params* argument to :class:`Quantity`.

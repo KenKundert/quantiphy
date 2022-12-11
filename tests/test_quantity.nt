@@ -1378,11 +1378,11 @@ test_number_recognition:
 
     foster:
         given: q = Quantity('1 e-9 Ω')
-        error: 1 e-9 Ω: not a valid number.
+        error: '1 e-9 Ω': not a valid number.
 
     deforest:
         given: q = Quantity('1n Ω')
-        error: 1n Ω: not a valid number.
+        error: '1n Ω': not a valid number.
 
     fortune:
         given: q = Quantity('1e-9 Ω')
@@ -1816,6 +1816,37 @@ test_number_recognition:
             shear:
                 evaluate: q.fixed(prec=2, strip_zeros=True, strip_radix=True)
                 expected: '$100'
+
+    cliche:
+        given: q = Quantity('$123.45')
+        tests:
+            tendon:
+                evaluate: q.as_tuple()
+                expected: (123.45, '$')
+            roommate:
+                evaluate: q.fixed(prec=0, strip_zeros=False, strip_radix=False)
+                expected: '$123.'
+            instep:
+                evaluate: q.fixed(prec=0, strip_zeros=True, strip_radix=False)
+                expected: '$123.'
+            sprinkle:
+                evaluate: q.fixed(prec=0, strip_zeros=False, strip_radix=True)
+                expected: '$123'
+            guild:
+                evaluate: q.fixed(prec=0, strip_zeros=True, strip_radix=True)
+                expected: '$123'
+            invoice:
+                evaluate: q.fixed(prec=2, strip_zeros=False, strip_radix=False)
+                expected: '$123.45'
+            vintage:
+                evaluate: q.fixed(prec=2, strip_zeros=True, strip_radix=False)
+                expected: '$123.45'
+            nutrient:
+                evaluate: q.fixed(prec=2, strip_zeros=False, strip_radix=True)
+                expected: '$123.45'
+            shear:
+                evaluate: q.fixed(prec=2, strip_zeros=True, strip_radix=True)
+                expected: '$123.45'
 
     retina:
         given: q = Quantity('Ƀ1.4')
@@ -2710,10 +2741,10 @@ test_number_recognition:
                 expected: '10'
             muffle:
                 evaluate: q.render(prec='full', strip_zeros=True, strip_radix=False, show_units=True)
-                expected: '10.0 s'
+                expected: '10. s'
             crash:
                 evaluate: q.render(prec='full', strip_zeros=True, strip_radix=False, show_units=False)
-                expected: '10.0'
+                expected: '10.'
             stationer:
                 evaluate: q.render(prec='full', strip_zeros=False, strip_radix=True, show_units=True)
                 expected: '10 s'
@@ -2722,10 +2753,10 @@ test_number_recognition:
                 expected: '10'
             woman:
                 evaluate: q.render(prec='full', strip_zeros=False, strip_radix=False, show_units=True)
-                expected: '10. s'
+                expected: '10.0 s'
             potty:
                 evaluate: q.render(prec='full', strip_zeros=False, strip_radix=False, show_units=False)
-                expected: '10.'
+                expected: '10.0'
             forgo:
                 evaluate: q.render(prec=0, strip_zeros=True, strip_radix=True, show_units=True)
                 expected: '10 s'
@@ -2734,10 +2765,10 @@ test_number_recognition:
                 expected: '10'
             diploma:
                 evaluate: q.render(prec=0, strip_zeros=True, strip_radix=False, show_units=True)
-                expected: '10.0 s'
+                expected: '10. s'
             christen:
                 evaluate: q.render(prec=0, strip_zeros=True, strip_radix=False, show_units=False)
-                expected: '10.0'
+                expected: '10.'
             scuff:
                 evaluate: q.render(prec=0, strip_zeros=False, strip_radix=True, show_units=True)
                 expected: '10 s'
@@ -2746,10 +2777,10 @@ test_number_recognition:
                 expected: '10'
             cameraman:
                 evaluate: q.render(prec=0, strip_zeros=False, strip_radix=False, show_units=True)
-                expected: '10. s'
+                expected: '10.0 s'
             indwell:
                 evaluate: q.render(prec=0, strip_zeros=False, strip_radix=False, show_units=False)
-                expected: '10.'
+                expected: '10.0'
             propound:
                 evaluate: q.render(prec=1, strip_zeros=True, strip_radix=True, show_units=True)
                 expected: '10 s'
@@ -2758,10 +2789,10 @@ test_number_recognition:
                 expected: '10'
             texture:
                 evaluate: q.render(prec=1, strip_zeros=True, strip_radix=False, show_units=True)
-                expected: '10.0 s'
+                expected: '10. s'
             protector:
                 evaluate: q.render(prec=1, strip_zeros=True, strip_radix=False, show_units=False)
-                expected: '10.0'
+                expected: '10.'
             gargle:
                 evaluate: q.render(prec=1, strip_zeros=False, strip_radix=True, show_units=True)
                 expected: '10 s'
@@ -2770,10 +2801,10 @@ test_number_recognition:
                 expected: '10'
             navigate:
                 evaluate: q.render(prec=1, strip_zeros=False, strip_radix=False, show_units=True)
-                expected: '10. s'
+                expected: '10.0 s'
             crazy:
                 evaluate: q.render(prec=1, strip_zeros=False, strip_radix=False, show_units=False)
-                expected: '10.'
+                expected: '10.0'
 
     flotation:
         given: q = Quantity('1420.405751786 MHz')
@@ -2786,6 +2817,12 @@ test_number_recognition:
                 expected: '1.4204 GHz'
             inflexion:
                 evaluate: q.render(strip_zeros=True)
+                expected: '1.4204 GHz'
+            autumn:
+                evaluate: q.render(strip_zeros=False, strip_radix=False)
+                expected: '1.4204 GHz'
+            signalman:
+                evaluate: q.render(strip_zeros=True, strip_radix=False)
                 expected: '1.4204 GHz'
             squaw:
                 evaluate: q.render(prec=0, strip_zeros=False)

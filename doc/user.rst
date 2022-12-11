@@ -387,7 +387,7 @@ whose name starts with a scale factor character.  For example:
 Finally, you can also specify conversion parameters using *params*.  These 
 values are ignored by *QuantiPhy* except that they are made available to any 
 :class:`UnitConversion` conversion functions as a way of implementing 
-parameterized conversions.
+parametrized conversions.
 
 
 Quantity Attributes
@@ -412,61 +412,6 @@ In addition, you can also override the preferences with attributes:
     >>> out_period.spacer = ''
     >>> print(out_period)
     100ns
-
-
-.. _subclassing Quantity:
-
-Subclassing Quantity
-""""""""""""""""""""
-
-You can subclass :class:`Quantity` to make it easier to create a particular type 
-of quantity, or to create quantities with particular qualities.  The following 
-example demonstrates both. It creates a subclass for dollars that both sets the 
-units and display preferences.  Display preferences for currencies are often 
-very different from what you would want from physical quantities:
-
-.. code-block:: python
-
-    >>> class Dollars(Quantity):
-    ...     units = '$'
-    ...     form = 'fixed'
-    ...     prec = 2
-    ...     strip_zeros = False
-    ...     show_commas = True
-
-    >>> cost = Dollars(100_000)
-    >>> print(cost)
-    $100,000.00
-
-This example creates a special class for bytes.
-
-.. code-block:: python
-
-    >>> class Bytes(Quantity):
-    ...     units = 'B'
-    ...     form = 'binary'
-    ...     accept_binary = True
-
-    >>> memory = Bytes('64KiB')
-    >>> print(memory)
-    64 KiB
-
-Lastly, this example creates a special class for temperatures. It disallows use 
-of 'K' as a scale factor to avoid confusion with Kelvin units.
-
-.. code-block:: python
-
-    >>> class Temperature(Quantity):
-    ...     units = 'K'
-    ...     input_sf = Quantity.get_pref('input_sf').replace('K', '')
-
-    >>> Tcore = Temperature('15M')
-    >>> Tphoto = Temperature('5.3k')
-    >>> Tcmb = Temperature('3.18')
-    >>> print(Tcore, Tphoto, Tcmb, sep='\n')
-    15 MK
-    5.3 kK
-    3.18 K
 
 
 .. _scaling upon creation:
@@ -523,6 +468,17 @@ quantity to have:
     >>> print(Tboil)
     373.15 K
 
+or if you pass in a subclass of :class:`Quantity` that has units:
+
+.. code-block:: python
+
+    >>> class Kelvin(Quantity):
+    ...     units = 'K'
+
+    >>> Tboil = Quantity('212 °F', scale=Kelvin)
+    >>> print(Tboil)
+    373.15 K
+
 This assumes that the initial value is specified with units. If not, you need to 
 provide them for this mechanism to work.
 
@@ -554,87 +510,14 @@ consistent units.  For example:
     220.46 lb
     210 lb
 
-QuantiPhy* provides a collection of predefined converters for common units:
-
-=========== ================================================================
-C °C        K, F °F, R °R
-K           C °C, F °F, R °R
-m           km, m, cm, mm, um μm micron, nm, Å angstrom, mi mile miles,
-            in inch inches
-g           kg, mg, ug μg, ng, oz, lb lbs
-s           sec second seconds, min minute minutes, hour hours hr, day days
-b           B
-BTC btc Ƀ ₿ sat sats ș
-=========== ================================================================
-
-The conversions can occur between a pair of units, one from the first column and 
-one from the second. They do not occur when both units are only in the second 
-column. So for example, it is possible to convert between *g* and *lbs*, but not 
-between *oz* and *lb*.  However, if you notice, the units in the second column 
-are grouped using commas.  A set of units within commas are considered 
-equivalent, meaning that there are multiple names for the same underlying unit.  
-For example, *in*, *inch*, and *inches* are all considered equivalent. You can 
-convert between equivalent units even though both are found in the second 
-column. This feature was used in the above example where *lbs* was converted to 
-*lb*.
-
-You can also create your own converters using :class:`UnitConversion`:
-
-.. code-block:: python
-
-    >>> from quantiphy import UnitConversion
-
-    >>> m2pc = UnitConversion('m', 'pc parsec', 3.0857e16)
-
-    >>> d_sol = Quantity('5 μpc', scale='m')
-    >>> print(d_sol)
-    154.28 Gm
-
-This unit conversion says, when converting units of 'm' to either 'pc' or 
-'parsec' multiply by 3.0857e16, when going the other way, divide by 3.0857e16.
-
-.. code-block:: python
-
-    >>> d_sol = Quantity('154.285 Gm', scale='pc')
-    >>> print(d_sol)
-    5 upc
-
-:class:`UnitConversion` supports linear conversions (slope only), affine 
-conversions (slope and intercept) and nonlinear conversions.
-
-Notice that the return value of *UnitConversion* was not used. It is enough to 
-simply create the *UnitConversion* for it to be available to *Quantity*. So, it 
-is normal to not capture the return value of *UnitConversion*. However, there 
-are two things you can do with the return value. First you can convert it to 
-a string to get a description of the relationship. This is largely used as 
-a sanity check:
-
-.. code-block:: python
-
-    >>> print(str(m2pc))
-    m ← 3.0857e+16*pc
-
-In addition, you can use it to directly perform conversions:
-
-.. code-block:: python
-
-    >>> m = m2pc.convert(1, 'pc')
-    >>> print(str(m))
-    30.857e15 m
-
-    >>> kpc = m2pc.convert(30.857e+18, 'm')
-    >>> print(str(kpc))
-    1 kpc
-
-You can find an example of this usage in :ref:`quantiphy cryptocurrency 
-example`.
+To perform these conversions *QuantiPhy* uses redefined relationships between 
+pairs of units.  These relationships are defined using :ref:`unit converters`.
 
 When using unit conversions it is important to only convert to units without 
-scale factors (such as those in the first column above) when creating 
-a quantity.  For example, it is better to convert to 'g' rather than 'kg'.  If 
-the desired units used when creating a quantity includes a scale factor, then it 
-is easy to end up with two scale factors when converting the number to a string 
-(ex: 1 mkg or one milli-kilo-gram).
+scale factors when creating a quantity.  For example, it is better to convert to 
+'g' rather than 'kg'.  Otherwise, if the desired units used when creating 
+a quantity includes a scale factor, it is easy to end up with two scale factors 
+when converting the number to a string (ex: 1 mkg or one milli-kilo-gram).
 
 Here is an example that uses quantity rescaling. Imagine that a table is being 
 read that gives temperature versus time, but the temperature is given in °F and 
@@ -1301,6 +1184,318 @@ on to the underlying float. For example:
    single: mu0 (permeability of free space)
    single: μ₀ (permeability of free space)
    single: Z0 (characteristic impedance of free space)
+
+
+.. _subclassing Quantity:
+
+Subclassing Quantity
+--------------------
+
+You can subclass :class:`Quantity` to make it easier to create a particular type 
+of quantity, or to create quantities with particular qualities.  The following 
+example demonstrates both. It creates a subclass for dollars that both sets the 
+units and the display preferences.  Any *Quantity* preference (see 
+:meth:`Quantity.set_prefs`) may be given as an attribute. Display preferences 
+for currencies are often very different from what you would want from physical 
+quantities:
+
+.. code-block:: python
+
+    >>> class Dollars(Quantity):
+    ...     units = '$'
+    ...     form = 'fixed'
+    ...     prec = 2
+    ...     strip_zeros = False
+    ...     show_commas = True
+
+    >>> cost = Dollars(100_000)
+    >>> print(cost)
+    $100,000.00
+
+This example creates a special class for bytes.
+
+.. code-block:: python
+
+    >>> class Bytes(Quantity):
+    ...     units = 'B'
+    ...     form = 'binary'
+    ...     accept_binary = True
+
+    >>> memory = Bytes('64KiB')
+    >>> print(memory)
+    64 KiB
+
+Here, two classes are created for voltage and current, each with their own 
+perspective on what values should be considered negligible.
+
+.. code-block:: python
+
+    >>> class Voltage(Quantity):
+    ...     units = 'V'
+    ...     negligible = 1e-6
+
+    >>> class Current(Quantity):
+    ...     units = 'A'
+    ...     negligible = 1e-12
+
+    >>> Vout = Voltage(1e-9)
+    >>> Ileak = Current(1e-9)
+    >>> print(f"Vout = {Vout}, Ileak = {Ileak}.")
+    Vout = 0 V, Ileak = 1 nA.
+
+Lastly, this example creates a special class for temperatures. It disallows use 
+of 'K' as a scale factor to avoid confusion with Kelvin units.
+
+.. code-block:: python
+
+    >>> class Temperature(Quantity):
+    ...     units = 'K'
+    ...     input_sf = Quantity.get_pref('input_sf').replace('K', '')
+
+    >>> Tcore = Temperature('15M')
+    >>> Tphoto = Temperature('5.3k')
+    >>> Tcmb = Temperature('3.18')
+    >>> print(Tcore, Tphoto, Tcmb, sep='\n')
+    15 MK
+    5.3 kK
+    3.18 K
+
+
+.. _scaling with subclasses:
+
+Scaling with Subclasses
+.......................
+
+Special scaling rules come into play if the *units* attribute is present on 
+a :class:`Quantity` class.  In such a case you can specify the class as an 
+argument to a scaling operation.  For example:
+
+.. code-block:: python
+
+    >>> class Grams(Quantity):
+    ...     units = 'g'
+
+    >>> class Pounds(Quantity):
+    ...     units = 'lbs'
+
+    >>> wt = Pounds(10)
+    >>> mass = wt.scale(Grams)
+
+    >>> print(mass, repr(mass), sep='\n')
+    4.5359 kg
+    Grams('4.5359237 kg')
+
+    >>> print(wt.render(scale=Grams))
+    4.5359 kg
+
+Notice that use of *Grams* with the :meth:`Quantity.scale()` method resulted in 
+a return value of type *Grams*.  This does not naturally occur if you scale 
+using scale factors or units:
+
+.. code-block:: python
+
+    >>> mass = wt.scale('g')
+    >>> print(mass, repr(mass), sep='\n')
+    4.5359 kg
+    Quantity('4.5359237 kg')
+
+In this case you can replicate the previous behavior by adding *Grams* as an 
+argument to the conversion:
+
+.. code-block:: python
+
+    >>> mass = wt.scale('g', cls=Grams)
+    >>> print(mass, repr(mass), sep='\n')
+    4.5359 kg
+    Grams('4.5359237 kg')
+
+
+.. _scaling upon subclass creation:
+
+Scaling Upon Subclass Creation
+..............................
+
+When creating quantities using a subclass, a conversion automatically occurs if 
+both the subclass and the value have units.  The conversion converts the given 
+units to those expected by the class.  For example:
+
+.. code-block:: python
+
+    >>> class Seconds(Quantity):
+    ...     units = 's'
+
+    >>> ttl = Seconds('2 days')
+    >>> print(ttl)
+    172.8 ks
+
+If you also specify a *scale* argument, that conversion occurs before the result 
+is converted to the units of the class:
+
+.. code-block:: python
+
+    >>> class Days(Quantity):
+    ...     units = 'days'
+
+    >>> expires = Days('48 hr', scale='s')
+    >>> print(expires)
+    2 days
+
+Adding the *scale* argument is handy because *QuantiPhy* does not provide 
+a built-in direct conversion between hours and days.  In this case two 
+conversions occur, from hours to seconds, as a result of the scale request, and 
+from seconds to days, to convert to the units expected by the class.
+
+
+.. _unit converters:
+
+Unit Converters
+---------------
+
+The :class:`UnitConversion` class defines conversion relationships between pairs 
+of units, which saves you the trouble of having to remember the actual 
+conversion factors.  Once defined, a relationship is available anywhere in 
+*QuantiPhy* where a unit conversion can occur.  `For example 
+<https://en.wikipedia.org/wiki/Smoot>`_:
+
+.. code-block:: python
+
+    >>> from quantiphy import Quantity, UnitConversion
+
+    >>> m_smoot = UnitConversion('m', 'smoots', 1.7)
+
+    >>> length_of_harvard_bridge = Quantity('619.48_m')
+    >>> print(length_of_harvard_bridge.render(scale='smoots', prec=3))
+    364.4 smoots
+
+This is a linear conversion.  This unit conversion says, when converting 
+*smoots* to *m*, multiply by 1.7.  When going the other way, divide by 1.7.
+
+QuantiPhy* provides a collection of built-in converters for common units:
+
+=========== ================================================================
+base units  related units
+=========== ================================================================
+C °C        K, F °F, R °R
+K           C °C, F °F, R °R
+m           km, m, cm, mm, um μm micron, nm, Å angstrom, mi mile miles,
+            in inch inches
+g           kg, mg, ug μg, ng, oz, lb lbs
+s           sec second seconds, min minute minutes, hour hours hr, day days
+b           B
+BTC btc Ƀ ₿ sat sats ș
+=========== ================================================================
+
+The conversions can occur between a pair of units, one from the first column and 
+one from the second. They do not occur when both units are only in the second 
+column. So for example, it is possible to convert between *g* and *lbs*, but not 
+between *oz* and *lb*.  However, if you notice, the units in the second column 
+are grouped using commas.  A set of units within commas are considered 
+equivalent, meaning that there are multiple names for the same underlying unit.  
+For example, *in*, *inch*, and *inches* are all considered equivalent. You can 
+convert between equivalent units even though both are found in either the first 
+or second columns.
+
+:class:`UnitConversion` supports linear conversions (slope only), affine 
+conversions (slope and intercept) nonlinear conversions, parameterized 
+conversions (conversions with extra parameters) and dynamic conversions 
+(convertions that change over time).  Here are some examples:
+
+.. code-block:: python
+
+    >>> def from_dB(dB):
+    ...     return 10**(dB/20)
+
+    >>> def to_dB(v):
+    ...     return 20*math.log10(v)
+
+    >>> m_inch = UnitConversion('m', 'in inch inches', 0.0254)  # linear
+    >>> C_F = UnitConversion('C °C', 'F °F', 5/9, -32*5/9)      # affine
+    >>> _dB = UnitConversion('', 'dB', from_dB, to_dB)          # nonlinear
+
+    >>> print(Quantity('12 in', scale='m'))
+    304.8 mm
+
+    >>> print(Quantity('100 °C', scale='°F'))
+    212 °F
+
+    >>> print(Quantity('100', scale='dB'))
+    40 dB
+
+Notice that the return value of *UnitConversion* was not used in the examples 
+above.  It is enough to simply create the *UnitConversion* for it to be 
+available to *Quantity*. So, it is normal to not capture the return value of 
+*UnitConversion*. However, there are a few things you can do with the return 
+value.  First you can convert it to a string to get a description of the 
+relationship.  This is largely used as a sanity check:
+
+.. code-block:: python
+
+    >>> print(C_F)
+    C ← 0.5555555555555556*F + -17.778
+
+In addition, you can use it to directly perform conversions:
+
+.. code-block:: python
+
+    >>> temp_F = C_F.convert(0, '°C', '°F')
+    >>> print(temp_F)
+    32 °F
+
+    >>> temp_C = C_F.convert(32, '°F', '°C')
+    >>> print(temp_C)
+    0 °C
+
+Finally, you can pre-define multiple conversions between the same pairs of 
+units, and activate the one you currently wish to use.  This can be useful with 
+conversions that change over time.  For example
+
+.. code-block:: python
+
+    >>> m_btc_usd_2017_peak = UnitConversion('USD $', 'BTC Ƀ', 19870.62)
+    >>> m_btc_usd_2021_peak = UnitConversion('USD $', 'BTC Ƀ', 68978.64)
+
+    >>> print(Quantity("5 BTC", scale='$'))
+    $344.89k
+
+    >>> m_btc_usd_2017_peak.activate()
+    >>> print(Quantity("5 BTC", scale='$'))
+    $99.353k
+
+    >>> m_btc_usd_2021_peak.activate()
+    >>> print(Quantity("5 BTC", scale='$'))
+    $344.89k
+
+Notice that defining a conversion between the same pair of units acts to conceal 
+an earlier definition, but the previous definition can be restored using 
+*activate()*.
+
+Occasionally you might encounter conversion that require one or more extra 
+parameters.  For example, to convert between molarity and concentration requires 
+the atomic weight of the solute.  These extra parameters can be passed in when 
+creating a quantity and then are available to the desired conversion.  For 
+example:
+
+.. code-block:: python
+
+    >> @UnitConversion.fixture
+    >> def from_molarity(M, mw):
+    ..     return M * mw
+
+    >> @UnitConversion.fixture
+    >> def to_molarity(g_L, mw):
+    ..     return g_L / mw
+
+    >> mol_conv = UnitConversion('g/L', 'M', from_molarity, to_molarity)
+
+    >> KCl_conc = Quantity('1.2 mg/L', params=74.55)
+    >> print(f"{KCl_conc:qM}")
+    16.097 uM
+
+For more information on defining unit converters, see :class:`UnitConversion`.
+For more information on parametrized unit converters, see 
+:meth:`UnitConversion.fixture`.  For example of real-time dynamic conversions, 
+see :ref:`quantiphy bitcoin example`.
+
 
 .. _constants:
 
@@ -2395,7 +2590,7 @@ errors:
     ...     q = Quantity('tweed')
     ... except QuantiPhyError as e:
     ...     print(str(e))
-    tweed: not a valid number.
+    'tweed': not a valid number.
 
 The alternative would be to catch each error individually:
 
@@ -2410,7 +2605,7 @@ The alternative would be to catch each error individually:
     ...     q = Quantity('tweed')
     ... except (InvalidNumber, UnknownScaleFactor, UnknownConversion, InvalidRecognizer) as e:
     ...     print(str(e))
-    tweed: not a valid number.
+    'tweed': not a valid number.
 
 *QuantiPhy* provides uniform access methods for its exceptions. You can access 
 all the unnamed arguments passed to the exception using the *args* attribute, 

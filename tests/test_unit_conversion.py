@@ -65,6 +65,17 @@ def test_simple_scaling():
         assert q.render(scale=dB) == '-40 dBV'
         assert str(q.scale(dB)) == '-40 dBV'
 
+    conversion = UnitConversion('¢ pennies', '$ dollars', 100)
+    assert str(conversion.convert()) == '100 ¢'
+    assert str(conversion.convert('$')) == '100 ¢'
+    assert str(conversion.convert('¢')) == '$10m'
+    assert str(conversion.convert(100, '¢')) == '$1'
+    assert str(conversion.convert(100, '$')) == '10 k¢'
+    assert str(conversion.convert(100, to_units='¢')) == '10 k¢'
+    assert str(conversion.convert(100, to_units='$')) == '$1'
+    assert str(conversion.convert(5, '¢', 'pennies')) == '5 pennies'
+    assert str(conversion.convert(5, '$', 'dollars')) == '5 dollars'
+
 def test_temperature():
     Quantity.reset_prefs()
     with Quantity.prefs(
@@ -281,44 +292,66 @@ def test_add():
     for contribution in [1.23, 4.56, 9.89]:
         total = total.add(Quantity(contribution, '$'), check_units=True)
     assert total.render() == '$44.04'
-    try:
+
+    with pytest.raises(IncompatibleUnits) as exception:
         total = total.add(Quantity(contribution, 'lbs'), check_units=True)
-        assert False
-    except TypeError:
-        assert True
+    assert str(exception.value) == "incompatible units ($ and lbs)."
+    assert isinstance(exception.value, IncompatibleUnits)
+    assert isinstance(exception.value, QuantiPhyError)
+    assert isinstance(exception.value, TypeError)
+    assert exception.value.args == ('$', 'lbs')
 
 def test_linear_conversion():
     Quantity.reset_prefs()
-    conversion = UnitConversion('USD', 'BTC', 100000)
-    assert str(conversion) == 'USD ← 100000*BTC'
+    conversion = UnitConversion('USD $', 'BTC Ƀ ₿', 10000)
+    assert str(conversion) == 'USD ← 10000*BTC'
 
     result = conversion.convert(1, 'BTC', 'USD')
-    assert str(result) == '100 kUSD'
+    assert str(result) == '10 kUSD'
 
     result = conversion.convert(1, 'USD', 'BTC')
-    assert str(result) == '10 uBTC'
+    assert str(result) == '100 uBTC'
 
     result = conversion.convert(from_units='BTC', to_units='USD')
-    assert str(result) == '100 kUSD'
+    assert str(result) == '10 kUSD'
 
     result = conversion.convert(from_units='USD', to_units='BTC')
-    assert str(result) == '10 uBTC'
+    assert str(result) == '100 uBTC'
 
     result = conversion.convert('BTC')
-    assert str(result) == '100 kUSD'
+    assert str(result) == '10 kUSD'
 
     result = conversion.convert('USD')
-    assert str(result) == '10 uBTC'
+    assert str(result) == '100 uBTC'
 
     result = conversion.convert(10)
-    assert str(result) == '1 MUSD'
+    assert str(result) == '100 kUSD'
 
-    dollar = Quantity('200000 USD')
+    dollar = Quantity('20000 USD')
     bitcoin = conversion.convert(dollar)
     assert str(bitcoin) == '2 BTC'
-
-    dollar = conversion.convert(bitcoin)
-    assert str(dollar) == '200 kUSD'
+    btc = conversion.convert(dollar, from_units='USD')
+    assert str(btc) == '2 BTC'
+    btc = conversion.convert(dollar, to_units='BTC')
+    assert str(btc) == '2 BTC'
+    btc = conversion.convert(dollar, to_units='₿')
+    assert str(btc) == '₿2'
+    btc = conversion.convert(dollar, from_units='$', to_units='₿')
+    assert str(btc) == '₿2'
+    usd = conversion.convert(bitcoin)
+    assert str(usd) == '20 kUSD'
+    usd = conversion.convert(bitcoin, from_units='BTC')
+    assert str(usd) == '20 kUSD'
+    usd = conversion.convert(bitcoin, to_units='USD')
+    assert str(usd) == '20 kUSD'
+    usd = conversion.convert(bitcoin, to_units='$')
+    assert str(usd) == '$20k'
+    usd = conversion.convert(bitcoin, from_units='₿', to_units='$')
+    assert str(usd) == '$20k'
+    with pytest.raises(IncompatibleUnits) as exception:
+        conversion.convert(dollar, from_units='BTC')
+    with pytest.raises(IncompatibleUnits) as exception:
+        conversion.convert(bitcoin, from_units='USD')
 
 
 def test_affine_conversion():
@@ -334,16 +367,25 @@ def test_affine_conversion():
     result = conversion.convert(32, from_units='F')
     assert str(result) == '0 C'
 
-    with pytest.raises(KeyError) as exception:
+    with pytest.raises(UnknownConversion) as exception:
         result = conversion.convert(0, from_units='X', to_units='X')
     assert str(exception.value) == "unable to convert to 'X'."
+
+    with pytest.raises(UnknownConversion) as exception:
+        result = conversion.convert(0, from_units='F', to_units='X')
+    assert str(exception.value) == "unable to convert to 'X'."
+
+    with pytest.raises(UnknownConversion) as exception:
+        result = conversion.convert(0, from_units='X', to_units='F')
+    assert str(exception.value) == "unable to convert from 'X'."
     assert isinstance(exception.value, UnknownConversion)
     assert isinstance(exception.value, QuantiPhyError)
     assert isinstance(exception.value, KeyError)
     assert exception.value.args == ('X',)
 
-    result = conversion.convert(0, to_units='X')
-    assert str(result) == '32 F'
+    with pytest.raises(UnknownConversion) as exception:
+        result = conversion.convert(0, to_units='X')
+    assert str(exception.value) == "unable to convert to 'X'."
 
     with pytest.raises(KeyError) as exception:
         result = conversion.convert(0, from_units='X')
@@ -364,6 +406,26 @@ def test_func_converters():
         assert isinstance(value, Quantity)
         return 20*math.log10(value)
 
+    vconverter = UnitConversion('', 'dB', from_dB, to_dB)
+    assert str(vconverter) == ' ← from_dB(dB), dB ← to_dB()'
+    assert str(vconverter.convert(Quantity('100'))) == '40 dB'
+    assert str(vconverter.convert(Quantity('-20dB'))) == '100m'
+
+    vconverter = UnitConversion('dB', '', to_dB, from_dB)
+    assert str(vconverter) == 'dB ← to_dB(),  ← from_dB(dB)'
+    assert str(vconverter.convert(Quantity('100'))) == '40 dB'
+    assert str(vconverter.convert(Quantity('-20dB'))) == '100m'
+
+    vconverter = UnitConversion('V/V', 'dB', from_dB, to_dB)
+    assert str(vconverter) == 'V/V ← from_dB(dB), dB ← to_dB(V/V)'
+    assert str(vconverter.convert(Quantity('100mV/V'))) == '-20 dB'
+    assert str(vconverter.convert(Quantity('-20dB'))) == '100 mV/V'
+
+    vconverter = UnitConversion('A/A', 'dB', from_dB, to_dB)
+    assert str(vconverter) == 'A/A ← from_dB(dB), dB ← to_dB(A/A)'
+    assert str(vconverter.convert(Quantity('100mA/A'))) == '-20 dB'
+    assert str(vconverter.convert(Quantity('-20dB'))) == '100 mA/A'
+
     vconverter = UnitConversion('V', 'dBV', from_dB, to_dB)
     assert str(vconverter) == 'V ← from_dB(dBV), dBV ← to_dB(V)'
     assert str(vconverter.convert(Quantity('100mV'))) == '-20 dBV'
@@ -374,6 +436,16 @@ def test_func_converters():
     assert str(aconverter.convert(Quantity('100mA'))) == '-20 dBA'
     assert str(aconverter.convert(Quantity('-20dBA'))) == '100 mA'
 
+    assert '{:pdB}'.format(Quantity('100mV/V')) == '-20 dB'
+    assert '{:pdB}'.format(Quantity('10V/V')) == '20 dB'
+    assert '{:pV/V}'.format(Quantity('-20 dB')) == '0.1 V/V'
+    assert '{:pV/V}'.format(Quantity('20 dB')) == '10 V/V'
+
+    assert '{:pdB}'.format(Quantity('100mA/A')) == '-20 dB'
+    assert '{:pdB}'.format(Quantity('10A/A')) == '20 dB'
+    assert '{:pA/A}'.format(Quantity('-20 dB')) == '0.1 A/A'
+    assert '{:pA/A}'.format(Quantity('20 dB')) == '10 A/A'
+
     assert '{:pdBV}'.format(Quantity('100mV')) == '-20 dBV'
     assert '{:pdBV}'.format(Quantity('10V')) == '20 dBV'
     assert '{:pV}'.format(Quantity('-20 dBV')) == '0.1 V'
@@ -383,6 +455,17 @@ def test_func_converters():
     assert '{:pdBA}'.format(Quantity('10A')) == '20 dBA'
     assert '{:pA}'.format(Quantity('-20 dBA')) == '0.1 A'
     assert '{:pA}'.format(Quantity('20 dBA')) == '10 A'
+
+    vconverter = UnitConversion('', 'dB', from_dB, to_dB)
+    assert str(vconverter) == ' ← from_dB(dB), dB ← to_dB()'
+    assert str(vconverter.convert(Quantity('100m'))) == '-20 dB'
+    assert str(vconverter.convert(Quantity('-20dB'))) == '100m'
+
+    assert '{:pdB}'.format(Quantity('100m')) == '-20 dB'
+    assert '{:pdB}'.format(Quantity('10')) == '20 dB'
+    # unitless conversions do not work with format strings
+    # assert '{:p}'.format(Quantity('-20 dB')) == '0.1'
+    # assert '{:p}'.format(Quantity('20 dB')) == '10'
 
 
 def test_subclass_conversion():
@@ -409,19 +492,34 @@ def test_subclass_conversion():
     result = conversion.convert(1, 'sat', 'BTC')
     assert str(result) == '10 nBTC'
 
+    class Seconds(Quantity):
+        units = 's'
 
-def test_parameterized_cconverters():
+    class Days(Quantity):
+        prec = 0
+        form = 'fixed'
+        units = 'days'
+
+    s = Seconds('48 hr')
+    assert str(s) == '172.8 ks'
+    d = Days(s)
+    assert str(d) == '2 days'
+    d = Days('48 hr', scale='s')
+    assert str(d) == '2 days'
+
+
+def test_parametrized_cconverters():
 
     # zero parameter case
     @UnitConversion.fixture
     def to_dB(v):
         assert isinstance(v, Quantity)
-        return 20*math.log(v, 10)  #, 'dB'+v.units
+        return 20*math.log(v, 10)
 
     @UnitConversion.fixture
     def from_dB(v):
         assert isinstance(v, Quantity)
-        return pow(10, v/20)  #, v.units[2:] if v.units.startswith('dB') else v.units
+        return pow(10, v/20)
 
     conv = UnitConversion('V', 'dBV', from_dB, to_dB)
     conv = UnitConversion('A', 'dBA', from_dB, to_dB)
@@ -571,6 +669,13 @@ def test_reactivated_cconverters():
     assert molarity.render() == '342.22 mM'
     assert molarity.render(scale='g', prec=2) == '5 g'
 
+
+def test_oddballs():
+    with pytest.raises(TypeError) as exception:
+        UnitConversion(UnitConversion, 'Hz', 1, 1)
+
+    with pytest.raises(TypeError) as exception:
+        UnitConversion('Hz', UnitConversion, 1, 1)
 
 
 if __name__ == '__main__':

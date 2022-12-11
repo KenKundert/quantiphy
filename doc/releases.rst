@@ -9,11 +9,14 @@ Latest development release
 | Released: 2022-12-04
 
 - Add new standard SI scale factors (*Q*, *R*, *r*, *q*).
+- Subclasses of :class:`Quantity` with units now convert values to the desired 
+  units rather than allowing the units of the class to be overridden by those of 
+  the value.
 
 
 2.18 (2022-08-31)
 -----------------
-- Support parameterized unit conversions (such as molarity).
+- Support parametrized unit conversions (such as molarity).
 - Allow % to act as a scale factor.
 - First argument of scaling functions are now guaranteed to be quantities.
 - Added :func:`UnitConversion.fixture` decorator function.

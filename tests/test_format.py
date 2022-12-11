@@ -350,6 +350,43 @@ def test_format_method():
     assert q.format('#P') == 'f = 1420405751.7860 Hz'
     assert q.format('#,P') == 'f = 1,420,405,751.7860 Hz'
 
+    Quantity.set_prefs(
+        spacer = None,
+        show_label = None,
+        label_fmt = None,
+        label_fmt_full = None,
+        show_desc = False,
+        prec = 4,
+        strip_zeros = False,
+    )
+    q=Quantity('f = 1420.405751786 MHz -- frequency of hydrogen line')
+    assert q.format() == '1.4204 GHz'
+    assert q.format('') == '1.4204 GHz'
+    assert q.format('.8') == '1.42040575 GHz'
+    assert q.format('.8s') == '1.42040575 GHz'
+    assert q.format('.8S') == 'f = 1.42040575 GHz'
+    assert q.format('.8q') == '1.42040575 GHz'
+    assert q.format('.8Q') == 'f = 1.42040575 GHz'
+    assert q.format('r') == '1.4204G'
+    assert q.format('R') == 'f = 1.4204G'
+    assert q.format('u') == 'Hz'
+    assert q.format('f') == '1420405751.7860'
+    assert q.format('F') == 'f = 1420405751.7860'
+    assert q.format('e') == '1.4204e+09'
+    assert q.format('E') == 'f = 1.4204e+09'
+    assert q.format('g') == '1.4204e+09'
+    assert q.format('G') == 'f = 1.4204e+09'
+    assert q.format('n') == 'f'
+    assert q.format('d') == 'frequency of hydrogen line'
+    assert q.format('p') == '1420405751.786 Hz'
+    assert q.format(',p') == '1,420,405,751.786 Hz'
+    assert q.format('P') == 'f = 1420405751.786 Hz'
+    assert q.format(',P') == 'f = 1,420,405,751.786 Hz'
+    assert q.format('#p') == '1420405751.7860 Hz'
+    assert q.format('#,p') == '1,420,405,751.7860 Hz'
+    assert q.format('#P') == 'f = 1420405751.7860 Hz'
+    assert q.format('#,P') == 'f = 1,420,405,751.7860 Hz'
+
 def test_render():
     Quantity.set_prefs(
         spacer = None,
@@ -403,6 +440,20 @@ def test_render():
     assert q.fixed(prec=2, strip_zeros=True, strip_radix=False) == '$100.'
     assert q.fixed(prec=2, strip_zeros=False, strip_radix=True) == '$100.00'
     assert q.fixed(prec=2, strip_zeros=True, strip_radix=True) == '$100'
+
+    q=Quantity('$123.45')
+    assert q.render(prec=0, strip_zeros=False, strip_radix=False) == '$100.0'
+    assert q.render(prec=0, strip_zeros=True, strip_radix=False) == '$100.'
+    assert q.render(prec=0, strip_zeros=False, strip_radix=True) == '$100'
+    assert q.render(prec=0, strip_zeros=True, strip_radix=True) == '$100'
+    assert q.render(prec=2, strip_zeros=False, strip_radix=False) == '$123.0'
+    assert q.render(prec=2, strip_zeros=True, strip_radix=False) == '$123.'
+    assert q.render(prec=2, strip_zeros=False, strip_radix=True) == '$123'
+    assert q.render(prec=2, strip_zeros=True, strip_radix=True) == '$123'
+    assert q.render(prec=4, strip_zeros=False, strip_radix=False) == '$123.45'
+    assert q.render(prec=4, strip_zeros=True, strip_radix=False) == '$123.45'
+    assert q.render(prec=4, strip_zeros=False, strip_radix=True) == '$123.45'
+    assert q.render(prec=4, strip_zeros=True, strip_radix=True) == '$123.45'
 
 def test_sign():
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None, show_desc=False)

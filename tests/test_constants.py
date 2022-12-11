@@ -85,7 +85,7 @@ def test_constants():
 
     with pytest.raises(ValueError) as exception:
         str(Quantity('fuzz'))
-    assert str(exception.value) == 'fuzz: not a valid number.'
+    assert str(exception.value) == "'fuzz': not a valid number."
     assert isinstance(exception.value, InvalidNumber)
     assert isinstance(exception.value, QuantiPhyError)
     assert isinstance(exception.value, ValueError)

@@ -919,6 +919,7 @@ this example can be found on GitHub.
 
 
 .. bitcoin example {{{1
+.. _quantiphy bitcoin example:
 
 Dynamic Unit Conversions
 ------------------------

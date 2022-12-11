@@ -145,10 +145,14 @@ def test_misc():
     assert q.name == ''
     assert q.desc == ''
 
+    q1 = Quantity('7')
+    q2 = Quantity(q1, 'Hz', units='s')
+    assert q2.render() == '7 s'
+
     # check some exceptions
     with pytest.raises(ValueError) as exception:
         q = Quantity('f_hy = 1420405751;786 Hz')
-    assert str(exception.value) == '1420405751;786 Hz: not a valid number.'
+    assert str(exception.value) == "'1420405751;786 Hz': not a valid number."
     assert isinstance(exception.value, InvalidNumber)
     assert isinstance(exception.value, QuantiPhyError)
     assert isinstance(exception.value, ValueError)
@@ -157,7 +161,7 @@ def test_misc():
     # check some exceptions
     with pytest.raises(ValueError) as exception:
         q = Quantity('# nan')
-    assert str(exception.value) == '# nan: not a valid number.'
+    assert str(exception.value) == "'# nan': not a valid number."
     assert isinstance(exception.value, InvalidNumber)
     assert isinstance(exception.value, QuantiPhyError)
     assert isinstance(exception.value, ValueError)
@@ -188,7 +192,7 @@ def test_misc2():
     assert str(q) == '7'
     with pytest.raises(ValueError) as exception:
         q = Foo('%')
-    assert str(exception.value) == '%: not a valid number.'
+    assert str(exception.value) == "'%': not a valid number."
     assert isinstance(exception.value, InvalidNumber)
     assert isinstance(exception.value, QuantiPhyError)
     assert isinstance(exception.value, ValueError)
@@ -230,9 +234,17 @@ def test_misc2():
     q = Quantity('1.8_V')
     assert q.render(prec='full') == '1.8 V'
 
+    with Quantity.prefs(keep_components=False, strip_zeros=False):
+        q = Quantity('1.2345 V')
+        assert q.render(prec='full') == '1.234500000000 V'
+
+    with Quantity.prefs(keep_components=True, strip_zeros=False):
+        q = Quantity('1.2345000 V')
+        assert q.render(prec='full') == '1.2345000 V'
+
     with pytest.raises(ValueError) as exception:
         q = Quantity('x*y = z')
-    assert str(exception.value) == 'z: not a valid number.'
+    assert str(exception.value) == "'z': not a valid number."
     assert isinstance(exception.value, InvalidNumber)
     assert isinstance(exception.value, QuantiPhyError)
     assert isinstance(exception.value, ValueError)
@@ -248,7 +260,7 @@ def test_misc2():
 
     with pytest.raises(ValueError) as exception:
         Quantity('x\ny = z')
-    assert str(exception.value) == 'z: not a valid number.'
+    assert str(exception.value) == "'z': not a valid number."
     assert isinstance(exception.value, InvalidNumber)
     assert isinstance(exception.value, QuantiPhyError)
     assert isinstance(exception.value, ValueError)
@@ -430,14 +442,17 @@ def test_misc2():
     assert Quantity('10m').render(form='eng') == '10_m'
     Quantity.set_prefs(input_sf=None, unity_sf='_')
     assert Quantity('10m').render(form='eng') == '10e-3'
+
+    # no support for hella or helo
     with pytest.raises(ValueError) as exception:
         Quantity.set_prefs(input_sf='QRHYZTGMkμnpfazyhrq', unity_sf='_', spacer='')
-    assert str(exception.value) == 'H, h: unknown scale factor.'  # no support for hella or helo
+    assert str(exception.value) == 'input_sf: unknown scale factor: H, h.'
     assert isinstance(exception.value, UnknownScaleFactor)
     assert isinstance(exception.value, QuantiPhyError)
     assert isinstance(exception.value, ValueError)
     assert exception.value.args == ('H', 'h')
-    assert repr(exception.value) == "UnknownScaleFactor('H', 'h')"
+    assert exception.value.kwargs == dict(culprit='input_sf', combined='H, h')
+    assert repr(exception.value) == "UnknownScaleFactor('H', 'h', combined='H, h', culprit='input_sf')"
     exception.value.render('{}, {}: unknown') == 'H, h: unknown'
 
     Quantity.set_prefs(input_sf=None, unity_sf=None, spacer=None)
@@ -446,15 +461,37 @@ def test_misc2():
     Quantity.input_sf = 'GMkwb'
     with pytest.raises(ValueError) as exception:
         Quantity('10m')
-    assert str(exception.value) == 'b, w: unknown scale factor.'
+    assert str(exception.value) == 'input_sf: unknown scale factor: b, w.'
     assert isinstance(exception.value, UnknownScaleFactor)
     assert isinstance(exception.value, QuantiPhyError)
     assert isinstance(exception.value, ValueError)
     assert exception.value.args == ('b', 'w')
-    assert repr(exception.value) == "UnknownScaleFactor('b', 'w')"
+    assert repr(exception.value) == "UnknownScaleFactor('b', 'w', combined='b, w', culprit='input_sf')"
     exception.value.render('{}, {}: unknown') == 'b, w: unknown'
 
     del Quantity.input_sf
+
+    # test output_sf
+    Quantity.set_prefs(output_sf='GMk')
+    assert Quantity('10k').render(form='si') == '10k'
+    assert Quantity('10m').render(form='si') == '10e-3'
+    Quantity.set_prefs(output_sf=None)
+    assert Quantity('10k').render(form='si') == '10k'
+    assert Quantity('10m').render(form='si') == '10m'
+
+    # no support for hella or helo
+    with pytest.raises(ValueError) as exception:
+        Quantity.set_prefs(output_sf='QRHYZTGMkμnpfazyhrq', unity_sf='_', spacer='')
+    assert str(exception.value) == 'output_sf: unknown scale factor: H, h.'
+    assert isinstance(exception.value, UnknownScaleFactor)
+    assert isinstance(exception.value, QuantiPhyError)
+    assert isinstance(exception.value, ValueError)
+    assert exception.value.args == ('H', 'h')
+    assert exception.value.kwargs == dict(culprit='output_sf', combined='H, h')
+    assert repr(exception.value) == "UnknownScaleFactor('H', 'h', combined='H, h', culprit='output_sf')"
+    exception.value.render('{}, {}: unknown') == 'H, h: unknown'
+
+    Quantity.set_prefs(output_sf=None, unity_sf=None, spacer=None)
 
     # test map_sf
     Quantity.set_prefs(map_sf=Quantity.map_sf_to_greek)
@@ -827,6 +864,11 @@ def test_scale():
     assert str(q1.scale(v2)) == '6 ns'
     assert repr(q1.scale(v2)) == "Quantity('6 ns')"
 
+    v = Quantity('5V')
+    assert str(v) == '5 V'
+    assert repr(v.scale((0.001, 'A'))) == "Quantity('5 mA')"
+    i = Quantity(v, 'V', scale=(0.001, 'A')) == "Quantity('5 mA')"
+
     q1.name = 'period'
     q3 = q1.scale(q2).name == 'period'
     q1.desc = 'duration of one cycle'
@@ -845,12 +887,36 @@ def test_scale():
         units = '¢'
         prec = 0
 
-    print(UnitConversion(Dollars, Cents, 0.01))
+    converter = UnitConversion(Dollars, Cents, 0.01)
+    assert str(converter) == "$ ← 0.01*¢"
+
+    total = Quantity(Cents(100), scale=Dollars)
+    assert str(total) == '$1'
+    assert repr(total) == "Quantity('$1')"
+    assert repr(total.scale(Dollars)) == "Dollars('$1')"
+    assert repr(total.scale(Dollars, cls=Cents)) == "Cents('100 ¢')"
+        # starts of cents, then in converted to dollars, then back to cents
 
     total = Dollars(1)
     assert str(total) == '$1.00'
     total = total.scale(1000000)
     assert str(total) == '$1,000,000.00'
+
+    dollars = Dollars('100', scale=0.01)
+    assert dollars.as_tuple() == (1, '$')
+    assert str(dollars) == '$1.00'
+
+    dollars = Dollars('100¢', scale=(0.01, '$'))
+    assert dollars.as_tuple() == (1, '$')
+    assert str(dollars) == '$1.00'
+
+    dollars = Dollars('100¢')
+    assert dollars.as_tuple() == (1, '$')
+    assert str(dollars) == '$1.00'
+
+    with pytest.raises(UnknownConversion) as exception:
+        dollars = Dollars('100Hz')
+    assert str(exception.value) == "unable to convert between '$' and 'Hz'."
 
     class WholeDollars(Dollars):
         prec = 0
@@ -865,6 +931,14 @@ def test_scale():
     total = total.scale(Cents)
     assert str(total) == '10,000,000,000 ¢'
     assert type(total) == Cents
+
+    assert str(Dollars('100 ¢')) == '$1.00'
+    assert str(WholeDollars('100 ¢')) == '$1'
+    assert str(Cents('$1')) == '100 ¢'
+
+    with pytest.raises(TypeError) as exception:
+        dollars = dollars.scale(UnitConversion)
+
 
 def test_negligible():
     Quantity.reset_prefs()
@@ -994,6 +1068,7 @@ def test_percent():
         assert '%' in Quantity.get_pref('input_sf')
         assert Quantity('10%').render() == '100m'
         assert Quantity('10%Δ').render() == '100 mΔ'
+
 
 if __name__ == '__main__':
     # As a debugging aid allow the tests to be run on their own, outside pytest.
