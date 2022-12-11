@@ -1683,8 +1683,8 @@ class Quantity(float):
               new quantity.
             - If a function, it takes two arguments, the value to be scaled and
               its units.  The value is guaranteed to be a Quantity that includes
-              the units, so the second argument is not redundant and will
-              eventually be deprecated.  It returns two values, the value and
+              the units, so the second argument is redundant and will eventually
+              be deprecated.  The function returns two values, the value and
               units of the new value.
             - If a string, it is taken to the be desired units. This value along
               with the units of the quantity are used to select a known unit

@@ -581,8 +581,10 @@ tuple
     of the new quantity.
 
 function
-    The function takes two arguments, the value and the units of the quantity 
-    and it returns two values, the value and units of the new value.
+    The function takes two arguments, the value to be scaled and its units.  The 
+    value is guaranteed to be a Quantity that includes the units, so the second 
+    argument is redundant and will eventually be deprecated.  The function 
+    returns two values, the value and units of the new value.
 
 string
     The argument is taken to the be desired units. This value along with the 
