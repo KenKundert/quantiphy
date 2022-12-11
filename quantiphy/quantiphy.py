@@ -370,8 +370,8 @@ def add_constant(value, alias=None, unit_systems=None):
 
 
 # Globals {{{1
-__version__ = '2.18.3'
-__released__ = '2022-12-04'
+__version__ = '2.19a1'
+__released__ = '2022-12-10'
 
 # These mappings are only used when reading numbers
 # The key for these mappings must be a single character
