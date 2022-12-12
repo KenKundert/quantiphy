@@ -1,13 +1,10 @@
-from typing import Any, Callable, List, Tuple
+from typing import Any, Callable, Sequence
 
 class QuantiPhyError(Exception):
     args: tuple
     kwargs: dict
 
-    def __init__(self, *args, **kwargs) -> None:
-        ...
-
-    def render(self, template: str):
+    def render(self, template: str) -> str:
         ...
 
 class ExpectedQuantity(QuantiPhyError, ValueError):
@@ -65,7 +62,7 @@ class Quantity(float):
         model: str | Quantity = ...,
         *,
         units: str = ...,
-        scale: str | float | Tuple[float | Quantity, str] | Callable = ...,
+        scale: str | float | tuple[float | Quantity, str] | Callable = ...,
         name: str = ...,
         desc: str = ...,
         ignore_sf: bool = ...,
@@ -99,12 +96,12 @@ class Quantity(float):
     def is_nan(self) -> str | None:
         ...
 
-    def as_tuple(self) -> Tuple[float, str]:
+    def as_tuple(self) -> tuple[float, str]:
         ...
 
     def scale(
         self,
-        scale: str | float | Tuple[float | Quantity, str] | Callable,
+        scale: str | float | tuple[float | Quantity, str] | Callable,
         cls: type = ...
     ) -> Quantity:
         ...
@@ -124,7 +121,7 @@ class Quantity(float):
         show_label: bool = ...,
         strip_zeros:bool = ...,
         strip_radix: bool = ...,
-        scale: str | float | Tuple[float | Quantity, str] | Callable = ...,
+        scale: str | float | tuple[float | Quantity, str] | Callable = ...,
         negligible: float = ...,
     ):
         ...
@@ -137,7 +134,7 @@ class Quantity(float):
         show_commas: bool = ...,
         strip_zeros: bool = ...,
         strip_radix: bool = ...,
-        scale: str | float | Tuple[float | Quantity, str] | Callable = ...,
+        scale: str | float | tuple[float | Quantity, str] | Callable = ...,
     ):
         ...
 
@@ -148,7 +145,7 @@ class Quantity(float):
         show_label: bool = ...,
         strip_zeros: bool = ...,
         strip_radix: bool = ...,
-        scale: str | float | Tuple[float | Quantity, str] | Callable = ...,
+        scale: str | float | tuple[float | Quantity, str] | Callable = ...,
     ): ...
 
     def is_close(
@@ -180,7 +177,7 @@ class Quantity(float):
         ...
 
     @staticmethod
-    def map_sf_to_greek(sf: str) -> str | Tuple[str, bool]:
+    def map_sf_to_greek(sf: str) -> str | tuple[str, bool]:
         ...
 
     @classmethod
@@ -204,8 +201,8 @@ class UnitConversion:
 
     def __init__(
         self,
-        to_units: str | List[str] | Quantity,
-        from_units: str | List[str] | Quantity,
+        to_units: str | Quantity | Sequence[str],
+        from_units: str | Quantity | Sequence[str],
         slope: float | Callable = ...,
         intercept: float | Callable = ...,
     ) -> None:
@@ -232,7 +229,7 @@ def set_unit_system(unit_system: str) -> None:
 def add_constant(
     value: Quantity | str,
     alias: str = ...,
-    unit_systems: str | List[str] = ...,
+    unit_systems: str | Sequence[str] = ...,
 ) -> None:
     ...
 
