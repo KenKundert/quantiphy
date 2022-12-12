@@ -2724,6 +2724,7 @@ class Quantity(float):
     # map_sf_to_sci_notation() {{{2
     _SCI_NOTATION_MAPPER = {
         ord('e'): '×10',
+        # ord('e'): '⋅10',
         ord('+'): '',
         ord('＋'): '',
         ord('-'): '⁻',

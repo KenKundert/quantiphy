@@ -973,7 +973,7 @@ performed, so it is always up-to-date, no longer how long the program runs.
     print(f'{unit_btc:>8,.2p} = {unit_btc:,.2p$}')
     print(f'{unit_dollar:>8,.2p} = {unit_dollar:,.0psat}')
 
-When run, the script prints something like this:
+When run, the script prints something like this::
 
    1 BTC = $46,007
       $1 = 2,174 sat

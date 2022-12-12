@@ -442,6 +442,12 @@ def test_misc2():
     assert Quantity('10m').render(form='eng') == '10_m'
     Quantity.set_prefs(input_sf=None, unity_sf='_')
     assert Quantity('10m').render(form='eng') == '10e-3'
+    assert Quantity('10cm').render() == '100mm'
+
+    Quantity.set_prefs(unity_sf='', spacer=' ')
+    assert Quantity('10%').render() == '10%'
+    Quantity.set_prefs(input_sf='%')
+    assert Quantity('10%').render() == '100m'
 
     # no support for hella or helo
     with pytest.raises(ValueError) as exception:

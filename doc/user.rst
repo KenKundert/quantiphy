@@ -156,7 +156,7 @@ taken to be the value, and the second, if given, is taken to be the model, which
 is a source of default values.
 
 
-The First Argument: The Value
+The first argument: the value
 """""""""""""""""""""""""""""
 
 The value may be given as a float, as a string, or as a quantity.  The string 
@@ -203,7 +203,7 @@ If given as a string, the value may also be the name of a known :ref:`constant
 The following constants are pre-defined: *h*, *ħ*, *k*, *q*, *c*, *0°C*, *ε₀*, 
 *μ₀*, and *Z₀*. You may add your own :ref:`constants <constants>`.
 
-Currency units ($€¥£₩₺₽₹ɃΞ) are a bit different than other units in that they 
+Currency units ($€¥£₩₺₽₹Ƀ₿Ξ) are a bit different than other units in that they 
 are placed at the front of the quantity.
 
 .. code-block:: python
@@ -228,6 +228,8 @@ units:
 When given as a string, the number may use any of the following scale factors 
 (though you can use the *input_sf* preference to prune this list if desired):
 
+|   Q (10\ :sup:`30`) quetta
+|   R (10\ :sup:`27`) ronna
 |   Y (10\ :sup:`24`) yotta
 |   Z (10\ :sup:`21`) zetta
 |   E (10\ :sup:`18`) exa
@@ -247,12 +249,14 @@ When given as a string, the number may use any of the following scale factors
 |   a (10\ :sup:`-18`) atto
 |   z (10\ :sup:`-21`) zepto
 |   y (10\ :sup:`-24`) yocto
+|   r (10\ :sup:`-27`) ronto
+|   q (10\ :sup:`-30`) quecto
 
 In addition, the units must start with a letter or any of these characters: 
-``%√°ÅΩƱ``, and may be followed by those characters or digits or any of these 
-characters: ``-^/()·⁻⁰¹²³⁴⁵⁶⁷⁸⁹``.  Thus, any of the following would be accepted 
-as units: ``Ohms``, ``V/A``, ``J-s``, ``m/s^2``, ``H/(m-s)``, ``Ω``, ``%``, 
-``m·s⁻²``, ``V/√Hz``.
+``°ÅΩƱΩ℧¢$€¥£₩₺₽₹Ƀ₿șΞΔ%√``, and may be followed by those characters (except %) 
+or digits or any of these characters: ``-^/()·⁻⁰¹²³⁴⁵⁶⁷⁸⁹``.  Thus, any of the 
+following would be accepted as units: ``Ohms``, ``V/A``, ``J-s``, ``m/s^2``, 
+``H/(m-s)``, ``Ω``, ``%``, ``m·s⁻²``, ``V/√Hz``.
 
 When specifying the value as a string you may also give a name and description, 
 and if you do they become available as the attributes *name* and *desc*.  This 
@@ -282,7 +286,7 @@ For example:
     Tclk = 10 ns  # clock period
 
 
-The Second Argument: The Model
+The second argument: the model
 """"""""""""""""""""""""""""""
 
 If you only specify a real number for the value, then the units, name, and 
@@ -324,7 +328,7 @@ have units. The same is true for the description. For example:
     18 in
 
 
-The Remaining Arguments
+The remaining arguments
 """""""""""""""""""""""
 
 Any arguments beyond the first two must be given as named arguments.
@@ -390,7 +394,7 @@ values are ignored by *QuantiPhy* except that they are made available to any
 parametrized conversions.
 
 
-Quantity Attributes
+Quantity attributes
 """""""""""""""""""
 
 You can overwrite :class:`Quantity` attributes to override the units, name, or 
@@ -510,7 +514,7 @@ consistent units.  For example:
     220.46 lb
     210 lb
 
-To perform these conversions *QuantiPhy* uses redefined relationships between 
+To perform these conversions *QuantiPhy* uses predefined relationships between 
 pairs of units.  These relationships are defined using :ref:`unit converters`.
 
 When using unit conversions it is important to only convert to units without 
@@ -519,11 +523,11 @@ scale factors when creating a quantity.  For example, it is better to convert to
 a quantity includes a scale factor, it is easy to end up with two scale factors 
 when converting the number to a string (ex: 1 mkg or one milli-kilo-gram).
 
-Here is an example that uses quantity rescaling. Imagine that a table is being 
-read that gives temperature versus time, but the temperature is given in °F and 
-the time is given in minutes, but for the purpose of later analysis it is 
-desired that the values be converted to the more natural units of Kelvin and 
-seconds:
+Here is another example that uses quantity scaling. Imagine that a table is 
+being read that gives temperature versus time, but the temperature is given in 
+°F and the time is given in minutes and neither are given with units.  Assume 
+that for the purpose of later analysis it is desirable for the values be 
+converted to the more natural units of Kelvin and seconds:
 
 .. code-block:: python
 
@@ -559,11 +563,11 @@ the new value to create a new Quantity. For example:
     4.4623 GHz
     8.9247 GHz
 
-    >>> type(h_line)
-    <class 'quantiphy.quantiphy.Quantity'>
+    >>> print(repr(h_line))
+    Quantity('1.420405751786 GHz')
 
-    >>> type(sagan)
-    <class 'quantiphy.quantiphy.Quantity'>
+    >>> print(repr(sagan))
+    Quantity('4.462336274928 GHz')
 
 Any value that can be passed to the *scale* argument for :class:`Quantity` or 
 :meth:`Quantity.render` can be passed to the *scale* method.  Specifically, the 
@@ -689,29 +693,14 @@ a string:
     '1.4204 GHz'
 
 SI scale factors are used by default when converting numbers to strings. The 
-following scale factors could be used:
+following scale factors could be used: ``QRYZEPTGMkc%munpfazyrq``, though by 
+default % is treated as a unit rather than a scale factor.  You need to activate 
+% in *input_sf* for it to be treated as a scale factor.
 
-|   Y (10\ :sup:`24`) yotta
-|   Z (10\ :sup:`21`) zetta
-|   E (10\ :sup:`18`) exa
-|   P (10\ :sup:`15`) peta
-|   T (10\ :sup:`12`) tera
-|   G (10\ :sup:`9`) giga
-|   M (10\ :sup:`6`) mega
-|   k (10\ :sup:`3`) kilo
-|   m (10\ :sup:`-3`) milli
-|   u (10\ :sup:`-6`) micro
-|   n (10\ :sup:`-9`) nano
-|   p (10\ :sup:`-12`) pico
-|   f (10\ :sup:`-15`) fempto
-|   a (10\ :sup:`-18`) atto
-|   z (10\ :sup:`-21`) zepto
-|   y (10\ :sup:`-24`) yocto
-
-However, only the scale factors listed in the *output_sf* preference are 
-actually used, and by default that is set to 'TGMkmunpfa', which avoids the more
-uncommon scale factors.  You can set *output_sf* to *Quantity.all_sf* to output 
-all known scale factors.
+Only the scale factors listed in the *output_sf* preference are actually used, 
+and by default that is set to ``TGMkmunpfa``, which avoids the more uncommon 
+scale factors.  You can set *output_sf* to *Quantity.all_sf* to output all known 
+scale factors except ``c`` or ``%``, which are never used in output.
 
 The :meth:`Quantity.render` method allows you to control the process of 
 converting a quantity to a string. For example:
@@ -741,7 +730,6 @@ converting a quantity to a string. For example:
 
     >>> k.render(negligible=1e-12)
     '0 J/K'
-
 
 *show_label* allows you to display the name and description of the quantity when 
 rendering. If *show_label* is *False*, the quantity is not labeled with the name 
@@ -825,7 +813,7 @@ Scaling When Rendering a Quantity
 
 Once it comes time to output quantities from your program, you may again may be 
 constrained in the way the numbers must be presented. *QuantiPhy* also allows 
-you to rescale the values as you render them to strings. In this case, the value 
+you to scale the values as you render them to strings. In this case, the value 
 of the quantity itself remains unchanged. For example, imagine having a quantity 
 in grams and wanting to present it in either kilograms or in pounds:
 
@@ -897,6 +885,10 @@ Quantities can be passed into the string *format* method:
 
 In these cases the preferences for SI scale factors, units, and precision are 
 honored.
+
+
+Specifying the format
+"""""""""""""""""""""
 
 You can override the precision as part of the format specification
 
@@ -980,6 +972,23 @@ a quantity to a string based on a naked format string. For example:
     >>> print(h_line.format('.6q'))
     1.420406 GHz
 
+Any format specification that is not recognized by *QuantiPhy* is simply passed 
+on to the underlying float. For example:
+
+.. code-block:: python
+
+    >>> print(f'TOTAL: {total:+#,.2f}')
+    TOTAL: +11,200,000.00
+
+    >>> with Quantity.prefs(input_sf='%'):
+    ...     growth = Quantity('23.7%')
+    >>> print(f'growth = {growth:.0%}')
+    growth = 24%
+
+
+Examples
+""""""""
+
 Here is an example of these format types:
 
 .. code-block:: python
@@ -1024,7 +1033,7 @@ scale factors is desired, and the units should not be included.
     >>> print('{:r}'.format(h_line))
     1.4204G
 
-The opposite can be achieve using 'p', which includes the units but not use SI 
+The opposite can be achieved using 'p', which includes the units but not use SI 
 scale factors:
 
 .. code-block:: python
@@ -1134,6 +1143,10 @@ is used if the quantity has a description.
     >>> print('{:S}'.format(freq))
     Fin = 100 MHz — input frequency
 
+
+Scaling while formatting
+""""""""""""""""""""""""
+
 Finally, you can add units after the format code, which causes the number to be 
 scaled to those units if the transformation represents a known unit conversion.
 In this case the format code must be specified (use 's' rather than '').
@@ -1161,15 +1174,6 @@ information back into the original units:
     0 min   450 °F
     10 min  400 °F
     20 min  360 °F
-
-Any format specification that is not recognized by *QuantiPhy* is simply passed 
-on to the underlying float. For example:
-
-.. code-block:: python
-
-    >>> total = Quantity(1976794.98, '$')
-    >>> print(f'TOTAL: {total:#,.2f}')
-    TOTAL: 1,976,794.98
 
 
 .. index::
@@ -1423,8 +1427,12 @@ conversions (conversions with extra parameters) and dynamic conversions
     >>> print(Quantity('100', scale='dB'))
     40 dB
 
-Notice that the return value of *UnitConversion* was not used in the examples 
-above.  It is enough to simply create the *UnitConversion* for it to be 
+Notice that the these scaling functions differ from those describe previously in 
+that the only take one argument and return one value.  The units are not 
+included in either then argument list or the return value.
+
+Also notice that the return value of *UnitConversion* was not used in the 
+examples above.  It is enough to simply create the *UnitConversion* for it to be 
 available to *Quantity*. So, it is normal to not capture the return value of 
 *UnitConversion*. However, there are a few things you can do with the return 
 value.  First you can convert it to a string to get a description of the 
@@ -1453,29 +1461,32 @@ conversions that change over time.  For example
 
 .. code-block:: python
 
-    >>> m_btc_usd_2017_peak = UnitConversion('USD $', 'BTC Ƀ', 19870.62)
-    >>> m_btc_usd_2021_peak = UnitConversion('USD $', 'BTC Ƀ', 68978.64)
+    >>> btc_usd_2017_peak = UnitConversion('USD $', 'BTC Ƀ', 19870.62)
+    >>> btc_usd_2021_peak = UnitConversion('USD $', 'BTC Ƀ', 68978.64)
 
     >>> print(Quantity("5 BTC", scale='$'))
     $344.89k
 
-    >>> m_btc_usd_2017_peak.activate()
+    >>> btc_usd_2017_peak.activate()
     >>> print(Quantity("5 BTC", scale='$'))
     $99.353k
 
-    >>> m_btc_usd_2021_peak.activate()
+    >>> btc_usd_2021_peak.activate()
     >>> print(Quantity("5 BTC", scale='$'))
     $344.89k
 
-Notice that defining a conversion between the same pair of units acts to conceal 
-an earlier definition, but the previous definition can be restored using 
-*activate()*.
+Defining a conversion between the same pair of units acts to conceal an earlier 
+definition, but the previous definition can be restored using *activate()*.
 
-Occasionally you might encounter conversion that require one or more extra 
-parameters.  For example, to convert between molarity and concentration requires 
-the atomic weight of the solute.  These extra parameters can be passed in when 
-creating a quantity and then are available to the desired conversion.  For 
-example:
+
+Parameterized Unit Converters
+.............................
+
+Occasionally you might encounter conversion that requires one or more extra 
+parameters.  For example, to convert between concentration and molarity in 
+solutions requires the atomic weight of the solute.  These extra parameters can 
+be passed in when creating a quantity and then are available to the desired 
+conversion.  For example:
 
 .. code-block:: python
 
@@ -1678,6 +1689,17 @@ concentrations.
     SO2 = 20 PPM
     NO2 = 100 PPB
 
+Alternately, you can simply set the preferences as attributes when creating the 
+sublclasses.  For example:
+
+    >>> class Dollars(Quantity):
+    ...     units = '$'
+    ...     prec = 2
+    ...     form = 'fixed'
+    ...     show_commas = True
+    ...     minus = Quantity.minus_sign
+    ...     strip_zeros = False
+
 When a subclass is created, the preferences active in the main class are copied 
 into the subclass. Subsequent changes to the preferences in the main class do 
 not affect the subclass.
@@ -1747,28 +1769,70 @@ example, consider creating a local module named *quantity.py*:
 .. code-block:: python
 
     from quantiphy import *
+    import locale
 
     # Base preferences
-    # Configure Quantity to produce values that are parsable by Verilog-AMS.
-    Quantity.set_prefs(
-        form='sia',         # use SI scale factors, but not unicode versions
-        prec='full',        # include all precision specified by user
-        spacer='',          # no space between number and scale factor
-        strip_radix=False,  # assures quantities are always treated as reals
-        show_units=False,   # do not include units
-        map_sf=Quantity.map_sf_to_greek,
-                            # because we are using sia this is ignored by 
-                            # default;  it comes into play when form is 
-                            # overridden to 'si' for comments
+    loc_conv = locale.localeconv()
+    radix = loc_conv['decimal_point']
+    comma = loc_conv['thousands_sep']
+    Quantity.set_prefs(radix=radix, comma=comma, known_units='K')
+
+    # Alternate preference sets
+    preferences = dict(
+        user = dict(
+            # assumes a user is reading values on a terminal with fixed-width font
+            form = 'si',
+            map_sf = Quantity.map_sf_to_greek,
+            prec = 4,
+            spacer = ' ',
+            strip_radix = True,
+            minus = Quantity.minus_sign,
+            show_units = True,
+        ),
+        shinx = dict(
+            # assumes values are to be rendered with a variable-with font by Sphinx
+            form = 'si',
+            map_sf = Quantity.map_sf_to_sci_notation,
+            prec = 4,
+            spacer = Quantity.narrow_non_breaking_space,
+            minus = Quantity.minus_sign,
+            strip_radix = True,
+            show_units = True,
+        ),
+        code_with_si = dict(
+            # assumes values are to be rendered to code that accepts sf but not units
+            form = 'sia',
+            map_sf = None,
+            prec='full',
+            spacer='',
+            minus = '-'.minus_sign,
+            strip_radix=False,  # assures quantities are always treated as reals
+        )
+        code_without_si = dict(
+            # assumes values are to be rendered to code that does not accept sf or units
+            form = 'eng',
+            map_sf = None,
+            prec='full',
+            spacer='',
+            minus = '-'.minus_sign,
+            strip_radix=False,  # assures quantities are always treated as reals
+        )
     )
+
+    def set_quantity_defaults(choice):
+        Quantity.set_prefs(**peferences[choice])
+
+    set_quantity_defaults('user')
 
 Now, in the other modules, you would simply import from *quantity* rather than 
 *quantiphy*:
 
 .. code-block:: python
 
-    from quantity import Quantity, QuantiPhyError
+    from quantity import Quantity, QuantiPhyError, set_quantity_defaults
 
+Then, if you change the preferences using *set_quantity_defaults* from one 
+module, the preferences are changed for all modules.
 
 .. index::
    single: localization
@@ -1778,8 +1842,8 @@ Now, in the other modules, you would simply import from *quantity* rather than
 Localization
 ------------
 
-*Quantiphy* provides 4 preferences that help with localization: *radix*, 
-*comma*, *plus*, and *minus*.
+*Quantiphy* provides 7 preferences that help with localization: *radix*, 
+*comma*, *plus*, *minus*, *inf*, *nan*, and *spacer*.
 
 radix
     The decimal point; generally ``.`` or ``,``.
@@ -1788,22 +1852,37 @@ comma
     The thousands separator; generally ``,``, ``.``, or the empty string.
 
 plus
-    The sign that indicates a positive number; generally ``+`` or ``＋``.
-    This only affect the plus sign used on exponents, a plus sign is never added 
-    to the front of a number.
+    *QuantitPhy* does not use plus signs when rendering quantities either on the 
+    mantissa or the exponent.  But it will accept this symbol as a plus signs 
+    when converting strings to quantities.
 
 minus
-    The sign that indicates a negative number; generally ``-`` or ``−``.
+    The symbol used to indicate a negative number; generally ``-`` or ``−``.
+    This symbol is also accepted as a minus signs when converting strings to 
+    quantities.
 
-By default *QuantiPhy* uses ``.``, ``,``, ``+``, and ``-`` as the defaults.  
-These are all simple ASCII characters.  They work as expected for the numbers 
-normally used in programming, such as ``-5.17e+06``.
+inf
+    The symbol or word that signifies infinity; generally ``inf`` or ``∞``.
+
+nan
+    The symbol or word that indicates a NaN or Not-a-Number; generally ``NaN`` 
+    or ``nan``.
+
+spacer
+    The character used to separate the mantissa from trailing units, or scale 
+    factor combined with units: generally `` `` or 
+    *Quantity.narrow_non_breaking_space*.  *spacer* does not affect how strings 
+    are converted quantities, where the spacer is optional and may ether be 
+    a space, a non-breaking space, a thin space, or a narrow non-breaking space.
+
+By default *QuantiPhy* uses ``.``, ``,``, ``+``, ``-``, ``inf``, ``nan`` and `` 
+`` as the defaults.  These are all simple ASCII characters.  They work as expected 
+for the numbers normally used in programming, such as ``-5.17e+06``.
 
 Both *radix* and *comma* affect the way stings are converted to quantities and 
-they way quantities are rendered, whereas *plus* and *minus* only affect the way 
-quantities are rendered.  When interpreting a string as a number, *QuantiPhy* 
-first strips the *comma* character from the string and then replaces the *radix* 
-character with ``.``.
+they way quantities are rendered.  When interpreting a string as a number, 
+*QuantiPhy* first strips the *comma* character from the string and then replaces 
+the *radix* character with ``.``.
 
 If you prefer to use ``,`` for your radix, you generally have two choices. With 
 the first, *radix* is set to ``,`` and *comma* to ``.``. This allows you to 
@@ -1945,9 +2024,9 @@ existing known units.
 
 .. code-block:: python
 
-    >>> d1 = Quantity('1 au')
-    >>> d2 = Quantity('1000 pc')
-    >>> p = Quantity('138 Pa')
+    >>> d1 = Quantity('1 au')     # astronomical unit
+    >>> d2 = Quantity('1000 pc')  # parsec
+    >>> p = Quantity('138 Pa')    # Pascal
     >>> print(d1.render(form='eng'), d2, p, sep='\n')
     1e-18 u
     1 nc
@@ -2004,8 +2083,9 @@ If, however, you add % as a known scale factor, it then acts as a scale factor.
     ...     print(tolerance.as_tuple(), change.as_tuple(),)
     (0.1, '') (0.1, 'Δ')
 
-In general you cannot simply add to the list of known scale factors, the %
-character is an exception as *QuantiPhy* knows about it but disables by default.
+In general you cannot simply add to the list of known scale factors.  The %
+character is an exception as *QuantiPhy* knows about it but disables it by 
+default.
 
 .. index::
    single: tabular data
