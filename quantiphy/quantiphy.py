@@ -970,15 +970,27 @@ class Quantity(float):
             Certain units, as defined using the *tight_units* preference, cause
             the spacer to be suppressed.
 
-        :arg bool strip_radix:
+        :arg bool or str strip_radix:
             When rendering, strip the radix (decimal point) if not needed from
-            numbers even if they could then be mistaken for integers. If this
-            setting is False, the radix is still striped if the number has a
-            scale factor. By default this is True.
+            numbers even if they could then be mistaken for integers.
 
-            Set strip_radix to False when generating output that will be read by
+            There are three valid values: *True*, *False*, and “cover”.  If
+            *True*, the radix is removed if it is the last character in the
+            mantissa, so 1 is rendered as “1”.  If *False*, it is not removed,
+            so 1 is rendered as “1.”.  If “cover”, the radix is replaced by
+            “.0”, so 1 is rendered as “1.0”.
+
+            If this setting is False, the radix is still stripped if the number
+            has a scale factor. The default value is True.
+
+            Set *strip_radix* to False when generating output that will be read by
             a parser that distinguishes between integers and reals based on the
-            presence of a decimal point.
+            presence of a decimal point or scale factor.
+
+            Be aware that use of “cover” can give the impression of more
+            precision than is intended.  For example, 1.4 if rendered with
+            *prec=0* would be “1.0”, which suggests a precision of 1 rather than
+            0.  This true only if *prec* is less than 3.
 
         :arg bool strip_zeros:
             When rendering, strip off any unneeded zeros from the number. By
@@ -1777,7 +1789,7 @@ class Quantity(float):
 
     # render() {{{2
     def render(
-        self, form=None, show_units=None, prec=None, show_label=None,
+        self, *, form=None, show_units=None, prec=None, show_label=None,
         strip_zeros=None, strip_radix=None, scale=None, negligible=None
     ):
         # description {{{3
@@ -2040,15 +2052,11 @@ class Quantity(float):
         mantissa = sign + mantissa[0:(shift+1)] + '.' + mantissa[(shift+1):]
 
         # remove trailing decimal point {{{3
-        if sf or strip_radix:  # could also add 'or units'
+        if sf or strip_radix is True:
             mantissa = mantissa.rstrip('.')
-        elif not strip_zeros:
-            # a trailing radix is not very attractive, so add a zero except if
-            # strip_zeros is set, which is where we are trying to retain the
-            # number of digits specified by prec to convey the number of
-            # significant figures.
-            if mantissa[-1] == '.':
-                mantissa += '0'
+        elif strip_radix == 'cover' and mantissa[-1] == '.':
+            # a trailing radix is not very attractive, so add a zero if requested
+            mantissa += '0'
 
         # combine mantissa, scale factor, and units and return the result {{{3
         if sf_is_exp == 'unk':
@@ -2058,7 +2066,7 @@ class Quantity(float):
 
     # fixed() {{{2
     def fixed(
-        self, show_units=None, prec=None, show_label=None, show_commas=None,
+        self, *, show_units=None, prec=None, show_label=None, show_commas=None,
         strip_zeros=None, strip_radix=None, scale=None,
     ):
         # description {{{3
@@ -2183,13 +2191,16 @@ class Quantity(float):
             number = float(self)
         comma = ',' if show_commas else ''
         mantissa = '{0:{1}.{2}f}'.format(number, comma, prec)
-        if '.' in mantissa and strip_zeros:
-            mantissa = mantissa.rstrip('0')
-        if strip_radix:
-            mantissa = mantissa.rstrip('.')
+        if '.' in mantissa:
+            if strip_zeros:
+                mantissa = mantissa.rstrip('0')
         else:
-            if '.' not in mantissa:
-                mantissa += '.'
+            mantissa += '.'
+        if strip_radix is True:
+            mantissa = mantissa.rstrip('.')
+        elif strip_radix == 'cover' and mantissa[-1] == '.':
+            # a trailing radix is not very attractive, so add a zero if requested
+            mantissa += '0'
 
         # combine mantissa, scale factor and units and return result {{{3
         value = self._combine(mantissa, '', units, self.spacer)
@@ -2197,7 +2208,7 @@ class Quantity(float):
 
     # binary() {{{2
     def binary(
-        self, show_units=None, prec=None, show_label=None,
+        self, *, show_units=None, prec=None, show_label=None,
         strip_zeros=None, strip_radix=None, scale=None,
     ):
         # description {{{3
@@ -2323,14 +2334,15 @@ class Quantity(float):
             mantissa = whole + frac[0:exp] + '.' + frac[exp:]
             sf_is_exp = False
 
-        # cannot use binary scale factors, just use float format {{{3
+        # cannot use binary scale factors {{{3
         except (IndexError, ValueError):
-            num = '{number:0.{prec}f}'.format(number=number, prec=prec)
-            if 'e' in num:  # pragma: no cover
+            if number and base > 0:  # use e-notation for very large numbers
+                num = '{number:0.{prec}e}'.format(number=number, prec=prec)
                 mantissa, exp = num.split('e')
                 sf = 'e' + exp
                 sf_is_exp = True
-            else:
+            else:  # use float notation for very small numbers
+                num = '{number:0.{prec}f}'.format(number=number, prec=prec)
                 mantissa = num
                 sf = ''
                 sf_is_exp = False
@@ -2340,8 +2352,11 @@ class Quantity(float):
             mantissa += '.'
         if strip_zeros:
             mantissa = mantissa.rstrip('0')
-        if strip_radix or (sf and sf_is_exp):
+        if strip_radix is True or (sf or sf_is_exp):
             mantissa = mantissa.rstrip('.')
+        elif strip_radix == 'cover' and mantissa[-1] == '.':
+            # a trailing radix is not very attractive, so add a zero if requested
+            mantissa += '0'
 
         # combine mantissa, scale factor and units and return result {{{3
         value = self._combine(mantissa, sf, units, self.spacer, sf_is_exp)

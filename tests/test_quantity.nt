@@ -2751,12 +2751,18 @@ test_number_recognition:
             lovely:
                 evaluate: q.render(prec='full', strip_zeros=False, strip_radix=True, show_units=False)
                 expected: '10'
-            woman:
+            oligarchy:
                 evaluate: q.render(prec='full', strip_zeros=False, strip_radix=False, show_units=True)
+                expected: '10. s'
+            woman:
+                evaluate: q.render(prec='full', strip_zeros=False, strip_radix='cover', show_units=True)
                 expected: '10.0 s'
+            weave:
+                evaluate: q.render(prec='full', strip_zeros=False, strip_radix='cover', show_units=False)
+                expected: '10.0'
             potty:
                 evaluate: q.render(prec='full', strip_zeros=False, strip_radix=False, show_units=False)
-                expected: '10.0'
+                expected: '10.'
             forgo:
                 evaluate: q.render(prec=0, strip_zeros=True, strip_radix=True, show_units=True)
                 expected: '10 s'
@@ -2775,11 +2781,17 @@ test_number_recognition:
             portion:
                 evaluate: q.render(prec=0, strip_zeros=False, strip_radix=True, show_units=False)
                 expected: '10'
-            cameraman:
+            stall:
                 evaluate: q.render(prec=0, strip_zeros=False, strip_radix=False, show_units=True)
+                expected: '10. s'
+            cameraman:
+                evaluate: q.render(prec=0, strip_zeros=False, strip_radix='cover', show_units=True)
                 expected: '10.0 s'
-            indwell:
+            gender:
                 evaluate: q.render(prec=0, strip_zeros=False, strip_radix=False, show_units=False)
+                expected: '10.'
+            indwell:
+                evaluate: q.render(prec=0, strip_zeros=False, strip_radix='cover', show_units=False)
                 expected: '10.0'
             propound:
                 evaluate: q.render(prec=1, strip_zeros=True, strip_radix=True, show_units=True)
@@ -2799,11 +2811,17 @@ test_number_recognition:
             overflow:
                 evaluate: q.render(prec=1, strip_zeros=False, strip_radix=True, show_units=False)
                 expected: '10'
-            navigate:
+            collapse:
                 evaluate: q.render(prec=1, strip_zeros=False, strip_radix=False, show_units=True)
+                expected: '10. s'
+            navigate:
+                evaluate: q.render(prec=1, strip_zeros=False, strip_radix='cover', show_units=True)
                 expected: '10.0 s'
-            crazy:
+            announcer:
                 evaluate: q.render(prec=1, strip_zeros=False, strip_radix=False, show_units=False)
+                expected: '10.'
+            crazy:
+                evaluate: q.render(prec=1, strip_zeros=False, strip_radix='cover', show_units=False)
                 expected: '10.0'
 
     flotation:

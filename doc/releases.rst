@@ -12,6 +12,7 @@ Latest development release
 - Subclasses of :class:`Quantity` with units now convert values to the desired 
   units rather than allowing the units of the class to be overridden by those of 
   the value.
+- Added “cover” option to *strip_radix*..
 - Added type hints.
 
 

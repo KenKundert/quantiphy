@@ -1803,19 +1803,19 @@ example, consider creating a local module named *quantity.py*:
             # assumes values are to be rendered to code that accepts sf but not units
             form = 'sia',
             map_sf = None,
-            prec='full',
-            spacer='',
+            prec = 'full',
+            spacer = '',
             minus = '-'.minus_sign,
-            strip_radix=False,  # assures quantities are always treated as reals
+            strip_radix = 'cover',  # assures quantities are always treated as reals
         )
         code_without_si = dict(
             # assumes values are to be rendered to code that does not accept sf or units
             form = 'eng',
             map_sf = None,
-            prec='full',
-            spacer='',
+            prec = 'full',
+            spacer = '',
             minus = '-'.minus_sign,
-            strip_radix=False,  # assures quantities are always treated as reals
+            strip_radix = 'cover',  # assures quantities are always treated as reals
         )
     )
 

@@ -1,133 +1,142 @@
 # encoding: utf8
 
-data1 = """
-         0B;            0 B;            0 B;       0.0000 B;         0.;       0.000000000000 B
+# imports {{{1
+from quantiphy import Quantity
+import pytest
+
+parametrize = pytest.mark.parametrize
+
+
+# test_reader() {{{1
+# test_set {{{2
+test_set = """
+        0 B;            0 B;            0 B;       0.0000 B;         0.;       0.000000000000 B
         nan;            NaN;            NaN;            NaN;        NaN;                    NaN
-       0.5B;         500 mB;          0.5 B;       0.5000 B;        0.5;       0.500000000000 B
-      0.25B;         250 mB;         0.25 B;       0.2500 B;       0.25;       0.250000000000 B
-     0.125B;         125 mB;        0.125 B;       0.1250 B;      0.125;       0.125000000000 B
-    0.0625B;        62.5 mB;       0.0625 B;       0.0625 B;     0.0625;       0.062500000000 B
-         1B;            1 B;            1 B;       1.0000 B;         1.;       1.000000000000 B
-         2B;            2 B;            2 B;       2.0000 B;         2.;       2.000000000000 B
-         4B;            4 B;            4 B;       4.0000 B;         4.;       4.000000000000 B
-         8B;            8 B;            8 B;       8.0000 B;         8.;       8.000000000000 B
-        16B;           16 B;           16 B;       16.000 B;        16.;       16.00000000000 B
-        32B;           32 B;           32 B;       32.000 B;        32.;       32.00000000000 B
-        64B;           64 B;           64 B;       64.000 B;        64.;       64.00000000000 B
-       128B;          128 B;          128 B;       128.00 B;       128.;       128.0000000000 B
-       256B;          256 B;          256 B;       256.00 B;       256.;       256.0000000000 B
-       512B;          512 B;          512 B;       512.00 B;       512.;       512.0000000000 B
-       1KiB;       1.024 kB;          1 KiB;     1.0000 KiB;       1.Ki;     1.000000000000 KiB
-       2KiB;       2.048 kB;          2 KiB;     2.0000 KiB;       2.Ki;     2.000000000000 KiB
-       4KiB;       4.096 kB;          4 KiB;     4.0000 KiB;       4.Ki;     4.000000000000 KiB
-       8KiB;       8.192 kB;          8 KiB;     8.0000 KiB;       8.Ki;     8.000000000000 KiB
-      16KiB;      16.384 kB;         16 KiB;     16.000 KiB;      16.Ki;     16.00000000000 KiB
-      32KiB;      32.768 kB;         32 KiB;     32.000 KiB;      32.Ki;     32.00000000000 KiB
-      64KiB;      65.536 kB;         64 KiB;     64.000 KiB;      64.Ki;     64.00000000000 KiB
-     128KiB;      131.07 kB;        128 KiB;     128.00 KiB;     128.Ki;     128.0000000000 KiB
-     256KiB;      262.14 kB;        256 KiB;     256.00 KiB;     256.Ki;     256.0000000000 KiB
-     512KiB;      524.29 kB;        512 KiB;     512.00 KiB;     512.Ki;     512.0000000000 KiB
-       1MiB;      1.0486 MB;          1 MiB;     1.0000 MiB;       1.Mi;     1.000000000000 MiB
-       2MiB;      2.0972 MB;          2 MiB;     2.0000 MiB;       2.Mi;     2.000000000000 MiB
-       4MiB;      4.1943 MB;          4 MiB;     4.0000 MiB;       4.Mi;     4.000000000000 MiB
-       8MiB;      8.3886 MB;          8 MiB;     8.0000 MiB;       8.Mi;     8.000000000000 MiB
-      16MiB;      16.777 MB;         16 MiB;     16.000 MiB;      16.Mi;     16.00000000000 MiB
-      32MiB;      33.554 MB;         32 MiB;     32.000 MiB;      32.Mi;     32.00000000000 MiB
-      64MiB;      67.109 MB;         64 MiB;     64.000 MiB;      64.Mi;     64.00000000000 MiB
-     128MiB;      134.22 MB;        128 MiB;     128.00 MiB;     128.Mi;     128.0000000000 MiB
-     256MiB;      268.44 MB;        256 MiB;     256.00 MiB;     256.Mi;     256.0000000000 MiB
-     512MiB;      536.87 MB;        512 MiB;     512.00 MiB;     512.Mi;     512.0000000000 MiB
-       1GiB;      1.0737 GB;          1 GiB;     1.0000 GiB;       1.Gi;     1.000000000000 GiB
-       2GiB;      2.1475 GB;          2 GiB;     2.0000 GiB;       2.Gi;     2.000000000000 GiB
-       4GiB;       4.295 GB;          4 GiB;     4.0000 GiB;       4.Gi;     4.000000000000 GiB
-       8GiB;      8.5899 GB;          8 GiB;     8.0000 GiB;       8.Gi;     8.000000000000 GiB
-      16GiB;       17.18 GB;         16 GiB;     16.000 GiB;      16.Gi;     16.00000000000 GiB
-      32GiB;       34.36 GB;         32 GiB;     32.000 GiB;      32.Gi;     32.00000000000 GiB
-      64GiB;      68.719 GB;         64 GiB;     64.000 GiB;      64.Gi;     64.00000000000 GiB
-     128GiB;      137.44 GB;        128 GiB;     128.00 GiB;     128.Gi;     128.0000000000 GiB
-     256GiB;      274.88 GB;        256 GiB;     256.00 GiB;     256.Gi;     256.0000000000 GiB
-     512GiB;      549.76 GB;        512 GiB;     512.00 GiB;     512.Gi;     512.0000000000 GiB
-       1TiB;      1.0995 TB;          1 TiB;     1.0000 TiB;       1.Ti;     1.000000000000 TiB
-       2TiB;       2.199 TB;          2 TiB;     2.0000 TiB;       2.Ti;     2.000000000000 TiB
-       4TiB;       4.398 TB;          4 TiB;     4.0000 TiB;       4.Ti;     4.000000000000 TiB
-       8TiB;      8.7961 TB;          8 TiB;     8.0000 TiB;       8.Ti;     8.000000000000 TiB
-      16TiB;      17.592 TB;         16 TiB;     16.000 TiB;      16.Ti;     16.00000000000 TiB
-      32TiB;      35.184 TB;         32 TiB;     32.000 TiB;      32.Ti;     32.00000000000 TiB
-      64TiB;      70.369 TB;         64 TiB;     64.000 TiB;      64.Ti;     64.00000000000 TiB
-     128TiB;      140.74 TB;        128 TiB;     128.00 TiB;     128.Ti;     128.0000000000 TiB
-     256TiB;      281.47 TB;        256 TiB;     256.00 TiB;     256.Ti;     256.0000000000 TiB
-     512TiB;      562.95 TB;        512 TiB;     512.00 TiB;     512.Ti;     512.0000000000 TiB
-       1PiB;    1.1259e15 B;          1 PiB;     1.0000 PiB;       1.Pi;     1.000000000000 PiB
-       2PiB;    2.2518e15 B;          2 PiB;     2.0000 PiB;       2.Pi;     2.000000000000 PiB
-       4PiB;    4.5036e15 B;          4 PiB;     4.0000 PiB;       4.Pi;     4.000000000000 PiB
-       8PiB;    9.0072e15 B;          8 PiB;     8.0000 PiB;       8.Pi;     8.000000000000 PiB
-      16PiB;    18.014e15 B;         16 PiB;     16.000 PiB;      16.Pi;     16.00000000000 PiB
-      32PiB;    36.029e15 B;         32 PiB;     32.000 PiB;      32.Pi;     32.00000000000 PiB
-      64PiB;    72.058e15 B;         64 PiB;     64.000 PiB;      64.Pi;     64.00000000000 PiB
-     128PiB;    144.12e15 B;        128 PiB;     128.00 PiB;     128.Pi;     128.0000000000 PiB
-     256PiB;    288.23e15 B;        256 PiB;     256.00 PiB;     256.Pi;     256.0000000000 PiB
-     512PiB;    576.46e15 B;        512 PiB;     512.00 PiB;     512.Pi;     512.0000000000 PiB
-       1EiB;    1.1529e18 B;          1 EiB;     1.0000 EiB;       1.Ei;     1.000000000000 EiB
-       2EiB;    2.3058e18 B;          2 EiB;     2.0000 EiB;       2.Ei;     2.000000000000 EiB
-       4EiB;    4.6117e18 B;          4 EiB;     4.0000 EiB;       4.Ei;     4.000000000000 EiB
-       8EiB;    9.2234e18 B;          8 EiB;     8.0000 EiB;       8.Ei;     8.000000000000 EiB
-      16EiB;    18.447e18 B;         16 EiB;     16.000 EiB;      16.Ei;     16.00000000000 EiB
-      32EiB;    36.893e18 B;         32 EiB;     32.000 EiB;      32.Ei;     32.00000000000 EiB
-      64EiB;    73.787e18 B;         64 EiB;     64.000 EiB;      64.Ei;     64.00000000000 EiB
-     128EiB;    147.57e18 B;        128 EiB;     128.00 EiB;     128.Ei;     128.0000000000 EiB
-     256EiB;    295.15e18 B;        256 EiB;     256.00 EiB;     256.Ei;     256.0000000000 EiB
-     512EiB;     590.3e18 B;        512 EiB;     512.00 EiB;     512.Ei;     512.0000000000 EiB
-       1ZiB;    1.1806e21 B;          1 ZiB;     1.0000 ZiB;       1.Zi;     1.000000000000 ZiB
-       2ZiB;    2.3612e21 B;          2 ZiB;     2.0000 ZiB;       2.Zi;     2.000000000000 ZiB
-       4ZiB;    4.7224e21 B;          4 ZiB;     4.0000 ZiB;       4.Zi;     4.000000000000 ZiB
-       8ZiB;    9.4447e21 B;          8 ZiB;     8.0000 ZiB;       8.Zi;     8.000000000000 ZiB
-      16ZiB;    18.889e21 B;         16 ZiB;     16.000 ZiB;      16.Zi;     16.00000000000 ZiB
-      32ZiB;    37.779e21 B;         32 ZiB;     32.000 ZiB;      32.Zi;     32.00000000000 ZiB
-      64ZiB;    75.558e21 B;         64 ZiB;     64.000 ZiB;      64.Zi;     64.00000000000 ZiB
-     128ZiB;    151.12e21 B;        128 ZiB;     128.00 ZiB;     128.Zi;     128.0000000000 ZiB
-     256ZiB;    302.23e21 B;        256 ZiB;     256.00 ZiB;     256.Zi;     256.0000000000 ZiB
-     512ZiB;    604.46e21 B;        512 ZiB;     512.00 ZiB;     512.Zi;     512.0000000000 ZiB
-       1YiB;    1.2089e24 B;          1 YiB;     1.0000 YiB;       1.Yi;     1.000000000000 YiB
-       2YiB;    2.4179e24 B;          2 YiB;     2.0000 YiB;       2.Yi;     2.000000000000 YiB
-       4YiB;    4.8357e24 B;          4 YiB;     4.0000 YiB;       4.Yi;     4.000000000000 YiB
-       8YiB;    9.6714e24 B;          8 YiB;     8.0000 YiB;       8.Yi;     8.000000000000 YiB
-      16YiB;    19.343e24 B;         16 YiB;     16.000 YiB;      16.Yi;     16.00000000000 YiB
-      32YiB;    38.686e24 B;         32 YiB;     32.000 YiB;      32.Yi;     32.00000000000 YiB
-      64YiB;    77.371e24 B;         64 YiB;     64.000 YiB;      64.Yi;     64.00000000000 YiB
-     128YiB;    154.74e24 B;        128 YiB;     128.00 YiB;     128.Yi;     128.0000000000 YiB
-     256YiB;    309.49e24 B;        256 YiB;     256.00 YiB;     256.Yi;     256.0000000000 YiB
-     512YiB;    618.97e24 B;        512 YiB;     512.00 YiB;     512.Yi;     512.0000000000 YiB
-       1RiB;    1.2379e27 B;          1 RiB;     1.0000 RiB;       1.Ri;     1.000000000000 RiB
-       2RiB;    2.4759e27 B;          2 RiB;     2.0000 RiB;       2.Ri;     2.000000000000 RiB
-       4RiB;    4.9518e27 B;          4 RiB;     4.0000 RiB;       4.Ri;     4.000000000000 RiB
-       8RiB;    9.9035e27 B;          8 RiB;     8.0000 RiB;       8.Ri;     8.000000000000 RiB
-      16RiB;    19.807e27 B;         16 RiB;     16.000 RiB;      16.Ri;     16.00000000000 RiB
-      32RiB;    39.614e27 B;         32 RiB;     32.000 RiB;      32.Ri;     32.00000000000 RiB
-      64RiB;    79.228e27 B;         64 RiB;     64.000 RiB;      64.Ri;     64.00000000000 RiB
-     128RiB;    158.46e27 B;        128 RiB;     128.00 RiB;     128.Ri;     128.0000000000 RiB
-     256RiB;    316.91e27 B;        256 RiB;     256.00 RiB;     256.Ri;     256.0000000000 RiB
-     512RiB;    633.83e27 B;        512 RiB;     512.00 RiB;     512.Ri;     512.0000000000 RiB
-       1QiB;    1.2677e30 B;          1 QiB;     1.0000 QiB;       1.Qi;     1.000000000000 QiB
-       2QiB;    2.5353e30 B;          2 QiB;     2.0000 QiB;       2.Qi;     2.000000000000 QiB
-       4QiB;    5.0706e30 B;          4 QiB;     4.0000 QiB;       4.Qi;     4.000000000000 QiB
-       8QiB;    10.141e30 B;          8 QiB;     8.0000 QiB;       8.Qi;     8.000000000000 QiB
-      16QiB;    20.282e30 B;         16 QiB;     16.000 QiB;      16.Qi;     16.00000000000 QiB
-      32QiB;    40.565e30 B;         32 QiB;     32.000 QiB;      32.Qi;     32.00000000000 QiB
-      64QiB;     81.13e30 B;         64 QiB;     64.000 QiB;      64.Qi;     64.00000000000 QiB
-     128QiB;    162.26e30 B;        128 QiB;     128.00 QiB;     128.Qi;     128.0000000000 QiB
-     256QiB;    324.52e30 B;        256 QiB;     256.00 QiB;     256.Qi;     256.0000000000 QiB
-     512QiB;    649.04e30 B;        512 QiB;     512.00 QiB;     512.Qi;     512.0000000000 QiB
-    1024QiB;    1.2981e33 B; 1298074214633706907132624082305024 B; 1298074214633706907132624082305024.0000 B; 1298074214633706907132624082305024.; 1298074214633706907132624082305024.000000000000 B
-      -1KiB;      -1.024 kB;         -1 KiB;    -1.0000 KiB;      -1.Ki;    -1.000000000000 KiB
-      -1MiB;     -1.0486 MB;         -1 MiB;    -1.0000 MiB;      -1.Mi;    -1.000000000000 MiB
-      -1GiB;     -1.0737 GB;         -1 GiB;    -1.0000 GiB;      -1.Gi;    -1.000000000000 GiB
-      -1TiB;     -1.0995 TB;         -1 TiB;    -1.0000 TiB;      -1.Ti;    -1.000000000000 TiB
-      -1PiB;   -1.1259e15 B;         -1 PiB;    -1.0000 PiB;      -1.Pi;    -1.000000000000 PiB
-      -1EiB;   -1.1529e18 B;         -1 EiB;    -1.0000 EiB;      -1.Ei;    -1.000000000000 EiB
-      -1ZiB;   -1.1806e21 B;         -1 ZiB;    -1.0000 ZiB;      -1.Zi;    -1.000000000000 ZiB
-      -1YiB;   -1.2089e24 B;         -1 YiB;    -1.0000 YiB;      -1.Yi;    -1.000000000000 YiB
-      -1RiB;   -1.2379e27 B;         -1 RiB;    -1.0000 RiB;      -1.Ri;    -1.000000000000 RiB
-      -1QiB;   -1.2677e30 B;         -1 QiB;    -1.0000 QiB;      -1.Qi;    -1.000000000000 QiB
+      0.5 B;         500 mB;          0.5 B;       0.5000 B;        0.5;       0.500000000000 B
+     0.25 B;         250 mB;         0.25 B;       0.2500 B;       0.25;       0.250000000000 B
+    0.125 B;         125 mB;        0.125 B;       0.1250 B;      0.125;       0.125000000000 B
+   0.0625 B;        62.5 mB;       0.0625 B;       0.0625 B;     0.0625;       0.062500000000 B
+        1 B;            1 B;            1 B;       1.0000 B;         1.;       1.000000000000 B
+        2 B;            2 B;            2 B;       2.0000 B;         2.;       2.000000000000 B
+        4 B;            4 B;            4 B;       4.0000 B;         4.;       4.000000000000 B
+        8 B;            8 B;            8 B;       8.0000 B;         8.;       8.000000000000 B
+       16 B;           16 B;           16 B;       16.000 B;        16.;       16.00000000000 B
+       32 B;           32 B;           32 B;       32.000 B;        32.;       32.00000000000 B
+       64 B;           64 B;           64 B;       64.000 B;        64.;       64.00000000000 B
+      128 B;          128 B;          128 B;       128.00 B;       128.;       128.0000000000 B
+      256 B;          256 B;          256 B;       256.00 B;       256.;       256.0000000000 B
+      512 B;          512 B;          512 B;       512.00 B;       512.;       512.0000000000 B
+      1 KiB;       1.024 kB;          1 KiB;     1.0000 KiB;        1Ki;     1.000000000000 KiB
+      2 KiB;       2.048 kB;          2 KiB;     2.0000 KiB;        2Ki;     2.000000000000 KiB
+      4 KiB;       4.096 kB;          4 KiB;     4.0000 KiB;        4Ki;     4.000000000000 KiB
+      8 KiB;       8.192 kB;          8 KiB;     8.0000 KiB;        8Ki;     8.000000000000 KiB
+     16 KiB;      16.384 kB;         16 KiB;     16.000 KiB;       16Ki;     16.00000000000 KiB
+     32 KiB;      32.768 kB;         32 KiB;     32.000 KiB;       32Ki;     32.00000000000 KiB
+     64 KiB;      65.536 kB;         64 KiB;     64.000 KiB;       64Ki;     64.00000000000 KiB
+    128 KiB;      131.07 kB;        128 KiB;     128.00 KiB;      128Ki;     128.0000000000 KiB
+    256 KiB;      262.14 kB;        256 KiB;     256.00 KiB;      256Ki;     256.0000000000 KiB
+    512 KiB;      524.29 kB;        512 KiB;     512.00 KiB;      512Ki;     512.0000000000 KiB
+      1 MiB;      1.0486 MB;          1 MiB;     1.0000 MiB;        1Mi;     1.000000000000 MiB
+      2 MiB;      2.0972 MB;          2 MiB;     2.0000 MiB;        2Mi;     2.000000000000 MiB
+      4 MiB;      4.1943 MB;          4 MiB;     4.0000 MiB;        4Mi;     4.000000000000 MiB
+      8 MiB;      8.3886 MB;          8 MiB;     8.0000 MiB;        8Mi;     8.000000000000 MiB
+     16 MiB;      16.777 MB;         16 MiB;     16.000 MiB;       16Mi;     16.00000000000 MiB
+     32 MiB;      33.554 MB;         32 MiB;     32.000 MiB;       32Mi;     32.00000000000 MiB
+     64 MiB;      67.109 MB;         64 MiB;     64.000 MiB;       64Mi;     64.00000000000 MiB
+    128 MiB;      134.22 MB;        128 MiB;     128.00 MiB;      128Mi;     128.0000000000 MiB
+    256 MiB;      268.44 MB;        256 MiB;     256.00 MiB;      256Mi;     256.0000000000 MiB
+    512 MiB;      536.87 MB;        512 MiB;     512.00 MiB;      512Mi;     512.0000000000 MiB
+      1 GiB;      1.0737 GB;          1 GiB;     1.0000 GiB;        1Gi;     1.000000000000 GiB
+      2 GiB;      2.1475 GB;          2 GiB;     2.0000 GiB;        2Gi;     2.000000000000 GiB
+      4 GiB;       4.295 GB;          4 GiB;     4.0000 GiB;        4Gi;     4.000000000000 GiB
+      8 GiB;      8.5899 GB;          8 GiB;     8.0000 GiB;        8Gi;     8.000000000000 GiB
+     16 GiB;       17.18 GB;         16 GiB;     16.000 GiB;       16Gi;     16.00000000000 GiB
+     32 GiB;       34.36 GB;         32 GiB;     32.000 GiB;       32Gi;     32.00000000000 GiB
+     64 GiB;      68.719 GB;         64 GiB;     64.000 GiB;       64Gi;     64.00000000000 GiB
+    128 GiB;      137.44 GB;        128 GiB;     128.00 GiB;      128Gi;     128.0000000000 GiB
+    256 GiB;      274.88 GB;        256 GiB;     256.00 GiB;      256Gi;     256.0000000000 GiB
+    512 GiB;      549.76 GB;        512 GiB;     512.00 GiB;      512Gi;     512.0000000000 GiB
+      1 TiB;      1.0995 TB;          1 TiB;     1.0000 TiB;        1Ti;     1.000000000000 TiB
+      2 TiB;       2.199 TB;          2 TiB;     2.0000 TiB;        2Ti;     2.000000000000 TiB
+      4 TiB;       4.398 TB;          4 TiB;     4.0000 TiB;        4Ti;     4.000000000000 TiB
+      8 TiB;      8.7961 TB;          8 TiB;     8.0000 TiB;        8Ti;     8.000000000000 TiB
+     16 TiB;      17.592 TB;         16 TiB;     16.000 TiB;       16Ti;     16.00000000000 TiB
+     32 TiB;      35.184 TB;         32 TiB;     32.000 TiB;       32Ti;     32.00000000000 TiB
+     64 TiB;      70.369 TB;         64 TiB;     64.000 TiB;       64Ti;     64.00000000000 TiB
+    128 TiB;      140.74 TB;        128 TiB;     128.00 TiB;      128Ti;     128.0000000000 TiB
+    256 TiB;      281.47 TB;        256 TiB;     256.00 TiB;      256Ti;     256.0000000000 TiB
+    512 TiB;      562.95 TB;        512 TiB;     512.00 TiB;      512Ti;     512.0000000000 TiB
+      1 PiB;    1.1259e15 B;          1 PiB;     1.0000 PiB;        1Pi;     1.000000000000 PiB
+      2 PiB;    2.2518e15 B;          2 PiB;     2.0000 PiB;        2Pi;     2.000000000000 PiB
+      4 PiB;    4.5036e15 B;          4 PiB;     4.0000 PiB;        4Pi;     4.000000000000 PiB
+      8 PiB;    9.0072e15 B;          8 PiB;     8.0000 PiB;        8Pi;     8.000000000000 PiB
+     16 PiB;    18.014e15 B;         16 PiB;     16.000 PiB;       16Pi;     16.00000000000 PiB
+     32 PiB;    36.029e15 B;         32 PiB;     32.000 PiB;       32Pi;     32.00000000000 PiB
+     64 PiB;    72.058e15 B;         64 PiB;     64.000 PiB;       64Pi;     64.00000000000 PiB
+    128 PiB;    144.12e15 B;        128 PiB;     128.00 PiB;      128Pi;     128.0000000000 PiB
+    256 PiB;    288.23e15 B;        256 PiB;     256.00 PiB;      256Pi;     256.0000000000 PiB
+    512 PiB;    576.46e15 B;        512 PiB;     512.00 PiB;      512Pi;     512.0000000000 PiB
+      1 EiB;    1.1529e18 B;          1 EiB;     1.0000 EiB;        1Ei;     1.000000000000 EiB
+      2 EiB;    2.3058e18 B;          2 EiB;     2.0000 EiB;        2Ei;     2.000000000000 EiB
+      4 EiB;    4.6117e18 B;          4 EiB;     4.0000 EiB;        4Ei;     4.000000000000 EiB
+      8 EiB;    9.2234e18 B;          8 EiB;     8.0000 EiB;        8Ei;     8.000000000000 EiB
+     16 EiB;    18.447e18 B;         16 EiB;     16.000 EiB;       16Ei;     16.00000000000 EiB
+     32 EiB;    36.893e18 B;         32 EiB;     32.000 EiB;       32Ei;     32.00000000000 EiB
+     64 EiB;    73.787e18 B;         64 EiB;     64.000 EiB;       64Ei;     64.00000000000 EiB
+    128 EiB;    147.57e18 B;        128 EiB;     128.00 EiB;      128Ei;     128.0000000000 EiB
+    256 EiB;    295.15e18 B;        256 EiB;     256.00 EiB;      256Ei;     256.0000000000 EiB
+    512 EiB;     590.3e18 B;        512 EiB;     512.00 EiB;      512Ei;     512.0000000000 EiB
+      1 ZiB;    1.1806e21 B;          1 ZiB;     1.0000 ZiB;        1Zi;     1.000000000000 ZiB
+      2 ZiB;    2.3612e21 B;          2 ZiB;     2.0000 ZiB;        2Zi;     2.000000000000 ZiB
+      4 ZiB;    4.7224e21 B;          4 ZiB;     4.0000 ZiB;        4Zi;     4.000000000000 ZiB
+      8 ZiB;    9.4447e21 B;          8 ZiB;     8.0000 ZiB;        8Zi;     8.000000000000 ZiB
+     16 ZiB;    18.889e21 B;         16 ZiB;     16.000 ZiB;       16Zi;     16.00000000000 ZiB
+     32 ZiB;    37.779e21 B;         32 ZiB;     32.000 ZiB;       32Zi;     32.00000000000 ZiB
+     64 ZiB;    75.558e21 B;         64 ZiB;     64.000 ZiB;       64Zi;     64.00000000000 ZiB
+    128 ZiB;    151.12e21 B;        128 ZiB;     128.00 ZiB;      128Zi;     128.0000000000 ZiB
+    256 ZiB;    302.23e21 B;        256 ZiB;     256.00 ZiB;      256Zi;     256.0000000000 ZiB
+    512 ZiB;    604.46e21 B;        512 ZiB;     512.00 ZiB;      512Zi;     512.0000000000 ZiB
+      1 YiB;    1.2089e24 B;          1 YiB;     1.0000 YiB;        1Yi;     1.000000000000 YiB
+      2 YiB;    2.4179e24 B;          2 YiB;     2.0000 YiB;        2Yi;     2.000000000000 YiB
+      4 YiB;    4.8357e24 B;          4 YiB;     4.0000 YiB;        4Yi;     4.000000000000 YiB
+      8 YiB;    9.6714e24 B;          8 YiB;     8.0000 YiB;        8Yi;     8.000000000000 YiB
+     16 YiB;    19.343e24 B;         16 YiB;     16.000 YiB;       16Yi;     16.00000000000 YiB
+     32 YiB;    38.686e24 B;         32 YiB;     32.000 YiB;       32Yi;     32.00000000000 YiB
+     64 YiB;    77.371e24 B;         64 YiB;     64.000 YiB;       64Yi;     64.00000000000 YiB
+    128 YiB;    154.74e24 B;        128 YiB;     128.00 YiB;      128Yi;     128.0000000000 YiB
+    256 YiB;    309.49e24 B;        256 YiB;     256.00 YiB;      256Yi;     256.0000000000 YiB
+    512 YiB;    618.97e24 B;        512 YiB;     512.00 YiB;      512Yi;     512.0000000000 YiB
+      1 RiB;    1.2379e27 B;          1 RiB;     1.0000 RiB;        1Ri;     1.000000000000 RiB
+      2 RiB;    2.4759e27 B;          2 RiB;     2.0000 RiB;        2Ri;     2.000000000000 RiB
+      4 RiB;    4.9518e27 B;          4 RiB;     4.0000 RiB;        4Ri;     4.000000000000 RiB
+      8 RiB;    9.9035e27 B;          8 RiB;     8.0000 RiB;        8Ri;     8.000000000000 RiB
+     16 RiB;    19.807e27 B;         16 RiB;     16.000 RiB;       16Ri;     16.00000000000 RiB
+     32 RiB;    39.614e27 B;         32 RiB;     32.000 RiB;       32Ri;     32.00000000000 RiB
+     64 RiB;    79.228e27 B;         64 RiB;     64.000 RiB;       64Ri;     64.00000000000 RiB
+    128 RiB;    158.46e27 B;        128 RiB;     128.00 RiB;      128Ri;     128.0000000000 RiB
+    256 RiB;    316.91e27 B;        256 RiB;     256.00 RiB;      256Ri;     256.0000000000 RiB
+    512 RiB;    633.83e27 B;        512 RiB;     512.00 RiB;      512Ri;     512.0000000000 RiB
+      1 QiB;    1.2677e30 B;          1 QiB;     1.0000 QiB;        1Qi;     1.000000000000 QiB
+      2 QiB;    2.5353e30 B;          2 QiB;     2.0000 QiB;        2Qi;     2.000000000000 QiB
+      4 QiB;    5.0706e30 B;          4 QiB;     4.0000 QiB;        4Qi;     4.000000000000 QiB
+      8 QiB;    10.141e30 B;          8 QiB;     8.0000 QiB;        8Qi;     8.000000000000 QiB
+     16 QiB;    20.282e30 B;         16 QiB;     16.000 QiB;       16Qi;     16.00000000000 QiB
+     32 QiB;    40.565e30 B;         32 QiB;     32.000 QiB;       32Qi;     32.00000000000 QiB
+     64 QiB;     81.13e30 B;         64 QiB;     64.000 QiB;       64Qi;     64.00000000000 QiB
+    128 QiB;    162.26e30 B;        128 QiB;     128.00 QiB;      128Qi;     128.0000000000 QiB
+    256 QiB;    324.52e30 B;        256 QiB;     256.00 QiB;      256Qi;     256.0000000000 QiB
+    512 QiB;    649.04e30 B;        512 QiB;     512.00 QiB;      512Qi;     512.0000000000 QiB
+   1024 QiB;    1.2981e33 B;   1.2981e+33 B;   1.2981e+33 B; 1.2981e+33;     1.298074214634e+33 B
+     -1 KiB;      -1.024 kB;         -1 KiB;    -1.0000 KiB;       -1Ki;    -1.000000000000 KiB
+     -1 MiB;     -1.0486 MB;         -1 MiB;    -1.0000 MiB;       -1Mi;    -1.000000000000 MiB
+     -1 GiB;     -1.0737 GB;         -1 GiB;    -1.0000 GiB;       -1Gi;    -1.000000000000 GiB
+     -1 TiB;     -1.0995 TB;         -1 TiB;    -1.0000 TiB;       -1Ti;    -1.000000000000 TiB
+     -1 PiB;   -1.1259e15 B;         -1 PiB;    -1.0000 PiB;       -1Pi;    -1.000000000000 PiB
+     -1 EiB;   -1.1529e18 B;         -1 EiB;    -1.0000 EiB;       -1Ei;    -1.000000000000 EiB
+     -1 ZiB;   -1.1806e21 B;         -1 ZiB;    -1.0000 ZiB;       -1Zi;    -1.000000000000 ZiB
+     -1 YiB;   -1.2089e24 B;         -1 YiB;    -1.0000 YiB;       -1Yi;    -1.000000000000 YiB
+     -1 RiB;   -1.2379e27 B;         -1 RiB;    -1.0000 RiB;       -1Ri;    -1.000000000000 RiB
+     -1 QiB;   -1.2677e30 B;         -1 QiB;    -1.0000 QiB;       -1Qi;    -1.000000000000 QiB
           h; 662.61e-36 J-s;          0 J-s;     0.0000 J-s;         0.;     0.000000000000 J-s
        hbar; 105.46e-36 J-s;          0 J-s;     0.0000 J-s;         0.;     0.000000000000 J-s
           k; 13.806e-24 J/K;          0 J/K;     0.0000 J/K;         0.;     0.000000000000 J/K
@@ -140,7 +149,126 @@ data1 = """
      1Zippy;        1 Zippy;        1 Zippy;   1.0000 Zippy;         1.;   1.000000000000 Zippy
 """.strip()
 
-data2 = """
+# code {{{2
+@parametrize(
+    "given, expected_1, expected_2, expected_3, expected_4, expected_5",
+    [tuple(v.strip() for v in line.split(";")) for line in test_set.splitlines()]
+)
+def test_reader(given, expected_1, expected_2, expected_3, expected_4, expected_5):
+    Quantity.reset_prefs()
+    with Quantity.prefs(known_units = 'Zippy'):
+        print(
+            f'Trying: given={given}:',
+            f'expected_1={expected_1},',
+            f'expected_2={expected_2},',
+            f'expected_3={expected_3},',
+            f'expected_4={expected_4},',
+            f'expected_5={expected_5}'
+        )
+        q = Quantity(given, binary=True)
+
+        result = str(q)
+        issue = f'{given}: expected “{expected_1}”, got “{result}”.'
+        assert expected_1 == result, issue
+
+        result = q.binary()
+        issue = f'{given}: expected “{expected_2}”, got “{result}”.'
+        assert expected_2 == result, issue
+
+        result = q.binary(prec=4, strip_zeros=False)
+        issue = f'{given}: expected “{expected_3}”, got “{result}”.'
+        assert expected_3 == result, issue
+
+        result = q.binary(strip_zeros=True, strip_radix=False, show_units=False)
+        issue = f'{given}: expected “{expected_4}”, got “{result}”.'
+        assert expected_4 == result, issue
+
+        result = q.binary(prec='full', strip_zeros=False)
+        issue = f'{given}: expected “{expected_5}”, got “{result}”.'
+        assert expected_5 == result, issue
+
+# test_writer() {{{1
+def test_writer():
+    Quantity.reset_prefs()
+    q = Quantity('mem = 1GiB', binary=True)
+
+    result = str(q)
+    expected = '1.0737 GB'
+    assert result == expected, f'{given}: expected “{expected}”, got “{result}”.'
+
+    result = q.binary()
+    expected = '1 GiB'
+    assert result == expected, f'{given}: expected “{expected}”, got “{result}”.'
+
+    result = q.render(form='binary')
+    expected = '1 GiB'
+    assert result == expected, f'{given}: expected “{expected}”, got “{result}”.'
+
+    result = f'{q:b}'
+    expected = '1 GiB'
+    assert result == expected, f'{given}: expected “{expected}”, got “{result}”.'
+
+    result = q.binary(prec=2, strip_zeros=False)
+    expected = '1.00 GiB'
+    assert result == expected, f'{given}: expected “{expected}”, got “{result}”.'
+
+    result = f'{q:#0.2b}'
+    expected = '1.00 GiB'
+    assert result == expected, f'{given}: expected “{expected}”, got “{result}”.'
+
+    result = q.binary(show_label=True)
+    expected = 'mem = 1 GiB'
+    assert result == expected, f'{given}: expected “{expected}”, got “{result}”.'
+
+    result = f'{q:B}'
+    expected = 'mem = 1 GiB'
+    assert result == expected, f'{given}: expected “{expected}”, got “{result}”.'
+
+    result = q.binary(show_label=True, scale='b')
+    expected = 'mem = 8 Gib'
+    assert result == expected, f'{given}: expected “{expected}”, got “{result}”.'
+
+    result = f'{q:Bb}'
+    expected = 'mem = 8 Gib'
+    assert result == expected, f'{given}: expected “{expected}”, got “{result}”.'
+
+    result = q.binary(strip_zeros=False)
+    expected = '1.0000 GiB'
+    assert result == expected, f'{given}: expected “{expected}”, got “{result}”.'
+
+    result = f'{q:#b}'
+    expected = '1.0000 GiB'
+    assert result == expected, f'{given}: expected “{expected}”, got “{result}”.'
+
+    result = q.binary(strip_zeros=True, strip_radix=False)
+    expected = '1 GiB'
+    assert result == expected, f'{given}: expected “{expected}”, got “{result}”.'
+
+    q = Quantity('1GB', binary=True)
+
+    result = str(q)
+    expected = '1 GB'
+    assert result == expected, f'{given}: expected “{expected}”, got “{result}”.'
+
+    result = q.binary()
+    expected = '953.67 MiB'
+    assert result == expected, f'{given}: expected “{expected}”, got “{result}”.'
+
+    result = f'{q:b}'
+    expected = '953.67 MiB'
+    assert result == expected, f'{given}: expected “{expected}”, got “{result}”.'
+
+    result = q.binary(prec=2)
+    expected = '954 MiB'
+    assert result == expected, f'{given}: expected “{expected}”, got “{result}”.'
+
+    result = f'{q:0.2b}'
+    expected = '954 MiB'
+    assert result == expected, f'{given}: expected “{expected}”, got “{result}”.'
+
+# test_writer_prec() {{{1
+# test_set {{{2
+test_set = """
      931.32 pB;        0 B;        0 B;        0 B;        0 B;        0 B
      1.8626 nB;        0 B;        0 B;        0 B;        0 B;        0 B
      3.7253 nB;        0 B;        0 B;        0 B;        0 B;        0 B
@@ -202,6 +330,89 @@ data2 = """
      268.44 MB;    300 MiB;    260 MiB;    256 MiB;    256 MiB;    256 MiB
      536.87 MB;    500 MiB;    510 MiB;    512 MiB;    512 MiB;    512 MiB
      1.0737 GB;   1000 MiB;   1000 MiB;   1020 MiB;   1024 MiB;   1024 MiB
+     2.1475 GB;      2 GiB;      2 GiB;      2 GiB;      2 GiB;      2 GiB
+      4.295 GB;      4 GiB;      4 GiB;      4 GiB;      4 GiB;      4 GiB
+     8.5899 GB;      8 GiB;      8 GiB;      8 GiB;      8 GiB;      8 GiB
+      17.18 GB;     20 GiB;     16 GiB;     16 GiB;     16 GiB;     16 GiB
+      34.36 GB;     30 GiB;     32 GiB;     32 GiB;     32 GiB;     32 GiB
+     68.719 GB;     60 GiB;     64 GiB;     64 GiB;     64 GiB;     64 GiB
+     137.44 GB;    100 GiB;    130 GiB;    128 GiB;    128 GiB;    128 GiB
+     274.88 GB;    300 GiB;    260 GiB;    256 GiB;    256 GiB;    256 GiB
+     549.76 GB;    500 GiB;    510 GiB;    512 GiB;    512 GiB;    512 GiB
+    1.09955 TB;      1 TiB;      1 TiB;      1 TiB;      1 TiB;      1 TiB
+      2.199 TB;      2 TiB;      2 TiB;      2 TiB;      2 TiB;      2 TiB
+      4.398 TB;      4 TiB;      4 TiB;      4 TiB;      4 TiB;      4 TiB
+     8.7961 TB;      8 TiB;      8 TiB;      8 TiB;      8 TiB;      8 TiB
+     17.592 TB;     20 TiB;     16 TiB;     16 TiB;     16 TiB;     16 TiB
+     35.184 TB;     30 TiB;     32 TiB;     32 TiB;     32 TiB;     32 TiB
+     70.369 TB;     60 TiB;     64 TiB;     64 TiB;     64 TiB;     64 TiB
+     140.74 TB;    100 TiB;    130 TiB;    128 TiB;    128 TiB;    128 TiB
+     281.47 TB;    300 TiB;    260 TiB;    256 TiB;    256 TiB;    256 TiB
+     562.95 TB;    500 TiB;    510 TiB;    512 TiB;    512 TiB;    512 TiB
+     1.1259 PB;      1 PiB;      1 PiB;      1 PiB;      1 PiB;      1 PiB
+     2.2518 PB;      2 PiB;      2 PiB;      2 PiB;      2 PiB;      2 PiB
+     4.5036 PB;      4 PiB;      4 PiB;      4 PiB;      4 PiB;      4 PiB
+     9.0072 PB;      8 PiB;      8 PiB;      8 PiB;      8 PiB;      8 PiB
+     18.014 PB;     20 PiB;     16 PiB;     16 PiB;     16 PiB;     16 PiB
+     36.029 PB;     30 PiB;     32 PiB;     32 PiB;     32 PiB;     32 PiB
+     72.058 PB;     60 PiB;     64 PiB;     64 PiB;     64 PiB;     64 PiB
+     144.12 PB;    100 PiB;    130 PiB;    128 PiB;    128 PiB;    128 PiB
+     288.23 PB;    300 PiB;    260 PiB;    256 PiB;    256 PiB;    256 PiB
+     576.46 PB;    500 PiB;    510 PiB;    512 PiB;    512 PiB;    512 PiB
+    1.15295 EB;      1 EiB;      1 EiB;      1 EiB;      1 EiB;      1 EiB
+     2.3058 EB;      2 EiB;      2 EiB;      2 EiB;      2 EiB;      2 EiB
+     4.6117 EB;      4 EiB;      4 EiB;      4 EiB;      4 EiB;      4 EiB
+     9.2234 EB;      8 EiB;      8 EiB;      8 EiB;      8 EiB;      8 EiB
+     18.447 EB;     20 EiB;     16 EiB;     16 EiB;     16 EiB;     16 EiB
+     36.893 EB;     30 EiB;     32 EiB;     32 EiB;     32 EiB;     32 EiB
+     73.787 EB;     60 EiB;     64 EiB;     64 EiB;     64 EiB;     64 EiB
+     147.57 EB;    100 EiB;    130 EiB;    128 EiB;    128 EiB;    128 EiB
+     295.15 EB;    300 EiB;    260 EiB;    256 EiB;    256 EiB;    256 EiB
+      590.3 EB;    500 EiB;    510 EiB;    512 EiB;    512 EiB;    512 EiB
+     1.1806 ZB;      1 ZiB;      1 ZiB;      1 ZiB;      1 ZiB;      1 ZiB
+     2.3612 ZB;      2 ZiB;      2 ZiB;      2 ZiB;      2 ZiB;      2 ZiB
+     4.7224 ZB;      4 ZiB;      4 ZiB;      4 ZiB;      4 ZiB;      4 ZiB
+     9.4447 ZB;      8 ZiB;      8 ZiB;      8 ZiB;      8 ZiB;      8 ZiB
+     18.889 ZB;     20 ZiB;     16 ZiB;     16 ZiB;     16 ZiB;     16 ZiB
+     37.779 ZB;     30 ZiB;     32 ZiB;     32 ZiB;     32 ZiB;     32 ZiB
+     75.558 ZB;     60 ZiB;     64 ZiB;     64 ZiB;     64 ZiB;     64 ZiB
+     151.12 ZB;    100 ZiB;    130 ZiB;    128 ZiB;    128 ZiB;    128 ZiB
+     302.23 ZB;    300 ZiB;    260 ZiB;    256 ZiB;    256 ZiB;    256 ZiB
+     604.46 ZB;    500 ZiB;    510 ZiB;    512 ZiB;    512 ZiB;    512 ZiB
+    1.20895 YB;      1 YiB;      1 YiB;      1 YiB;      1 YiB;      1 YiB
+     2.4179 YB;      2 YiB;      2 YiB;      2 YiB;      2 YiB;      2 YiB
+     4.8357 YB;      4 YiB;      4 YiB;      4 YiB;      4 YiB;      4 YiB
+     9.6714 YB;      8 YiB;      8 YiB;      8 YiB;      8 YiB;      8 YiB
+     19.343 YB;     20 YiB;     16 YiB;     16 YiB;     16 YiB;     16 YiB
+     38.686 YB;     30 YiB;     32 YiB;     32 YiB;     32 YiB;     32 YiB
+     77.371 YB;     60 YiB;     64 YiB;     64 YiB;     64 YiB;     64 YiB
+     154.74 YB;    100 YiB;    130 YiB;    128 YiB;    128 YiB;    128 YiB
+     309.49 YB;    300 YiB;    260 YiB;    256 YiB;    256 YiB;    256 YiB
+     618.97 YB;    500 YiB;    510 YiB;    512 YiB;    512 YiB;    512 YiB
+    1.23795 RB;      1 RiB;      1 RiB;      1 RiB;      1 RiB;      1 RiB
+     2.4759 RB;      2 RiB;      2 RiB;      2 RiB;      2 RiB;      2 RiB
+     4.9518 RB;      4 RiB;      4 RiB;      4 RiB;      4 RiB;      4 RiB
+     9.9035 RB;      8 RiB;      8 RiB;      8 RiB;      8 RiB;      8 RiB
+     19.807 RB;     20 RiB;     16 RiB;     16 RiB;     16 RiB;     16 RiB
+     39.614 RB;     30 RiB;     32 RiB;     32 RiB;     32 RiB;     32 RiB
+     79.228 RB;     60 RiB;     64 RiB;     64 RiB;     64 RiB;     64 RiB
+     158.46 RB;    100 RiB;    130 RiB;    128 RiB;    128 RiB;    128 RiB
+     316.91 RB;    300 RiB;    260 RiB;    256 RiB;    256 RiB;    256 RiB
+     633.83 RB;    500 RiB;    510 RiB;    512 RiB;    512 RiB;    512 RiB
+     1.2677 QB;      1 QiB;      1 QiB;      1 QiB;      1 QiB;      1 QiB
+     2.5353 QB;      2 QiB;      2 QiB;      2 QiB;      2 QiB;      2 QiB
+     5.0706 QB;      4 QiB;      4 QiB;      4 QiB;      4 QiB;      4 QiB
+    10.1412 QB;      8 QiB;      8 QiB;      8 QiB;      8 QiB;      8 QiB
+     20.282 QB;     20 QiB;     16 QiB;     16 QiB;     16 QiB;     16 QiB
+     40.565 QB;     30 QiB;     32 QiB;     32 QiB;     32 QiB;     32 QiB
+      81.13 QB;     60 QiB;     64 QiB;     64 QiB;     64 QiB;     64 QiB
+     162.26 QB;    100 QiB;    130 QiB;    128 QiB;    128 QiB;    128 QiB
+     324.52 QB;    300 QiB;    260 QiB;    256 QiB;    256 QiB;    256 QiB
+     649.04 QB;    500 QiB;    510 QiB;    512 QiB;    512 QiB;    512 QiB
+     1298.1 QB;    1e+33 B;  1.3e+33 B;  1.3e+33 B;1.298e+33 B;1.2981e+33 B
+     2596.1 QB;    3e+33 B;  2.6e+33 B;  2.6e+33 B;2.596e+33 B;2.5961e+33 B
+     5192.3 QB;    5e+33 B;  5.2e+33 B; 5.19e+33 B;5.192e+33 B;5.1923e+33 B
+      10385 QB;    1e+34 B;    1e+34 B; 1.04e+34 B;1.038e+34 B;1.0385e+34 B
           1 uB;        0 B;        0 B;        0 B;        0 B;        0 B
          10 uB;        0 B;        0 B;        0 B;        0 B;        0 B
         100 uB;        0 B;        0 B;        0 B;        0 B;   0.0001 B
@@ -217,142 +428,72 @@ data2 = """
           1 MB;   1000 KiB;    980 KiB;    977 KiB;  976.6 KiB; 976.56 KiB
 """.strip()
 
-from quantiphy import Quantity
-
-
-def test_reader():
+# code {{{2
+@parametrize(
+    "given, expected_1, expected_2, expected_3, expected_4, expected_5",
+    [tuple(v.strip() for v in line.split(";")) for line in test_set.splitlines()]
+)
+def test_writer_prec(given, expected_1, expected_2, expected_3, expected_4, expected_5):
     Quantity.reset_prefs()
-    with Quantity.prefs(known_units = 'Zippy'):
-        for line in data1.splitlines():
-            v, s1, s2, s3, s4, s5 = [c.strip() for c in line.strip().split(';')]
-            print('Trying: v={v}, s1={s1}, s2={s2}, s3={s3}, s4={s4}, s5={s5}'.format(**locals()))
-            q = Quantity(v, binary=True)
+    print(
+        f'Trying: given={given}:',
+        f'expected_1={expected_1},',
+        f'expected_2={expected_2},',
+        f'expected_3={expected_3},',
+        f'expected_4={expected_4},',
+        f'expected_5={expected_5}'
+    )
+    q = Quantity(given)
 
-            res = str(q)
-            exp = '{v}: expected <{s1}>, got <{res}>.'.format(**locals())
-            assert s1 == res, exp
+    result = q.binary(prec=0)
+    issue = f'{given}: expected “{expected_1}”, got “{result}”.'
+    assert result == expected_1, issue
 
-            res = q.binary()
-            exp = '{v}: expected <{s2}>, got <{res}>.'.format(**locals())
-            assert s2 == res, exp
+    result = q.binary(prec=1)
+    issue = f'{given}: expected “{expected_2}”, got “{result}”.'
+    assert result == expected_2, issue
 
-            res = q.binary(prec=4, strip_zeros=False)
-            exp = '{v}: expected <{s3}>, got <{res}>.'.format(**locals())
-            assert s3 == res, exp
+    result = q.binary(prec=2)
+    issue = f'{given}: expected “{expected_3}”, got “{result}”.'
+    assert result == expected_3, issue
 
-            res = q.binary(strip_zeros=True, strip_radix=False, show_units=False)
-            exp = '{v}: expected <{s4}>, got <{res}>.'.format(**locals())
-            assert s4 == res, exp
+    result = q.binary(prec=3)
+    issue = f'{given}: expected “{expected_4}”, got “{result}”.'
+    assert result == expected_4, issue
 
-            res = q.binary(prec='full', strip_zeros=False)
-            exp = '{v}: expected <{s5}>, got <{res}>.'.format(**locals())
-            assert s5 == res, exp
+    result = q.binary(prec=4)
+    issue = f'{given}: expected “{expected_5}”, got “{result}”.'
+    assert result == expected_5, issue
 
-def test_writer():
+
+# test_writer_cover() {{{1
+def test_writer_cover():
     Quantity.reset_prefs()
-    q = Quantity('mem = 1GiB', binary=True)
 
-    res = str(q)
-    exp = '1.0737 GB'
-    assert res == exp, res
+    q = Quantity('mem = 0.5B', binary=True)
+    result = q.binary(strip_radix='cover', strip_zeros=True, prec=5)
+    expected = '0.5 B'
+    assert result == expected, f'{given}: expected “{expected}”, got “{result}”.'
 
-    res = q.binary()
-    exp = '1 GiB'
-    assert res == exp, res
+    q = Quantity('mem = 8B', binary=True)
+    result = q.binary(strip_radix='cover', strip_zeros=True, prec=5)
+    expected = '8.0 B'
+    assert result == expected, f'{given}: expected “{expected}”, got “{result}”.'
 
-    res = q.render(form='binary')
-    exp = '1 GiB'
-    assert res == exp, res
+    q = Quantity('mem = 64 B', binary=True)
+    result = q.binary(strip_radix='cover', strip_zeros=True, prec=5)
+    expected = '64.0 B'
+    assert result == expected, f'{given}: expected “{expected}”, got “{result}”.'
 
-    res = '{q:b}'.format(**locals())
-    exp = '1 GiB'
-    assert res == exp, res
+    q = Quantity('mem = 512 B', binary=True)
+    result = q.binary(strip_radix='cover', strip_zeros=True, prec=5)
+    expected = '512.0 B'
+    assert result == expected, f'{given}: expected “{expected}”, got “{result}”.'
 
-    res = q.binary(prec=2, strip_zeros=False)
-    exp = '1.00 GiB'
-    assert res == exp, res
-
-    res = '{q:#0.2b}'.format(**locals())
-    exp = '1.00 GiB'
-    assert res == exp, res
-
-    res = q.binary(show_label=True)
-    exp = 'mem = 1 GiB'
-    assert res == exp, res
-
-    res = '{q:B}'.format(**locals())
-    exp = 'mem = 1 GiB'
-    assert res == exp, res
-
-    res = q.binary(show_label=True, scale='b')
-    exp = 'mem = 8 Gib'
-    assert res == exp, res
-
-    res = '{q:Bb}'.format(**locals())
-    exp = 'mem = 8 Gib'
-    assert res == exp, res
-
-    res = q.binary(strip_zeros=False)
-    exp = '1.0000 GiB'
-    assert res == exp, res
-
-    res = '{q:#b}'.format(**locals())
-    exp = '1.0000 GiB'
-    assert res == exp, res
-
-    res = q.binary(strip_zeros=True, strip_radix=False)
-    exp = '1. GiB'
-    assert res == exp, res
-
-    q = Quantity('1GB', binary=True)
-
-    res = str(q)
-    exp = '1 GB'
-    assert res == exp, res
-
-    res = q.binary()
-    exp = '953.67 MiB'
-    assert res == exp, res
-
-    res = '{q:b}'.format(**locals())
-    exp = '953.67 MiB'
-    assert res == exp, res
-
-    res = q.binary(prec=2)
-    exp = '954 MiB'
-    assert res == exp, res
-
-    res = '{q:0.2b}'.format(**locals())
-    exp = '954 MiB'
-    assert res == exp, res
-
-def test_writer_prec():
-    Quantity.reset_prefs()
-    for line in data2.splitlines():
-        v, p0, p1, p2, p3, p4 = [c.strip() for c in line.strip().split(';')]
-        print('Trying: v={v}, p0={p0}, p1={p1}, p2={p2}, p3={p3}, p4={p4}'.format(**locals()))
-        q = Quantity(v)
-
-        res = q.binary(prec=0)
-        exp = '{v}: expected <{p0}>, got <{res}>.'.format(**locals())
-        assert res == p0, exp
-
-        res = q.binary(prec=1)
-        exp = '{v}: expected <{p1}>, got <{res}>.'.format(**locals())
-        assert res == p1, exp
-
-        res = q.binary(prec=2)
-        exp = '{v}: expected <{p2}>, got <{res}>.'.format(**locals())
-        assert res == p2, exp
-
-        res = q.binary(prec=3)
-        exp = '{v}: expected <{p3}>, got <{res}>.'.format(**locals())
-        assert res == p3, exp
-
-        res = q.binary(prec=4)
-        exp = '{v}: expected <{p4}>, got <{res}>.'.format(**locals())
-        assert res == p4, exp
-
+    q = Quantity('mem = 4,096 B', binary=True)
+    result = q.binary(strip_radix='cover', strip_zeros=True, prec=5)
+    expected = '4 KiB'
+    assert result == expected, f'{given}: expected “{expected}”, got “{result}”.'
 
 if __name__ == '__main__':
     # As a debugging aid allow the tests to be run on their own, outside pytest.

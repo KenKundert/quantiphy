@@ -5,7 +5,6 @@ import pytest
 
 def test_format():
     Quantity.reset_prefs()
-    print(Quantity._preferences)
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None, show_desc=False)
     q=Quantity('f = 1420.405751786 MHz -- frequency of hydrogen line')
     assert '{}'.format(q) == '1.4204 GHz'
@@ -442,15 +441,15 @@ def test_render():
     assert q.fixed(prec=2, strip_zeros=True, strip_radix=True) == '$100'
 
     q=Quantity('$123.45')
-    assert q.render(prec=0, strip_zeros=False, strip_radix=False) == '$100.0'
+    assert q.render(prec=0, strip_zeros=False, strip_radix='cover') == '$100.0'
     assert q.render(prec=0, strip_zeros=True, strip_radix=False) == '$100.'
     assert q.render(prec=0, strip_zeros=False, strip_radix=True) == '$100'
     assert q.render(prec=0, strip_zeros=True, strip_radix=True) == '$100'
-    assert q.render(prec=2, strip_zeros=False, strip_radix=False) == '$123.0'
+    assert q.render(prec=2, strip_zeros=False, strip_radix='cover') == '$123.0'
     assert q.render(prec=2, strip_zeros=True, strip_radix=False) == '$123.'
     assert q.render(prec=2, strip_zeros=False, strip_radix=True) == '$123'
     assert q.render(prec=2, strip_zeros=True, strip_radix=True) == '$123'
-    assert q.render(prec=4, strip_zeros=False, strip_radix=False) == '$123.45'
+    assert q.render(prec=4, strip_zeros=False, strip_radix='cover') == '$123.45'
     assert q.render(prec=4, strip_zeros=True, strip_radix=False) == '$123.45'
     assert q.render(prec=4, strip_zeros=False, strip_radix=True) == '$123.45'
     assert q.render(prec=4, strip_zeros=True, strip_radix=True) == '$123.45'
