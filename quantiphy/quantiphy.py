@@ -978,7 +978,9 @@ class Quantity(float):
             *True*, the radix is removed if it is the last character in the
             mantissa, so 1 is rendered as “1”.  If *False*, it is not removed,
             so 1 is rendered as “1.”.  If “cover”, the radix is replaced by
-            “.0”, so 1 is rendered as “1.0”.
+            “.0”, so 1 is rendered as “1.0”.  Thus, “cover” is a variant of
+            *False*; it also retains the radix but adds a 0 to avoid a ‘hanging’
+            radix.
 
             If this setting is False, the radix is still stripped if the number
             has a scale factor. The default value is True.
