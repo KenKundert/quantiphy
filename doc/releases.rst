@@ -5,8 +5,8 @@ Releases
 
 Latest development release
 --------------------------
-| Version: 2.19a1
-| Released: 2022-12-10
+| Version: 2.19a2
+| Released: 2022-12-17
 
 - Add new standard SI scale factors (*Q*, *R*, *r*, *q*).
 - Subclasses of :class:`Quantity` with units now convert values to the desired 
