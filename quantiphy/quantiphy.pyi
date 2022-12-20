@@ -123,7 +123,7 @@ class Quantity(float):
         strip_radix: bool = ...,
         scale: str | float | tuple[float | Quantity, str] | Callable = ...,
         negligible: float = ...,
-    ):
+    ) -> str:
         ...
 
     def fixed(
@@ -135,7 +135,7 @@ class Quantity(float):
         strip_zeros: bool = ...,
         strip_radix: bool = ...,
         scale: str | float | tuple[float | Quantity, str] | Callable = ...,
-    ):
+    ) -> str:
         ...
 
     def binary(
@@ -146,7 +146,8 @@ class Quantity(float):
         strip_zeros: bool = ...,
         strip_radix: bool = ...,
         scale: str | float | tuple[float | Quantity, str] | Callable = ...,
-    ): ...
+    ) -> str:
+        ...
 
     def is_close(
         self,
@@ -231,5 +232,72 @@ def add_constant(
     alias: str = ...,
     unit_systems: str | Sequence[str] = ...,
 ) -> None:
+    ...
+
+def as_real(
+    value: float | str | Quantity,
+    model: str | Quantity = ...,
+    *,
+    units: str = ...,
+    scale: str | float | tuple[float | Quantity, str] | Callable = ...,
+    name: str = ...,
+    desc: str = ...,
+    ignore_sf: bool = ...,
+    binary: bool = ...,
+    params: Any = ...
+) -> float:
+    ...
+
+def as_tuple(
+    value: float | str | Quantity,
+    model: str | Quantity = ...,
+    *,
+    units: str = ...,
+    scale: str | float | tuple[float | Quantity, str] | Callable = ...,
+    name: str = ...,
+    desc: str = ...,
+    ignore_sf: bool = ...,
+    binary: bool = ...,
+    params: Any = ...
+) -> tuple[float, str]:
+    ...
+
+def render(
+    value: float,
+    units: str,
+    form: str = ...,
+    show_units: bool = ...,
+    prec: int = ...,
+    show_label: bool = ...,
+    strip_zeros:bool = ...,
+    strip_radix: bool = ...,
+    scale: str | float | tuple[float | Quantity, str] | Callable = ...,
+    negligible: float = ...,
+) -> str:
+    ...
+
+def fixed(
+    value: float,
+    units: str,
+    show_units: bool = ...,
+    prec: int = ...,
+    show_label: bool = ...,
+    show_commas: bool = ...,
+    strip_zeros: bool = ...,
+    strip_radix: bool = ...,
+    scale: str | float | tuple[float | Quantity, str] | Callable = ...,
+) -> str:
+    ...
+
+def binary(
+    value: float,
+    units: str,
+    show_units: bool = ...,
+    prec: int = ...,
+    show_label: bool = ...,
+    strip_zeros: bool = ...,
+    strip_radix: bool = ...,
+    scale: str | float | tuple[float | Quantity, str] | Callable = ...,
+) -> str:
     ...
 

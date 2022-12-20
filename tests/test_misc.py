@@ -211,7 +211,7 @@ def test_misc2():
     with pytest.raises(KeyError) as exception:
         Foo.set_prefs(assign_rec=r'(\w+)\s*=\s*(.*)') # no named groups!
         Foo('seven = 7')
-    assert str(exception.value) == "recognizer does not contain 'val' key."
+    assert str(exception.value) == "recognizer does not contain ‘val’ key."
     assert isinstance(exception.value, InvalidRecognizer)
     assert isinstance(exception.value, QuantiPhyError)
     assert isinstance(exception.value, KeyError)
@@ -922,7 +922,7 @@ def test_scale():
 
     with pytest.raises(UnknownConversion) as exception:
         dollars = Dollars('100Hz')
-    assert str(exception.value) == "unable to convert between '$' and 'Hz'."
+    assert str(exception.value) == "unable to convert between ‘$’ and ‘Hz’."
 
     class WholeDollars(Dollars):
         prec = 0

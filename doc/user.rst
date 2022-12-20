@@ -2705,15 +2705,57 @@ string that can access both the unnamed and named arguments:
     ... except UnknownScaleFactor as e:
     ...     print(e.render('factor de escala desconocido.'))
     ... except UnknownConversion as e:
-    ...     if 'direction' in e.kwargs:
-    ...         direction = e.kwargs['direction']
-    ...         if direction == 'to':
+    ...     if 'to_units' in e.kwargs:
+    ...         if 'from_units' in e.kwargs:
+    ...             template = 'incapaz de convertir entre {} y {}'
+    ...         else:
     ...             template = 'incapaz de convertir a {}'
-    ...         else:  # direction must be 'from'
-    ...             template = 'incapaz de convertir de {}'
     ...     else:
-    ...         template = 'incapaz de convertir entre {} y {}'
+    ...         template = 'incapaz de convertir de {}'
     ...     print(e.render(template))
     ... except InvalidRecognizer as e:
     ...     print(e.render("el reconocedor no contiene la clave 'val'"))
     tweed: no es un número valido.
+
+Alternately, if you wish to globally replace the default *QuantiPhy* error 
+messages, you can simply override the ``_template`` attribute for the 
+exceptions:
+
+.. ignore
+
+    Save the exception templates:
+
+        >>> invalid_number_template = InvalidNumber._template
+        >>> unknown_scale_factor_template = UnknownScaleFactor._template
+        >>> unknown_conversion_template = UnknownConversion._template
+        >>> invalid_recognizer_template = InvalidRecognizer._template
+
+.. code-block:: python
+
+    >>> InvalidNumber._template = '{!r}: no es un número valido.'
+    >>> UnknownScaleFactor._template = 'factor de escala desconocido.'
+    >>> UnknownConversion._template = (
+    ...     'incapaz de convertir entre ‘{to_units}’ y ‘{from_units}’',
+    ...     'incapaz de convertir a ‘{to_units}’',
+    ...     'incapaz de convertir de ‘{from_units}’',
+    ... )
+    >>> InvalidRecognizer._template = "el reconocedor no contiene la clave ‘val’"
+
+    >>> try:
+    ...     q = Quantity('tweed')
+    ... except QuantiPhyError as e:
+    ...     print(e.render())
+    'tweed': no es un número valido.
+
+As shown in *UnknownConversion*, ``_template`` may be given as a tuple of format 
+strings, in which case the first one for which all arguments are available is 
+used.
+
+.. ignore
+
+    Restore the exception templates:
+
+        >>> InvalidNumber._template = invalid_number_template
+        >>> UnknownScaleFactor._template = unknown_scale_factor_template
+        >>> UnknownConversion._template = unknown_conversion_template
+        >>> InvalidRecognizer._template = invalid_recognizer_template

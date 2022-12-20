@@ -15,6 +15,11 @@ from .quantiphy import (
     set_unit_system,
     add_constant,        # constants
     Quantity,            # quantities
+    as_real,             # quantity functions
+    as_tuple,
+    render,
+    fixed,
+    binary,
     __version__,         # version
     __released__,
 )

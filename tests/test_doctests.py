@@ -23,7 +23,7 @@ def test_quantiphy():
     Quantity.reset_prefs()
     rv = doctest.testfile('../quantiphy/quantiphy.py', optionflags=doctest.ELLIPSIS)
     assert rv.failed == 0
-    assert rv.attempted == 119
+    assert rv.attempted == 132
         # this target should be updated when the number of doctests change
 
 def test_manual():
@@ -33,7 +33,7 @@ def test_manual():
     Quantity.reset_prefs()
     expected_test_count = {
         '../doc/index.rst': 31,
-        '../doc/user.rst': 411,
+        '../doc/user.rst': 424,
         '../doc/api.rst': 0,
         '../doc/examples.rst': 36,
         '../doc/accessories.rst': 12,

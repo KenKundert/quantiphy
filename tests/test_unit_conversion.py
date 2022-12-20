@@ -25,18 +25,20 @@ def test_simple_scaling():
         assert str(q.scale(qs)) == '4 g'
         with pytest.raises(KeyError) as exception:
             q.render(scale='fuzz')
-        assert str(exception.value) == "unable to convert between 'fuzz' and 'g'."
+        assert str(exception.value) == "unable to convert between ‘fuzz’ and ‘g’."
         assert isinstance(exception.value, UnknownConversion)
         assert isinstance(exception.value, QuantiPhyError)
         assert isinstance(exception.value, KeyError)
-        assert exception.value.args == ('fuzz', 'g')
+        assert exception.value.args == ()
+        assert exception.value.kwargs == dict(to_units='fuzz', from_units='g')
         with pytest.raises(KeyError) as exception:
             q.scale('fuzz')
-        assert str(exception.value) == "unable to convert between 'fuzz' and 'g'."
+        assert str(exception.value) == "unable to convert between ‘fuzz’ and ‘g’."
         assert isinstance(exception.value, UnknownConversion)
         assert isinstance(exception.value, QuantiPhyError)
         assert isinstance(exception.value, KeyError)
-        assert exception.value.args == ('fuzz', 'g')
+        assert exception.value.args == ()
+        assert exception.value.kwargs == dict(to_units='fuzz', from_units='g')
 
         q=Quantity('1', units='g', scale=1000)
         assert q.render() == '1 kg'
@@ -369,31 +371,33 @@ def test_affine_conversion():
 
     with pytest.raises(UnknownConversion) as exception:
         result = conversion.convert(0, from_units='X', to_units='X')
-    assert str(exception.value) == "unable to convert to 'X'."
+    assert str(exception.value) == "unable to convert to ‘X’."
 
     with pytest.raises(UnknownConversion) as exception:
         result = conversion.convert(0, from_units='F', to_units='X')
-    assert str(exception.value) == "unable to convert to 'X'."
+    assert str(exception.value) == "unable to convert to ‘X’."
 
     with pytest.raises(UnknownConversion) as exception:
         result = conversion.convert(0, from_units='X', to_units='F')
-    assert str(exception.value) == "unable to convert from 'X'."
+    assert str(exception.value) == "unable to convert from ‘X’."
     assert isinstance(exception.value, UnknownConversion)
     assert isinstance(exception.value, QuantiPhyError)
     assert isinstance(exception.value, KeyError)
-    assert exception.value.args == ('X',)
+    assert exception.value.args == ()
+    assert exception.value.kwargs == dict(from_units='X',)
 
     with pytest.raises(UnknownConversion) as exception:
         result = conversion.convert(0, to_units='X')
-    assert str(exception.value) == "unable to convert to 'X'."
+    assert str(exception.value) == "unable to convert to ‘X’."
 
     with pytest.raises(KeyError) as exception:
         result = conversion.convert(0, from_units='X')
-    assert str(exception.value) == "unable to convert from 'X'."
+    assert str(exception.value) == "unable to convert from ‘X’."
     assert isinstance(exception.value, UnknownConversion)
     assert isinstance(exception.value, QuantiPhyError)
     assert isinstance(exception.value, KeyError)
-    assert exception.value.args == ('X',)
+    assert exception.value.args == ()
+    assert exception.value.kwargs == dict(from_units='X',)
 
 def test_func_converters():
     Quantity.reset_prefs()

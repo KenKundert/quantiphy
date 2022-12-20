@@ -433,10 +433,12 @@ def test_render():
     q=Quantity('$100')
     assert q.fixed(prec=0, strip_zeros=False, strip_radix=False) == '$100.'
     assert q.fixed(prec=0, strip_zeros=True, strip_radix=False) == '$100.'
+    assert q.fixed(prec=0, strip_zeros=True, strip_radix='cover') == '$100.0'
     assert q.fixed(prec=0, strip_zeros=False, strip_radix=True) == '$100'
     assert q.fixed(prec=0, strip_zeros=True, strip_radix=True) == '$100'
     assert q.fixed(prec=2, strip_zeros=False, strip_radix=False) == '$100.00'
     assert q.fixed(prec=2, strip_zeros=True, strip_radix=False) == '$100.'
+    assert q.fixed(prec=2, strip_zeros=True, strip_radix='cover') == '$100.0'
     assert q.fixed(prec=2, strip_zeros=False, strip_radix=True) == '$100.00'
     assert q.fixed(prec=2, strip_zeros=True, strip_radix=True) == '$100'
 

@@ -178,7 +178,7 @@ class InvalidRecognizer(QuantiPhyError, KeyError):
     is raised when the current value of *assign_rec* does not satisfy this
     requirement.
     """
-    _template = "recognizer does not contain 'val' key."
+    _template = "recognizer does not contain ‘val’ key."
 
 
 # MissingName {{{2
@@ -196,8 +196,9 @@ class UnknownConversion(QuantiPhyError, KeyError):
     conversion was requested and there is no corresponding unit converter.
     """
     _template = (
-        "unable to convert {direction} '{}'.",
-        "unable to convert between '{}' and '{}'.",
+        "unable to convert between ‘{to_units}’ and ‘{from_units}’.",
+        "unable to convert to ‘{to_units}’.",
+        "unable to convert from ‘{from_units}’.",
     )
 
 
@@ -3073,7 +3074,7 @@ def _convert_units(to_units, from_units, value):
     try:
         return _unit_conversions[(to_units, from_units)](value)
     except KeyError:
-        raise UnknownConversion(to_units, from_units)
+        raise UnknownConversion(to_units=to_units, from_units=from_units)
 
 
 # UnitConversion class {{{2
@@ -3382,9 +3383,9 @@ class UnitConversion(object):
                 from_units = self.to_units[0]
 
         if to_units not in self.to_units + self.from_units:
-            raise UnknownConversion(to_units, direction='to')
+            raise UnknownConversion(to_units=to_units)
         if from_units not in self.to_units + self.from_units:
-            raise UnknownConversion(from_units, direction='from')
+            raise UnknownConversion(from_units=from_units)
 
         converted = _convert_units(to_units, from_units, value)
         return Quantity(converted, units=to_units)
@@ -3542,3 +3543,95 @@ UnitConversion('b', 'B', 8)
 
 # Bitcoin conversions {{{2
 UnitConversion(['sat', 'sats', 'ș'], ['BTC', 'btc', 'Ƀ', '₿'], 1e8)
+
+
+# Quantity functions {{{1
+# as_real() {{{2
+def as_real(*args, **kwargs):
+    """Convert to real.
+
+    Takes the same arguments as :class:`Quantity`, but returns a float rather
+    than a Quantity.
+
+    Examples::
+
+        >>> from quantiphy import as_real
+        >>> print(as_real('1 uL'))
+        1e-06
+
+        >>> print(as_real('1.2 mg/L', scale='M', params=74.55))
+        1.6096579476861166e-05
+
+    """
+    return Quantity(*args, **kwargs).real
+
+# as_tuple() {{{2
+def as_tuple(*args, **kwargs):
+    """Convert to tuple (value, units).
+
+    Takes the same arguments as :class:`Quantity`, but returns a tuple consisting
+    of the value and units.
+
+    Examples::
+
+        >>> from quantiphy import as_tuple
+        >>> print(as_tuple('1 uL'))
+        (1e-06, 'L')
+
+        >>> print(as_tuple('1.2 mg/L', scale='M', params=74.55))
+        (1.6096579476861166e-05, 'M')
+
+    """
+    return Quantity(*args, **kwargs).as_tuple()
+
+# render() {{{2
+def render(value, units, params=None, *args, **kwargs):
+    """Render value and units to string (SI scale factors format).
+
+    The first two arguments are the value and the units and are required.  The
+    remaining arguments are the same as those of :meth:`Quantity.render`.
+
+    Examples::
+
+        >>> from quantiphy import render
+        >>> print(render(1e-6, 'L'))
+        1 uL
+
+        >>> print(render(16.097e-6, 'M', scale='g/L', params=74.55))
+        1.2 mg/L
+
+    """
+    return Quantity(value, units=units, params=params).render(*args, **kwargs)
+
+# fixed() {{{2
+def fixed(value, units, params=None, *args, **kwargs):
+    """Render value and units to string (fixed-point format).
+
+    The first two arguments are the value and the units and are required.  The
+    remaining arguments are the same as those of :meth:`Quantity.fixed`.
+
+    Example::
+
+        >>> from quantiphy import fixed
+        >>> print(fixed(1e7, '$', show_commas=True, strip_zeros=False, prec=2))
+        $10,000,000.00
+
+    """
+    return Quantity(value, units=units, params=params).fixed(*args, **kwargs)
+
+# binary() {{{2
+def binary(value, units, params=None, *args, **kwargs):
+    """Render value and units to string (binary scale factors format)
+
+    The first two arguments are the value and the units and are required.  The
+    remaining arguments are the same as those of :meth:`Quantity.binary`.
+
+    Example::
+
+        >>> from quantiphy import binary
+        >>> print(binary(2**32, 'B'))
+        4 GiB
+
+    """
+    return Quantity(value, units=units, params=params).binary(*args, **kwargs)
+

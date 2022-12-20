@@ -1,6 +1,13 @@
 from .quantiphy import (
-    # quantities
+    # quantity class
     Quantity as Quantity,
+
+    # quantity functions
+    as_real as as_real,
+    as_tuple as as_tuple,
+    render as render,
+    fixed as fixed,
+    binary as binary,
 
     # constants
     add_constant as add_constant,
