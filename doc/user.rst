@@ -2729,6 +2729,11 @@ corresponding Python error for compatibility with existing code.  It is
 recommended that new code catch the *QuantiPhy* specific exceptions rather than 
 the generic Python exceptions as their use will be deprecated in the future.
 
+.. note::
+
+    It is expected that in release 2.20, expected in the first half of 2023, the 
+    exceptions will no longer inherit from the generic Python exceptions.
+
 *QuantiPhy* employs the following exceptions:
 
 :class:`ExpectedQuantity`:

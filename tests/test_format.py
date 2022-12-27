@@ -69,15 +69,15 @@ def test_full_format():
     assert '{:G}'.format(q) == 'f = 1420405751.786'
     assert '{:n}'.format(q) == 'f'
     assert '{:d}'.format(q) == 'frequency of hydrogen line'
-    assert '{:.2p}'.format(q) == '1420405751.79 Hz'
-    assert '{:,.2p}'.format(q) == '1,420,405,751.79 Hz'
+    assert '{:p}'.format(q) == '1420405751.786 Hz'
+    assert '{:,p}'.format(q) == '1,420,405,751.786 Hz'
     assert '{:,.2pHz}'.format(q) == '1,420,405,751.79 Hz'
     assert '{:,.2pkHz}'.format(q) == '1,420,405.75 kHz'
     assert '{:,.2pMHz}'.format(q) == '1,420.41 MHz'
     assert '{:,.2pGHz}'.format(q) == '1.42 GHz'
     assert '{:,.2pTHz}'.format(q) == '0 THz'
-    assert '{:.2P}'.format(q) == 'f = 1420405751.79 Hz'
-    assert '{:,.2P}'.format(q) == 'f = 1,420,405,751.79 Hz'
+    assert '{:P}'.format(q) == 'f = 1420405751.786 Hz'
+    assert '{:,P}'.format(q) == 'f = 1,420,405,751.786 Hz'
     assert '{:#.3q}'.format(q) == '1.420 GHz'
     assert '{:#.6p}'.format(q) == '1420405751.786000 Hz'
     assert '{:.0q}'.format(q) == '1 GHz'
@@ -98,10 +98,19 @@ def test_full_format():
         q = Quantity(given)
         if q == 0 and expected[0] == '-':
             expected = expected[1:]
+        assert q.render(form='si', strip_zeros=False) == expected, given
         assert q.render(form='si', prec='full', strip_zeros=False) == expected, given
 
-    q=Quantity('2ns')
-    assert float(q) == 2e-9
+    # check fixed()
+    base = '000654321.123456000'
+    for d in range(-12, 12):
+        num = f"{base}e{d}"
+        q = Quantity(num, '$')
+
+        prec = max(6-d, 0)
+        fmtd = f"{float(num):25.{prec}f}".strip()
+        assert f"${fmtd}" == q.fixed()
+
 
 def test_width():
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None, show_desc=False)
@@ -437,7 +446,7 @@ def test_render():
     assert q.fixed(strip_zeros=False) == '$1000000.0000'
     assert q.fixed(strip_zeros=True, strip_radix=False) == '$1000000.'
     assert q.fixed(prec='full') == '$1000000'
-    assert q.fixed(prec='full', strip_zeros=False) == '$1000000.000000000000'
+    assert q.fixed(prec='full', strip_zeros=False) == '$1000000'
     assert q.render(form='fixed') == '$1000000'
 
     q=Quantity('$100')

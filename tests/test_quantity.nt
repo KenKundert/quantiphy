@@ -2345,6 +2345,12 @@ test_number_recognition:
             point:
                 evaluate: q.render(prec='full')
                 expected: '3.14159265 ns'
+            proposer:
+                evaluate: q.fixed(prec='full')
+                expected: '0.00000000314159265 s'
+            molecule:
+                evaluate: q.fixed(prec='full', strip_zeros=False)
+                expected: '0.00000000314159265 s'
 
     magnate:
         given: q = Quantity('3.14159265 ns')
@@ -2355,6 +2361,12 @@ test_number_recognition:
             birdcage:
                 evaluate: q.render(prec='full')
                 expected: '3.14159265 ns'
+            proposer:
+                evaluate: q.fixed(prec='full')
+                expected: '0.00000000314159265 s'
+            molecule:
+                evaluate: q.fixed(prec='full', strip_zeros=False)
+                expected: '0.00000000314159265 s'
 
     canard:
         given: q = Quantity('3.141592650ns')
@@ -2365,6 +2377,12 @@ test_number_recognition:
             pressman:
                 evaluate: q.render(prec='full')
                 expected: '3.14159265 ns'
+            proposer:
+                evaluate: q.fixed(prec='full')
+                expected: '0.00000000314159265 s'
+            molecule:
+                evaluate: q.fixed(prec='full', strip_zeros=False)
+                expected: '0.000000003141592650 s'
 
     clothe:
         given: q = Quantity('3.1415926500ns')
@@ -2375,6 +2393,12 @@ test_number_recognition:
             pressure:
                 evaluate: q.render(prec='full')
                 expected: '3.14159265 ns'
+            proposer:
+                evaluate: q.fixed(prec='full')
+                expected: '0.00000000314159265 s'
+            molecule:
+                evaluate: q.fixed(prec='full', strip_zeros=False)
+                expected: '0.0000000031415926500 s'
 
     texture:
         given: q = Quantity('.314159265ns')
@@ -2385,6 +2409,12 @@ test_number_recognition:
             caption:
                 evaluate: q.render(prec='full')
                 expected: '314.159265 ps'
+            proposer:
+                evaluate: q.fixed(prec='full')
+                expected: '0.000000000314159265 s'
+            molecule:
+                evaluate: q.fixed(prec='full', strip_zeros=False)
+                expected: '0.000000000314159265 s'
 
     escalate:
         given: q = Quantity('.314159265 ns')
@@ -2395,6 +2425,12 @@ test_number_recognition:
             porcupine:
                 evaluate: q.render(prec='full')
                 expected: '314.159265 ps'
+            proposer:
+                evaluate: q.fixed(prec='full')
+                expected: '0.000000000314159265 s'
+            molecule:
+                evaluate: q.fixed(prec='full', strip_zeros=False)
+                expected: '0.000000000314159265 s'
 
     raise:
         given: q = Quantity('.3141592650ns')
@@ -2405,6 +2441,12 @@ test_number_recognition:
             scalp:
                 evaluate: q.render(prec='full')
                 expected: '314.159265 ps'
+            proposer:
+                evaluate: q.fixed(prec='full')
+                expected: '0.000000000314159265 s'
+            molecule:
+                evaluate: q.fixed(prec='full', strip_zeros=False)
+                expected: '0.0000000003141592650 s'
 
     campsite:
         given: q = Quantity('.31415926500ns')
@@ -2415,6 +2457,12 @@ test_number_recognition:
             flaunt:
                 evaluate: q.render(prec='full')
                 expected: '314.159265 ps'
+            proposer:
+                evaluate: q.fixed(prec='full')
+                expected: '0.000000000314159265 s'
+            molecule:
+                evaluate: q.fixed(prec='full', strip_zeros=False)
+                expected: '0.00000000031415926500 s'
 
     whodunit:
         given: q = Quantity('0.314159265ns')
@@ -2425,6 +2473,12 @@ test_number_recognition:
             brutalize:
                 evaluate: q.render(prec='full')
                 expected: '314.159265 ps'
+            proposer:
+                evaluate: q.fixed(prec='full')
+                expected: '0.000000000314159265 s'
+            molecule:
+                evaluate: q.fixed(prec='full', strip_zeros=False)
+                expected: '0.000000000314159265 s'
 
     limerick:
         given: q = Quantity('0.314159265 ns')
@@ -2435,6 +2489,12 @@ test_number_recognition:
             chutney:
                 evaluate: q.render(prec='full')
                 expected: '314.159265 ps'
+            proposer:
+                evaluate: q.fixed(prec='full')
+                expected: '0.000000000314159265 s'
+            molecule:
+                evaluate: q.fixed(prec='full', strip_zeros=False)
+                expected: '0.000000000314159265 s'
 
     moped:
         given: q = Quantity('0.3141592650ns')
@@ -2445,6 +2505,12 @@ test_number_recognition:
             fusty:
                 evaluate: q.render(prec='full')
                 expected: '314.159265 ps'
+            proposer:
+                evaluate: q.fixed(prec='full')
+                expected: '0.000000000314159265 s'
+            molecule:
+                evaluate: q.fixed(prec='full', strip_zeros=False)
+                expected: '0.0000000003141592650 s'
 
     layette:
         given: q = Quantity('0.31415926500ns')
@@ -2455,6 +2521,12 @@ test_number_recognition:
             serpent:
                 evaluate: q.render(prec='full')
                 expected: '314.159265 ps'
+            proposer:
+                evaluate: q.fixed(prec='full')
+                expected: '0.000000000314159265 s'
+            molecule:
+                evaluate: q.fixed(prec='full', strip_zeros=False)
+                expected: '0.00000000031415926500 s'
 
     luncheon:
         given: q = Quantity('.0314159265ns')
@@ -2465,6 +2537,12 @@ test_number_recognition:
             expedite:
                 evaluate: q.render(prec='full')
                 expected: '31.4159265 ps'
+            proposer:
+                evaluate: q.fixed(prec='full')
+                expected: '0.0000000000314159265 s'
+            molecule:
+                evaluate: q.fixed(prec='full', strip_zeros=False)
+                expected: '0.0000000000314159265 s'
 
     abyss:
         given: q = Quantity('.0314159265 ns')
@@ -2475,6 +2553,12 @@ test_number_recognition:
             denounce:
                 evaluate: q.render(prec='full')
                 expected: '31.4159265 ps'
+            proposer:
+                evaluate: q.fixed(prec='full')
+                expected: '0.0000000000314159265 s'
+            molecule:
+                evaluate: q.fixed(prec='full', strip_zeros=False)
+                expected: '0.0000000000314159265 s'
 
     daylight:
         given: q = Quantity('.03141592650ns')
@@ -2485,6 +2569,12 @@ test_number_recognition:
             metronome:
                 evaluate: q.render(prec='full', strip_zeros=False)
                 expected: '31.41592650 ps'
+            proposer:
+                evaluate: q.fixed(prec='full')
+                expected: '0.0000000000314159265 s'
+            molecule:
+                evaluate: q.fixed(prec='full', strip_zeros=False)
+                expected: '0.00000000003141592650 s'
 
     jackpot:
         given: q = Quantity('.031415926500ns')
@@ -2495,6 +2585,12 @@ test_number_recognition:
             vendetta:
                 evaluate: q.render(prec='full', strip_zeros=False)
                 expected: '31.415926500 ps'
+            proposer:
+                evaluate: q.fixed(prec='full')
+                expected: '0.0000000000314159265 s'
+            molecule:
+                evaluate: q.fixed(prec='full', strip_zeros=False)
+                expected: '0.000000000031415926500 s'
 
     gelding:
         given: q = Quantity('0.00314159265ns')
@@ -2505,6 +2601,12 @@ test_number_recognition:
             bazooka:
                 evaluate: q.render(prec='full')
                 expected: '3.14159265 ps'
+            proposer:
+                evaluate: q.fixed(prec='full')
+                expected: '0.00000000000314159265 s'
+            molecule:
+                evaluate: q.fixed(prec='full', strip_zeros=False)
+                expected: '0.00000000000314159265 s'
 
     sliver:
         given: q = Quantity('0.00314159265 ns')
@@ -2515,6 +2617,12 @@ test_number_recognition:
             oboist:
                 evaluate: q.render(prec='full')
                 expected: '3.14159265 ps'
+            proposer:
+                evaluate: q.fixed(prec='full')
+                expected: '0.00000000000314159265 s'
+            molecule:
+                evaluate: q.fixed(prec='full', strip_zeros=False)
+                expected: '0.00000000000314159265 s'
 
     turquoise:
         given: q = Quantity('0.003141592650ns')
@@ -2525,6 +2633,12 @@ test_number_recognition:
             barrier:
                 evaluate: q.render(prec='full')
                 expected: '3.14159265 ps'
+            proposer:
+                evaluate: q.fixed(prec='full')
+                expected: '0.00000000000314159265 s'
+            molecule:
+                evaluate: q.fixed(prec='full', strip_zeros=False)
+                expected: '0.000000000003141592650 s'
 
     astonish:
         given: q = Quantity('0.0031415926500ns')
@@ -2535,6 +2649,12 @@ test_number_recognition:
             president:
                 evaluate: q.render(prec='full')
                 expected: '3.14159265 ps'
+            proposer:
+                evaluate: q.fixed(prec='full')
+                expected: '0.00000000000314159265 s'
+            molecule:
+                evaluate: q.fixed(prec='full', strip_zeros=False)
+                expected: '0.0000000000031415926500 s'
 
     reverie:
         given: q = Quantity('.000314159265ns')
@@ -2545,6 +2665,12 @@ test_number_recognition:
             bitchy:
                 evaluate: q.render(prec='full')
                 expected: '314.159265 fs'
+            proposer:
+                evaluate: q.fixed(prec='full')
+                expected: '0.000000000000314159265 s'
+            molecule:
+                evaluate: q.fixed(prec='full', strip_zeros=False)
+                expected: '0.000000000000314159265 s'
 
     angreal:
         given: q = Quantity('.000314159265 ns')
@@ -2555,6 +2681,12 @@ test_number_recognition:
             bookie:
                 evaluate: q.render(prec='full')
                 expected: '314.159265 fs'
+            proposer:
+                evaluate: q.fixed(prec='full')
+                expected: '0.000000000000314159265 s'
+            molecule:
+                evaluate: q.fixed(prec='full', strip_zeros=False)
+                expected: '0.000000000000314159265 s'
 
     rewire:
         given: q = Quantity('.0003141592650ns')
@@ -2565,6 +2697,12 @@ test_number_recognition:
             sport:
                 evaluate: q.render(prec='full', strip_zeros=False)
                 expected: '314.1592650 fs'
+            proposer:
+                evaluate: q.fixed(prec='full')
+                expected: '0.000000000000314159265 s'
+            molecule:
+                evaluate: q.fixed(prec='full', strip_zeros=False)
+                expected: '0.0000000000003141592650 s'
 
     promise:
         given: q = Quantity('.00031415926500ns')
@@ -2575,6 +2713,12 @@ test_number_recognition:
             unzip:
                 evaluate: q.render(prec='full', strip_zeros=False)
                 expected: '314.15926500 fs'
+            proposer:
+                evaluate: q.fixed(prec='full')
+                expected: '0.000000000000314159265 s'
+            molecule:
+                evaluate: q.fixed(prec='full', strip_zeros=False)
+                expected: '0.00000000000031415926500 s'
 
     harmonica:
         given: q = Quantity('0.0000314159265 ns')
@@ -2585,6 +2729,12 @@ test_number_recognition:
             thrifty:
                 evaluate: q.render(prec='full')
                 expected: '31.4159265 fs'
+            proposer:
+                evaluate: q.fixed(prec='full')
+                expected: '0.0000000000000314159265 s'
+            molecule:
+                evaluate: q.fixed(prec='full', strip_zeros=False)
+                expected: '0.0000000000000314159265 s'
 
     flashcard:
         given: q = Quantity('0.0000314159265 ns')
@@ -2595,6 +2745,12 @@ test_number_recognition:
             amputate:
                 evaluate: q.render(prec='full')
                 expected: '31.4159265 fs'
+            proposer:
+                evaluate: q.fixed(prec='full')
+                expected: '0.0000000000000314159265 s'
+            molecule:
+                evaluate: q.fixed(prec='full', strip_zeros=False)
+                expected: '0.0000000000000314159265 s'
 
     sediment:
         given: q = Quantity('0.00003141592650ns')
@@ -2605,6 +2761,12 @@ test_number_recognition:
             elevate:
                 evaluate: q.render(prec='full', strip_zeros=False)
                 expected: '31.41592650 fs'
+            proposer:
+                evaluate: q.fixed(prec='full')
+                expected: '0.0000000000000314159265 s'
+            molecule:
+                evaluate: q.fixed(prec='full', strip_zeros=False)
+                expected: '0.00000000000003141592650 s'
 
     cleanser:
         given: q = Quantity('0.000031415926500ns')
@@ -2615,6 +2777,12 @@ test_number_recognition:
             tantrum:
                 evaluate: q.render(prec='full', strip_zeros=False)
                 expected: '31.415926500 fs'
+            proposer:
+                evaluate: q.fixed(prec='full')
+                expected: '0.0000000000000314159265 s'
+            molecule:
+                evaluate: q.fixed(prec='full', strip_zeros=False)
+                expected: '0.000000000000031415926500 s'
 
 
     # test preferences {{{1

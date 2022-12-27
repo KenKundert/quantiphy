@@ -18,6 +18,7 @@ Latest development release
 - Added scale factor conversion.
 - Added quantity functions: :func:`as_real`, :func:`as_tuple`, :func:`render`, 
   :func:`fixed`, and :func:`binary`.
+- Fixed rendering of full precision numbers in :meth:`Quantity.fixed()`.
 - Added “cover” option to *strip_radix* preference.
 - Added type hints.
 

@@ -235,12 +235,23 @@ def test_misc2():
     assert q.render(prec='full') == '1.8 V'
 
     with Quantity.prefs(keep_components=False, strip_zeros=False):
-        q = Quantity('1.2345 V')
-        assert q.render(prec='full') == '1.234500000000 V'
+        q = Quantity('1.2345 MV')
+        assert q.render(prec='full') == '1.234500000000 MV'
+        with pytest.raises(AttributeError):
+            q._mantissa
+        with pytest.raises(AttributeError):
+            q._scale_factor
 
     with Quantity.prefs(keep_components=True, strip_zeros=False):
-        q = Quantity('1.2345000 V')
-        assert q.render(prec='full') == '1.2345000 V'
+        q = Quantity('1.2345000 MV')
+        assert q.render(prec='full') == '1.2345000 MV'
+        assert q._mantissa == '1.2345000'
+        assert q._scale_factor == 'M'
+
+        q = Quantity('1.2345000e6 V')
+        assert q.render(prec='full') == '1.2345000 MV'
+        assert q._mantissa == '1.2345000'
+        assert q._scale_factor == 'e6'
 
     with pytest.raises(ValueError) as exception:
         q = Quantity('x*y = z')

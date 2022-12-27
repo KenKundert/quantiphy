@@ -1164,7 +1164,8 @@ class Quantity(float):
         except KeyError as e:
             raise UnknownFormatKey(e.args[0])
 
-    # _map_leading_sign {{{2
+    # private utility functions {{{2
+    # _map_leading_sign {{{3
     def _map_leading_sign(self, value, leading_units=''):
         # maps a leading sign, but only if given
         if math.isnan(self):
@@ -1178,7 +1179,7 @@ class Quantity(float):
             return self.plus + leading_units + value[1:]
         return leading_units + value
 
-    # _map_sign {{{2
+    # _map_sign {{{3
     def _map_sign(self, value):
         # maps + and - anywhere in the value
         if self.minus != '-':
@@ -1187,7 +1188,7 @@ class Quantity(float):
             value = value.replace('+', self.plus)
         return value
 
-    # _fix_punct {{{2
+    # _fix_punct {{{3
     def _fix_punct(self, mantissa):
         def replace_char(c):
             if c == '.':
@@ -1197,7 +1198,45 @@ class Quantity(float):
             return c
         return ''.join((map(replace_char, mantissa)))
 
-    # _combine {{{2
+    # _split_original_number {{{3
+    def _split_original_number(self):
+        mantissa = self._mantissa
+        if mantissa[0] in '+-':
+            sign = '-' if mantissa[0] == '-' else ''
+            mantissa = mantissa[1:]
+        else:
+            sign = ''
+        sf = self._scale_factor
+
+        # convert scale factor to integer exponent
+        try:
+            exp = int(sf)
+        except ValueError:
+            if sf:
+                exp = int(MAPPINGS.get(sf, sf).lstrip('e'))
+            else:
+                exp = 0
+
+        # add decimal point to mantissa if missing
+        mantissa += '' if '.' in mantissa else '.'
+        # strip off leading zeros and break into components
+        whole, frac = mantissa.lstrip('0').split('.')
+        if whole == '':
+            # no whole part
+            # normalize by removing leading zeros from fractional part
+            orig_len = len(frac)
+            frac_stripped = frac.lstrip('0')
+            if frac_stripped:
+                whole = frac_stripped[:1]
+                frac = frac_stripped[1:]
+                exp -= orig_len - len(frac)
+            else:
+                # stripping off zeros left us with nothing, this must be 0
+                whole = '0'
+                exp = 0
+        return sign, whole, frac, exp
+
+    # _combine {{{3
     def _combine(self, mantissa, sf, units, spacer, sf_is_exp=False):
         if units in self.tight_units:
             spacer = ''
@@ -1938,42 +1977,8 @@ class Quantity(float):
 
         # convert into scientific notation with proper precision {{{3
         if prec == 'full' and hasattr(self, '_mantissa') and not scale:
-            mantissa = self._mantissa
-            if mantissa[0] in '+-':
-                sign = '-' if mantissa[0] == '-' else ''
-                mantissa = mantissa[1:]
-            else:
-                sign = ''
-            sf = self._scale_factor
-
-            # convert scale factor to integer exponent
-            try:
-                exp = int(sf)
-            except ValueError:
-                if sf:
-                    exp = int(MAPPINGS.get(sf, sf).lstrip('e'))
-                else:
-                    exp = 0
-
-            # add decimal point to mantissa if missing
-            mantissa += '' if '.' in mantissa else '.'
-            # strip off leading zeros and break into components
-            whole, frac = mantissa.lstrip('0').split('.')
-            if whole == '':
-                # no whole part
-                # normalize by removing leading zeros from fractional part
-                orig_len = len(frac)
-                frac_stripped = frac.lstrip('0')
-                if frac_stripped:
-                    whole = frac_stripped[:1]
-                    frac = frac_stripped[1:]
-                    exp -= orig_len - len(frac)
-                else:
-                    # stripping off zeros left us with nothing, this must be 0
-                    whole = '0'
-                    exp = 0
-            # normalize the mantissa
-            mantissa = whole[0] + '.' + whole[1:] + frac
+            sign, whole, frac, exp = self._split_original_number()
+            mantissa = f"{whole[0]}.{whole[1:]}{frac}"
             exp += len(whole) - 1
         else:
             # determine precision
@@ -2077,9 +2082,7 @@ class Quantity(float):
 
         :arg prec:
             The desired precision (one plus this value is the desired number of
-            digits). If specified as 'full', *full_prec* is used as the number
-            of digits (and not the originally specified precision as with
-            *render()*).
+            digits). If specified as 'full', the full original precision is used.
         :type prec: integer or 'full'
 
         :arg show_label:
@@ -2132,7 +2135,7 @@ class Quantity(float):
 
         Example::
 
-            >>> t = Quantity('Total = $1000000 — the total')
+            >>> t = Quantity('Total = $1000000.00 — the total')
             >>> print(
             ...     t.fixed(),
             ...     t.fixed(show_commas=True),
@@ -2153,7 +2156,7 @@ class Quantity(float):
             ...     t.fixed(strip_zeros=False, prec='full'),
             ...     t.fixed(show_label=True),
             ...     t.fixed(show_label='f'), sep=newline)
-            $1000000.000000000000
+            $1000000.00
             Total = $1000000
             Total = $1000000 — the total
 
@@ -2181,16 +2184,46 @@ class Quantity(float):
             value = self._combine(value, '', units, ' ')
             return self._label(value, show_label)
 
-        # format and return the result {{{3
-        if prec == 'full':
-            prec = self.full_prec
-        if scale or isinstance(scale, numbers.Number):
-            number, units = _scale(scale, self)
-            units = units if show_units else ''
+        # split into and process components {{{3
+        if prec == 'full' and hasattr(self, '_mantissa') and not scale:
+            sign, whole, frac, exp = self._split_original_number()
+
+            # eliminate exponent by moving radix
+            if exp < 0: # move radix to left
+                if -exp < len(whole):
+                    # partition whole and move trailing digits to frac
+                    frac = whole[exp:] + frac
+                    whole = whole[:exp]
+                else:
+                    # move all of whole to frac and add zeros to left-hand side
+                    frac = (-exp - len(whole))*'0' + whole + frac
+                    whole = '0'
+            else: # move radix to right
+                if len(frac) > exp:
+                    # partition frac and move leading digits to frac
+                    whole = whole + frac[:exp]
+                    frac = frac[exp:]
+                else:
+                    # move all of frac to whole and add zeros to right-hand side
+                    whole = whole + frac + (exp-len(frac))*'0'
+                    frac = ''
+            if show_commas:
+                whole = f"{int(whole):,}"
+            mantissa = f"{sign}{whole}.{frac}"
         else:
-            number = float(self)
-        comma = ',' if show_commas else ''
-        mantissa = '{0:{1}.{2}f}'.format(number, comma, prec)
+            if prec == 'full':
+                prec = self.full_prec
+            assert prec >= 0
+
+            if scale or isinstance(scale, numbers.Number):
+                number, units = _scale(scale, self)
+                units = units if show_units else ''
+            else:
+                number = float(self)
+            comma = ',' if show_commas else ''
+            mantissa = '{0:{1}.{2}f}'.format(number, comma, prec)
+
+        # strip zeros and radix if requested
         if '.' in mantissa:
             if strip_zeros:
                 mantissa = mantissa.rstrip('0')
