@@ -25,6 +25,11 @@ def test_format():
     assert '{:n}'.format(q) == 'f'
     assert '{:d}'.format(q) == 'frequency of hydrogen line'
     assert '{:p}'.format(q) == '1420405751.786 Hz'
+    assert '{:pHz}'.format(q) == '1420405751.786 Hz'
+    assert '{:pkHz}'.format(q) == '1420405.7518 kHz'
+    assert '{:pMHz}'.format(q) == '1420.4058 MHz'
+    assert '{:pGHz}'.format(q) == '1.4204 GHz'
+    assert '{:pTHz}'.format(q) == '0.0014 THz'
     assert '{:,p}'.format(q) == '1,420,405,751.786 Hz'
     assert '{:P}'.format(q) == 'f = 1420405751.786 Hz'
     assert '{:,P}'.format(q) == 'f = 1,420,405,751.786 Hz'
@@ -46,7 +51,7 @@ def test_format():
 def test_full_format():
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None, show_desc=False)
     Quantity.set_prefs(prec='full')
-    q = Quantity('f = 1420.405751786 MHz -- frequency of hydrogen line')
+    q = Quantity('f = 1420.405751786 MHz — frequency of hydrogen line')
     assert '{}'.format(q) == '1.420405751786 GHz'
     assert '{:.8}'.format(q) == '1.42040575 GHz'
     assert '{:.8s}'.format(q) == '1.42040575 GHz'
@@ -66,6 +71,11 @@ def test_full_format():
     assert '{:d}'.format(q) == 'frequency of hydrogen line'
     assert '{:.2p}'.format(q) == '1420405751.79 Hz'
     assert '{:,.2p}'.format(q) == '1,420,405,751.79 Hz'
+    assert '{:,.2pHz}'.format(q) == '1,420,405,751.79 Hz'
+    assert '{:,.2pkHz}'.format(q) == '1,420,405.75 kHz'
+    assert '{:,.2pMHz}'.format(q) == '1,420.41 MHz'
+    assert '{:,.2pGHz}'.format(q) == '1.42 GHz'
+    assert '{:,.2pTHz}'.format(q) == '0 THz'
     assert '{:.2P}'.format(q) == 'f = 1420405751.79 Hz'
     assert '{:,.2P}'.format(q) == 'f = 1,420,405,751.79 Hz'
     assert '{:#.3q}'.format(q) == '1.420 GHz'

@@ -71,7 +71,7 @@ def _scale(scale, unscaled):
 
     # if scale is string, it contains the units to convert to
     if isinstance(scale, str):
-        scaled = _convert_units(scale, unscaled.units, unscaled)
+        scaled = UnitConversion._convert_units(scale, unscaled.units, unscaled)
         to_units = scale
     else:
         # otherwise, it might be a function
@@ -195,11 +195,7 @@ class UnknownConversion(QuantiPhyError, KeyError):
     The given units are not supported by the underlying class, or a unit
     conversion was requested and there is no corresponding unit converter.
     """
-    _template = (
-        "unable to convert between ‘{to_units}’ and ‘{from_units}’.",
-        "unable to convert to ‘{to_units}’.",
-        "unable to convert from ‘{from_units}’.",
-    )
+    _template = "unable to convert between ‘{to_units}’ and ‘{from_units}’."
 
 
 # UnknownFormatKey {{{2
@@ -404,6 +400,7 @@ MAPPINGS = {
     'r': 'e-27', # ronto
     'q': 'e-30', # quecto
 }
+ALL_SF = ''.join(MAPPINGS.keys())
 BINARY_MAPPINGS = {
     'Qi': 1024*1024*1024*1024*1024*1024*1024*1024*1024*1024,
     'Ri': 1024*1024*1024*1024*1024*1024*1024*1024*1024,
@@ -1454,8 +1451,8 @@ class Quantity(float):
 
     # constructor {{{2
     def __new__(
-        cls, value, model=None, *, units=None, scale=None,
-        name=None, desc=None, ignore_sf=None, binary=None, params=None
+        cls, value, model=None, *, units=None, scale=None, binary=None,
+        name=None, desc=None, ignore_sf=None, params=None
     ):
         # preliminaries {{{3
         if ignore_sf is None:
@@ -1712,8 +1709,8 @@ class Quantity(float):
               subclass.
         :arg class cls:
             Class to use for return value. If not given, the class of self is
-            used unless scale is a subclass of :class:`Quantity`, in which case
-            *scale* is used.
+            used it the units do not change, in which case :class:`Quantity` is
+            used.
         :type scale: real, pair, function, string, or quantity
 
         :raises UnknownConversion(QuantiPhyError, KeyError):
@@ -3062,23 +3059,11 @@ add_constant(
 
 
 # Unit Conversions {{{1
-_unit_conversions = {}
-
-
-# _convert_units() {{{2
-def _convert_units(to_units, from_units, value):
-    # Not intended to be used by the user.  If you want this functionality,
-    # simply use: Quantity(value, from_units).scale(to_units).
-    if to_units == from_units:
-        return value
-    try:
-        return _unit_conversions[(to_units, from_units)](value)
-    except KeyError:
-        raise UnknownConversion(to_units=to_units, from_units=from_units)
-
-
 # UnitConversion class {{{2
 class UnitConversion(object):
+    _unit_conversions = {}
+    _known_units = set()
+
     # description {{{3
     """
     Creates a unit converter.
@@ -3219,6 +3204,9 @@ class UnitConversion(object):
 
     # constructor {{{3
     def __init__(self, to_units, from_units, slope=1, intercept=0):
+        self.slope = slope
+        self.intercept = intercept
+
         # convert units to lists
         # allow units to be a subclass of Quantity that has units
         try:
@@ -3235,11 +3223,11 @@ class UnitConversion(object):
             if not self.from_units:
                 self.from_units = ['']
 
-        # convert units to lists and save values
-        self.slope = slope
-        self.intercept = intercept
+        # save all units to set of known units
+        for units in self.to_units + self.from_units:
+            self._known_units.add(units)
 
-        # add to known converters
+        # add converter to set of known (aka active) converters
         self.activate()
 
     # activate() {{{3
@@ -3264,20 +3252,18 @@ class UnitConversion(object):
         # add to known unit conversion
         for to in self.to_units:
             for frm in self.from_units:
-                _unit_conversions[(to, frm)] = _forward
-                _unit_conversions[(frm, to)] = _reverse
+                self._unit_conversions[(to, frm)] = _forward
+                self._unit_conversions[(frm, to)] = _reverse
 
         # add no-op converters to allow a from-units to be converted to another
         for u1 in self.from_units:
             for u2 in self.from_units:
-                if u1 != u2:
-                    _unit_conversions[(u1, u2)] = self._no_op
+                self._unit_conversions[(u1, u2)] = self._no_op
 
         # add no-op converters to allow a to-units to be converted to another
         for u1 in self.to_units:
             for u2 in self.to_units:
-                if u1 != u2:
-                    _unit_conversions[(u1, u2)] = self._no_op
+                self._unit_conversions[(u1, u2)] = self._no_op
 
     # forward conversion {{{3
     def _forward(self, value):
@@ -3382,13 +3368,16 @@ class UnitConversion(object):
             else:
                 from_units = self.to_units[0]
 
-        if to_units not in self.to_units + self.from_units:
-            raise UnknownConversion(to_units=to_units)
-        if from_units not in self.to_units + self.from_units:
-            raise UnknownConversion(from_units=from_units)
+        converted = self._convert_units(to_units, from_units, value)
 
-        converted = _convert_units(to_units, from_units, value)
         return Quantity(converted, units=to_units)
+
+    # clear_all() {{{3
+    @classmethod
+    def clear_all(cls):
+        """Remove all known unit conversions."""
+        cls._unit_conversions = {}
+        cls._known_units = set()
 
     # fixture() {{{3
     @staticmethod
@@ -3487,6 +3476,81 @@ class UnitConversion(object):
                 return converter_func(q)
         return wrapper
 
+    # _convert_units() {{{2
+    @classmethod
+    def _convert_units(cls, to_units, from_units, value):
+        # Not intended to be used by the user.
+        # If you want this functionality, simply use:
+        #     Quantity(value, from_units).scale(to_units)
+
+        def get_converter(to_units, from_units):
+            # handle unity scale factor conversions
+            if (
+                to_units == from_units or
+                (to_units, from_units) in cls._unit_conversions
+            ):
+                return to_units, from_units, 1, 1
+
+            # Split scale factors from units.
+            # There are a few cases to consider:
+            # 1. there is no scale factor and the units are known
+            # 2. there is a scale factor and the units are known
+            # 3. the to_ and from_units are the same
+            #    a. there is no scale factor on the to_units
+            #    b. there is no scale factor on the from_units
+            #    c. there are scale factors on both the to_ and from_units
+
+            # handle known-unit cases for to_units
+            to_sf = None
+            to_resolved = to_units in cls._known_units  # case 1
+            if not to_resolved:
+                to_prefix, to_suffix = to_units[:1], to_units[1:]
+                to_resolved = to_prefix in ALL_SF and to_suffix in cls._known_units
+                if to_resolved:
+                    to_sf, to_units = to_prefix, to_suffix  # case 2
+
+            # handle known-unit cases for from_units
+            from_sf = None
+            from_resolved = from_units in cls._known_units  # case 1
+            if not from_resolved:
+                from_prefix, from_suffix = from_units[:1], from_units[1:]
+                from_resolved = from_prefix in ALL_SF and from_suffix in cls._known_units
+                if from_resolved:
+                    from_sf, from_units = from_prefix, from_suffix   # case 2
+
+            # handle same-unit cases
+            if not to_resolved and not from_resolved:  # case 3
+                if to_units == from_suffix and from_prefix in ALL_SF:  # case 3a
+                    from_sf, from_units = from_prefix, from_suffix
+                elif from_units == to_suffix and to_prefix in ALL_SF:  # case 3b
+                    to_sf, to_units = to_prefix, to_suffix
+                elif from_prefix in ALL_SF and to_prefix in ALL_SF:  # case 3c
+                    to_sf, to_units = to_prefix, to_suffix
+                    from_sf, from_units = from_prefix, from_suffix
+
+            def get_sf(sf):
+                if sf is None:
+                    return 1
+                return float('1' + MAPPINGS[sf])
+
+            if to_sf or from_sf:
+                return to_units, from_units, get_sf(to_sf), get_sf(from_sf)
+
+            raise UnknownConversion(to_units=to_units, from_units=from_units)
+
+        to_units, from_units, to_sf, from_sf = get_converter(to_units, from_units)
+
+        if not hasattr(value, 'units'):
+            value = Quantity(value, from_units)
+        if to_units == from_units:
+            return from_sf * value / to_sf
+        try:
+            converter = cls._unit_conversions[(to_units, from_units)]
+            return converter(value.scale(from_sf)) / to_sf
+        except KeyError:
+            raise UnknownConversion(to_units=to_units, from_units=from_units)
+
+
     # __str__ {{{3
     def __str__(self):
         if callable(self.slope) or callable(self.intercept):
@@ -3514,23 +3578,15 @@ UnitConversion('K', 'F °F', 5/9, 273.15 - 32*5/9)
 UnitConversion('K', 'R °R', 5/9, 0)
 
 # Length/Distance conversions {{{2
-UnitConversion('m', 'km', 1000)
-UnitConversion('m', 'cm', 1/100)
-UnitConversion('m', 'mm', 1/1000)
-UnitConversion('m', 'um µm μm micron', 1/1000000)
-UnitConversion('m', 'nm', 1/1000000000)
+UnitConversion('m', 'micron', 1/1000000)
 UnitConversion('m', 'Å angstrom', 1/10000000000)
 UnitConversion('m', 'mi mile miles', 1609.344)
 UnitConversion('m', 'ft feet', 0.3048)
 UnitConversion('m', 'in inch inches', 0.0254)
 
-# Mass conversions {{{2
+# Weight/Mass conversions {{{2
 UnitConversion('g', 'lb lbs', 453.59237)
 UnitConversion('g', 'oz', 28.34952)
-UnitConversion('g', 'kg', 1000)
-UnitConversion('g', 'mg', 1/1000)
-UnitConversion('g', 'ug µg μg', 1/1000000)
-UnitConversion('g', 'ng', 1/1000000000)
 
 # Time conversions {{{2
 UnitConversion('s', 'sec second seconds')
@@ -3551,7 +3607,11 @@ def as_real(*args, **kwargs):
     """Convert to real.
 
     Takes the same arguments as :class:`Quantity`, but returns a float rather
-    than a Quantity.
+    than a Quantity.  Takes one additional optional keyword argument ...
+
+    :arg class cls:
+        Quantity subclass used to do the conversion.
+        If not given, :class:`Quantity` is used.
 
     Examples::
 
@@ -3563,14 +3623,19 @@ def as_real(*args, **kwargs):
         1.6096579476861166e-05
 
     """
-    return Quantity(*args, **kwargs).real
+    cls = kwargs.pop('cls', Quantity)
+    return cls(*args, **kwargs).real
 
 # as_tuple() {{{2
 def as_tuple(*args, **kwargs):
     """Convert to tuple (value, units).
 
     Takes the same arguments as :class:`Quantity`, but returns a tuple consisting
-    of the value and units.
+    of the value and units.  Takes one additional optional keyword argument ...
+
+    :arg class cls:
+        Quantity subclass used to do the conversion.
+        If not given, :class:`Quantity` is used.
 
     Examples::
 
@@ -3582,7 +3647,8 @@ def as_tuple(*args, **kwargs):
         (1.6096579476861166e-05, 'M')
 
     """
-    return Quantity(*args, **kwargs).as_tuple()
+    cls = kwargs.pop('cls', Quantity)
+    return cls(*args, **kwargs).as_tuple()
 
 # render() {{{2
 def render(value, units, params=None, *args, **kwargs):

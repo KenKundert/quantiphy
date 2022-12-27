@@ -8,11 +8,17 @@ Latest development release
 | Version: 2.19a2
 | Released: 2022-12-17
 
-- Add new standard SI scale factors (*Q*, *R*, *r*, *q*).
+
+2.19 (2023-01-??)
+-----------------
+- Added new standard SI scale factors (*Q*, *R*, *r*, *q*).
 - Subclasses of :class:`Quantity` with units now convert values to the desired 
   units rather than allowing the units of the class to be overridden by those of 
   the value.
-- Added “cover” option to *strip_radix*..
+- Added scale factor conversion.
+- Added quantity functions: :func:`as_real`, :func:`as_tuple`, :func:`render`, 
+  :func:`fixed`, and :func:`binary`.
+- Added “cover” option to *strip_radix* preference.
 - Added type hints.
 
 

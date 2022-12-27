@@ -241,8 +241,9 @@ When given as a string, the number may use any of the following scale factors
 |   _ (1)
 |   c (10\ :sup:`-2`) centi
 |   m (10\ :sup:`-3`) milli
-|   u (10\ :sup:`-6`) micro
-|   μ (10\ :sup:`-6`) micro
+|   u (10\ :sup:`-6`) micro (ASCII)
+|   µ (10\ :sup:`-6`) micro (unicode micro)
+|   μ (10\ :sup:`-6`) micro (unicode Greek mu)
 |   n (10\ :sup:`-9`) nano
 |   p (10\ :sup:`-12`) pico
 |   f (10\ :sup:`-15`) fempto
@@ -436,8 +437,9 @@ the number and assign the units when creating the quantity:
     2.529 kg
 
 In this case the value is given in kilograms, and is converted to the base units 
-of grams by multiplying the given value by 1000. This can also be expressed as 
-follows:
+of grams by multiplying the given value by 1000. You always want to convert to 
+base units (units with no scale factor) when creating a :class:`Quantity`.  This 
+can also be expressed as follows:
 
 .. code-block:: python
 
@@ -456,7 +458,7 @@ conversion is :index:`not linear <dB>`:
     >>> Quantity('-100 dBV', scale=from_dB)
     Quantity('10 uV')
 
-.. notice:
+.. note::
 
    Since version 2.18 the first argument, in this case *value*, is guaranteed to 
    be a :class:`Quantity` that contains both the units and any parameters needed 
@@ -472,19 +474,19 @@ quantity to have:
     >>> print(Tboil)
     373.15 K
 
-or if you pass in a subclass of :class:`Quantity` that has units:
+or if you employ a subclass of :class:`Quantity` that has units:
 
 .. code-block:: python
 
     >>> class Kelvin(Quantity):
     ...     units = 'K'
 
-    >>> Tboil = Quantity('212 °F', scale=Kelvin)
+    >>> Tboil = Kelvin('212 °F')
     >>> print(Tboil)
     373.15 K
 
 This assumes that the initial value is specified with units. If not, you need to 
-provide them for this mechanism to work.
+provide them for these mechanisms to work.
 
 .. code-block:: python
 
@@ -494,7 +496,7 @@ provide them for this mechanism to work.
 
 To do this conversion, *QuantiPhy* examines the given units (°F) and the desired 
 units (K) and chooses the appropriate converter.  No scaling is done if the 
-given units are the same as the desired units. Thus you can use the scaling 
+given units are equivalent as the desired units. Thus you can use the scaling 
 mechanism to convert a collection of data with mixed units to values with 
 consistent units.  For example:
 
@@ -840,7 +842,7 @@ performed.
     >>> print(T.render(scale=to_dB))
     -20 dBV
 
-.. notice:
+.. note::
 
    Since version 2.18 the first argument, in this case *value*, is guaranteed to 
    be a :class:`Quantity` that contains both the units and any parameters needed 
@@ -1191,6 +1193,185 @@ information back into the original units:
    single: μ₀ (permeability of free space)
    single: Z0 (characteristic impedance of free space)
 
+You can add a scale factor to the units, in which case the number will be scaled 
+accordingly:
+
+.. code-block:: python
+
+    >>> for p in range(1, 5):
+    ...     bytes = Quantity(256**p, 'B')
+    ...     print(f"An {8*p} bit bus addresses {bytes:,pkB}.")
+    An 8 bit bus addresses 0.256 kB.
+    An 16 bit bus addresses 65.536 kB.
+    An 24 bit bus addresses 16,777.216 kB.
+    An 32 bit bus addresses 4,294,967.296 kB.
+
+Generally you should only specify base units when using a format that renders 
+with scale factors as otherwise you could see two scale factors on the same 
+number.  For example, if the ``q`` format was used in the above example, the 
+last address space would be rendered as 4.295 MkB.
+
+
+.. index::
+   single: Kelvin/kilo ambiguity
+   single: meter/milli ambiguity
+   single: ambiguity of scale factors and units
+
+.. _ambiguity:
+
+Ambiguity of Scale Factors and Units
+------------------------------------
+
+By default, *QuantiPhy* treats both the scale factor and the units as being 
+optional.  With the scale factor being optional, the meaning of some 
+specifications can be ambiguous. For example, '1m' may represent 1 milli or it 
+may represent 1 meter.  Similarly, '1meter' my represent 1 meter or 
+1 milli-eter.  In this case *QuantiPhy* gives preference to the scale factor, so 
+'1m' normally converts to 1e-3. To allow you to avoid this ambiguity, 
+*QuantiPhy* accepts '_' as the unity scale factor.  In this way '1_m' is 
+unambiguously 1 meter. You can instruct *QuantiPhy* to output '_' as the unity 
+scale factor by specifying the *unity_sf* argument to 
+:meth:`Quantity.set_prefs()`:
+
+.. code-block:: python
+
+    >>> Quantity.set_prefs(unity_sf='_', spacer='')
+    >>> l = Quantity(1, 'm')
+    >>> print(l)
+    1_m
+
+This is often a good way to go if you are outputting numbers intended to be read 
+unambiguously or by both people and machines.
+
+If you need to interpret numbers that have units and are known not to have scale 
+factors, you can specify the *ignore_sf* preference:
+
+.. code-block:: python
+
+    >>> Quantity.set_prefs(ignore_sf=True, unity_sf='', spacer=' ')
+    >>> l = Quantity('1000m')
+    >>> l.as_tuple()
+    (1000.0, 'm')
+
+    >>> print(l)
+    1 km
+
+    >>> Quantity.set_prefs(ignore_sf=False)
+    >>> l = Quantity('1000m')
+    >>> l.as_tuple()
+    (1.0, '')
+
+If there are scale factors that you know you will never use, you can instruct 
+*QuantiPhy* to interpret a specific set and ignore the rest using the *input_sf* 
+preference.
+
+.. code-block:: python
+
+    >>> Quantity.set_prefs(input_sf='GMk')
+    >>> l = Quantity('1000m')
+    >>> l.as_tuple()
+    (1000.0, 'm')
+
+    >>> print(l)
+    1 km
+
+Specifying *input_sf=None* causes *QuantiPhy* to again accept all known scale 
+factors.
+
+.. code-block:: python
+
+    >>> Quantity.set_prefs(input_sf=None)
+    >>> l = Quantity('1000m')
+    >>> l.as_tuple()
+    (1.0, '')
+
+Alternatively, you can specify the units you wish to use whose leading character 
+is a scale factor.  Once known, these units no longer confuse *QuantiPhy*.  
+These units can be specified as a list or as a string. If specified as a string 
+the string is split to form the list. Specifying the known units replaces any 
+existing known units.
+
+.. code-block:: python
+
+    >>> d1 = Quantity('1 au')     # astronomical unit
+    >>> d2 = Quantity('1000 pc')  # parsec
+    >>> p = Quantity('138 Pa')    # Pascal
+    >>> print(d1.render(form='eng'), d2, p, sep='\n')
+    1e-18 u
+    1 nc
+    138e15 a
+
+    >>> Quantity.set_prefs(known_units='au pc Pa')
+    >>> d1 = Quantity('1 au')
+    >>> d2 = Quantity('1000 pc')
+    >>> p = Quantity('138 Pa')
+    >>> print(d1.render(form='eng'), d2, p, sep='\n')
+    1 au
+    1 kpc
+    138 Pa
+
+This same issue comes up for temperature quantities when given in Kelvin. There 
+are again several ways to handle this. First you can specify the acceptable 
+input scale factors leaving out 'K', ex. *input_sf* = 'TGMkmunpfa', or:
+
+..  code-block:: python
+
+    >>> Quantity.set_prefs(input_sf=Quantity.get_pref('input_sf').replace('K', ''))
+    >>> temp = Quantity('100K')
+    >>> print(temp.as_tuple())
+    (100.0, 'K')
+
+    >>> temp = Quantity('100k')
+    >>> print(temp.as_tuple())
+    (100000.0, '')
+
+    >>> temp = Quantity('100k', 'K')
+    >>> print(temp.as_tuple())
+    (100000.0, 'K')
+
+Alternatively, you can specify 'K' as one of the known units. Finally, if you 
+know exactly when you will be converting a temperature to a quantity, you can 
+specify *ignore_sf* for that specific conversion. The effect is the same either 
+way, 'K' is interpreted as a unit rather than a scale factor.
+
+The same techniques would be used to handle volumes in cubic centimeters:
+
+    >>> vol = Quantity('10 cc')
+    >>> print(vol.as_tuple())
+    (0.1, 'c')
+
+    >>> with Quantity.prefs(input_sf=Quantity.get_pref('input_sf').replace('c', '')):
+    ...     vol = Quantity('10 cc')
+    >>> print(vol.as_tuple())
+    (10.0, 'cc')
+
+    >>> with Quantity.prefs(known_units='cc'):
+    ...     vol = Quantity('100 cc')
+    >>> print(vol.as_tuple())
+    (100.0, 'cc')
+
+Percentages are a special case.  *QuantiPhy* can treat the % character as either 
+a unit or a scale factor (0.01).  By default it is treated as a unit:
+
+..  code-block:: python
+
+    >>> tolerance = Quantity('10%')
+    >>> change = Quantity('10%Δ')
+    >>> print(tolerance.as_tuple(), change.as_tuple(),)
+    (10.0, '%') (10.0, '%Δ')
+
+If, however, you add % as a known scale factor, it then acts as a scale factor.
+
+    >>> with Quantity.prefs(input_sf = Quantity.get_pref('input_sf') + '%'):
+    ...     tolerance = Quantity('10%')
+    ...     change = Quantity('10%Δ')
+    ...     print(tolerance.as_tuple(), change.as_tuple(),)
+    (0.1, '') (0.1, 'Δ')
+
+In general you cannot simply add to the list of known scale factors.  The %
+character is an exception as *QuantiPhy* knows about it but disables it by 
+default.
+
 
 .. _subclassing Quantity:
 
@@ -1352,6 +1533,9 @@ conversions occur, from hours to seconds, as a result of the scale request, and
 from seconds to days, to convert to the units expected by the class.
 
 
+.. index::
+   single: unit conversions
+
 .. _unit converters:
 
 Unit Converters
@@ -1369,12 +1553,21 @@ conversion factors.  Once defined, a relationship is available anywhere in
 
     >>> m_smoot = UnitConversion('m', 'smoots', 1.7)
 
-    >>> length_of_harvard_bridge = Quantity('619.48_m')
-    >>> print(length_of_harvard_bridge.render(scale='smoots', prec=3))
-    364.4 smoots
+    >>> length_of_harvard_bridge = Quantity('364.4 smoots')
+    >>> print(length_of_harvard_bridge.render(scale='m', prec=1))
+    620 m
 
 This is a linear conversion.  This unit conversion says, when converting 
 *smoots* to *m*, multiply by 1.7.  When going the other way, divide by 1.7.
+
+You can also specify units with a scale factor when scaling a number.  For 
+example, you can explicitly direct that the length of the bridge should be 
+output in kilometers using:
+
+.. code-block:: python
+
+    >>> print(f"{length_of_harvard_bridge:.2pkm}")
+    0.62 km
 
 QuantiPhy* provides a collection of built-in converters for common units:
 
@@ -1383,9 +1576,8 @@ base units  related units
 =========== ================================================================
 C °C        K, F °F, R °R
 K           C °C, F °F, R °R
-m           km, m, cm, mm, um μm micron, nm, Å angstrom, mi mile miles,
-            in inch inches
-g           kg, mg, ug μg, ng, oz, lb lbs
+m           micron, Å angstrom, mi mile miles, ft feet, in inch inches
+g           oz, lb lbs
 s           sec second seconds, min minute minutes, hour hours hr, day days
 b           B
 BTC btc Ƀ ₿ sat sats ș
@@ -1479,7 +1671,12 @@ Defining a conversion between the same pair of units acts to conceal an earlier
 definition, but the previous definition can be restored using *activate()*.
 
 
-Parameterized Unit Converters
+.. index::
+   single: parametrized unit conversions
+
+.. _parameterized unit conversions:
+
+Parametrized Unit Converters
 .............................
 
 Occasionally you might encounter conversion that requires one or more extra 
@@ -1508,6 +1705,113 @@ For more information on defining unit converters, see :class:`UnitConversion`.
 For more information on parametrized unit converters, see 
 :meth:`UnitConversion.fixture`.  For example of real-time dynamic conversions, 
 see :ref:`quantiphy bitcoin example`.
+
+
+.. index::
+   single: scale factor conversions
+
+.. _scale factor conversions:
+
+Scale Factor Conversions
+------------------------
+
+In the preceding sections it was shown that you can use the scaling features of 
+*QuantiPhy* to convert between units using only the name of the units.  When 
+doing so the relationship between the units must be known, and 
+:class:`UnitConversion` is used to specify the relationship.  However, it is 
+also possible to perform simple scale factor conversions without changing the 
+units.  This case is specified in a manner similar to a unit conversion, but in 
+this case both the from-units and the to-units are the same, and it is not 
+necessary to define a :class:`UnitConversion`.  For example, imagine printing 
+a table of bit-rates where the rates are held in bps but are expected to be 
+displayed in Mbps:
+
+.. code-block:: python
+
+    >>> rates = [155.52e6, 622.08e6, 2.48832e9, 9.95328e9, 39.81312e9]
+    >>> rates = [Quantity(r, 'bps') for r in rates]
+    >>> for r in rates:
+    ...     print(f"{r:>14,.2pMbps}")
+       155.52 Mbps
+       622.08 Mbps
+     2,488.32 Mbps
+     9,953.28 Mbps
+    39,813.12 Mbps
+
+You can also do the inverse; convert simple numbers given in Mbps to quantities 
+in bps:
+
+.. code-block:: python
+
+    >>> rates = [155.52, 622.08, 2488.32, 9953.28, 39813.12]
+    >>> rates = [Quantity(r, 'Mbps', scale='bps') for r in rates]
+    >>> for r in rates:
+    ...     print(r.as_tuple())
+    (155520000.0, 'bps')
+    (622080000.0, 'bps')
+    (2488320000.0, 'bps')
+    (9953280000.0, 'bps')
+    (39813120000.0, 'bps')
+
+
+.. _quantity functions:
+
+Quantity Functions
+------------------
+
+It is sometimes handy to convert directly to and from real values rather than 
+converting to :class:`Quantity` objects and holding them.  Generally it is 
+preferred to key a value and its units together, but as said before, the primary 
+use of *QuantiPhy* is inputting and outputting numbers.  If you are not 
+inputting and outputting the same numbers, may not be worth even the small 
+overhead of a :class:`Quantity` object.  In that case, you can use quantity 
+functions to convert directly to and from real values.  If you wish to use 
+*QuantiPhy* to convert to a simple float, use :func:`as_real()`.  It takes the 
+same arguments as a :class:`Quantity`, but returns a float rather than 
+a *Quantity*:
+
+.. code-block:: python
+
+    >>> from quantiphy import as_real
+    >>> print(as_real('10 mL'))
+    0.01
+
+It is common to use :ref:`scale factor conversions` to scale the result to the 
+desired size:
+
+.. code-block:: python
+
+    >>> print(as_real('10 mL', scale='uL'))
+    10000.0
+
+:func:`as_tuple()` is similar except it returns both the value and the units as 
+a tuple:
+
+.. code-block:: python
+
+    >>> from quantiphy import as_tuple
+    >>> print(as_tuple('10 mL'))
+    (0.01, 'L')
+
+    >>> print(as_tuple('10 mL', scale='uL'))
+    (10000.0, 'uL')
+
+Finally, you can use :func:`render()`, :func:`fixed()`, and :func:`binary()` to 
+convert a real value and units into a string.  Besides the value and the units, 
+the these functions the same arguments as :meth:`Quantity.render()`,
+:meth:`Quantity.fixed()`, and :meth:`Quantity.binary()`.
+
+.. code-block:: python
+
+    >>> from quantiphy import render, fixed, binary
+    >>> print(render(1e-6, 'L'))
+    1 uL
+
+    >>> print(fixed(1e7, '$', show_commas=True, strip_zeros=False, prec=2))
+    $10,000,000.00
+
+    >>> print(binary(2**32, 'B'))
+    4 GiB
 
 
 .. _constants:
@@ -1789,7 +2093,7 @@ example, consider creating a local module named *quantity.py*:
             minus = Quantity.minus_sign,
             show_units = True,
         ),
-        shinx = dict(
+        sphinx = dict(
             # assumes values are to be rendered with a variable-with font by Sphinx
             form = 'si',
             map_sf = Quantity.map_sf_to_sci_notation,
@@ -1849,7 +2153,8 @@ radix
     The decimal point; generally ``.`` or ``,``.
 
 comma
-    The thousands separator; generally ``,``, ``.``, or the empty string.
+    The thousands separator; generally ``,``, ``.``, ``_`` or a narrow 
+    non-breaking space.
 
 plus
     *QuantitPhy* does not use plus signs when rendering quantities either on the 
@@ -1943,149 +2248,6 @@ on the fly:
     ...     print(f'{q:#,.2p}')
     €100,000,000.00
 
-
-.. index::
-   single: Kelvin/kilo ambiguity
-   single: ambiguity between scale factors and units
-
-.. _ambiguity:
-
-Ambiguity of Scale Factors and Units
-------------------------------------
-
-By default, *QuantiPhy* treats both the scale factor and the units as being 
-optional.  With the scale factor being optional, the meaning of some 
-specifications can be ambiguous. For example, '1m' may represent 1 milli or it 
-may represent 1 meter.  Similarly, '1meter' my represent 1 meter or 
-1 milli-eter.  In this case *QuantiPhy* gives preference to the scale factor, so 
-'1m' normally converts to 1e-3. To allow you to avoid this ambiguity, 
-*QuantiPhy* accepts '_' as the unity scale factor.  In this way '1_m' is 
-unambiguously 1 meter. You can instruct *QuantiPhy* to output '_' as the unity 
-scale factor by specifying the *unity_sf* argument to 
-:meth:`Quantity.set_prefs()`:
-
-.. code-block:: python
-
-    >>> Quantity.set_prefs(unity_sf='_', spacer='')
-    >>> l = Quantity(1, 'm')
-    >>> print(l)
-    1_m
-
-This is often a good way to go if you are outputting numbers intended to be read 
-unambiguously or by both people and machines.
-
-If you need to interpret numbers that have units and are known not to have scale 
-factors, you can specify the *ignore_sf* preference:
-
-.. code-block:: python
-
-    >>> Quantity.set_prefs(ignore_sf=True, unity_sf='', spacer=' ')
-    >>> l = Quantity('1000m')
-    >>> l.as_tuple()
-    (1000.0, 'm')
-
-    >>> print(l)
-    1 km
-
-    >>> Quantity.set_prefs(ignore_sf=False)
-    >>> l = Quantity('1000m')
-    >>> l.as_tuple()
-    (1.0, '')
-
-If there are scale factors that you know you will never use, you can instruct 
-*QuantiPhy* to interpret a specific set and ignore the rest using the *input_sf* 
-preference.
-
-.. code-block:: python
-
-    >>> Quantity.set_prefs(input_sf='GMk')
-    >>> l = Quantity('1000m')
-    >>> l.as_tuple()
-    (1000.0, 'm')
-
-    >>> print(l)
-    1 km
-
-Specifying *input_sf=None* causes *QuantiPhy* to again accept all known scale 
-factors.
-
-.. code-block:: python
-
-    >>> Quantity.set_prefs(input_sf=None)
-    >>> l = Quantity('1000m')
-    >>> l.as_tuple()
-    (1.0, '')
-
-Alternatively, you can specify the units you wish to use whose leading character 
-is a scale factor.  Once known, these units no longer confuse *QuantiPhy*.  
-These units can be specified as a list or as a string. If specified as a string 
-the string is split to form the list. Specifying the known units replaces any 
-existing known units.
-
-.. code-block:: python
-
-    >>> d1 = Quantity('1 au')     # astronomical unit
-    >>> d2 = Quantity('1000 pc')  # parsec
-    >>> p = Quantity('138 Pa')    # Pascal
-    >>> print(d1.render(form='eng'), d2, p, sep='\n')
-    1e-18 u
-    1 nc
-    138e15 a
-
-    >>> Quantity.set_prefs(known_units='au pc Pa')
-    >>> d1 = Quantity('1 au')
-    >>> d2 = Quantity('1000 pc')
-    >>> p = Quantity('138 Pa')
-    >>> print(d1.render(form='eng'), d2, p, sep='\n')
-    1 au
-    1 kpc
-    138 Pa
-
-This same issue comes up for temperature quantities when given in Kelvin. There 
-are again several ways to handle this. First you can specify the acceptable 
-input scale factors leaving out 'K', ex. *input_sf* = 'TGMkmunpfa', or:
-
-..  code-block:: python
-
-    >>> Quantity.set_prefs(input_sf = Quantity.get_pref('input_sf').replace('K', ''))
-    >>> temp = Quantity('100K')
-    >>> print(temp.as_tuple())
-    (100.0, 'K')
-
-    >>> temp = Quantity('100k')
-    >>> print(temp.as_tuple())
-    (100000.0, '')
-
-    >>> temp = Quantity('100k', 'K')
-    >>> print(temp.as_tuple())
-    (100000.0, 'K')
-
-Alternatively, you can specify 'K' as one of the known units. Finally, if you 
-know exactly when you will be converting a temperature to a quantity, you can 
-specify *ignore_sf* for that specific conversion. The effect is the same either 
-way, 'K' is interpreted as a unit rather than a scale factor.
-
-Percentages are a special case.  *QuantiPhy* can treat the % character as either 
-a unit or a scale factor (0.01).  By default it is treated as a unit:
-
-..  code-block:: python
-
-    >>> tolerance = Quantity('10%')
-    >>> change = Quantity('10%Δ')
-    >>> print(tolerance.as_tuple(), change.as_tuple(),)
-    (10.0, '%') (10.0, '%Δ')
-
-If, however, you add % as a known scale factor, it then acts as a scale factor.
-
-    >>> with Quantity.prefs(input_sf = Quantity.get_pref('input_sf') + '%'):
-    ...     tolerance = Quantity('10%')
-    ...     change = Quantity('10%Δ')
-    ...     print(tolerance.as_tuple(), change.as_tuple(),)
-    (0.1, '') (0.1, 'Δ')
-
-In general you cannot simply add to the list of known scale factors.  The %
-character is an exception as *QuantiPhy* knows about it but disables it by 
-default.
 
 .. index::
    single: tabular data
@@ -2565,7 +2727,7 @@ cannot convert into a number.  Now, a variety of *QuantiPhy* specific exceptions
 are used to indicate specific errors. However, these exceptions subclass the 
 corresponding Python error for compatibility with existing code.  It is 
 recommended that new code catch the *QuantiPhy* specific exceptions rather than 
-the generic Python exceptions as their use may be deprecated in the future.
+the generic Python exceptions as their use will be deprecated in the future.
 
 *QuantiPhy* employs the following exceptions:
 
@@ -2614,15 +2776,11 @@ the generic Python exceptions as their use may be deprecated in the future.
 :class:`UnknownConversion`:
     Subclass of :class:`QuantiPhyError` and *KeyError*.
 
-    Used by :meth:`UnitConversion.convert()`.
-
-    Raised when the given units are not supported by the underlying class.
-
-    Used by :class:`Quantity()`,
-    :meth:`Quantity.scale()`,
-    :meth:`Quantity.render()`,
-    :meth:`Quantity.fixed()`, and
-    :meth:`Quantity.format()`.
+    Used by :meth:`UnitConversion.convert()`, :class:`Quantity()`,
+    :meth:`Quantity.scale()`, :meth:`Quantity.render()`,
+    :meth:`Quantity.fixed()`, :meth:`Quantity.format()`,
+    :meth:`Quantity.binary()`, :func:`as_real()`, :func:`as_tuple`,
+    :func:`render()`, :func:`fixed`, and :func:`binary`.
 
     Raised when a unit conversion was requested and there is no corresponding 
     unit converter.

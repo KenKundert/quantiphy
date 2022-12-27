@@ -67,7 +67,7 @@ class Quantity(float):
         desc: str = ...,
         ignore_sf: bool = ...,
         binary: bool = ...,
-        params: Any = ...
+        params: Any = ...,
     ) -> Quantity:
         ...
 
@@ -217,11 +217,15 @@ class UnitConversion:
         value: float | str | Quantity = ...,
         from_units: str = ...,
         to_units: str = ...,
+        as_tuple: bool = ...,
     ):
         ...
 
     @staticmethod
     def fixture(converter_func):
+        ...
+
+    def clear_all(self) -> None:
         ...
 
 def set_unit_system(unit_system: str) -> None:
