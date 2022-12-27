@@ -5,8 +5,8 @@ Releases
 
 Latest development release
 --------------------------
-| Version: 2.19a2
-| Released: 2022-12-17
+| Version: 2.19a3
+| Released: 2022-12-26
 
 
 2.19 (2023-01-??)

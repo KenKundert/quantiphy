@@ -1,7 +1,7 @@
 major: 2
 minor: 19
 patch: 0
-revision: 2
+revision: 3
 type: alpha
 files:
     pyproject.toml:
