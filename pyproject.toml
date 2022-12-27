@@ -1,6 +1,6 @@
 [project]
 name = "quantiphy"
-version = "2.19a3"
+version = "2.19a4"
 description = "physical quantities (numbers with units)"
 readme = "README.rst"
 keywords = [
