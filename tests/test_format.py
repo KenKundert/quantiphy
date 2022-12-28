@@ -111,6 +111,9 @@ def test_full_format():
         fmtd = f"{float(num):25.{prec}f}".strip()
         assert f"${fmtd}" == q.fixed()
 
+    q = Quantity('1234.56 Ω')
+    assert q.fixed(scale='MΩ') == "0.00123456 MΩ"
+
 
 def test_width():
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None, show_desc=False)

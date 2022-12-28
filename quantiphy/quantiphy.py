@@ -22,7 +22,7 @@ Documentation can be found at https://quantiphy.readthedocs.io.
 """
 
 # MIT License {{{1
-# Copyright (C) 2016-2022 Kenneth S. Kundert
+# Copyright (C) 2016-2023 Kenneth S. Kundert
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -3408,7 +3408,7 @@ class UnitConversion(object):
     # clear_all() {{{3
     @classmethod
     def clear_all(cls):
-        """Remove all known unit conversions."""
+        """Remove all previously defined unit conversions."""
         cls._unit_conversions = {}
         cls._known_units = set()
 
@@ -3573,15 +3573,13 @@ class UnitConversion(object):
 
         to_units, from_units, to_sf, from_sf = get_converter(to_units, from_units)
 
+        # do the conversion
         if not hasattr(value, 'units'):
             value = Quantity(value, from_units)
         if to_units == from_units:
             return from_sf * value / to_sf
-        try:
-            converter = cls._unit_conversions[(to_units, from_units)]
-            return converter(value.scale(from_sf)) / to_sf
-        except KeyError:
-            raise UnknownConversion(to_units=to_units, from_units=from_units)
+        converter = cls._unit_conversions[(to_units, from_units)]
+        return converter(value.scale(from_sf)) / to_sf
 
 
     # __str__ {{{3
