@@ -822,7 +822,7 @@ in grams and wanting to present it in either kilograms or in pounds:
 .. code-block:: python
 
     >>> m = Quantity('2529 g')
-    >>> print('mass (kg): %s' % m.render(show_units=False, scale=0.001))
+    >>> print("mass (kg): {}".format(m.render(show_units=False, scale=0.001)))
     mass (kg): 2.529
 
     >>> print(m.render(scale=(0.0022046, 'lb'), form='fixed'))
@@ -864,7 +864,7 @@ the output, the units can be converted back to the original units if desired:
 .. code-block:: python
 
     >>> for time, temp in data:
-    ...     print('%-7s %s' % (time.render(scale='min'), temp.render(scale='°F')))
+    ...     print("{:<7} {}".format(time.render(scale='min'), temp.render(scale='°F')))
     0 min   450 °F
     10 min  400 °F
     20 min  360 °F
@@ -2051,12 +2051,12 @@ statement to temporarily override preferences:
 
     >>> with Quantity.prefs(form='fixed', show_units=False, prec=2):
     ...     for time, temp in data:
-    ...         print('%-7s %s' % (time, temp))
+    ...         print(f"{time:<7} {temp}")
     0       505.37
     600     477.59
     1200    455.37
 
-    >>> print('Final temperature = %s @ %s.' % data[-1][::-1])
+    >>> print(f"Final temperature = {data[-1][1]} @ {data[-1][0]}.")
     Final temperature = 455.37 K @ 1.2 ks.
 
 Notice that the specified preferences only affected the table, not the final 
