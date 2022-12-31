@@ -1,4 +1,4 @@
-from typing import Any, Callable, Sequence
+from typing import Any, Callable, Dict, List, Sequence
 
 class QuantiPhyError(Exception):
     args: tuple
@@ -76,7 +76,42 @@ class Quantity(float):
         ...
 
     @classmethod
-    def set_prefs(cls, **kwargs) -> None:
+    def set_prefs(
+        cls,
+        abstol: float = ...,
+        accept_binary: bool = ...,
+        assign_rec: str = ...,
+        comma: str = ...,
+        form: str = ...,
+        full_prec: int = ...,
+        ignore_sf: bool = ...,
+        inf: str = ...,
+        input_sf: str = ...,
+        keep_components: bool = ...,
+        known_units: str | List[str] = ...,
+        label_fmt: str = ...,
+        label_fmt_full: str = ...,
+        map_sf: dict | Callable = ...,
+        minus: str = ...,
+        nan: str = ...,
+        negligible: float | Dict[str, float] = ...,
+        number_fmt: str | Callable = ...,
+        output_sf: str = ...,
+        plus: str = ...,
+        prec: int | str = ...,
+        preferred_units: Dict[str, str] = ...,
+        radix: str = ...,
+        reltol: float = ...,
+        show_commas: bool = ...,
+        show_desc: bool = ...,
+        show_label: bool | str = ...,
+        show_units: bool | str = ...,
+        spacer: str = ...,
+        strip_radix: bool | str = ...,
+        strip_zeros: bool = ...,
+        tight_units: List[str] = ...,
+        unity_sf: str = ...,
+    ) -> None:
         ...
 
     @classmethod
@@ -117,8 +152,8 @@ class Quantity(float):
         self,
         form: str = ...,
         show_units: bool = ...,
-        prec: int = ...,
-        show_label: bool = ...,
+        prec: int | str = ...,
+        show_label: bool | str = ...,
         strip_zeros:bool = ...,
         strip_radix: bool = ...,
         scale: str | float | tuple[float | Quantity, str] | Callable = ...,
@@ -129,8 +164,8 @@ class Quantity(float):
     def fixed(
         self,
         show_units: bool = ...,
-        prec: int = ...,
-        show_label: bool = ...,
+        prec: int | str = ...,
+        show_label: bool | str = ...,
         show_commas: bool = ...,
         strip_zeros: bool = ...,
         strip_radix: bool = ...,
@@ -141,8 +176,8 @@ class Quantity(float):
     def binary(
         self,
         show_units: bool = ...,
-        prec: int = ...,
-        show_label: bool = ...,
+        prec: int | str = ...,
+        show_label: bool | str = ...,
         strip_zeros: bool = ...,
         strip_radix: bool = ...,
         scale: str | float | tuple[float | Quantity, str] | Callable = ...,
@@ -271,8 +306,8 @@ def render(
     units: str,
     form: str = ...,
     show_units: bool = ...,
-    prec: int = ...,
-    show_label: bool = ...,
+    prec: int | str = ...,
+    show_label: bool | str = ...,
     strip_zeros:bool = ...,
     strip_radix: bool = ...,
     scale: str | float | tuple[float | Quantity, str] | Callable = ...,
@@ -284,8 +319,8 @@ def fixed(
     value: float,
     units: str,
     show_units: bool = ...,
-    prec: int = ...,
-    show_label: bool = ...,
+    prec: int | str = ...,
+    show_label: bool | str = ...,
     show_commas: bool = ...,
     strip_zeros: bool = ...,
     strip_radix: bool = ...,
@@ -297,8 +332,8 @@ def binary(
     value: float,
     units: str,
     show_units: bool = ...,
-    prec: int = ...,
-    show_label: bool = ...,
+    prec: int | str = ...,
+    show_label: bool | str = ...,
     strip_zeros: bool = ...,
     strip_radix: bool = ...,
     scale: str | float | tuple[float | Quantity, str] | Callable = ...,

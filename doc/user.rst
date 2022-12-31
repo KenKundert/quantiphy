@@ -1619,9 +1619,19 @@ conversions (conversions with extra parameters) and dynamic conversions
     >>> print(Quantity('100', scale='dB'))
     40 dB
 
-Notice that the these scaling functions differ from those describe previously in 
-that the only take one argument and return one value.  The units are not 
-included in either then argument list or the return value.
+One thing to be aware of with affine conversions like °C to °F: they are 
+suitable for converting absolute temperatures but not temperature differences.
+One way around this is to add another conversion specifically for differences:
+
+.. code-block:: python
+
+    >>> dC_F = UnitConversion('ΔC Δ°C', 'ΔF Δ°F', 5/9)
+    >>> print(Quantity('100 Δ°C', scale='Δ°F'))
+    180 Δ°F
+
+Notice that the scaling functions used here differ from those described 
+previously in that they only take one argument and return one value.  The units 
+are not included in either then argument list or the return value.
 
 Also notice that the return value of *UnitConversion* was not used in the 
 examples above.  It is enough to simply create the *UnitConversion* for it to be 

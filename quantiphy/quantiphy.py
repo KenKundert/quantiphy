@@ -479,6 +479,8 @@ DEFAULTS = dict(
     output_sf = 'TGMkmunpfa',
     plus = '+',
     prec = 4,
+    preferred_units = {},
+    _preferred_units = {},  # transposed version of preferred_units
     radix = '.',
     reltol = 1e-6,
     show_commas = False,
@@ -924,6 +926,14 @@ class Quantity(float):
             Default precision  in digits where 0 corresponds to 1 digit.  Must
             be nonnegative.  This precision is used when the full precision is
             not required. Default is 4.
+        :type prec: int or str
+
+        :arg dict preferred_units:
+            A dictionary that is used when looking up the preferred units when
+            rendering.  For example, if *preferred_units* contains the entry:
+            {“Ω”: “Ohms Ohm ohms ohm”}, then when rendering a quantity with
+            units “Ohms”, “Ohm”, “ohms”, or “ohm”, the units are rendered as
+            “Ω”.
 
         :arg float reltol:
             Relative tolerance, used by :meth:`Quantity.is_close()` when
@@ -1033,8 +1043,33 @@ class Quantity(float):
         """
         # code {{{4
         cls._initialize_preferences()
+
+        # preprocess specific preferences
+        # split known_units
         if isinstance(kwargs.get('known_units'), str):
             kwargs['known_units'] = kwargs['known_units'].split()
+
+        # split preferred_units
+        if 'preferred_units' in kwargs:
+            _preferred_units = {}
+            for preferred_unit, undesired in kwargs['preferred_units'].items():
+                for each in undesired.split():
+                    _preferred_units[each] = preferred_unit
+            kwargs['_preferred_units'] = _preferred_units
+
+        # check for unknown output scale factors
+        if kwargs.get('output_sf'):
+            unknown_sf = set(kwargs['output_sf']) - set(MAPPINGS.keys())
+            if unknown_sf:
+                raise UnknownScaleFactor(
+                    *sorted(unknown_sf),
+                    combined = ", ".join(sorted(unknown_sf)),
+                    culprit = "output_sf"
+                )
+
+        # no need to check the input scale factors here
+        # they are checked when rebuilding recognizers
+
         for k, v in kwargs.items():
             if k not in DEFAULTS.keys():
                 raise UnknownPreference(k)
@@ -1050,16 +1085,10 @@ class Quantity(float):
                     cls._preferences[k] = DEFAULTS[k]
             else:
                 cls._preferences[k] = v
+
         if 'input_sf' in kwargs:
             cls._initialize_recognizers()
-        if 'output_sf' in kwargs:
-            unknown_sf = set(cls.get_pref('output_sf')) - set(MAPPINGS.keys())
-            if unknown_sf:
-                raise UnknownScaleFactor(
-                    *sorted(unknown_sf),
-                    combined = ", ".join(sorted(unknown_sf)),
-                    culprit = "output_sf"
-                )
+
 
     # get preference {{{3
     @classmethod
@@ -1945,7 +1974,7 @@ class Quantity(float):
         strip_zeros = self.strip_zeros if strip_zeros is None else strip_zeros
         strip_radix = self.strip_radix if strip_radix is None else strip_radix
         negligible = self.negligible if negligible is None else negligible
-        units = self.units if show_units else ''
+        units = self._preferred_units.get(self.units, self.units) if show_units else ''
         if prec is None:
             prec = self.prec
 
@@ -2174,7 +2203,7 @@ class Quantity(float):
         show_commas = self.show_commas if show_commas is None else show_commas
         strip_zeros = self.strip_zeros if strip_zeros is None else strip_zeros
         strip_radix = self.strip_radix if strip_radix is None else strip_radix
-        units = self.units if show_units else ''
+        units = self._preferred_units.get(self.units, self.units) if show_units else ''
         if prec is None:
             prec = self.prec
 
@@ -2327,7 +2356,7 @@ class Quantity(float):
         show_units = self.show_units if show_units is None else show_units
         strip_zeros = self.strip_zeros if strip_zeros is None else strip_zeros
         strip_radix = self.strip_radix if strip_radix is None else strip_radix
-        units = self.units if show_units else ''
+        units = self._preferred_units.get(self.units, self.units) if show_units else ''
         if prec is None:
             prec = self.prec
         elif prec == 'full':

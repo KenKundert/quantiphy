@@ -49,7 +49,7 @@ def test_fixed():
     assert fixed(1e6, 'g', scale='g', show_commas=True) == '1,000,000 g'
     assert fixed(1e6, 'g', scale='kg', show_commas=True) == '1,000 kg'
 
-def test_fixed():
+def test_binary():
     UnitConversion('b', 'B', 8)
     assert binary(2, 'B') == '2 B'
     assert binary(2, 'B', scale='b') == '16 b'
