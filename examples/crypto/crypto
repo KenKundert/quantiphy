@@ -1,0 +1,57 @@
+#!/usr/bin/env python3
+
+import requests
+from textwrap import dedent
+from quantiphy import Quantity, UnitConversion, InvalidNumber
+from inform import display, fatal, os_error, render_bar, terminate
+
+Quantity.set_prefs(prec=2, known_units='ADA EOS ETH ZEC')
+
+# read holdings
+try:
+    with open('holdings') as f:
+        lines = f.read().splitlines()
+    holdings = {
+        q.units: q for q in [
+            Quantity(l, ignore_sf=True) for l in lines if l
+        ]
+    }
+except OSError as e:
+    fatal(os_error(e))
+except InvalidNumber as e:
+    fatal(e)
+
+# download latest asset prices from cryptocompare.com
+currencies = dict(
+    fsyms = ','.join(holdings.keys()),  # from symbols
+    tsyms = 'USD',                      # to symbols
+)
+url_args = '&'.join(f'{k}={v}' for k, v in currencies.items())
+base_url = f'https://min-api.cryptocompare.com/data/pricemulti'
+url = '?'.join([base_url, url_args])
+try:
+    response = requests.get(url)
+except KeyboardInterrupt:
+    terminate('Killed by user.')
+except Exception as e:
+    fatal('cannot connect to cryptocompare.com.')
+conversions = response.json()
+
+# define unit conversions
+converters = {
+    sym: UnitConversion(('$', 'USD'), sym, conversions[sym]['USD'])
+    for sym in holdings
+}
+
+# sum total holdings
+total = Quantity(sum(q.scale('$') for q in holdings.values()), '$')
+
+# show summary of holdings and conversions
+for sym, q in holdings.items():
+    tokens = f'{q}'
+    value = f'{q:q$}'
+    percent = f'{100*q.scale("$")/total:.0f}%'
+    price = f'{converters[sym].convert()} ea'
+    bar = render_bar(q.scale('$')/total, 45)
+    display(f'{tokens:>8} @ {price:>9} = {value:<6} {percent:>3} {bar}')
+display(f'                 Total = {total:q}')

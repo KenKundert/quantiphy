@@ -1,0 +1,76 @@
+#!/usr/bin/env python3
+
+import requests
+from textwrap import dedent
+from quantiphy import Quantity, UnitConversion
+
+Quantity.set_prefs(prec=2)
+
+# holdings
+btc = Quantity(100, 'Ƀ')
+bch = Quantity(100, 'BCH')
+eth = Quantity(100, 'Ξ')
+zec = Quantity(100, 'ZEC')
+holdings = [btc, eth, bch, zec]
+
+# download latest asset prices from cryptocompare.com
+currencies = dict(
+    fsyms = 'BTC,ETH,BCH,ZEC',  # from symbols
+    tsyms = 'ETH,USD',          # to symbols
+)
+url_args = '&'.join(f'{k}={v}' for k, v in currencies.items())
+base_url = f'https://min-api.cryptocompare.com/data/pricemulti'
+url = '?'.join([base_url, url_args])
+r = requests.get(url)
+conversions = r.json()
+
+# define unit conversions
+units = {
+    'USD': ('$', 'USD'),
+    'BTC': ('Ƀ', 'BTC'),
+    'ETH': ('Ξ', 'ETH'),
+    'BCH': ('BCH',    ),
+    'ZEC': ('ZEC',    ),
+}
+def get_converter(fm, to):
+    return UnitConversion(units[to], units[fm], conversions[fm][to])
+btc2usd = get_converter('BTC', 'USD')
+eth2usd = get_converter('ETH', 'USD')
+bch2usd = get_converter('BCH', 'USD')
+zec2usd = get_converter('ZEC', 'USD')
+btc2eth = get_converter('BTC', 'ETH')
+
+# sum total holdings
+total = Quantity(sum(q.scale('$') for q in holdings), '$')
+
+# show summary of conversions and holdings
+print(dedent(f'''
+    Current Prices:
+          1 BTC = {btc2usd.convert()} or {btc2eth.convert()}
+          1 ETH = {eth2usd.convert()} or {btc2eth.convert(1, 'Ξ')}
+          1 BCH = {bch2usd.convert()}
+          1 ZEC = {zec2usd.convert()}
+
+    Holdings:
+        {btc:>7qBTC} = {btc:7q$} {100*btc.scale('$')/total:.0f}%
+        {eth:>7qETH} = {eth:7q$} {100*eth.scale('$')/total:.0f}%
+        {bch:>7qBCH} = {bch:7q$} {100*bch.scale('$')/total:.0f}%
+        {zec:>7qZEC} = {zec:7q$} {100*zec.scale('$')/total:.0f}%
+          Total = {total:q}
+''').strip())
+
+# show summary of conversions and holdings
+print(dedent(f'''
+    Current Prices:
+        1 BTC = {btc2usd.convert():>10,.2p} or {btc2eth.convert():>8,.4p}
+        1 ETH = {eth2usd.convert():>10,.2p} or {btc2eth.convert(1, 'Ξ'):>8,.4p}
+        1 BCH = {bch2usd.convert():>10,.2p}
+        1 ZEC = {zec2usd.convert():>10,.2p}
+
+    Holdings:
+        {btc:>7qBTC} = {btc:>13,.2p$} {100*btc.scale('$')/total:.0f}%
+        {eth:>7qETH} = {eth:>13,.2p$} {100*eth.scale('$')/total:.0f}%
+        {bch:>7qBCH} = {bch:>13,.2p$} {100*bch.scale('$')/total:.0f}%
+        {zec:>7qZEC} = {zec:>13,.2p$} {100*zec.scale('$')/total:.0f}%
+          Total = {total:>13,.2p}
+'''))

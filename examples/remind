@@ -1,0 +1,241 @@
+#!/usr/bin/env python3
+# DESCRIPTION {{{1
+"""
+Schedule a reminder
+
+Usage:
+    remind [options] <time_spec>...
+
+Options:
+    -m <message>, --msg <message>      The message to display
+    -c, --no-confirmation              Don’t print confirmation message
+    -f, --foreground                   Wait in the foreground
+    -n, --no-message                   Do not give message
+    -s, --sleep                        Mimic sleep command (implies -c -f -n)
+    -u <urgency>, --urgency <urgency>  Urgency (choose from critical, normal, low)
+
+The time spec can either be an absolute time such as 3:30pm (12 hour clock), 
+15:30 (24 hour clock), noon, midnight or now; or it can be a relative time given 
+in seconds, minutes, or hours. For example:
+
+    remind 4pm
+    remind 100s
+    remind 15m
+    remind 2h
+
+You can give several time specifications, though only one should be absolute,
+and if given, it should be the first.  Multiple relative times accumulate and
+can be negative.  If given, a sign can be either + or -, and there should be no 
+spaces between the sign and its number. Do not give a negative relative time as 
+the first time specification.  So for example:
+
+    remind 4pm -1m status meeting
+    remind 9am +6h harvest ice
+
+Any argument that is not recognized as a time spec is taken to be a message
+fragment.  It terminates the time specification and is appended to the message.  
+So, if you have a doctors appointment at 2pm and it will take you 30 minutes to 
+get there and you want to have a buffer of 15 minutes, you can use:
+
+    remind 2pm -30m -15m leave for the doctor
+
+At the specified time, in this case 1:15pm, a notification is raised.
+
+You can instruct remind to run in foreground, not to give a confirmation, or not 
+to give the reminder.  Or you can do all three with the --sleep option, in which 
+case remind becomes very much like a fancy version of the sleep command.
+"""
+
+# IMPORTS {{{1
+from docopt import docopt
+from inform import Color, display, done, fatal, full_stop, notify, terminate
+from pathlib import Path
+from quantiphy import Quantity, UnitConversion, QuantiPhyError
+from time import sleep
+import arrow
+import os
+
+# CONSTANTS {{{1
+# Preferences {{{2
+default_urgency = "critical"
+default_message = "It’s time!"
+nap_interval = 60  # how often to wake and check time (seconds)
+late_warning = 60  # how late does a reminder need to be to warrant a warning (seconds)
+__version__ = "1.1"
+__released__ = "2022-11-07"
+
+# Time Conversions {{{2
+UnitConversion("s", "sec second seconds")
+UnitConversion("s", "m min minute minutes", 60)
+UnitConversion("s", "h hr hour hours", 60*60)
+UnitConversion("s", "d day days", 24*60*60)
+UnitConversion("s", "w week weeks", 7*24*60*60)
+UnitConversion("s", "M month months", 30*24*60*60)
+UnitConversion("s", "y year years", 365*24*60*60)
+Quantity.set_prefs(ignore_sf=True)
+
+# Time Formats {{{2
+time_formats = {
+    "h:mm:ss A": "ex. 1:30:00 PM, 1:30:00 pm",
+    "h:mm:ssA": "ex. 1:30:00PM, 1:30:00pm",
+    "h:mm A": "ex. 1:30 PM, 1:30 pm",
+    "h:mmA": "ex. 1:30PM, 1:30pm",
+    "hA": "ex. 1PM or 1pm",
+    "HH:mm:ss": "ex. 13:00:00",
+    "HH:mm": "ex. 13:00",
+}
+aliases = dict(
+    noon = "12pm",
+    midnight = "12am",
+)
+
+# Urgencies {{{2
+urgencies = dict(
+   critical = "critical",  # persistent, audible
+   normal = "normal",      # ephemeral, audible
+   low = "low",            # ephemeral, short, silent, no message if late
+   c = "critical",
+   n = "normal",
+   l = "low",
+   high = "critical",
+   medium = "normal",
+   med = "normal",
+   h = "critical",
+   m = "normal",
+)
+
+# UTILITIES {{{1
+# when() {{{2
+def when(seconds):
+    seconds = abs(seconds)
+    if seconds < 120:
+        return f"{seconds:0.0f} seconds"
+    minutes = seconds / 60
+    if minutes < 120:
+        return f"{minutes:0.0f} minutes"
+    hours = minutes / 60
+    if hours < 6:
+        return f"{hours:0.1f} hours"
+    if hours < 48:
+        return f"{hours:0.0f} hours"
+    days = hours / 24
+    if days < 3:
+        return f"{days:0.0f} days"
+    return f"{days:0.1f} days"
+
+# MAIN {{{1
+# Process command line options {{{2
+cmdline = docopt(
+    __doc__,
+    version = f"remind {__version__} ({__released__})",
+    options_first = True  # need this to allow time offsets to be negative
+)
+time_specs = cmdline["<time_spec>"]
+message_fragments = []
+if cmdline["--msg"]:
+    message_fragments.append(cmdline["--msg"])
+give_confirmation = True
+run_in_background = True
+give_reminder = True
+if cmdline['--sleep']:
+    give_confirmation = False
+    run_in_background = False
+    give_reminder = False
+if cmdline['--no-confirmation']:
+    give_confirmation = False
+if cmdline['--foreground']:
+    run_in_background = False
+if cmdline['--no-message']:
+    give_reminder = False
+notification_urgency = urgencies.get(cmdline['--urgency'], default_urgency)
+
+# Initialization {{{2
+seconds = Quantity(0, "s")
+now = arrow.now()
+target = now
+if not Color.isTTY():
+    display = notify
+
+# Process the command line time specifications {{{2
+#
+for i, each in enumerate(time_specs):
+    each = aliases.get(each, each)
+    if each in ['+', '-']:
+        fatal("sign must be immediately adjacent to its time.")
+    if each == "now":
+        target = arrow.now()
+    else:
+        for fmt in time_formats:
+            try:
+                specified = arrow.get(each, fmt)
+                delta = specified - specified.floor("day")
+                target = now.floor("day") + delta
+                if specified < now:
+                    target.shift(hours=24)
+                break
+            except arrow.parser.ParserError:
+                pass
+            except ValueError as e:
+                fatal(full_stop(e), culprit=each)
+        else:
+            try:
+                seconds = seconds.add(Quantity(each, "m", scale="s"))
+            except QuantiPhyError as e:
+                message_fragments.extend(cmdline["<time_spec>"][i:])
+                break
+
+# Wait and give reminder {{{2
+try:
+    # correct for times that appear to be in the past {{{3
+    target = target.shift(seconds=seconds)
+    sleep_interval = (target - now).total_seconds()
+    if sleep_interval <= 0:
+        # target is in the past, advance it by a day
+        corrected_target = target.shift(days=1)
+        sleep_interval = (corrected_target - now).total_seconds()
+        if sleep_interval <= 0:
+            # target is still in the past, give an error message and quit
+            terminate(f"target time was {target.humanize()}.")
+        target = corrected_target
+
+    # choose the message {{{3
+    if not message_fragments:
+        message_fragments = [default_message]
+    message = " ".join(message_fragments)
+
+    # print confirmation message {{{3
+    if give_confirmation:
+        display(
+            f"Reminder scheduled for {target.format('h:mm A')},",
+            f"{when(sleep_interval)} from now.",
+            codicil = f"Message: {message}",
+        )
+
+    # move process to background by duplicating it and exiting the original {{{3
+    if run_in_background:
+        if os.fork():
+            os._exit(0)
+
+    # wait for scheduled time {{{3
+    # wake up occasionally to recompute how much time remains
+    # this allows computer to take a nap
+    while sleep_interval > 0:
+        sleep(min(sleep_interval, nap_interval))
+        sleep_interval = (target - arrow.now()).total_seconds()
+
+    # add warning if reminder is late {{{3
+    if -sleep_interval > late_warning:
+        if notification_urgency == "low" and run_in_background:
+            done()
+        late = f"Reminder is {when(sleep_interval)} late."
+        message = "\n".join([message, late])
+
+    # give reminder to user {{{3
+    if give_reminder:
+        if run_in_background:
+            notify(message, urgency=notification_urgency)
+        else:
+            display(message)
+
+except KeyboardInterrupt:
+    display("remind was killed, no reminder will be given.")

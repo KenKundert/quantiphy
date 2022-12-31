@@ -1,0 +1,224 @@
+#!/usr/bin/env python3
+# Usage {{{1
+"""
+Time Value of Money
+
+Usage:
+    tvm [options] [{outputs}]
+
+Options:
+    -f <val>, --fv <val>       future value
+    -p <val>, --pv <val>       present value
+    -P <val>, --pmt <val>      payment per period
+    -N <val>, --periods <val>  total number of periods
+    -y <val>, --years <val>    total number of years (alternative to --periods)
+    -n <val>, --freq <val>     number of payments per year
+    -r <val>, --rate <val>     annual discount rate in percent
+    -i, --ignore               ignore any previously specified values
+
+If a value is not given it is recalled from the previous invocation.
+Specify --ignore to use the default values for all unspecified options, which
+are: pv=0, fv=0, pmt=0, years=30, freq=12.
+"""
+
+# Imports {{{1
+from json import dumps, loads
+from math import log
+from pathlib import Path
+
+from appdirs import user_cache_dir
+from docopt import docopt
+
+from inform import Color, conjoin, display, fatal, os_error
+from quantiphy import QuantiPhyError, Quantity
+
+# Globals {{{1
+Quantity.set_prefs(prec=2, strip_zeros=False, spacer="")
+outputs = "fv pv pmt years periods".split()
+currency = "$"
+computed_color = "white"
+given_color = "green"
+__version__ = "1.0.0"
+__released__ = "2020-07-19"
+
+
+class Currency(Quantity):
+    units = currency
+    form = "fixed"
+    prec = 2
+    strip_zeros = False
+    show_commas = True
+
+
+class Percent(Quantity):
+    units = "%"
+    form = "fixed"
+    prec = "full"
+    strip_zeros = True
+
+
+class Years(Quantity):
+    units = ""
+    form = "fixed"
+    prec = 2
+    strip_zeros = True
+
+
+class Periods(Quantity):
+    units = ""
+    form = "fixed"
+    prec = 2
+    strip_zeros = True
+
+
+# load params {{{1
+cache_dir = Path(user_cache_dir("tvm"))
+cache = Path(cache_dir, "data.json")
+try:
+    raw = cache.read_text()
+    params = loads(raw)
+except FileNotFoundError:
+    params = {}
+except OSError as e:
+    fatal(os_error(e))
+
+# read command line {{{1
+cmdline = docopt(
+    __doc__.format(outputs="|".join(outputs)),
+    version=f"tvm {__version__} ({__released__})",
+    options_first=False,
+)
+if cmdline["--ignore"]:
+    params = {}
+for name, value in cmdline.items():
+    if name.startswith("--") and value and name != "--ignore":
+        name = name[2:]
+        try:
+            params[name] = Quantity(value)
+        except QuantiPhyError as e:
+            fatal(e, culprit=name)
+if "freq" not in params:
+    params["freq"] = 12
+if cmdline["--periods"]:
+    params["years"] = params["freq"] / params["periods"]
+elif cmdline["--years"]:
+    params["periods"] = params["freq"] * params["years"]
+if "periods" not in params and "years" not in params:
+    params["periods"] = params["freq"] * 30
+    params["years"] = 30
+elif "periods" not in params:
+    params["periods"] = params["freq"] * params["years"]
+elif "years" not in params:
+    params["years"] = params["periods"] / params["freq"]
+
+if "rate" not in params:
+    fatal("discount rate is missing: specify with --rate.")
+
+for k in outputs:
+    if cmdline[k]:
+        compute = k
+        break
+else:
+    compute = params.get("compute")
+if not compute:
+    fatal(conjoin(outputs, " or "), template="must specify the value you desire ({}).")
+params["compute"] = compute
+
+
+# utility function {{{1
+def rate():
+    return params["rate"] / params["freq"] / 100
+
+
+try:
+    # compute future value {{{1
+    if compute == "fv":
+        r = rate()
+        pv = params.get("pv", 0)
+        pmt = params.get("pmt", 0)
+        N = params["periods"]
+        growth = (1 + r) ** N
+        fv = pv * growth + pmt * (growth - 1) / r
+        params["fv"] = fv
+
+    # compute present value {{{1
+    elif compute == "pv":
+        r = rate()
+        fv = params.get("fv", 0)
+        pmt = params.get("pmt", 0)
+        N = params["periods"]
+        growth = (1 + r) ** N
+        pv = fv / growth + pmt * (1 - 1 / growth) / r
+        params["pv"] = pv
+
+    # compute payment {{{1
+    elif compute == "pmt":
+        r = rate()
+        fv = params.get("fv", 0)
+        pv = params.get("pv", 0)
+        N = params["periods"]
+        growth = (1 + r) ** N
+        if r:
+            pmt = fv / ((growth - 1) / r) - pv / ((1 - 1 / growth) / r)
+        else:
+            pmt = (fv - pv)/N
+        params["pmt"] = pmt
+
+    # compute years {{{1
+    elif compute == "years":
+        r = rate()
+        fv = params.get("fv", 0)
+        pv = params.get("pv", 0)
+        pmt = params.get("pmt", 0)
+        try:
+            N = log((fv * r + pmt) / (pv * r + pmt)) / log(1 + r)
+        except ValueError:
+            fatal("cannot be computed.", culprit=compute)
+        params["years"] = N / params["freq"]
+
+    # compute periods {{{1
+    elif compute == "periods":
+        r = rate()
+        fv = params.get("fv", 0)
+        pv = params.get("pv", 0)
+        pmt = params.get("pmt", 0)
+        try:
+            N = log((fv * r + pmt) / (pv * r + pmt)) / log(1 + r)
+        except ValueError:
+            fatal("cannot be computed.", culprit=compute)
+        params["periods"] = N
+
+    else:
+        raise AssertionError
+
+    # Gather the results
+    results = dict(
+        pv=Currency(pv),
+        pmt=Currency(pmt),
+        fv=Currency(fv),
+        r=Percent(params["rate"]),
+        periods=Periods(N),
+        years=Years(N / params["freq"]),
+    )
+
+except KeyError as e:
+    fatal("missing:", str(e))
+
+# write out params {{{1
+try:
+    cache_dir.mkdir(exist_ok=True)
+    raw = dumps(params)
+    cache.write_text(raw)
+except OSError as e:
+    fatal(os_error(e))
+
+# output results {{{1
+computed = Color(computed_color, enable=Color.isTTY())
+given = Color(given_color, enable=Color.isTTY())
+for k, v in results.items():
+    if k == compute:
+        k = k.upper()
+        colorize = computed
+    else:
+        colorize = given
+    display(k, v, template=colorize("{} = {}"))

@@ -1,0 +1,6 @@
+#!/bin/sh
+
+./ds-sim
+pl vin.wave vout.wave
+pl vin.wave dout.wave
+
