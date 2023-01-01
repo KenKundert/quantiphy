@@ -131,7 +131,7 @@ class QuantiPhyError(Exception):
             except (IndexError, KeyError):
                 continue
         else:
-            raise ValueError('No valid template found.')
+            raise ValueError("No valid template found.")
         culprits = ', '.join(str(a) for a in self.args)
         return '{}: {}'.format(culprits, t)
 
@@ -151,7 +151,7 @@ class ExpectedQuantity(QuantiPhyError, ValueError):
     The value is required to be a Quantity or a string that can be converted to
     a Quantity.
     """
-    _template = 'expected a quantity for value.'
+    _template = "expected a quantity for value."
 
 
 # IncompatibleUnits {{{2
@@ -159,7 +159,7 @@ class IncompatibleUnits(QuantiPhyError, TypeError):
     """
     The units of the contribution do not match those of the underlying quantity.
     """
-    _template = 'incompatible units ({} and {}).'
+    _template = "incompatible units ({} and {})."
 
 
 # InvalidNumber {{{2
@@ -186,7 +186,7 @@ class MissingName(QuantiPhyError, NameError):
     """
     *alias* was not specified and no name was available from *value*.
     """
-    _template = 'no name specified.'
+    _template = "no name specified."
 
 
 # UnknownConversion {{{2
@@ -206,7 +206,7 @@ class UnknownFormatKey(QuantiPhyError, KeyError):
     for name, *v* for value, and *d* for description. This exception is raised
     when some other name is used for an interpolated argument.
     """
-    _template = '{}: unknown format key.'
+    _template = "{}: unknown format key."
 
 
 # UnknownPreference {{{2
@@ -214,7 +214,7 @@ class UnknownPreference(QuantiPhyError, KeyError):
     """
     The name given for a preference is unknown.
     """
-    _template = '{}: unknown preference.'
+    _template = "{}: unknown preference."
 
 
 # UnknownScaleFactor {{{2
@@ -442,7 +442,11 @@ FORMAT_SPEC = re.compile(r'''\A
         ([qpPQrRbBusSeEfFgGdn])         # format
         ([a-zA-Z%{us}{cs}][-^/()\w]*)?  # units
     )?
-\Z'''.format(cs=re.escape(CURRENCY_SYMBOLS), us=re.escape(UNIT_SYMBOLS)), re.VERBOSE)
+\Z'''.format(
+        cs=re.escape(CURRENCY_SYMBOLS), us=re.escape(UNIT_SYMBOLS)
+    ),
+    re.VERBOSE,
+)
 
 # Defaults {{{1
 DEFAULTS = dict(
@@ -902,7 +906,7 @@ class Quantity(float):
             Which scale factors to output, generally one would only use familiar
             scale factors. The default is 'TGMkmunpfa', which gets rid or the
             very large ('QRYZEP') and very small ('zyrq') scale factors that many
-            people do not recognize.  You can set this to *Quantity.all_sf* to 
+            people do not recognize.  You can set this to *Quantity.all_sf* to
             configure *Quantity* to use all available output scale factors.
 
         :arg str radix:
@@ -1225,6 +1229,7 @@ class Quantity(float):
             elif c == ',':
                 return self.comma
             return c
+
         return ''.join((map(replace_char, mantissa)))
 
     # _split_original_number {{{3
@@ -1342,7 +1347,8 @@ class Quantity(float):
         binary_scale_factor = _named_regex('sf', '|'.join(BINARY_MAPPINGS))
         currency = _named_regex('currency', f'[{CURRENCY_SYMBOLS}]')
         units = _named_regex(
-            r'units', r'(?:[a-zA-Z%√{us}{cur}][-^/()\w·⁻⁰¹²³⁴⁵⁶⁷⁸⁹√{us}{cur}]*)?'.format(
+            'units',
+            r'(?:[a-zA-Z%√{us}{cur}][-^/()\w·⁻⁰¹²³⁴⁵⁶⁷⁸⁹√{us}{cur}]*)?'.format(
                 us = re.escape(UNIT_SYMBOLS),
                 cur = re.escape(CURRENCY_SYMBOLS),
             )
@@ -1353,7 +1359,7 @@ class Quantity(float):
 
         # number_with_scale_factor {{{3
         number_with_scale_factor = (
-            r'{sign}{mantissa}{space}*{scale_factor}{units}'.format(**locals()),
+            '{sign}{mantissa}{space}*{scale_factor}{units}'.format(**locals()),
             lambda match: fix_sign(match.group('sign')) + match.group('mant'),
             lambda match: match.group('sf'),
             lambda match: match.group('units')
@@ -1361,7 +1367,7 @@ class Quantity(float):
 
         # number_with_exponent {{{3
         number_with_exponent = (
-            r'{sign}{mantissa}{exponent}{space}*{units}'.format(**locals()),
+            '{sign}{mantissa}{exponent}{space}*{units}'.format(**locals()),
             lambda match: fix_sign(match.group('sign')) + match.group('mant'),
             lambda match: match.group('exp').lower(),
             lambda match: match.group('units')
@@ -1370,7 +1376,7 @@ class Quantity(float):
         # simple_number {{{3
         # this one must be processed after number_with_scale_factor
         simple_number = (
-            r'{sign}{mantissa}{space}*{units}'.format(**locals()),
+            '{sign}{mantissa}{space}*{units}'.format(**locals()),
             lambda match: fix_sign(match.group('sign')) + match.group('mant'),
             lambda match: '',
             lambda match: match.group('units')
@@ -1378,7 +1384,7 @@ class Quantity(float):
 
         # currency_with_scale_factor {{{3
         currency_with_scale_factor = (
-            r'{sign}{currency}{mantissa}{space}*{scale_factor}'.format(**locals()),
+            '{sign}{currency}{mantissa}{space}*{scale_factor}'.format(**locals()),
             lambda match: fix_sign(match.group('sign')) + match.group('mant'),
             lambda match: match.group('sf'),
             lambda match: match.group('currency')
@@ -1386,7 +1392,7 @@ class Quantity(float):
 
         # currency_with_exponent {{{3
         currency_with_exponent = (
-            r'{sign}{currency}{mantissa}{exponent}'.format(**locals()),
+            '{sign}{currency}{mantissa}{exponent}'.format(**locals()),
             lambda match: fix_sign(match.group('sign')) + match.group('mant'),
             lambda match: match.group('exp').lower(),
             lambda match: match.group('currency')
@@ -1394,7 +1400,7 @@ class Quantity(float):
 
         # simple_currency {{{3
         simple_currency = (
-            r'{sign}{currency}{mantissa}'.format(**locals()),
+            '{sign}{currency}{mantissa}'.format(**locals()),
             lambda match: fix_sign(match.group('sign')) + match.group('mant'),
             lambda match: '',
             lambda match: match.group('currency')
@@ -1402,7 +1408,7 @@ class Quantity(float):
 
         # nan_with_units {{{3
         nan_with_units = (
-            r'{sign}{nan}{space}+{units}'.format(**locals()),
+            '{sign}{nan}{space}+{units}'.format(**locals()),
             lambda match: fix_sign(match.group('sign')) + match.group('nan').lower(),
             lambda match: '',
             lambda match: match.group('units')
@@ -1410,7 +1416,7 @@ class Quantity(float):
 
         # currency_nan {{{3
         currency_nan = (
-            r'{sign}{currency}{nan}'.format(**locals()),
+            '{sign}{currency}{nan}'.format(**locals()),
             lambda match: fix_sign(match.group('sign')) + match.group('nan').lower(),
             lambda match: '',
             lambda match: match.group('currency')
@@ -1418,7 +1424,7 @@ class Quantity(float):
 
         # simple_nan {{{3
         simple_nan = (
-            r'{sign}{nan}'.format(**locals()),
+            '{sign}{nan}'.format(**locals()),
             lambda match: fix_sign(match.group('sign')) + match.group('nan').lower(),
             lambda match: '',
             lambda match: ''
@@ -1427,7 +1433,7 @@ class Quantity(float):
         # inf_with_units {{{3
         # the word 'inf' is handled as a nan, this only matches ∞
         inf_with_units = (
-            r'{sign}∞{space}*{units}'.format(**locals()),
+            '{sign}∞{space}*{units}'.format(**locals()),
             lambda match: fix_sign(match.group('sign')) + 'inf',
             lambda match: '',
             lambda match: match.group('units')
@@ -1436,7 +1442,7 @@ class Quantity(float):
         # currency_inf {{{3
         # the word 'inf' is handled as a nan, this only matches ∞
         currency_inf = (
-            r'{sign}{currency}∞'.format(**locals()),
+            '{sign}{currency}∞'.format(**locals()),
             lambda match: fix_sign(match.group('sign')) + 'inf',
             lambda match: '',
             lambda match: match.group('currency')
@@ -1445,7 +1451,7 @@ class Quantity(float):
         # simple_inf {{{3
         # the word 'inf' is handled as a nan, this only matches ∞
         simple_inf = (
-            r'{sign}∞'.format(**locals()),
+            '{sign}∞'.format(**locals()),
             lambda match: fix_sign(match.group('sign')) + 'inf',
             lambda match: '',
             lambda match: ''
@@ -1453,7 +1459,7 @@ class Quantity(float):
 
         # number_with_binary_scale_factor {{{3
         number_with_binary_scale_factor = (
-            r'{sign}{mantissa}{space}*{binary_scale_factor}{units}'.format(**locals()),
+            '{sign}{mantissa}{space}*{binary_scale_factor}{units}'.format(**locals()),
             lambda match: fix_sign(match.group('sign')) + match.group('mant'),
             lambda match: match.group('sf'),
             lambda match: match.group('units')
@@ -1519,8 +1525,10 @@ class Quantity(float):
 
     # constructor {{{2
     def __new__(
-        cls, value, model=None, *, units=None, scale=None, binary=None,
-        name=None, desc=None, ignore_sf=None, params=None
+        cls, value, model=None,
+        *,
+        units=None, scale=None, binary=None, name=None, desc=None,
+        ignore_sf=None, params=None
     ):
         # preliminaries {{{3
         if ignore_sf is None:
@@ -1553,7 +1561,7 @@ class Quantity(float):
             comma = cls.get_pref('comma')
             radix = cls.get_pref('radix')
             if comma == radix:
-                raise IncompatiblePreferences('comma and radix must differ.')
+                raise IncompatiblePreferences("comma and radix must differ.")
             if binary and not ignore_sf:
                 number_converters = cls.binary_number_converters
                 for pattern, get_mant, get_sf, get_units in number_converters:
@@ -1857,7 +1865,9 @@ class Quantity(float):
 
     # render() {{{2
     def render(
-        self, *, form=None, show_units=None, prec=None, show_label=None,
+        self,
+        *,
+        form=None, show_units=None, prec=None, show_label=None,
         strip_zeros=None, strip_radix=None, scale=None, negligible=None
     ):
         # description {{{3
@@ -2100,7 +2110,9 @@ class Quantity(float):
 
     # fixed() {{{2
     def fixed(
-        self, *, show_units=None, prec=None, show_label=None, show_commas=None,
+        self,
+        *,
+        show_units=None, prec=None, show_label=None, show_commas=None,
         strip_zeros=None, strip_radix=None, scale=None,
     ):
         # description {{{3
@@ -2218,7 +2230,7 @@ class Quantity(float):
             sign, whole, frac, exp = self._split_original_number()
 
             # eliminate exponent by moving radix
-            if exp < 0: # move radix to left
+            if exp < 0:  # move radix to left
                 if -exp < len(whole):
                     # partition whole and move trailing digits to frac
                     frac = whole[exp:] + frac
@@ -2227,7 +2239,7 @@ class Quantity(float):
                     # move all of whole to frac and add zeros to left-hand side
                     frac = (-exp - len(whole))*'0' + whole + frac
                     whole = '0'
-            else: # move radix to right
+            else:        # move radix to right
                 if len(frac) > exp:
                     # partition frac and move leading digits to frac
                     whole = whole + frac[:exp]
@@ -2495,11 +2507,8 @@ class Quantity(float):
         return '{}({!r})'.format(
             self.__class__.__name__,
             self.render(
-                form = form,
-                show_units = True,
-                prec = 'full',
-                negligible = -1,
-                strip_zeros = True
+                form=form, show_units=True, prec='full', negligible=-1,
+                strip_zeros=True
             )
         )
 
@@ -3281,7 +3290,9 @@ class UnitConversion(object):
         try:
             self.from_units = [from_units.units]
         except AttributeError:
-            self.from_units = from_units.split() if isinstance(from_units, str) else from_units
+            self.from_units = (
+                from_units.split() if isinstance(from_units, str) else from_units
+            )
             if not self.from_units:
                 self.from_units = ['']
 
@@ -3564,21 +3575,23 @@ class UnitConversion(object):
 
             # handle known-unit cases for to_units
             to_sf = None
-            to_resolved = to_units in cls._known_units  # case 1
+            to_resolved = to_units in cls._known_units                 # case 1
             if not to_resolved:
                 to_prefix, to_suffix = to_units[:1], to_units[1:]
                 to_resolved = to_prefix in ALL_SF and to_suffix in cls._known_units
                 if to_resolved:
-                    to_sf, to_units = to_prefix, to_suffix  # case 2
+                    to_sf, to_units = to_prefix, to_suffix             # case 2
 
             # handle known-unit cases for from_units
             from_sf = None
-            from_resolved = from_units in cls._known_units  # case 1
+            from_resolved = from_units in cls._known_units             # case 1
             if not from_resolved:
                 from_prefix, from_suffix = from_units[:1], from_units[1:]
-                from_resolved = from_prefix in ALL_SF and from_suffix in cls._known_units
+                from_resolved = (
+                    from_prefix in ALL_SF and from_suffix in cls._known_units
+                )
                 if from_resolved:
-                    from_sf, from_units = from_prefix, from_suffix   # case 2
+                    from_sf, from_units = from_prefix, from_suffix     # case 2
 
             # handle same-unit cases
             if not to_resolved and not from_resolved:  # case 3
@@ -3586,7 +3599,7 @@ class UnitConversion(object):
                     from_sf, from_units = from_prefix, from_suffix
                 elif from_units == to_suffix and to_prefix in ALL_SF:  # case 3b
                     to_sf, to_units = to_prefix, to_suffix
-                elif from_prefix in ALL_SF and to_prefix in ALL_SF:  # case 3c
+                elif from_prefix in ALL_SF and to_prefix in ALL_SF:    # case 3c
                     to_sf, to_units = to_prefix, to_suffix
                     from_sf, from_units = from_prefix, from_suffix
 

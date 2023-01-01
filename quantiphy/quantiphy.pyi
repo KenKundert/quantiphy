@@ -4,42 +4,19 @@ class QuantiPhyError(Exception):
     args: tuple
     kwargs: dict
 
-    def render(self, template: str) -> str:
-        ...
+    def render(self, template: str) -> str: ...
 
-class ExpectedQuantity(QuantiPhyError, ValueError):
-    ...
-
-class IncompatibleUnits(QuantiPhyError, TypeError):
-    ...
-
-class InvalidNumber(QuantiPhyError, ValueError, TypeError):
-    ...
-
-class InvalidRecognizer(QuantiPhyError, KeyError):
-    ...
-
-class MissingName(QuantiPhyError, NameError):
-    ...
-
-class UnknownConversion(QuantiPhyError, KeyError):
-    ...
-
-class UnknownFormatKey(QuantiPhyError, KeyError):
-    ...
-
-class UnknownPreference(QuantiPhyError, KeyError):
-    ...
-
-class UnknownScaleFactor(QuantiPhyError, ValueError):
-    ...
-
-class UnknownUnitSystem(QuantiPhyError, KeyError):
-    ...
-
-class IncompatiblePreferences(QuantiPhyError, ValueError):
-    ...
-
+class ExpectedQuantity(QuantiPhyError, ValueError): ...
+class IncompatibleUnits(QuantiPhyError, TypeError): ...
+class InvalidNumber(QuantiPhyError, ValueError, TypeError): ...
+class InvalidRecognizer(QuantiPhyError, KeyError): ...
+class MissingName(QuantiPhyError, NameError): ...
+class UnknownConversion(QuantiPhyError, KeyError): ...
+class UnknownFormatKey(QuantiPhyError, KeyError): ...
+class UnknownPreference(QuantiPhyError, KeyError): ...
+class UnknownScaleFactor(QuantiPhyError, ValueError): ...
+class UnknownUnitSystem(QuantiPhyError, KeyError): ...
+class IncompatiblePreferences(QuantiPhyError, ValueError): ...
 
 __released__: str
 __version__: str
@@ -68,12 +45,10 @@ class Quantity(float):
         ignore_sf: bool = ...,
         binary: bool = ...,
         params: Any = ...,
-    ) -> Quantity:
-        ...
+    ) -> Quantity: ...
 
     @classmethod
-    def reset_prefs(cls) -> None:
-        ...
+    def reset_prefs(cls) -> None: ...
 
     @classmethod
     def set_prefs(
@@ -111,42 +86,30 @@ class Quantity(float):
         strip_zeros: bool = ...,
         tight_units: List[str] = ...,
         unity_sf: str = ...,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     @classmethod
-    def get_pref(cls, name: str):
-        ...
+    def get_pref(cls, name: str): ...
 
     @classmethod
-    def prefs(cls, **kwargs):
-        ...
+    def prefs(cls, **kwargs): ...
 
-    def __getattr__(self, name: str) -> Any:
-        ...
-
-    def is_infinite(self) -> str | None:
-        ...
-
-    def is_nan(self) -> str | None:
-        ...
-
-    def as_tuple(self) -> tuple[float, str]:
-        ...
+    def __getattr__(self, name: str) -> Any: ...
+    def is_infinite(self) -> str | None: ...
+    def is_nan(self) -> str | None: ...
+    def as_tuple(self) -> tuple[float, str]: ...
 
     def scale(
         self,
         scale: str | float | tuple[float | Quantity, str] | Callable,
-        cls: type = ...
-    ) -> Quantity:
-        ...
+        cls: type = ...,
+    ) -> Quantity: ...
 
     def add(
         self,
         addend: float | Quantity,
         check_units: bool = ...,
-    ):
-        ...
+    ): ...
 
     def render(
         self,
@@ -154,12 +117,11 @@ class Quantity(float):
         show_units: bool = ...,
         prec: int | str = ...,
         show_label: bool | str = ...,
-        strip_zeros:bool = ...,
+        strip_zeros: bool = ...,
         strip_radix: bool = ...,
         scale: str | float | tuple[float | Quantity, str] | Callable = ...,
         negligible: float = ...,
-    ) -> str:
-        ...
+    ) -> str: ...
 
     def fixed(
         self,
@@ -170,8 +132,7 @@ class Quantity(float):
         strip_zeros: bool = ...,
         strip_radix: bool = ...,
         scale: str | float | tuple[float | Quantity, str] | Callable = ...,
-    ) -> str:
-        ...
+    ) -> str: ...
 
     def binary(
         self,
@@ -181,8 +142,7 @@ class Quantity(float):
         strip_zeros: bool = ...,
         strip_radix: bool = ...,
         scale: str | float | tuple[float | Quantity, str] | Callable = ...,
-    ) -> str:
-        ...
+    ) -> str: ...
 
     def is_close(
         self,
@@ -190,14 +150,10 @@ class Quantity(float):
         reltol: float = ...,
         abstol: float = ...,
         check_units: bool = ...,
-    ):
-        ...
+    ): ...
 
-    def format(self, template: str) -> str:
-        ...
-
-    def __format__(self, template: str) -> str:
-        ...
+    def format(self, template: str) -> str: ...
+    def __format__(self, template: str) -> str: ...
 
     @classmethod
     def extract(
@@ -205,16 +161,13 @@ class Quantity(float):
         text: str,
         predefined: dict = ...,
         **kwargs,
-    ):
-        ...
+    ): ...
 
     @staticmethod
-    def map_sf_to_sci_notation(sf: str):
-        ...
+    def map_sf_to_sci_notation(sf: str): ...
 
     @staticmethod
-    def map_sf_to_greek(sf: str) -> str | tuple[str, bool]:
-        ...
+    def map_sf_to_greek(sf: str) -> str | tuple[str, bool]: ...
 
     @classmethod
     def all_from_conv_fmt(
@@ -222,30 +175,21 @@ class Quantity(float):
         text: str,
         only_e_notation: bool = ...,
         **kwargs,
-    ):
-        ...
+    ): ...
 
     @classmethod
-    def all_from_si_fmt(
-        cls,
-        text:str,
-        **kwargs
-    ):
-        ...
+    def all_from_si_fmt(cls, text: str, **kwargs): ...
 
 class UnitConversion:
-
     def __init__(
         self,
         to_units: str | Quantity | Sequence[str],
         from_units: str | Quantity | Sequence[str],
         slope: float | Callable = ...,
         intercept: float | Callable = ...,
-    ) -> None:
-        ...
+    ) -> None: ...
 
-    def activate(self) -> None:
-        ...
+    def activate(self) -> None: ...
 
     def convert(
         self,
@@ -253,25 +197,20 @@ class UnitConversion:
         from_units: str = ...,
         to_units: str = ...,
         as_tuple: bool = ...,
-    ):
-        ...
+    ): ...
 
     @staticmethod
-    def fixture(converter_func):
-        ...
+    def fixture(converter_func): ...
 
-    def clear_all(self) -> None:
-        ...
+    def clear_all(self) -> None: ...
 
-def set_unit_system(unit_system: str) -> None:
-    ...
+def set_unit_system(unit_system: str) -> None: ...
 
 def add_constant(
     value: Quantity | str,
     alias: str = ...,
     unit_systems: str | Sequence[str] = ...,
-) -> None:
-    ...
+) -> None: ...
 
 def as_real(
     value: float | str | Quantity,
@@ -283,9 +222,8 @@ def as_real(
     desc: str = ...,
     ignore_sf: bool = ...,
     binary: bool = ...,
-    params: Any = ...
-) -> float:
-    ...
+    params: Any = ...,
+) -> float: ...
 
 def as_tuple(
     value: float | str | Quantity,
@@ -297,9 +235,8 @@ def as_tuple(
     desc: str = ...,
     ignore_sf: bool = ...,
     binary: bool = ...,
-    params: Any = ...
-) -> tuple[float, str]:
-    ...
+    params: Any = ...,
+) -> tuple[float, str]: ...
 
 def render(
     value: float,
@@ -308,12 +245,11 @@ def render(
     show_units: bool = ...,
     prec: int | str = ...,
     show_label: bool | str = ...,
-    strip_zeros:bool = ...,
+    strip_zeros: bool = ...,
     strip_radix: bool = ...,
     scale: str | float | tuple[float | Quantity, str] | Callable = ...,
     negligible: float = ...,
-) -> str:
-    ...
+) -> str: ...
 
 def fixed(
     value: float,
@@ -325,8 +261,7 @@ def fixed(
     strip_zeros: bool = ...,
     strip_radix: bool = ...,
     scale: str | float | tuple[float | Quantity, str] | Callable = ...,
-) -> str:
-    ...
+) -> str: ...
 
 def binary(
     value: float,
@@ -337,6 +272,4 @@ def binary(
     strip_zeros: bool = ...,
     strip_radix: bool = ...,
     scale: str | float | tuple[float | Quantity, str] | Callable = ...,
-) -> str:
-    ...
-
+) -> str: ...
