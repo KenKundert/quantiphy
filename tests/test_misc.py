@@ -98,9 +98,17 @@ def test_misc():
     assert q.is_nan() is None
     assert q.is_infinite() == 'inf'
 
+    q = Quantity('-$∞')
+    assert q.is_nan() is None
+    assert q.is_infinite() == '-inf'
+
     q = Quantity('∞Ω')
     assert q.is_nan() is None
     assert q.is_infinite() == 'inf'
+
+    q = Quantity('-∞Ω')
+    assert q.is_nan() is None
+    assert q.is_infinite() == '-inf'
 
     q = Quantity('∞')
     assert q.is_nan() is None
