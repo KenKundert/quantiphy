@@ -9,7 +9,7 @@ Latest development release
 | Released: 2022-12-30
 
 
-2.19 (2023-01-??)
+2.19 (2023-01-05)
 -----------------
 - Added new standard SI scale factors (*Q*, *R*, *r*, *q*).
 - Subclasses of :class:`Quantity` with units now convert values to the desired 
