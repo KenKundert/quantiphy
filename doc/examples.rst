@@ -929,7 +929,7 @@ are set they do not change during the life of the process.  However, that need
 not be true if functions are used to perform the conversion.  In the following 
 example, the current price of Bitcoin is queried from a price service and used 
 in the conversion.  The price service is queried each time a conversion is 
-performed, so it is always up-to-date, no longer how long the program runs.
+performed, so it is always up-to-date, no matter how long the program runs.
 
 .. code-block:: python
 
