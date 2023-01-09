@@ -975,5 +975,6 @@ performed, so it is always up-to-date, no matter how long the program runs.
 
 When run, the script prints something like this::
 
-   1 BTC = $46,007
-      $1 = 2,174 sat
+   1 BTC = $17,211.91
+      $1 = 5,810 sat
+
