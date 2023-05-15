@@ -2371,7 +2371,7 @@ class Quantity(float):
         units = self._preferred_units.get(self.units, self.units) if show_units else ''
         if prec is None:
             prec = self.prec
-        elif prec == 'full':
+        if prec == 'full':
             prec = self.full_prec
 
         # check for infinities or NaN {{{3
