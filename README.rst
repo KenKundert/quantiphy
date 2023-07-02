@@ -19,6 +19,10 @@ QuantiPhy — Physical Quantities
 .. image:: https://img.shields.io/pypi/pyversions/quantiphy.svg
     :target: https://pypi.python.org/pypi/quantiphy/
 
+.. image:: https://anaconda.org/conda-forge/quantiphy/badges/version.svg
+    :target: https://anaconda.org/conda-forge/quantiphy
+
+
 
 | Author: Ken Kundert
 | Version: 2.19.1

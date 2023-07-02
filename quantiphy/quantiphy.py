@@ -77,7 +77,7 @@ def _scale(scale, unscaled):
         # otherwise, it might be a function
         try:
             scaled, to_units = scale(unscaled, unscaled.units)
-                 # passing units as second argument is redundant, deprecated
+                # passing units as second argument is redundant, deprecated
         except TypeError:
             # otherwise, assume it is a scale factor
             try:
@@ -373,32 +373,32 @@ __released__ = '2023-05-14'
 # These mappings are only used when reading numbers
 # The key for these mappings must be a single character
 MAPPINGS = {
-    'Q': 'e30',  # quetta
-    'R': 'e27',  # ronna
-    'Y': 'e24',  # yotta
-    'Z': 'e21',  # zetta
-    'E': 'e18',  # exa
-    'P': 'e15',  # peta
-    'T': 'e12',  # tera
-    'G': 'e9',   # giga
-    'M': 'e6',   # mega
-    'K': 'e3',   # kilo
-    'k': 'e3',   # kilo
-    '_': 'e0',   # unity
-    'c': 'e-2',  # centi, only available for input, not used in output
-    '%': 'e-2',  # percent, potentially available for input, not used in output
-    'm': 'e-3',  # milli
-    'u': 'e-6',  # micro (ASCII)
-    'µ': 'e-6',  # micro (unicode micro)
-    'μ': 'e-6',  # micro (unicode greek mu)
-    'n': 'e-9',  # nano
-    'p': 'e-12', # pico
-    'f': 'e-15', # femto
-    'a': 'e-18', # ato
-    'z': 'e-21', # zepto
-    'y': 'e-24', # yocto
-    'r': 'e-27', # ronto
-    'q': 'e-30', # quecto
+    'Q': 'e30',   # quetta
+    'R': 'e27',   # ronna
+    'Y': 'e24',   # yotta
+    'Z': 'e21',   # zetta
+    'E': 'e18',   # exa
+    'P': 'e15',   # peta
+    'T': 'e12',   # tera
+    'G': 'e9',    # giga
+    'M': 'e6',    # mega
+    'K': 'e3',    # kilo
+    'k': 'e3',    # kilo
+    '_': 'e0',    # unity
+    'c': 'e-2',   # centi, only available for input, not used in output
+    '%': 'e-2',   # percent, potentially available for input, not used in output
+    'm': 'e-3',   # milli
+    'u': 'e-6',   # micro (ASCII)
+    'µ': 'e-6',   # micro (unicode micro)
+    'μ': 'e-6',   # micro (unicode greek mu)
+    'n': 'e-9',   # nano
+    'p': 'e-12',  # pico
+    'f': 'e-15',  # femto
+    'a': 'e-18',  # ato
+    'z': 'e-21',  # zepto
+    'y': 'e-24',  # yocto
+    'r': 'e-27',  # ronto
+    'q': 'e-30',  # quecto
 }
 ALL_SF = ''.join(MAPPINGS.keys())
 BINARY_MAPPINGS = {
@@ -1652,7 +1652,6 @@ class Quantity(float):
 
         # perform scaling {{{3
         # scaling can either be explicitly requested using scale parameter
-        original = number
         if scale or isinstance(scale, numbers.Number):
             try:
                 unscaled = Quantity(number, units, params=params)
