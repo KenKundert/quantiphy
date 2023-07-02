@@ -16,11 +16,11 @@ QuantiPhy — Physical Quantities
 .. image:: https://img.shields.io/pypi/v/quantiphy.svg
     :target: https://pypi.python.org/pypi/quantiphy
 
-.. image:: https://img.shields.io/pypi/pyversions/quantiphy.svg
-    :target: https://pypi.python.org/pypi/quantiphy/
-
 .. image:: https://anaconda.org/conda-forge/quantiphy/badges/version.svg
     :target: https://anaconda.org/conda-forge/quantiphy
+
+.. image:: https://img.shields.io/pypi/pyversions/quantiphy.svg
+    :target: https://pypi.python.org/pypi/quantiphy/
 
 
 
