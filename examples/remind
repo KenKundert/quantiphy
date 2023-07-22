@@ -61,17 +61,17 @@ default_urgency = "critical"
 default_message = "It’s time!"
 nap_interval = 60  # how often to wake and check time (seconds)
 late_warning = 60  # how late does a reminder need to be to warrant a warning (seconds)
-__version__ = "1.1"
-__released__ = "2022-11-07"
+__version__ = "1.2"
+__released__ = "2023-07-18"
 
 # Time Conversions {{{2
 UnitConversion("s", "sec second seconds")
 UnitConversion("s", "m min minute minutes", 60)
 UnitConversion("s", "h hr hour hours", 60*60)
 UnitConversion("s", "d day days", 24*60*60)
-UnitConversion("s", "w week weeks", 7*24*60*60)
+UnitConversion("s", "w W week weeks", 7*24*60*60)
 UnitConversion("s", "M month months", 30*24*60*60)
-UnitConversion("s", "y year years", 365*24*60*60)
+UnitConversion("s", "y Y year years", 365*24*60*60)
 Quantity.set_prefs(ignore_sf=True)
 
 # Time Formats {{{2
@@ -114,14 +114,14 @@ def when(seconds):
     if minutes < 120:
         return f"{minutes:0.0f} minutes"
     hours = minutes / 60
-    if hours < 6:
+    if hours < 10:
         return f"{hours:0.1f} hours"
     if hours < 48:
         return f"{hours:0.0f} hours"
     days = hours / 24
     if days < 3:
-        return f"{days:0.0f} days"
-    return f"{days:0.1f} days"
+        return f"{days:0.1f} days"
+    return f"{days:0.0f} days"
 
 # MAIN {{{1
 # Process command line options {{{2
@@ -213,7 +213,8 @@ try:
 
     # move process to background by duplicating it and exiting the original {{{3
     if run_in_background:
-        if os.fork():
+        if (pid := os.fork()):
+            display(f"PID: {pid}")
             os._exit(0)
 
     # wait for scheduled time {{{3

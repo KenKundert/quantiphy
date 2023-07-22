@@ -3772,4 +3772,3 @@ def binary(value, units, params=None, *args, **kwargs):
 
     """
     return Quantity(value, units=units, params=params).binary(*args, **kwargs)
-

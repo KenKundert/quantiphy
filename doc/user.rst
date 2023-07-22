@@ -1035,7 +1035,7 @@ scale factors is desired, and the units should not be included.
     >>> print('{:r}'.format(h_line))
     1.4204G
 
-The opposite can be achieved using 'p', which includes the units but not use SI 
+The opposite can be achieved using 'p', which includes the units without SI 
 scale factors:
 
 .. code-block:: python
@@ -1441,7 +1441,7 @@ of 'K' as a scale factor to avoid confusion with Kelvin units.
 
     >>> Tcore = Temperature('15M')
     >>> Tphoto = Temperature('5.3k')
-    >>> Tcmb = Temperature('3.18')
+    >>> Tcmb = Temperature('3.18K')
     >>> print(Tcore, Tphoto, Tcmb, sep='\n')
     15 MK
     5.3 kK
@@ -1773,7 +1773,7 @@ It is sometimes handy to convert directly to and from real values rather than
 converting to :class:`Quantity` objects and holding them.  Generally it is 
 preferred to key a value and its units together, but as said before, the primary 
 use of *QuantiPhy* is inputting and outputting numbers.  If you are not 
-inputting and outputting the same numbers, may not be worth even the small 
+inputting and outputting the same numbers, it may not be worth even the small 
 overhead of a :class:`Quantity` object.  In that case, you can use quantity 
 functions to convert directly to and from real values.  If you wish to use 
 *QuantiPhy* to convert to a simple float, use :func:`as_real()`.  It takes the 
