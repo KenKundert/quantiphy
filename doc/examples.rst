@@ -305,7 +305,7 @@ a variety of casual units of time.  *QuantiPhy* only pre-defines conversions for
 time units that are unambiguous and commonly used in scientific computation, so 
 that leaves out units like months and years. However, in many situations the 
 goal is simplicity rather than precision. In such a situation, it is convenient 
-to support any units a user may reasonable expect to use. In a casual setting it 
+to support any units a user may reasonably expect to use. In a casual setting it 
 would be very unusual to use SI scale factors, so there use will be prohibited 
 to allow a greater range of units (ex. m for minutes).
 

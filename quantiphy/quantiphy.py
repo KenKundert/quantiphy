@@ -62,7 +62,7 @@ def _scale(scale, unscaled):
     #     scale (what you want) scale is scaling factor or function, or to_units
     #     unscaled (what you have), a quantity
 
-    # allow subclasss of Quantity that has units to be the scale
+    # allow subclass of Quantity that has units to be the scale
     try:
         if issubclass(scale, Quantity):
             scale = scale.units
@@ -1802,7 +1802,7 @@ class Quantity(float):
 
         """
 
-        # if subclasss of Quantity is passed as scale, use as cls if not given
+        # if subclass of Quantity is passed as scale, use as cls if not given
         try:
             if issubclass(scale, Quantity) and not cls:
                 cls = scale
