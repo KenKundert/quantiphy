@@ -22,7 +22,7 @@ Documentation can be found at https://quantiphy.readthedocs.io.
 """
 
 # MIT License {{{1
-# Copyright (C) 2016-2023 Kenneth S. Kundert
+# Copyright (C) 2016-2024 Kenneth S. Kundert
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -1773,9 +1773,10 @@ class Quantity(float):
               the units, so the second argument is redundant and will eventually
               be deprecated.  The function returns two values, the value and
               units of the new value.
-            - If a string, it is taken to the be desired units. This value along
-              with the units of the quantity are used to select a known unit
-              conversion, which is applied to create the new value.
+            - If a string, it is taken to the be desired units, perhaps with a
+              scale factor. This value along with the units of the quantity are
+              used to select a known unit conversion, which is applied to create
+              the new value.
             - If a quantity, the units are ignored and the scale is treated as
               if were specified as a unitless float.
             - If a subclass of :class:`Quantity` that includes units, the units
@@ -1851,13 +1852,10 @@ class Quantity(float):
 
         try:
             if check_units and self.units != addend.units:
-                raise IncompatibleUnits(self.units, addend.units)
+                raise IncompatibleUnits(self, addend)
         except AttributeError:
             if check_units == 'strict':
-                raise IncompatibleUnits(
-                    getattr(self, 'units', None),
-                    getattr(addend, 'units', None)
-                )
+                raise IncompatibleUnits(self, addend)
         new = self.__class__(self.real + addend, self.units)
         new._inherit_attributes(self)
         return new
@@ -3424,7 +3422,7 @@ class UnitConversion(object):
                 elif from_units in self.to_units and value.units in self.to_units:
                     pass
                 else:
-                    raise IncompatibleUnits(value.units, from_units)
+                    raise IncompatibleUnits(value, from_units)
 
         if to_units is None and from_units is None:
             to_units = self.to_units[0]

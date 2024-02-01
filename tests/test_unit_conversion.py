@@ -297,11 +297,11 @@ def test_add():
 
     with pytest.raises(IncompatibleUnits) as exception:
         total = total.add(Quantity(contribution, 'lbs'), check_units=True)
-    assert str(exception.value) == "incompatible units ($ and lbs)."
+    assert str(exception.value) == "incompatible units ($44.04 and 9.89 lbs)."
     assert isinstance(exception.value, IncompatibleUnits)
     assert isinstance(exception.value, QuantiPhyError)
     assert isinstance(exception.value, TypeError)
-    assert exception.value.args == ('$', 'lbs')
+    assert "{} and {}".format(*exception.value.args) == "$44.04 and 9.89 lbs"
 
 def test_linear_conversion():
     Quantity.reset_prefs()
