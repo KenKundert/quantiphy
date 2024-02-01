@@ -8,6 +8,8 @@ Latest development release
 | Version: 2.19.2
 | Released: 2024-02-01
 
+- Include full quantities if available in class:`IncompatibleUnits` errors
+
 
 2.19 (2023-01-05)
 -----------------
