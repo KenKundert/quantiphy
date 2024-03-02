@@ -2576,6 +2576,7 @@ class Quantity(float):
             scale = units if units else None
             prec = int(prec) if prec else None
             ftype = ftype if ftype else ''
+            alt_form = dict(strip_zeros=False, strip_radix=False) if alt_form else {}
             if ftype and ftype in 'dnu':
                 if ftype == 'u':
                     value = scale if scale else self.units
@@ -2591,30 +2592,27 @@ class Quantity(float):
             if ftype in 's':  # note that ftype = '' matches this case
                 label = label if ftype else None
                 value = self.render(
-                    prec=prec, show_label=label, scale=scale,
-                    strip_zeros=not alt_form, strip_radix=not alt_form
+                    prec=prec, show_label=label, scale=scale, **alt_form
                 )
             elif ftype == 'q':
                 value = self.render(
                     form='si', prec=prec, show_units=True, show_label=label,
-                    strip_zeros=not alt_form, strip_radix=not alt_form, scale=scale
+                    scale=scale, **alt_form
                 )
             elif ftype == 'r':
                 value = self.render(
                     form='si', prec=prec, show_units=False, show_label=label,
-                    strip_zeros=not alt_form, strip_radix=not alt_form, scale=scale
+                    scale=scale, **alt_form
                 )
             elif ftype == 'p':
                 value = self.fixed(
                     prec=prec, show_units=True, show_label=label,
-                    show_commas=bool(comma), strip_zeros=not alt_form,
-                    strip_radix=not alt_form, scale=scale
+                    show_commas=bool(comma), scale=scale, **alt_form
                 )
             elif ftype == 'b':
                 value = self.binary(
                     prec=prec, show_units=True, show_label=label,
-                    strip_zeros=not alt_form, strip_radix=not alt_form,
-                    scale=scale
+                    scale=scale, **alt_form
                 )
             else:
                 if prec is None:
