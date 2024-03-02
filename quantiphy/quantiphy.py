@@ -2590,7 +2590,10 @@ class Quantity(float):
             ftype = ftype.lower()
             if ftype in 's':  # note that ftype = '' matches this case
                 label = label if ftype else None
-                value = self.render(prec=prec, show_label=label, scale=scale)
+                value = self.render(
+                    prec=prec, show_label=label, scale=scale,
+                    strip_zeros=not alt_form, strip_radix=not alt_form
+                )
             elif ftype == 'q':
                 value = self.render(
                     form='si', prec=prec, show_units=True, show_label=label,
