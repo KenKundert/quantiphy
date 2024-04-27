@@ -201,7 +201,7 @@ the `documentation <https://quantiphy.readthedocs.io>`_.
 .. |coverage| image:: https://coveralls.io/repos/github/KenKundert/quantiphy/badge.svg?branch=master
     :target: https://coveralls.io/github/KenKundert/quantiphy?branch=master
 
-.. |pypi version|image:: https://img.shields.io/pypi/v/quantiphy.svg
+.. |pypi version| image:: https://img.shields.io/pypi/v/quantiphy.svg
     :target: https://pypi.python.org/pypi/quantiphy
 
 .. |anaconda version| image:: https://anaconda.org/conda-forge/quantiphy/badges/version.svg
