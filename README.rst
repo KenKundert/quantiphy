@@ -1,28 +1,7 @@
 QuantiPhy — Physical Quantities
 ===============================
 
-.. image:: https://pepy.tech/badge/quantiphy/month
-    :target: https://pepy.tech/project/quantiphy
-
-.. image:: https://img.shields.io/readthedocs/quantiphy.svg
-   :target: https://quantiphy.readthedocs.io/en/latest/?badge=latest
-
-.. image:: https://github.com/KenKundert/quantiphy/actions/workflows/build.yaml/badge.svg
-    :target: https://github.com/KenKundert/quantiphy/actions/workflows/build.yaml
-
-.. image:: https://coveralls.io/repos/github/KenKundert/quantiphy/badge.svg?branch=master
-    :target: https://coveralls.io/github/KenKundert/quantiphy?branch=master
-
-.. image:: https://img.shields.io/pypi/v/quantiphy.svg
-    :target: https://pypi.python.org/pypi/quantiphy
-
-.. image:: https://anaconda.org/conda-forge/quantiphy/badges/version.svg
-    :target: https://anaconda.org/conda-forge/quantiphy
-
-.. image:: https://img.shields.io/pypi/pyversions/quantiphy.svg
-    :target: https://pypi.python.org/pypi/quantiphy/
-
-
+|downloads| |build status| |coverage| |rtd status| |pypi version| |anaconda version| |python version|
 
 | Author: Ken Kundert
 | Version: 2.19.2
@@ -208,3 +187,26 @@ incorporate quantity values into strings:
 
 *QuantiPhy* has many more features and capabilities. For more information, view 
 the `documentation <https://quantiphy.readthedocs.io>`_.
+
+
+.. |downloads| image:: https://pepy.tech/badge/quantiphy/month
+    :target: https://pepy.tech/project/quantiphy
+
+.. |rtd status| image:: https://img.shields.io/readthedocs/quantiphy.svg
+   :target: https://quantiphy.readthedocs.io/en/latest/?badge=latest
+
+.. |build status| image:: https://github.com/KenKundert/quantiphy/actions/workflows/build.yaml/badge.svg
+    :target: https://github.com/KenKundert/quantiphy/actions/workflows/build.yaml
+
+.. |coverage| image:: https://coveralls.io/repos/github/KenKundert/quantiphy/badge.svg?branch=master
+    :target: https://coveralls.io/github/KenKundert/quantiphy?branch=master
+
+.. |pypi version|image:: https://img.shields.io/pypi/v/quantiphy.svg
+    :target: https://pypi.python.org/pypi/quantiphy
+
+.. |anaconda version| image:: https://anaconda.org/conda-forge/quantiphy/badges/version.svg
+    :target: https://anaconda.org/conda-forge/quantiphy
+
+.. |python version| image:: https://img.shields.io/pypi/pyversions/quantiphy.svg
+    :target: https://pypi.python.org/pypi/quantiphy/
+
