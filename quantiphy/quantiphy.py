@@ -967,6 +967,10 @@ class Quantity(float):
 
         :type show_label: 'f', 'a', or bool
 
+        :arg bool show_units:
+            Whether the units should be included when rendering a quantity to a
+            string.  By default *show_units* is True.
+
         :arg str spacer:
             The spacer text to be inserted in a string between the numeric value
             and the scale factor when units are present.  Is generally specified

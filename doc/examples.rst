@@ -978,3 +978,38 @@ When run, the script prints something like this::
    1 BTC = $17,211.91
       $1 = 5,810 sat
 
+.. pluralize example {{{1
+.. _quantiphy pluralize example:
+
+Pluralize
+---------
+
+Using some external packages you can monkey patch a new method into *Quantity* 
+that converts quantities into the singular or plural forms of speech.
+
+.. ignore:
+
+    >>> Quantity.set_prefs(spacer=' ')
+
+.. code-block:: python
+
+    >>> from quantiphy import Quantity
+    >>> from inform import plural
+
+    >>> def pluralize(self):
+    ...     with self.prefs(form='fixed', show_units=False):
+    ...         return plural(self).format(self.plural_format)
+
+    >>> class Loaves(Quantity):
+    ...     units = 'loaves'
+    ...     plural_format = "# /loaf/loaves"
+    ...     pluralize = pluralize
+
+    >>> with Quantity.prefs(form='fixed'):
+    ...     for count in [0, 1, 2, 0.5]:
+    ...         q = Loaves(count)
+    ...         print(q, '->', q.pluralize())
+    0 loaves -> 0 loaves
+    1 loaves -> 1 loaf
+    2 loaves -> 2 loaves
+    0.5 loaves -> 0.5 loaves

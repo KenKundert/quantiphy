@@ -35,7 +35,7 @@ def test_manual():
         '../doc/index.rst': 31,
         '../doc/user.rst': 450,
         '../doc/api.rst': 0,
-        '../doc/examples.rst': 36,
+        '../doc/examples.rst': 42,
         '../doc/accessories.rst': 12,
         '../doc/releases.rst': 0,
     }
