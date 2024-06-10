@@ -92,6 +92,10 @@ Install with::
 Requires Python 3.6 or newer.  If you using an earlier version of Python,
 install version 2.10 of *QuantiPhy*.
 
+Alternately, *QuantiPhy* is also available in *Conda*.  Install it with::
+
+    conda install quantiphy --channel conda-forge
+
 You use *Quantity* to convert numbers and units in various forms to quantities:
 
 .. code-block:: python

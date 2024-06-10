@@ -78,7 +78,7 @@ The source code is available from the `ec repository
 <https://github.com/KenKundert/ec>`_ on GitHub, or you can install it directly 
 with::
 
-    pip install --user engineering_calculator
+    pip install engineering_calculator
 
 
 
@@ -122,7 +122,7 @@ The source code is available from the `tvm repository
 <https://github.com/KenKundert/tvm>`_ on GitHub, or you can install it directly 
 with::
 
-    pip install --user tvm
+    pip install tvm
 
 
 
@@ -149,7 +149,7 @@ The source code is available from the `psf_utils repository
 <https://github.com/KenKundert/psf_utils>`_ on GitHub, or you can install it 
 directly with::
 
-    pip install --user psf_utils
+    pip install psf_utils
 
 
 
@@ -179,7 +179,7 @@ The source code is available from the `quantiphy_eval repository
 <https://github.com/KenKundert/quantiphy_eval>`_ on GitHub, or you can install 
 it directly with::
 
-    pip install --user quantiphy_eval
+    pip install quantiphy_eval
 
 
 
@@ -216,7 +216,7 @@ The source code is available from the `remind repository
 <https://github.com/KenKundert/remind>`_ on GitHub, or you can install it 
 directly with::
 
-    pip install --user schedule-reminder
+    pip install schedule-reminder
 
 
 
@@ -290,4 +290,4 @@ The source code is available from the `rkm_codes repository
 <https://github.com/KenKundert/rkm_codes>`_ on GitHub, or you can install it 
 directly with::
 
-    pip install --user rkm_codes
+    pip install rkm_codes
