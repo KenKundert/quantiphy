@@ -1876,8 +1876,8 @@ class Quantity(float):
     def render(
         self,
         *,
-        form=None, show_units=None, prec=None, show_label=None,
-        strip_zeros=None, strip_radix=None, scale=None, negligible=None
+        form=None, show_units=None, prec=None, show_label=None, strip_zeros=None,
+        strip_radix=None, spacer=None, scale=None, negligible=None
     ):
         # description {{{3
         """Convert quantity to a string.
@@ -1992,6 +1992,7 @@ class Quantity(float):
         show_units = self.show_units if show_units is None else show_units
         strip_zeros = self.strip_zeros if strip_zeros is None else strip_zeros
         strip_radix = self.strip_radix if strip_radix is None else strip_radix
+        spacer = self.spacer if spacer is None else spacer
         negligible = self.negligible if negligible is None else negligible
         units = self._preferred_units.get(self.units, self.units) if show_units else ''
         if prec is None:
@@ -2114,7 +2115,7 @@ class Quantity(float):
         # combine mantissa, scale factor, and units and return the result {{{3
         if sf_is_exp == 'unk':
             sf_is_exp = (sf == eexp)
-        value = self._combine(mantissa, sf, units, self.spacer, sf_is_exp)
+        value = self._combine(mantissa, sf, units, spacer, sf_is_exp)
         return self._label(value, show_label)
 
     # fixed() {{{2
@@ -2122,7 +2123,7 @@ class Quantity(float):
         self,
         *,
         show_units=None, prec=None, show_label=None, show_commas=None,
-        strip_zeros=None, strip_radix=None, scale=None,
+        strip_zeros=None, strip_radix=None, spacer=None, scale=None,
     ):
         # description {{{3
         """Convert quantity to fixed-point string.
@@ -2224,6 +2225,7 @@ class Quantity(float):
         show_commas = self.show_commas if show_commas is None else show_commas
         strip_zeros = self.strip_zeros if strip_zeros is None else strip_zeros
         strip_radix = self.strip_radix if strip_radix is None else strip_radix
+        spacer = self.spacer if spacer is None else spacer
         units = self._preferred_units.get(self.units, self.units) if show_units else ''
         if prec is None:
             prec = self.prec
@@ -2286,13 +2288,13 @@ class Quantity(float):
             mantissa += '0'
 
         # combine mantissa, scale factor and units and return result {{{3
-        value = self._combine(mantissa, '', units, self.spacer)
+        value = self._combine(mantissa, '', units, spacer)
         return self._label(value, show_label)
 
     # binary() {{{2
     def binary(
         self, *, show_units=None, prec=None, show_label=None,
-        strip_zeros=None, strip_radix=None, scale=None,
+        strip_zeros=None, strip_radix=None, spacer=None, scale=None,
     ):
         # description {{{3
         """Convert quantity to string using binary scale factors.
@@ -2377,6 +2379,7 @@ class Quantity(float):
         show_units = self.show_units if show_units is None else show_units
         strip_zeros = self.strip_zeros if strip_zeros is None else strip_zeros
         strip_radix = self.strip_radix if strip_radix is None else strip_radix
+        spacer = self.spacer if spacer is None else spacer
         units = self._preferred_units.get(self.units, self.units) if show_units else ''
         if prec is None:
             prec = self.prec
@@ -2442,7 +2445,7 @@ class Quantity(float):
             mantissa += '0'
 
         # combine mantissa, scale factor and units and return result {{{3
-        value = self._combine(mantissa, sf, units, self.spacer, sf_is_exp)
+        value = self._combine(mantissa, sf, units, spacer, sf_is_exp)
         return self._label(value, show_label)
 
     # is_close() {{{2

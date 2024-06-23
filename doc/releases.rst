@@ -8,6 +8,10 @@ Latest development release
 | Version: 2.20
 | Released: 2024-04-27
 
+- Remove % from *tight_units* list.
+- Add spacer keyword argument to :meth:`Quantity.render`,
+  :meth:`Quantity.fixed` and :meth:`Quantity.binary`.
+
 
 2.20 (2024-04-27)
 -----------------
@@ -86,7 +90,7 @@ Latest development release
 ----------------
 - Added *negligible*, *tight_units*, *nan*, and *inf* preferences.
 - Added *negligible* argument to render.
-- Added *infinity_symbol* attribute.
+- Added :attr:`Quantity.infinity_symbol` attribute.
 - Changed the return values for :meth:`Quantity.is_nan()` and :meth:`Quantity.is_infinite()`.
 
 

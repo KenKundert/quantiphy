@@ -289,3 +289,9 @@ class DocumentedPublicMethods(PublicMethods):
             attr.__doc__
             and not name.startswith('__')
         )
+
+
+suppress_warnings = [
+    'misc.highlighting_failure',
+        # suppress warning about the inability to parse a literal text block
+]
