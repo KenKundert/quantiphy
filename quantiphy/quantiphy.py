@@ -418,18 +418,26 @@ BINARY_MAPPINGS = {
 # These mappings are only used when writing numbers
 BIG_SCALE_FACTORS = 'kMGTPEZYRQ'
     # These must be given in order, one for every three decades.
-    # Use k rather than K, because K looks like a temperature when used alone.
+    # Use k rather than K because K looks like a temperature when used alone.
 
 SMALL_SCALE_FACTORS = 'munpfazyrq'
     # These must be given in order, one for every three decades.
 
-# Supported currency symbols (these go on left side of number)
+# Supported currency symbols (these precede the number)
 CURRENCY_SYMBOLS = '$€¥£₩₺₽₹Ƀ₿Ξ'
+
+# Units that abut the number.
+# % is controversial, NIST and ISO say that a space should be used to separate
+# the percent sign from a number, but the Chicago Manual of Style says the
+# opposite.
+TIGHT_UNITS = '''°'"′″'''
+    # The code is written assuming that TIGHT_UNITS includes only single
+    # character symbols, though the user can add multi-character tight units.
 
 # Unit symbols that are not simple letters.
 # Do not include % as it will be picked up when converting text to numbers,
 # which is generally not desired (you would end up converting 0.001% to 1m%).
-UNIT_SYMBOLS = '°ÅΩƱΩ℧¢$€¥£₩₺₽₹Ƀ₿șΞΔ'
+UNIT_SYMBOLS = """ÅΩƱΩ℧Δ¢ș""" + CURRENCY_SYMBOLS + TIGHT_UNITS
 
 # Regular expression for recognizing and decomposing string .format method codes
 FORMAT_SPEC = re.compile(r'''\A
@@ -494,7 +502,7 @@ DEFAULTS = dict(
     spacer = ' ',
     strip_radix = True,
     strip_zeros = True,
-    tight_units = ''' % ° ' " ′ ″ '''.split(),
+    tight_units = list(TIGHT_UNITS),
     unity_sf = '',
 )
 
@@ -977,9 +985,9 @@ class Quantity(float):
             to be '' or ' '; use the latter if you prefer a space between the
             number and the units. Generally using ' ' makes numbers easier to
             read, particularly with complex units, and using '' is easier to
-            parse.  You could also use a Unicode non-breaking space ' '. For
-            your convenience, you can access a non-breaking space using
-            :attr:`Quantity.non_breaking_space`,
+            parse.  Use of a non-breaking space is preferred when embedding
+            numbers in prose.  For your convenience, you can access a
+            non-breaking spaces using :attr:`Quantity.non_breaking_space`,
             :attr:`Quantity.narrow_non_breaking_space`, or
             :attr:`Quantity.thin_space`.
 

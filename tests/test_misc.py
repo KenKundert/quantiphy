@@ -179,6 +179,12 @@ def test_misc():
     q = Quantity('90°')
     assert q.render() == '90°'
 
+    q = Quantity("36 ′")
+    assert q.render() == "36′"
+
+    q = Quantity('18 ″')
+    assert q.render() == '18″'
+
     q = Quantity('80°F')
     assert q.render() == '80 °F'
 
@@ -304,7 +310,7 @@ def test_misc2():
     q4 = Quantity('10%', name='bar', desc='buzz')
     assert '{:G}'.format(q3) == 'foo = 0.1'
     assert '{:G}'.format(q4) == 'bar = 10  # buzz'
-    assert '{:S}'.format(q4) == 'bar = 10%  # buzz'
+    assert '{:S}'.format(q4) == 'bar = 10 %  # buzz'
 
     class Derived(Quantity):
         pass
@@ -464,6 +470,8 @@ def test_misc2():
     assert Quantity('10cm').render() == '100mm'
 
     Quantity.set_prefs(unity_sf='', spacer=' ')
+    assert Quantity('10%').render() == '10 %'
+    Quantity.set_prefs(tight_units='%')
     assert Quantity('10%').render() == '10%'
     Quantity.set_prefs(input_sf='%')
     assert Quantity('10%').render() == '100m'
@@ -1085,8 +1093,13 @@ def test_percent():
     # by default QuantiPhy treats % as a tight unit
 
     assert '%' not in Quantity.get_pref('input_sf')
-    assert Quantity('10%').render() == '10%'
+    assert Quantity('10%').render() == '10 %'
     assert Quantity('10%Δ').render() == '10 %Δ'
+
+    # adding % to tight_units
+    with Quantity.prefs(tight_units = Quantity.get_pref('tight_units') + ['%']):
+        assert Quantity('10%').render() == '10%'
+        assert Quantity('10%Δ').render() == '10 %Δ'
 
     # but by adding it to input_sf it is treated as a scale factor
     with Quantity.prefs(input_sf = Quantity.get_pref('input_sf') + '%'):
