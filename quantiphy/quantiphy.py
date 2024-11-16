@@ -1530,7 +1530,7 @@ class Quantity(float):
             )
         )
         cls.embedded_e_notation_only = re.compile(
-            '{left_delimit}{sign}{mantissa}{exponent}{space}{smpl_units}{right_delimit}'.format(
+            r'{left_delimit}{sign}{mantissa}{exponent}{space}{smpl_units}\b'.format(
                 **locals()
             )
         )

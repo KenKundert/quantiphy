@@ -7,12 +7,13 @@ Usage:
     remind [options] <time_spec>...
 
 Options:
-    -m <message>, --msg <message>      The message to display
-    -c, --no-confirmation              Don’t print confirmation message
-    -f, --foreground                   Wait in the foreground
-    -n, --no-message                   Do not give message
-    -s, --sleep                        Mimic sleep command (implies -c -f -n)
-    -u <urgency>, --urgency <urgency>  Urgency (choose from critical, normal, low)
+    -m, --msg <message>      The message to display
+    -c, --no-confirmation    Don’t print confirmation message
+    -f, --foreground         Wait in the foreground
+    -n, --no-message         Do not give message
+    -s, --sleep              Mimic sleep command (implies -c -f -n)
+    -t, --today              Do not advance time 24 hours if time is in the past
+    -u, --urgency <urgency>  Urgency (choose from critical, normal, low)
 
 The time spec can either be an absolute time such as 3:30pm (12 hour clock), 
 15:30 (24 hour clock), noon, midnight or now; or it can be a relative time given 
@@ -22,6 +23,9 @@ in seconds, minutes, or hours. For example:
     remind 100s
     remind 15m
     remind 2h
+
+If the resulting time is in the past, it is advanced by 24 hours unless --today 
+is specified.
 
 You can give several time specifications, though only one should be absolute,
 and if given, it should be the first.  Multiple relative times accumulate and
@@ -61,8 +65,8 @@ default_urgency = "critical"
 default_message = "It’s time!"
 nap_interval = 60  # how often to wake and check time (seconds)
 late_warning = 60  # how late does a reminder need to be to warrant a warning (seconds)
-__version__ = "1.2"
-__released__ = "2023-07-18"
+__version__ = "1.3"
+__released__ = "2024-10-09"
 
 # Time Conversions {{{2
 UnitConversion("s", "sec second seconds")
@@ -170,8 +174,6 @@ for i, each in enumerate(time_specs):
                 specified = arrow.get(each, fmt)
                 delta = specified - specified.floor("day")
                 target = now.floor("day") + delta
-                if specified < now:
-                    target.shift(hours=24)
                 break
             except arrow.parser.ParserError:
                 pass
@@ -191,11 +193,12 @@ try:
     sleep_interval = (target - now).total_seconds()
     if sleep_interval <= 0:
         # target is in the past, advance it by a day
-        corrected_target = target.shift(days=1)
-        sleep_interval = (corrected_target - now).total_seconds()
+        if not cmdline['--today']:
+            corrected_target = target.shift(days=1)
+            sleep_interval = (corrected_target - now).total_seconds()
         if sleep_interval <= 0:
             # target is still in the past, give an error message and quit
-            terminate(f"target time was {target.humanize()}.")
+            terminate(f"Ignored because target time is in the past (was {target.humanize()}).")
         target = corrected_target
 
     # choose the message {{{3
