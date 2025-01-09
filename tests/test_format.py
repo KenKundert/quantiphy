@@ -39,6 +39,11 @@ def test_format():
     assert '{:.0p}'.format(q) == '1420405752 Hz'
     assert '{:#.0q}'.format(q) == '1 GHz'
     assert '{:#.0p}'.format(q) == '1420405752. Hz'
+    assert '{:#.0f}'.format(q) == '1420405752.'
+    assert '{:#.3f}'.format(q) == '1420405751.786'
+    assert '{:.0g}'.format(q) == '1e+09'
+    assert '{:#.0g}'.format(q) == '1.e+09'
+    assert '{:#.3g}'.format(q) == '1.420e+09'
 
     q = Quantity('2ns')
     assert float(q) == 2e-9

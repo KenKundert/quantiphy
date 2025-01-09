@@ -2587,11 +2587,11 @@ class Quantity(float):
         # code {{{3
         match = FORMAT_SPEC.match(template)
         if match:
-            align, alt_form, width, comma, prec, ftype, units = match.groups()
+            align, use_alt_form, width, comma, prec, ftype, units = match.groups()
             scale = units if units else None
             prec = int(prec) if prec else None
             ftype = ftype if ftype else ''
-            alt_form = dict(strip_zeros=False, strip_radix=False) if alt_form else {}
+            alt_form = dict(strip_zeros=False, strip_radix=False) if use_alt_form else {}
             if ftype and ftype in 'dnu':
                 if ftype == 'u':
                     value = scale if scale else self.units
@@ -2644,12 +2644,12 @@ class Quantity(float):
                     ))
                 else:
                     value = float(self)
-                value = '{0:{1}.{2}{3}}'.format(value, comma, prec, ftype)
+                value = '{0:{4}{1}.{2}{3}}'.format(value, comma, prec, ftype, use_alt_form)
                 value = self._map_leading_sign(value)
                 value = self._map_sign(value)
                 width = width.lstrip('0')
                     # format function treats 0 as a padding rather than a width
-                if self.strip_zeros:
+                if alt_form.get("strip_zeros", self.strip_zeros):
                     if 'e' in value:
                         mantissa, exponent = value.split('e')
                         if '.' in mantissa:

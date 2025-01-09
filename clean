@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 set nonomatch
-rm -rf generated_settings
+rm -rf generated_settings .tox
 rm -rf .cache
 
 # the rest is common to all python directories

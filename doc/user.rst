@@ -148,8 +148,8 @@ provides many of the most common conversions for you:
     93.206 Mmiles
 
 
-Specifying Quantities
-.....................
+Creating Quantities
+...................
 
 Normally, creating a :class:`Quantity` takes one or two arguments.  The first is 
 taken to be the value, and the second, if given, is taken to be the model, which 
@@ -683,13 +683,21 @@ If you are interested in the units of a quantity, you can use:
     >>> h_line.units
     'Hz'
 
-Or you can access both the value and the units, either as a tuple or in 
-a string:
+Or you can access both the value and the units as a tuple:
 
 .. code-block:: python
 
     >>> h_line.as_tuple()
     (1420405751.786, 'Hz')
+
+
+Rendering Quantities
+....................
+
+Rendering a quantity convert it to a string.  There are many ways to do so.
+Using *str* renders using default settings:
+
+.. code-block:: python
 
     >>> str(h_line)
     '1.4204 GHz'
