@@ -5,7 +5,9 @@ from quantiphy import (
     UnitConversion,
     UnknownConversion,
 )
-from pytest import approx, fixture, raises
+from pytest import approx, fixture, raises, mark
+parametrize = mark.parametrize
+
 
 @fixture
 def initialize_unit_conversions():
@@ -139,3 +141,41 @@ def test_cc(initialize_unit_conversions):
     assert as_tuple('25 cc', scale='mL') == approx((25, 'mL'))
     assert as_tuple('25 mcc', scale='L', ignore_sf=True) == approx((25e-6, 'L'))
     assert as_tuple('25 cc', scale='L') == approx((0.025, 'L'))
+
+@parametrize(
+    "value, to_units, expected", [
+        ('10e6 s',   's',   '10,000,000 s'),   # same units no scale factor
+        ('10e6 s',   'ks',  '10,000 ks'),      # same units with to scale factor
+        ('10e3 ks',  's',   '10,000,000 s'),   # same units with from scale factor
+        ('10e3 ks',  'Ms',  '10 Ms'),          # same units with to and from scale factor
+        ('10e6 s',   'sec', '10,000,000 sec'), # equiv units no scale factor
+        ('10e6 s',   'ksec','10,000 ksec'),    # equiv units with to scale factor
+        ('10e3 ksec','s',   '10,000,000 s'),   # equiv units with from scale factor
+        ('10e3 ksec','Ms',  '10 Ms'),          # equiv units with to and from scale factor
+        ('10e6 sec', 's',   '10,000,000 s'),   # equiv units no scale factor
+        ('10e6 sec', 'ks',  '10,000 ks'),      # equiv units with to scale factor
+        ('10e3 ks',  'sec', '10,000,000 sec'), # equiv units with from scale factor
+        ('10e3 ks',  'Msec','10 Msec'),        # equiv units with to and from scale factor
+        ('10e6 x',   'x',   '10,000,000 x'),   # unknown units no scale factor
+        ('10e6 x',   'kx',  '10,000 kx'),      # unknown units with to scale factor
+        ('10e3 kx',  'x',   '10,000,000 x'),   # unknown units with from scale factor
+        ('10e3 kx',  'Mx',  '10 Mx'),          # unknown units with to and from scale factor
+        ('10e3 kx',  'My',  'ERR My✗kx'),      # incompatible units
+        ('10e3 fuzz','buzz','10,000 buzz'),    # known units that start with a sf
+        ('10e3 buzz','fuzz','10,000 fuzz'),    # known units that start with a sf
+        ('10e3 fuzz','g',   'ERR g✗fuzz'),     # incompatible units, one starts with sf
+        ('10e3 g',   'fuzz','ERR fuzz✗g'),     # incompatible units, other starts with sf
+    ]
+)
+def test_scaling( initialize_unit_conversions, value, to_units, expected):
+    UnitConversion('s', 'sec second seconds')
+    UnitConversion('g', 'lb lbs', 453.59237)
+    UnitConversion("fuzz", "buzz")
+
+    q = Quantity(value)
+    try:
+        scaled = q.scale(to_units)
+        rendered = scaled.fixed(show_commas=True)
+    except UnknownConversion as e:
+        rendered = f"ERR {e.kwargs['to_units']}✗{e.kwargs['from_units']}"
+    assert rendered == expected, q

@@ -1795,11 +1795,12 @@ class Quantity(float):
               are taken to the be desired units and the behavior is the same as
               if a string were given, except that *cls* defaults to the given
               subclass.
+        :type scale: real, pair, function, string, or quantity
+
         :arg class cls:
             Class to use for return value. If not given, the class of self is
             used it the units do not change, in which case :class:`Quantity` is
             used.
-        :type scale: real, pair, function, string, or quantity
 
         :raises UnknownConversion(QuantiPhyError, KeyError):
             A unit conversion was requested and there is no corresponding unit
@@ -3145,9 +3146,6 @@ add_constant(
 # Unit Conversions {{{1
 # UnitConversion class {{{2
 class UnitConversion(object):
-    _unit_conversions = {}
-    _known_units = set()
-
     # description {{{3
     """
     Creates a unit converter.
@@ -3285,6 +3283,11 @@ class UnitConversion(object):
     :meth:`UnitConversion.fixture`).
 
     """
+
+    _unit_conversions = {}
+    _known_units = set()
+    _support_si_sf_scaling = True
+    _support_bin_sf_scaling = True
 
     # constructor {{{3
     def __init__(self, to_units, from_units, slope=1, intercept=0):
@@ -3465,6 +3468,26 @@ class UnitConversion(object):
         cls._unit_conversions = {}
         cls._known_units = set()
 
+    @classmethod
+    def enable_scaling(cls, si_scaling=None, bin_scaling=None):
+        """By default the given or desired units in a unit conversion or scaling
+        may include scale factors.  This is true for both SI and binary scale
+        factors.  The scale factor is provided as a prefix on the units.  In
+        rare cases the acceptance of scale factors may create problems.  You can
+        use this method to disable support for interpreting scale factors in
+        unit conversions.
+
+        si_scaling (bool):
+            Enables or disables support for SI scale factor scaling.
+
+        bin_scaling (bool):
+            Enables or disables support for binary scale factor scaling.
+        """
+        if si_scaling is not None:
+            cls._support_si_sf_scaling = si_scaling
+        if bin_scaling is not None:
+            cls._support_bin_sf_scaling = bin_scaling
+
     # fixture() {{{3
     @staticmethod
     def fixture(converter_func):
@@ -3569,6 +3592,8 @@ class UnitConversion(object):
         # If you want this functionality, simply use:
         #     Quantity(value, from_units).scale(to_units)
 
+        orig_to_units, orig_from_units = to_units, from_units
+
         def get_converter(to_units, from_units):
             # handle unity scale factor conversions
             if (
@@ -3586,45 +3611,43 @@ class UnitConversion(object):
             #    b. there is no scale factor on the from_units
             #    c. there are scale factors on both the to_ and from_units
 
+            # separate scale factor from units
+            def extract_sf(units):
+                # check for binary scale factor, all of which are two characters
+                if cls._support_bin_sf_scaling:
+                    sf, unit = units[:2], units[2:]
+                    if sf in BINARY_MAPPINGS:
+                        return sf, unit, BINARY_MAPPINGS[sf]
+
+                # check for SI scale factor, all of which are 1 character
+                if cls._support_si_sf_scaling:
+                    sf, unit = units[:1], units[1:]
+                    if sf in MAPPINGS:
+                        return sf, unit, float('1' + MAPPINGS[sf])
+
+                return None, units, 1
+
+            # separate scale factor from units
             # handle known-unit cases for to_units
-            to_sf = None
-            to_resolved = to_units in cls._known_units                 # case 1
-            if not to_resolved:
-                to_prefix, to_suffix = to_units[:1], to_units[1:]
-                to_resolved = to_prefix in ALL_SF and to_suffix in cls._known_units
-                if to_resolved:
-                    to_sf, to_units = to_prefix, to_suffix             # case 2
+            if to_units in cls._known_units:  # case 1
+                to_sf, to_scale = None, 1
+            else:  # case 2 or 3
+                to_sf, to_units, to_scale = extract_sf(to_units)
 
             # handle known-unit cases for from_units
-            from_sf = None
-            from_resolved = from_units in cls._known_units             # case 1
-            if not from_resolved:
-                from_prefix, from_suffix = from_units[:1], from_units[1:]
-                from_resolved = (
-                    from_prefix in ALL_SF and from_suffix in cls._known_units
-                )
-                if from_resolved:
-                    from_sf, from_units = from_prefix, from_suffix     # case 2
+            if from_units in cls._known_units:  # case 1
+                from_sf, from_scale = None, 1
+            else:  # case 2 or 3
+                from_sf, from_units, from_scale = extract_sf(from_units)
 
-            # handle same-unit cases
-            if not to_resolved and not from_resolved:  # case 3
-                if to_units == from_suffix and from_prefix in ALL_SF:  # case 3a
-                    from_sf, from_units = from_prefix, from_suffix
-                elif from_units == to_suffix and to_prefix in ALL_SF:  # case 3b
-                    to_sf, to_units = to_prefix, to_suffix
-                elif from_prefix in ALL_SF and to_prefix in ALL_SF:    # case 3c
-                    to_sf, to_units = to_prefix, to_suffix
-                    from_sf, from_units = from_prefix, from_suffix
+            # handle unknown unit cases (to- and from- must have same units)
+            if to_units == from_units:  # case 3
+                return to_units, from_units, to_scale, from_scale
 
-            def get_sf(sf):
-                if sf is None:
-                    return 1
-                return float('1' + MAPPINGS[sf])
+            if to_units in cls._known_units or from_units in cls._known_units:  # case 2
+                return to_units, from_units, to_scale, from_scale
 
-            if to_sf or from_sf:
-                return to_units, from_units, get_sf(to_sf), get_sf(from_sf)
-
-            raise UnknownConversion(to_units=to_units, from_units=from_units)
+            raise UnknownConversion(to_units=orig_to_units, from_units=orig_from_units)
 
         to_units, from_units, to_sf, from_sf = get_converter(to_units, from_units)
 
@@ -3633,7 +3656,10 @@ class UnitConversion(object):
             value = Quantity(value, from_units)
         if to_units == from_units:
             return from_sf * value / to_sf
-        converter = cls._unit_conversions[(to_units, from_units)]
+        try:
+            converter = cls._unit_conversions[(to_units, from_units)]
+        except KeyError:
+            raise UnknownConversion(to_units=orig_to_units, from_units=orig_from_units)
         return converter(value.scale(from_sf)) / to_sf
 
 
@@ -3664,7 +3690,7 @@ UnitConversion('K', 'F °F', 5/9, 273.15 - 32*5/9)
 UnitConversion('K', 'R °R', 5/9, 0)
 
 # Length/Distance conversions {{{2
-UnitConversion('m', 'micron', 1/1000000)
+UnitConversion('m', 'micron microns', 1/1000000)
 UnitConversion('m', 'Å angstrom', 1/10000000000)
 UnitConversion('m', 'mi mile miles', 1609.344)
 UnitConversion('m', 'ft feet', 0.3048)
