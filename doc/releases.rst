@@ -11,6 +11,7 @@ Latest development release
 - Remove % from *tight_units* list.
 - Add spacer keyword argument to :meth:`Quantity.render`,
   :meth:`Quantity.fixed` and :meth:`Quantity.binary`.
+- Add support for scaling with binary scale factors.
 
 
 2.20 (2024-04-27)

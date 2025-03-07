@@ -167,7 +167,7 @@ def test_cc(initialize_unit_conversions):
         ('10e3 g',   'fuzz','ERR fuzz✗g'),     # incompatible units, other starts with sf
     ]
 )
-def test_scaling( initialize_unit_conversions, value, to_units, expected):
+def test_scaling(initialize_unit_conversions, value, to_units, expected):
     UnitConversion('s', 'sec second seconds')
     UnitConversion('g', 'lb lbs', 453.59237)
     UnitConversion("fuzz", "buzz")
@@ -179,3 +179,12 @@ def test_scaling( initialize_unit_conversions, value, to_units, expected):
     except UnknownConversion as e:
         rendered = f"ERR {e.kwargs['to_units']}✗{e.kwargs['from_units']}"
     assert rendered == expected, q
+
+def test_bin_unit_scaling(initialize_unit_conversions):
+    q = Quantity('1 MiB', binary=True)
+    assert q.render() == '1.0486 MB'
+    assert q.scale('MiB').render() == '1 MiB'
+    assert q.render(scale='MiB') == '1 MiB'
+    assert q.binary() == '1 MiB'
+    assert q.fixed(scale='MiB') == '1 MiB'
+    assert q.fixed(scale='KiB') == '1024 KiB'
