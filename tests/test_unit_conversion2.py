@@ -165,6 +165,10 @@ def test_cc(initialize_unit_conversions):
         ('10e3 buzz','fuzz','10,000 fuzz'),    # known units that start with a sf
         ('10e3 fuzz','g',   'ERR g✗fuzz'),     # incompatible units, one starts with sf
         ('10e3 g',   'fuzz','ERR fuzz✗g'),     # incompatible units, other starts with sf
+        ('10e6',     '',    '10,000,000'),       # no units no scale factor
+        ('10e6',     'k',   '10,000 k'),         # no units with to scale factor
+        ('10e3k',    '',    '10,000,000'),       # no units with from scale factor
+        ('10e3k',    'M',   '10 M'),             # no units with to and from scale factor
     ]
 )
 def test_scaling(initialize_unit_conversions, value, to_units, expected):
