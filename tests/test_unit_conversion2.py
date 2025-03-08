@@ -5,10 +5,12 @@ from quantiphy import (
     UnitConversion,
     UnknownConversion,
 )
+import math
 from pytest import approx, fixture, raises, mark
 parametrize = mark.parametrize
 
 
+# Utility functions {{{1
 @fixture
 def initialize_unit_conversions():
     UnitConversion.clear_all()
@@ -33,6 +35,29 @@ def from_molarity(M, mw):
 def to_molarity(g_L, mw):
     return g_L / mw
 
+# these are modern scaling functions for Quantiphy.scale()
+def from_dB_modern_scale(value):
+    return 10**(value/20), value.units[2:]
+
+def to_dB_modern_scale(value):
+    return 20*math.log10(value), 'dB'+value.units
+
+# these are modern scaling functions for UnitConversion
+def from_dB_modern_uc(value):
+    return 10**(value/20)
+
+def to_dB_modern_uc(value):
+    return 20*math.log10(value)
+
+# these are deprecated scaling functions for Quantiphy.scale()
+def from_dB_deprecated_scale(value, units):
+    return 10**(value/20), units[2:]
+
+def to_dB_deprecated_scale(value, units):
+    return 20*math.log10(value), 'dB'+units
+
+
+# test_converter() {{{1
 def test_converter(initialize_unit_conversions):
     cc_L = UnitConversion('cc', 'L', 1000)
     assert str(cc_L) == 'cc ← 1000*L'
@@ -73,6 +98,7 @@ def test_converter(initialize_unit_conversions):
     assert exception.value.kwargs == dict(from_units='gallons', to_units='L')
     assert str(exception.value) == 'unable to convert between ‘L’ and ‘gallons’.'
 
+# test_differing_known_units() {{{1
 def test_differing_known_units(initialize_unit_conversions):
     Quantity.set_prefs(known_units='cc')
     UnitConversion('cc', 'L', 1000)
@@ -89,6 +115,7 @@ def test_differing_known_units(initialize_unit_conversions):
     volume = as_tuple('100 uL', scale='mcc', ignore_sf=True)
     assert volume == approx((100, 'mcc'))
 
+# test_same_unknown_units() {{{1
 def test_same_unknown_units(initialize_unit_conversions):
     freq = as_tuple('100 Hz', scale='Hz', ignore_sf=True)
     assert freq == approx((100, 'Hz'))
@@ -102,6 +129,7 @@ def test_same_unknown_units(initialize_unit_conversions):
     freq = as_tuple('100 kHz', scale='MHz', ignore_sf=True)
     assert freq == approx((0.1, 'MHz'))
 
+# test_exceptions() {{{1
 def test_exceptions(initialize_unit_conversions):
     # unknown units case
     with raises(UnknownConversion) as exception:
@@ -120,12 +148,14 @@ def test_exceptions(initialize_unit_conversions):
     assert str(exception.value) == 'unable to convert between ‘m’ and ‘g’.'
 
 
+# test_molarity() {{{1
 def test_molarity(initialize_unit_conversions):
     mol_conv = UnitConversion('g/L', 'M', from_molarity, to_molarity)
 
     assert as_tuple('1.2 mg/L', scale='uM', params=74.55) == approx((16.096579477, 'uM'))
     assert as_tuple('1.2 mg/L', scale='µM', params=74.55) == approx((16.096579477, 'µM'))
 
+# test_cc() {{{1
 def test_cc(initialize_unit_conversions):
     cc_L = UnitConversion('cc', 'L', 1000)
     assert str(cc_L) == 'cc ← 1000*L'
@@ -142,6 +172,7 @@ def test_cc(initialize_unit_conversions):
     assert as_tuple('25 mcc', scale='L', ignore_sf=True) == approx((25e-6, 'L'))
     assert as_tuple('25 cc', scale='L') == approx((0.025, 'L'))
 
+# test_scaling() {{{1
 @parametrize(
     "value, to_units, expected", [
         ('10e6 s',   's',   '10,000,000 s'),   # same units no scale factor
@@ -184,6 +215,7 @@ def test_scaling(initialize_unit_conversions, value, to_units, expected):
         rendered = f"ERR {e.kwargs['to_units']}✗{e.kwargs['from_units']}"
     assert rendered == expected, q
 
+# test_bin_unit_scaling() {{{1
 def test_bin_unit_scaling(initialize_unit_conversions):
     q = Quantity('1 MiB', binary=True)
     assert q.render() == '1.0486 MB'
@@ -192,3 +224,61 @@ def test_bin_unit_scaling(initialize_unit_conversions):
     assert q.binary() == '1 MiB'
     assert q.fixed(scale='MiB') == '1 MiB'
     assert q.fixed(scale='KiB') == '1024 KiB'
+
+# test_enable_sf_scaling() {{{1
+def test_enable_sf_scaling(initialize_unit_conversions):
+    q = Quantity('1 MiB', binary=True)
+    assert q.as_tuple() == (1048576.0, 'B')
+    scaled = q.scale('KiB')
+    assert scaled.as_tuple() == (1024, 'KiB')
+    scaled = q.scale('MB')
+    assert scaled.as_tuple() == (1.048576, 'MB')
+
+    UnitConversion.enable_sf_scaling(bin_scaling=False)
+    with raises(UnknownConversion) as exception:
+        scaled = q.scale('KiB')
+
+    UnitConversion.enable_sf_scaling(si_scaling=False)
+    with raises(UnknownConversion) as exception:
+        scaled = q.scale('MB')
+
+    UnitConversion.enable_sf_scaling(bin_scaling=True)
+    scaled = q.scale('KiB')
+    assert scaled.as_tuple() == (1024, 'KiB')
+
+    UnitConversion.enable_sf_scaling(si_scaling=True)
+    scaled = q.scale('MB')
+    assert scaled.as_tuple() == (1.048576, 'MB')
+
+# test_deprecated_scaling_functions() {{{1
+def test_deprecated_scaling_functions(initialize_unit_conversions):
+    # first test modern functions for Quantity.scale()
+    dBV = Quantity('-40 dBV')
+    assert dBV.scale(from_dB_modern_scale).render() == '10 mV'
+    V = Quantity('10 mV')
+    assert V.scale(to_dB_modern_scale).render() == '-40 dBV'
+
+    # assure these functions can also be passed to UnitConversion
+    converter = UnitConversion('V', 'dBV', from_dB_modern_scale, to_dB_modern_scale)
+    assert converter.convert(dBV).render() == '10 mV'
+    assert converter.convert(V).render() == '-40 dBV'
+
+    # second test modern functions for UnitConversion
+    dBV = Quantity('-40 dBV')
+    V = Quantity('10 mV')
+
+    # assure these functions can also be passed to UnitConversion
+    converter = UnitConversion('V', 'dBV', from_dB_modern_uc, to_dB_modern_uc)
+    assert converter.convert(dBV).render() == '10 mV'
+    assert converter.convert(V).render() == '-40 dBV'
+
+    # third test deprecated functions for Quantity.scale()
+    dBV = Quantity('-40 dBV')
+    assert dBV.scale(from_dB_deprecated_scale).render() == '10 mV'
+    V = Quantity('10 mV')
+    assert V.scale(to_dB_deprecated_scale).render() == '-40 dBV'
+
+    # assure these functions can also be passed to UnitConversion
+    converter = UnitConversion('V', 'dBV', from_dB_deprecated_scale, to_dB_deprecated_scale)
+    assert converter.convert(dBV).render() == '10 mV'
+    assert converter.convert(V).render() == '-40 dBV'

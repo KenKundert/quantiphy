@@ -322,10 +322,10 @@ they like, but internally they are all converted to seconds.
     >>> _ = UnitConversion('s', 'sec second seconds')
     >>> _ = UnitConversion('s', 'm min minute minutes', 60)
     >>> _ = UnitConversion('s', 'h hr hour hours', 60*60)
-    >>> _ = UnitConversion('s', 'd day days', 24*60*60)
-    >>> _ = UnitConversion('s', 'w week weeks', 7*24*60*60)
+    >>> _ = UnitConversion('s', 'D d day days', 24*60*60)
+    >>> _ = UnitConversion('s', 'W w week weeks', 7*24*60*60)
     >>> _ = UnitConversion('s', 'M month months', 30*24*60*60)
-    >>> _ = UnitConversion('s', 'y year years', 365*24*60*60)
+    >>> _ = UnitConversion('s', 'Y y year years', 365*24*60*60)
     >>> Quantity.set_prefs(ignore_sf=True)
 
     >>> configuration = '''

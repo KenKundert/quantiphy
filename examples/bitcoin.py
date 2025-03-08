@@ -15,7 +15,7 @@ def get_btc_price():
         resp = requests.get(url=url, params=params)
         prices = resp.json()
         return prices['bitcoin']['usd']
-    except Exception as e:
+    except Exception:
         print('error: cannot connect to coingecko.com.')
 
 # use UnitConversion from QuantiPhy to perform the conversion

@@ -73,21 +73,29 @@ def _scale(scale, unscaled):
     if isinstance(scale, str):
         scaled = UnitConversion._convert_units(scale, unscaled.units, unscaled)
         to_units = scale
-    else:
-        # otherwise, it might be a function
+        return scaled, to_units
+
+    if callable(scale):
         try:
-            scaled, to_units = scale(unscaled, unscaled.units)
-                # passing units as second argument is redundant, deprecated
-        except TypeError:
-            # otherwise, assume it is a scale factor
+            scaled, to_units = scale(unscaled)
+                # do not pass units as second argument, this is the new style
+        except TypeError as e:
             try:
-                # might be a tuple containing scale factor and units
-                multiplier, to_units = scale
-            except TypeError:
-                # otherwise, assume it is just a scale factor
-                multiplier = scale
-                to_units = unscaled.units
-            scaled = multiplier * unscaled
+                scaled, to_units = scale(unscaled, unscaled.units)
+                    # passing units as second argument is redundant, deprecated
+            except TypeError:  # pragma: no cover
+                raise e
+        return scaled, to_units
+
+    # otherwise, assume it is a scale factor
+    try:
+        # might be a tuple containing scale factor and units
+        multiplier, to_units = scale
+    except TypeError:
+        # otherwise, assume it is just a scale factor
+        multiplier = scale
+        to_units = unscaled.units
+    scaled = multiplier * unscaled
     return scaled, to_units
 
 
@@ -3469,7 +3477,7 @@ class UnitConversion(object):
         cls._known_units = set()
 
     @classmethod
-    def enable_scaling(cls, si_scaling=None, bin_scaling=None):
+    def enable_sf_scaling(cls, si_scaling=None, bin_scaling=None):
         """By default the given or desired units in a unit conversion or scaling
         may include scale factors.  This is true for both SI and binary scale
         factors.  The scale factor is provided as a prefix on the units.  In
@@ -3660,7 +3668,25 @@ class UnitConversion(object):
             converter = cls._unit_conversions[(to_units, from_units)]
         except KeyError:
             raise UnknownConversion(to_units=orig_to_units, from_units=orig_from_units)
-        return converter(value.scale(from_sf)) / to_sf
+        scaled = value.scale(from_sf)
+        try:
+            value = converter(scaled)
+        except TypeError as e:
+            # assume that this scale function is the deprecated form that
+            # expects units as the second argument
+            try:
+                value = converter(scaled, scaled.units)
+            except TypeError:  # pragma: no cover
+                raise e
+        try:
+            value, units = value
+                # the Quantity.scale() method returns the units along with the
+                # scaled value.  This differs from UnitConversion scale
+                # functions, which do not return the units.  This code allows
+                # UnitConversion to work with Quantity.scale() scale functions.
+        except TypeError:
+            pass
+        return value / to_sf
 
 
     # __str__ {{{3

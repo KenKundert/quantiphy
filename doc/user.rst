@@ -452,18 +452,15 @@ conversion is :index:`not linear <dB>`:
 
 .. code-block:: python
 
-    >>> def from_dB(value, units=''):
+    >>> def from_dB(value):
     ...     return 10**(value/20), value.units[2:]
 
     >>> Quantity('-100 dBV', scale=from_dB)
     Quantity('10 uV')
 
-.. note::
-
-   Since version 2.18 the first argument, in this case *value*, is guaranteed to 
-   be a :class:`Quantity` that contains both the units and any parameters needed 
-   during the conversion.  As such, the second argument, *units*, is not longer 
-   needed and will eventually be removed.
+The argument to the conversion function, in this case *value*, is guaranteed to 
+be a :class:`Quantity` that contains both the units and any parameters needed 
+during the conversion.
 
 The conversion can also often occur if you simply state the units you wish the 
 quantity to have:
@@ -833,8 +830,35 @@ in grams and wanting to present it in either kilograms or in pounds:
     >>> print("mass (kg): {}".format(m.render(show_units=False, scale=0.001)))
     mass (kg): 2.529
 
-    >>> print(m.render(scale=(0.0022046, 'lb'), form='fixed'))
-    5.5754 lb
+Alternatively, you can use either the built-in converters or the converters you 
+created to do the conversion simply based on the units:
+
+.. code-block:: python
+
+    >>> print(m.render(scale='lb'))
+    5.5755 lb
+
+You can also give the desired scale factor as part of the units:
+
+.. code-block:: python
+
+    >>> m = Quantity('2529 g')
+    >>> print("mass (kg): {}".format(m.render(show_units=False, scale='kg')))
+    mass (kg): 2.529
+
+This also works with the binary scale factors:
+
+.. code-block:: python
+
+    >>> rates = [155.52e6, 622.08e6, 2.48832e9, 9.95328e9, 39.81312e9]
+    >>> rates = [Quantity(r, 'b') for r in rates]
+    >>> for r in rates:
+    ...     print(f"{r:>14,.2pMiB}")
+         18.54 MiB
+         74.16 MiB
+        296.63 MiB
+      1,186.52 MiB
+      4,746.09 MiB
 
 As before, functions can also be used to do the conversion. Here is an example 
 where that comes in handy: a logarithmic conversion to :index:`dBV <dB>` is 
@@ -843,27 +867,16 @@ performed.
 .. code-block:: python
 
     >>> import math
-    >>> def to_dB(value, units=''):
+    >>> def to_dB(value):
     ...     return 20*math.log10(value), 'dB'+value.units
 
     >>> T = Quantity('100mV')
     >>> print(T.render(scale=to_dB))
     -20 dBV
 
-.. note::
-
-   Since version 2.18 the first argument, in this case *value*, is guaranteed to 
-   be a :class:`Quantity` that contains both the units and any parameters needed 
-   during the conversion.  As such, the second argument, *units*, is not longer 
-   needed and will eventually be removed.
-
-Finally, you can also use either the built-in converters or the converters you 
-created to do the conversion simply based on the units:
-
-.. code-block:: python
-
-    >>> print(m.render(scale='lb'))
-    5.5755 lb
+The argument to the conversion function, in this case *value*, is guaranteed to 
+be a :class:`Quantity` that contains both the units and any parameters needed 
+during the conversion.
 
 In an earlier example the units of time and temperature data were converted to 
 normal SI units. Presumably this makes processing easier. Now, when producing 
@@ -1208,11 +1221,11 @@ accordingly:
 
     >>> for p in range(1, 5):
     ...     bytes = Quantity(256**p, 'B')
-    ...     print(f"An {8*p} bit bus addresses {bytes:,pkB}.")
-    An 8 bit bus addresses 0.256 kB.
-    An 16 bit bus addresses 65.536 kB.
-    An 24 bit bus addresses 16,777.216 kB.
-    An 32 bit bus addresses 4,294,967.296 kB.
+    ...     print(f"An {8*p} bit bus addresses {bytes:,pkB} ({bytes:,pKiB}).")
+    An 8 bit bus addresses 0.256 kB (0.25 KiB).
+    An 16 bit bus addresses 65.536 kB (64 KiB).
+    An 24 bit bus addresses 16,777.216 kB (16,384 KiB).
+    An 32 bit bus addresses 4,294,967.296 kB (4,194,304 KiB).
 
 Generally you should only specify base units when using a format that renders 
 with scale factors as otherwise you could see two scale factors on the same 
@@ -1637,13 +1650,14 @@ One way around this is to add another conversion specifically for differences:
     >>> print(Quantity('100 Δ°C', scale='Δ°F'))
     180 Δ°F
 
-Notice that the scaling functions used here differ from those described 
-previously in that they only take one argument and return one value.  The units 
-are not included in either then argument list or the return value.
+Notice that the scaling functions used here differ slightly from those described 
+previously in that they only return one value.  The units are not included in 
+the return value.  You can use the previously described scaling functions that 
+do return units here, but the units will be ignored.
 
-Also notice that the return value of *UnitConversion* was not used in the 
-examples above.  It is enough to simply create the *UnitConversion* for it to be 
-available to *Quantity*. So, it is normal to not capture the return value of 
+The return value of *UnitConversion* was not used in the examples above.  It is 
+enough to simply create the *UnitConversion* for it to be available to 
+*Quantity*. So, it is normal to not capture the return value of 
 *UnitConversion*. However, there are a few things you can do with the return 
 value.  First you can convert it to a string to get a description of the 
 relationship.  This is largely used as a sanity check:
@@ -1721,8 +1735,8 @@ conversion.  For example:
 
 For more information on defining unit converters, see :class:`UnitConversion`.
 For more information on parametrized unit converters, see 
-:meth:`UnitConversion.fixture`.  For example of real-time dynamic conversions, 
-see :ref:`quantiphy bitcoin example`.
+:meth:`UnitConversion.fixture`.  For an example of real-time dynamic 
+conversions, see :ref:`quantiphy bitcoin example`.
 
 
 .. index::
@@ -1739,10 +1753,10 @@ doing so the relationship between the units must be known, and
 :class:`UnitConversion` is used to specify the relationship.  However, it is 
 also possible to perform simple scale factor conversions without changing the 
 units.  This case is specified in a manner similar to a unit conversion, but in 
-this case both the from-units and the to-units are the same, and it is not 
-necessary to define a :class:`UnitConversion`.  For example, imagine printing 
-a table of bit-rates where the rates are held in bps but are expected to be 
-displayed in Mbps:
+this case both the from-units and the to-units are the same or are equivalent, 
+and it is not necessary to define a :class:`UnitConversion`.  For example, 
+imagine printing a table of bit-rates where the rates are held in bps but are 
+expected to be displayed in Mbps:
 
 .. code-block:: python
 
