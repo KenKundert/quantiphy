@@ -432,7 +432,7 @@ SMALL_SCALE_FACTORS = 'munpfazyrq'
     # These must be given in order, one for every three decades.
 
 # Supported currency symbols (these precede the number)
-CURRENCY_SYMBOLS = '$€¥£₩₺₽₹Ƀ₿Ξ'
+CURRENCY_SYMBOLS = '$€¥£₩₺₽₹Ƀ₿฿Ξ'
 
 # Units that abut the number.
 # % is controversial, NIST and ISO say that a space should be used to separate
@@ -3733,10 +3733,11 @@ UnitConversion('s', 'hr hour hours', 3600)
 UnitConversion('s', 'day days', 86400)
 
 # Bit conversions {{{2
-UnitConversion('b', 'B', 8)
+UnitConversion('b bit bits', 'B byte bytes', 8)
+UnitConversion('bps b/s', 'Bps B/s', 8)
 
 # Bitcoin conversions {{{2
-UnitConversion(['sat', 'sats', 'ș'], ['BTC', 'btc', 'Ƀ', '₿'], 1e8)
+UnitConversion(['sat', 'sats', 'ș'], ['BTC', 'btc', 'Ƀ', '₿', '฿'], 1e8)
 
 
 # Quantity functions {{{1

@@ -691,7 +691,7 @@ Or you can access both the value and the units as a tuple:
 Rendering Quantities
 ....................
 
-Rendering a quantity convert it to a string.  There are many ways to do so.
+Rendering a quantity converts it to a string.  There are many ways to do so.
 Using *str* renders using default settings:
 
 .. code-block:: python
@@ -1600,7 +1600,8 @@ K           C °C, F °F, R °R
 m           micron, Å angstrom, mi mile miles, ft feet, in inch inches
 g           oz, lb lbs
 s           sec second seconds, min minute minutes, hour hours hr, day days
-b           B
+b bit bits  B byte bytes
+bps b/s     Bps B/s
 BTC btc Ƀ ₿ sat sats ș
 =========== ================================================================
 
@@ -2740,8 +2741,15 @@ The rendered value is affected by the *inf* and *nan* preferences or attributes:
 .. code-block:: python
 
    >>> inf.inf = '∞'
+   >>> print(inf)
+   ∞ Hz
    >>> inf.is_infinite()
    '∞'
+   >>> nan.nan = '�'
+   >>> print(nan)
+   � Hz
+   >>> nan.is_nan()
+   '�'
 
 
 .. index::

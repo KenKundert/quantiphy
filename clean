@@ -2,7 +2,7 @@
 
 set nonomatch
 rm -rf generated_settings .tox
-rm -rf .cache
+rm -rf .cache .ruff_cache
 
 # the rest is common to all python directories
 rm -f *.pyc *.pyo
