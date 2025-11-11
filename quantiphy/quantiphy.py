@@ -942,10 +942,10 @@ class Quantity(float):
             *QuantiPhy* currently does not add leading plus signs to either
             mantissa or exponent, so this setting is ignored.
 
-        :arg int prec:
-            Default precision  in digits where 0 corresponds to 1 digit.  Must
-            be nonnegative.  This precision is used when the full precision is
-            not required. Default is 4.
+        :arg prec:
+            Default precision in digits where 0 corresponds to 1 digit.  Must
+            be a nonnegative integer or "full".  This precision is used when the
+            full precision is not required. Default is 4.
         :type prec: int or str
 
         :arg dict preferred_units:
@@ -3736,7 +3736,8 @@ UnitConversion('s', 'day days', 86400)
 UnitConversion('b bit bits', 'B byte bytes', 8)
 UnitConversion('bps b/s', 'Bps B/s', 8)
 
-# Bitcoin conversions {{{2
+# Currency conversions {{{2
+UnitConversion(['$'], ['USD'], 1)
 UnitConversion(['sat', 'sats', 'ș'], ['BTC', 'btc', 'Ƀ', '₿', '฿'], 1e8)
 
 
