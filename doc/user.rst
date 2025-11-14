@@ -2217,6 +2217,16 @@ By default *QuantiPhy* uses ``.``, ``,``, ``+``, ``-``, ``inf``, ``nan`` and ``
 `` as the defaults.  These are all simple ASCII characters.  They work as expected 
 for the numbers normally used in programming, such as ``-5.17e+06``.
 
+For convenience *QuantiPhy* provides the Unicode characters that are often used 
+in localization as attributes of *Quantity*:
+
+| *Quantity.non_breaking_space*
+| *Quantity.narrow_non_breaking_space*
+| *Quantity.thin_space*
+| *Quantity.plus_sign*
+| *Quantity.minus_sign*
+| *Quantity.infinity_symbol*
+
 Both *radix* and *comma* affect the way stings are converted to quantities and 
 they way quantities are rendered.  When interpreting a string as a number, 
 *QuantiPhy* first strips the *comma* character from the string and then replaces 
