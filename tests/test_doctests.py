@@ -33,7 +33,7 @@ def test_manual():
     Quantity.reset_prefs()
     expected_test_count = {
         '../doc/index.rst': 31,
-        '../doc/user.rst': 458,
+        '../doc/user.rst': 464,
         '../doc/api.rst': 0,
         '../doc/examples.rst': 42,
         '../doc/accessories.rst': 12,

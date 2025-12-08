@@ -54,6 +54,7 @@ def test_format():
     assert exception.value.args[0] == "Unknown format code 'x' for object of type 'float'"
 
 def test_full_format():
+    Quantity.reset_prefs()
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None, show_desc=False)
     Quantity.set_prefs(prec='full')
     q = Quantity('f = 1420.405751786 MHz — frequency of hydrogen line')
@@ -121,6 +122,7 @@ def test_full_format():
 
 
 def test_width():
+    Quantity.reset_prefs()
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None, show_desc=False)
     Quantity.set_prefs(prec='full')
     q=Quantity('f = 1420.405751786 MHz -- frequency of hydrogen line')
@@ -154,6 +156,7 @@ def test_width():
     assert '{:#25.0p}'.format(q) == '           1420405752. Hz'
 
 def test_currency():
+    Quantity.reset_prefs()
     Quantity.set_prefs(
         spacer = None,
         show_label = None,
@@ -197,6 +200,7 @@ def test_currency():
     assert float(q) == 2e-9
 
 def test_exceptional():
+    Quantity.reset_prefs()
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None, show_desc=False)
     Quantity.set_prefs(prec='full')
     q=Quantity('light = inf Hz -- a high frequency')
@@ -223,6 +227,7 @@ def test_exceptional():
     assert '{:,.2P}'.format(q) == 'light = inf Hz'
 
 def test_scaled_format():
+    Quantity.reset_prefs()
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None, show_desc=False)
     Quantity.set_prefs(prec=None)
     q=Quantity('Tboil = 100 °C -- boiling point of water')
@@ -255,6 +260,7 @@ def test_scaled_format():
     assert '{:#,.2P°F}'.format(q) == 'Tboil = 212.00 °F'
 
 def test_number_fmt():
+    Quantity.reset_prefs()
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None, show_desc=False)
     Quantity.set_prefs(prec=None)
     with Quantity.prefs(number_fmt='{whole:>3s}{frac:<4s} {units:<2s}'):
@@ -331,6 +337,7 @@ def test_number_fmt():
         assert '<{:s}>'.format(Quantity('123,4 mm')) == '<123,4   mm>'
 
 def test_alignment():
+    Quantity.reset_prefs()
     assert '<{:<16s}>'.format(Quantity('h')) == '<662.61e-36 J-s  >'
     assert '<{:^16s}>'.format(Quantity('h')) == '< 662.61e-36 J-s >'
     assert '<{:>16s}>'.format(Quantity('h')) == '<  662.61e-36 J-s>'
@@ -339,6 +346,7 @@ def test_alignment():
     assert '<{:>17s}>'.format(Quantity('h')) == '<   662.61e-36 J-s>'
 
 def test_format_method():
+    Quantity.reset_prefs()
     Quantity.set_prefs(
         spacer = None,
         show_label = None,
@@ -414,6 +422,7 @@ def test_format_method():
     assert q.format('#,P') == 'f = 1,420,405,751.7860 Hz'
 
 def test_render():
+    Quantity.reset_prefs()
     Quantity.set_prefs(
         spacer = None,
         show_label = None,
@@ -484,6 +493,7 @@ def test_render():
     assert q.render(prec=4, strip_zeros=True, strip_radix=True) == '$123.45'
 
 def test_sign():
+    Quantity.reset_prefs()
     Quantity.set_prefs(spacer=None, show_label=None, label_fmt=None, label_fmt_full=None, show_desc=False)
 
     # Positive numbers
@@ -735,6 +745,8 @@ def test_sign():
         assert '{:p}'.format(q) == '−inf Hz'
 
 def test_radix_comma_output():
+    Quantity.reset_prefs()
+
     with Quantity.prefs(
         spacer = None,
         show_label = None,
@@ -777,6 +789,7 @@ def test_radix_comma_output():
         assert '{:,.2P}'.format(q) == 'c = 299.792.458 m/s'
 
 def test_plus_minus():
+    Quantity.reset_prefs()
     with Quantity.prefs(
         spacer = None,
         show_label = None,
@@ -814,6 +827,7 @@ def test_plus_minus():
         assert qmm.render(form='sia') == '−1 us'
 
 def test_radix_comma_input():
+    Quantity.reset_prefs()
     with Quantity.prefs(
         spacer = None,
         show_label = None,
@@ -851,6 +865,7 @@ def test_radix_comma_input():
         assert Quantity('$1.00e8').render() == '$100M'
 
 def test_radix_comma_exception():
+    Quantity.reset_prefs()
     with pytest.raises(ValueError) as exception:
         with Quantity.prefs(
             radix = ',',
@@ -875,6 +890,7 @@ def test_radix_comma_exception():
 
 
 def test_output_sf():
+    Quantity.reset_prefs()
     with Quantity.prefs(output_sf = Quantity.all_sf):
         q=Quantity('c')
         assert f"{Quantity(1e35, 'Hz')}" == '100e33 Hz'

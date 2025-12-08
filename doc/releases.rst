@@ -12,6 +12,9 @@ Latest development release
 - Add spacer keyword argument to :meth:`Quantity.render`,
   :meth:`Quantity.fixed` and :meth:`Quantity.binary`.
 - Add support for scaling with binary scale factors.
+- Add USD and bps unit conversions
+- Add support # modifier to f & g formats
+- Add *transparent_preferences* :class:`Quantity` attribute.
 
 
 2.20 (2024-04-27)

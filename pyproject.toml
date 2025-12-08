@@ -40,7 +40,7 @@ requires = ["flit_core >=2,<4"]
 build-backend = "flit_core.buildapi"
 
 [tool.ruff]
-exclude = [".tox", "doc", "tests", "Diffs"]
+exclude = [".tox", "doc", "tests", ".diffs"]
 
 [tool.ruff.lint]
 select = ["F"]

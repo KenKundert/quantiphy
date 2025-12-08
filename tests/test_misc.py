@@ -1108,6 +1108,140 @@ def test_percent():
         assert Quantity('10%Δ').render() == '100 mΔ'
 
 
+def test_prefs():
+    Quantity.reset_prefs()
+    q = Quantity(1, 'nones')
+
+    class Opaque(Quantity):
+        pass
+    o = Opaque(2, 'opaques')
+
+    class Opaque2(Opaque):
+        pass
+    o2 = Opaque2(3, 'opaques2')
+
+    class Transparent(Quantity):
+        transparent_preferences = True
+    Transparent._initialize_preferences()
+    t = Transparent(4, 'transparents')
+
+    class Transparent2(Transparent):
+        transparent_preferences = True
+    Transparent._initialize_preferences()
+    t2 = Transparent2(5, 'transparents2')
+
+    with Quantity.prefs(spacer='-'):
+        print(q)
+        print(o)
+        print(o2)
+        print(t)
+        print(t2)
+
+        assert Quantity.get_pref('spacer') == '-'
+        assert Opaque.get_pref('spacer') == ' '
+        assert Opaque2.get_pref('spacer') == ' '
+        assert Transparent.get_pref('spacer') == '-'
+        assert Transparent2.get_pref('spacer') == '-'
+        assert str(q) == "1-nones"
+        assert str(o) == "2 opaques"
+        assert str(o2) == "3 opaques2"
+        assert str(t) == "4-transparents"
+        assert str(t2) == "5-transparents2"
+
+        with Transparent.prefs(spacer='_'):
+            assert Quantity.get_pref('spacer') == '-'
+            assert Opaque.get_pref('spacer') == ' '
+            assert Opaque2.get_pref('spacer') == ' '
+            assert Transparent.get_pref('spacer') == '_'
+            assert Transparent2.get_pref('spacer') == '_'
+            assert str(q) == "1-nones"
+            assert str(o) == "2 opaques"
+            assert str(o2) == "3 opaques2"
+            assert str(t) == "4_transparents"
+            assert str(t2) == "5_transparents2"
+
+            with Transparent2.prefs(spacer='='):
+                assert Quantity.get_pref('spacer') == '-'
+                assert Opaque.get_pref('spacer') == ' '
+                assert Opaque2.get_pref('spacer') == ' '
+                assert Transparent.get_pref('spacer') == '_'
+                assert Transparent2.get_pref('spacer') == '='
+                assert str(q) == "1-nones"
+                assert str(o) == "2 opaques"
+                assert str(o2) == "3 opaques2"
+                assert str(t) == "4_transparents"
+                assert str(t2) == "5=transparents2"
+
+                Quantity.set_prefs(spacer=' ')
+                Opaque.set_prefs(spacer='-')
+                Opaque2.set_prefs(spacer='-')
+                Transparent.set_prefs(spacer=' ')
+                Transparent2.set_prefs(spacer=' ')
+                assert Quantity.get_pref('spacer') == ' '
+                assert Opaque.get_pref('spacer') == '-'
+                assert Opaque2.get_pref('spacer') == '-'
+                assert Transparent.get_pref('spacer') == ' '
+                assert Transparent2.get_pref('spacer') == ' '
+                assert str(q) == "1 nones"
+                assert str(o) == "2-opaques"
+                assert str(o2) == "3-opaques2"
+                assert str(t) == "4 transparents"
+                assert str(t2) == "5 transparents2"
+
+    Quantity.reset_prefs()
+    Opaque.reset_prefs()
+    Opaque2.reset_prefs()
+    Transparent.reset_prefs()
+    Transparent2.reset_prefs()
+
+    assert Quantity.get_pref('spacer') == ' '
+    assert Opaque.get_pref('spacer') == ' '
+    assert Opaque2.get_pref('spacer') == ' '
+    assert Transparent.get_pref('spacer') == ' '
+    assert Transparent2.get_pref('spacer') == ' '
+    assert str(q) == "1 nones"
+    assert str(o) == "2 opaques"
+    assert str(o2) == "3 opaques2"
+    assert str(t) == "4 transparents"
+    assert str(t2) == "5 transparents2"
+
+    Quantity.set_prefs(spacer='-')
+    assert Quantity.get_pref('spacer') == '-'
+    assert Opaque.get_pref('spacer') == ' '
+    assert Opaque2.get_pref('spacer') == ' '
+    assert Transparent.get_pref('spacer') == '-'
+    assert Transparent2.get_pref('spacer') == '-'
+    assert str(q) == "1-nones"
+    assert str(o) == "2 opaques"
+    assert str(o2) == "3 opaques2"
+    assert str(t) == "4-transparents"
+    assert str(t2) == "5-transparents2"
+
+    Transparent.set_prefs(spacer='_')
+    assert Quantity.get_pref('spacer') == '-'
+    assert Opaque.get_pref('spacer') == ' '
+    assert Opaque2.get_pref('spacer') == ' '
+    assert Transparent.get_pref('spacer') == '_'
+    assert Transparent2.get_pref('spacer') == '_'
+    assert str(q) == "1-nones"
+    assert str(o) == "2 opaques"
+    assert str(o2) == "3 opaques2"
+    assert str(t) == "4_transparents"
+    assert str(t2) == "5_transparents2"
+
+    Transparent2.set_prefs(spacer='=')
+    assert Quantity.get_pref('spacer') == '-'
+    assert Opaque.get_pref('spacer') == ' '
+    assert Opaque2.get_pref('spacer') == ' '
+    assert Transparent.get_pref('spacer') == '_'
+    assert Transparent2.get_pref('spacer') == '='
+    assert str(q) == "1-nones"
+    assert str(o) == "2 opaques"
+    assert str(o2) == "3 opaques2"
+    assert str(t) == "4_transparents"
+    assert str(t2) == "5=transparents2"
+
+
 if __name__ == '__main__':
     # As a debugging aid allow the tests to be run on their own, outside pytest.
     # This makes it easier to see and interpret and textual output.

@@ -1468,6 +1468,41 @@ of 'K' as a scale factor to avoid confusion with Kelvin units.
     5.3 kK
     3.18 K
 
+The first time a subclass is used to create a *Quantity* subclass object the 
+preferences from the parent class are copied into the subclass.  After that 
+point, any changes made to the preferences of the parent class no longer affect 
+the subclass.  However, this behavior can be altered by adding the 
+*transparent_preferences* attribute to the subclass definition:
+
+.. code-block:: python
+
+    >>> class Decibels(Quantity):
+    ...     units = 'dB'
+    ...     prec=1
+
+    >>> gain = Decibels(-40)
+
+    >>> with Quantity.prefs(minus=Quantity.minus_sign):
+    ...     print(gain)
+    -40 dB
+
+    >>> class Decibels(Quantity):
+    ...     units = 'dB'
+    ...     prec=1
+    ...     transparent_preferences = True
+
+    >>> gain = Decibels(-40)
+
+    >>> with Quantity.prefs(minus=Quantity.minus_sign):
+    ...     print(gain)
+    −40 dB
+
+It is a bit subtle, but if you look carefully at the minus sign in the second 
+case, you can see that it looks a little longer.  That is because the normal 
+hyphen was replaced by the unicode minus sign.  That did not happen in the first 
+case because *Decibels* was disconnected from any changes to *Quantity*'s 
+preferences.
+
 
 .. _scaling with subclasses:
 

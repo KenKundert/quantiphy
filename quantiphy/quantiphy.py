@@ -658,35 +658,54 @@ class Quantity(float):
 
     # preferences {{{2
     _initialized = False
+    transparent_preferences = False
+        # if set true, subclasses will use current preferences from the parent
+        # class, even those that have changed since the subclass was created.
 
     # initialize preferences {{{3
     @classmethod
     def _initialize_preferences(cls):
-        if cls._initialized == id(cls):
-            return
-        cls.reset_prefs()
+        if cls._initialized != id(cls):
+            cls.reset_prefs()
 
     # reset preferences {{{3
     @classmethod
-    def reset_prefs(cls):
+    def reset_prefs(cls, transparent=None):
         """Reset preferences
+
+        :arg bool transparent:
+            If true this class inherits current preferences from the parent
+            classes.  In false, the parents preferences are copied into this
+            class the first time it is used, and any changes made to the parents
+            preferences after first use are ignored.  The default is false.
 
         Resets all preferences to the current preferences of the parent class.
         If there is no parent class, they are reset to their defaults.
         """
+        if transparent is None:
+            transparent = cls.transparent_preferences
+
         cls._initialized = id(cls)
         if cls == Quantity:
+            # this is the base class
             prefs = DEFAULTS
+            transparent = False
         else:
+            # this is a subclass
             parent = cls.__mro__[1]
                 # for some reason I cannot get super to work right
             prefs = parent._preferences
-        # copy dict so any changes made to parent's preferences do not affect us
-        prefs = dict(prefs)
+
+        if not transparent:
+            # copy dict so subsequent changes made to parent's preferences do not affect us
+            prefs = dict(prefs)
+
+        cls.transparent_preferences = transparent
+
         cls._preferences = ChainMap({}, prefs)
             # use chain to support use of contexts
             # put empty map in as first so user never accidentally deletes or
-            # changes one of the initial preferences
+            # modifies one of the initial preferences
 
     # set preferences {{{3
     @classmethod
@@ -1139,6 +1158,7 @@ class Quantity(float):
 
         """
         cls._initialize_preferences()
+
         try:
             return getattr(cls, name, cls._preferences[name])
         except KeyError:
@@ -1154,11 +1174,15 @@ class Quantity(float):
         def __enter__(self):
             cls = self.cls
             cls._initialize_preferences()
-            cls._preferences = cls._preferences.new_child()
+            cls._preferences.maps.insert(0, {})
+                # do not use ChainMap.new_child() as that creates a new ChainMap,
+                # orphaning the original, which could be being used by a subclass
             cls.set_prefs(**self.kwargs)
 
         def __exit__(self, *args):
-            self.cls._preferences = self.cls._preferences.parents
+            self.cls._preferences.maps.pop(0)
+                # do not use ChainMap.parents as that creates a new ChainMap,
+                # orphaning the original, which could be being used by a subclass
 
     # now, return the context manager
     @classmethod
