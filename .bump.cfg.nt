@@ -1,8 +1,8 @@
 major: 2
-minor: 20
-patch: 2
-revision: 0
-type: release
+minor: 21
+patch: 0
+revision: 1
+type: rc
 files:
     pyproject.toml:
         version: version

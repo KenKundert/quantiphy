@@ -5,8 +5,8 @@ Releases
 
 Latest development release
 --------------------------
-| Version: 2.20.2
-| Released: 2025-03-08
+| Version: 2.21rc1
+| Released: 2025-12-07
 
 - Remove % from *tight_units* list.
 - Add spacer keyword argument to :meth:`Quantity.render`,
