@@ -2041,25 +2041,26 @@ want different preferences:
      25C  1.00021MHz
      75C  1.00178MHz
 
-In this example, a subclass is created that is intended to report in 
+In the following example, a subclass is created that is intended to report in 
 concentrations.
 
 .. code-block:: python
 
     >>> class Concentration(Quantity):
     ...     pass
+
     >>> Concentration.set_prefs(
     ...     map_sf = dict(u=' PPM', n= ' PPB', p=' PPT'),
     ...     show_label = True,
     ... )
 
-    >>> pollutants = dict(CO=5, SO2=20, NO2=0.10)
+    >>> pollutants = {'CO': 5, 'SO₂': 20, 'NO₂': 0.10}
     >>> concentrations = [Concentration(v, scale=1e-6, name=k) for k, v in pollutants.items()]
     >>> for each in concentrations:
     ...     print(each)
     CO = 5 PPM
-    SO2 = 20 PPM
-    NO2 = 100 PPB
+    SO₂ = 20 PPM
+    NO₂ = 100 PPB
 
 Alternately, you can simply set the preferences as attributes when creating the 
 sublclasses.  For example:
