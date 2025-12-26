@@ -375,7 +375,7 @@ def add_constant(value, alias=None, unit_systems=None):
 
 
 # Globals {{{1
-__version__ = '2.22'
+__version__ = '2.21'
 __released__ = '2025-12-25'
 
 # These mappings are only used when reading numbers
