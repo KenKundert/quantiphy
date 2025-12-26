@@ -5,8 +5,8 @@ Releases
 
 Latest development release
 --------------------------
-| Version: 2.21rc1
-| Released: 2025-12-07
+| Version: 2.22
+| Released: 2025-12-25
 
 
 2.21 (2025-12-25)
