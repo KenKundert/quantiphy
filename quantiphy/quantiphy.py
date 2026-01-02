@@ -22,7 +22,7 @@ Documentation can be found at https://quantiphy.readthedocs.io.
 """
 
 # MIT License {{{1
-# Copyright (C) 2016-2025 Kenneth S. Kundert
+# Copyright (C) 2016-2026 Kenneth S. Kundert
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -3864,3 +3864,5 @@ def binary(value, units, params=None, *args, **kwargs):
 
     """
     return Quantity(value, units=units, params=params).binary(*args, **kwargs)
+
+# vim: set sw=4 sts=4 tw=80 fo=ntcqwa12 et spell:
