@@ -499,6 +499,8 @@ DEFAULTS = dict(
     output_sf = 'TGMkmunpfa',
     plus = '+',
     prec = 4,
+    preferred_quantities = {},
+    _preferred_quantities = {},  # transposed version of preferred_quantities
     preferred_units = {},
     _preferred_units = {},  # transposed version of preferred_units
     radix = '.',
@@ -967,6 +969,14 @@ class Quantity(float):
             full precision is not required. Default is 4.
         :type prec: int or str
 
+        :arg dict preferred_quantities:
+            A dictionary that is used when looking up the preferred quantity when
+            instantiating.  For example, if *preferred_quantities* contains the entry:
+            {Decibels: “dB dBV dBA dBm dBc”} where *Decibels* is a subclass of
+            *Quantity*, then when instantiating a quantity with units “dB”, “dBV”,
+            “dBA”, “dBm”, or “dBc”, the quantity returned would have *Decibels*
+            as its class.
+
         :arg dict preferred_units:
             A dictionary that is used when looking up the preferred units when
             rendering.  For example, if *preferred_units* contains the entry:
@@ -1092,13 +1102,21 @@ class Quantity(float):
         if isinstance(kwargs.get('known_units'), str):
             kwargs['known_units'] = kwargs['known_units'].split()
 
+        # split preferred_quantities
+        if 'preferred_quantities' in kwargs:
+            kwargs['_preferred_quantities'] = {
+                unit : quantity
+                for quantity, units in kwargs['preferred_quantities'].items()
+                for unit in units.split()
+            }
+
         # split preferred_units
         if 'preferred_units' in kwargs:
-            _preferred_units = {}
-            for preferred_unit, undesired in kwargs['preferred_units'].items():
-                for each in undesired.split():
-                    _preferred_units[each] = preferred_unit
-            kwargs['_preferred_units'] = _preferred_units
+            kwargs['_preferred_units'] = {
+                unit : preferred
+                for preferred, units in kwargs['preferred_units'].items()
+                for unit in units.split()
+            }
 
         # check for unknown output scale factors
         if kwargs.get('output_sf'):
@@ -1715,7 +1733,13 @@ class Quantity(float):
 
         # create the underlying data structure and add attributes {{{3
         try:
-            self = float.__new__(cls, number)
+            preferred_quantities = cls._preferences["_preferred_quantities"]
+            preferred_quantity = preferred_quantities[units]
+            assert issubclass(preferred_quantity, cls)
+        except (AttributeError, KeyError):
+            preferred_quantity = cls
+        try:
+            self = float.__new__(preferred_quantity, number)
         except TypeError:
             raise InvalidNumber(number)
         if units:
@@ -2971,7 +2995,8 @@ class Quantity(float):
             end = match.start(0)
             number = match.group(0)
             try:
-                number = Quantity(number).render(**kwargs)
+                q = cls.__new__(cls, number)
+                number = q.render(**kwargs)
             except ValueError:  # pragma: no cover
                 # something unexpected happened
                 # but this is not essential, so ignore it
@@ -3020,7 +3045,8 @@ class Quantity(float):
             end = match.start(0)
             number = match.group(0)
             try:
-                number = Quantity(number).render(**kwargs)
+                q = cls.__new__(cls, number)
+                number = q.render(**kwargs)
             except ValueError:  # pragma: no cover
                 # something unexpected happened
                 # but this is not essential, so ignore it

@@ -119,6 +119,7 @@ class Quantity(float):
         show_label: bool | str = ...,
         strip_zeros: bool = ...,
         strip_radix: bool = ...,
+        spacer: str | bool = ...,
         scale: str | float | tuple[float | Quantity, str] | Callable = ...,
         negligible: float = ...,
     ) -> str: ...

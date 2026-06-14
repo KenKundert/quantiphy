@@ -1468,6 +1468,23 @@ of 'K' as a scale factor to avoid confusion with Kelvin units.
     5.3 kK
     3.18 K
 
+Once defined, you can configure *Quantity* to return a subclass based on the 
+units provided.  This is done using the *preferred_quantities* preference.  For 
+example,
+
+.. code-block:: python
+
+    >>> with Quantity.prefs(preferred_quantities = {
+    ...     Dollars: '$ USD',
+    ...     Bytes: 'B',
+    ...     Voltage: 'V',
+    ...     Current: 'A',
+    ...     Temperature: 'K',
+    ... }):
+    ...         q = Quantity("4,294,967,296B")
+    ...         print(q)
+    4 GiB
+
 The first time a subclass is used to create a *Quantity* subclass object the 
 preferences from the parent class are copied into the subclass.  After that 
 point, any changes made to the preferences of the parent class no longer affect 
