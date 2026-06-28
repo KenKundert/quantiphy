@@ -9,6 +9,11 @@ Latest development release
 | Released: 2025-12-25
 
 
+2.22 (2026-06-28)
+-----------------
+- Add *preferred_quantities* :class:`Quantity` preference.
+
+
 2.21 (2025-12-25)
 -----------------
 - Remove % from *tight_units* list.
