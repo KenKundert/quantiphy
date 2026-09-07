@@ -5,8 +5,13 @@ Releases
 
 Latest development release
 --------------------------
-| Version: 2.22.1
-| Released: 2026-06-28
+| Version: 2.22.2
+| Released: 2026-09-06
+
+
+2.23 (2026-09-07)
+-----------------
+- Support casting from objects that define *__quantity__* method.
 
 
 2.22 (2026-06-28)

@@ -375,8 +375,8 @@ def add_constant(value, alias=None, unit_systems=None):
 
 
 # Globals {{{1
-__version__ = '2.22.1'
-__released__ = '2026-06-28'
+__version__ = '2.22.2'
+__released__ = '2026-09-06'
 
 # These mappings are only used when reading numbers
 # The key for these mappings must be a single character
@@ -1689,6 +1689,8 @@ class Quantity(float):
         # process the value {{{3
         if isinstance(value, str) and value in _active_constants:
             value = _active_constants[value]
+        if hasattr(value, '__quantity__'):
+            value = value.__quantity__()
         if isinstance(value, Quantity):
             number = value
             mantissa = getattr(value, '_mantissa', None)

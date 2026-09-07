@@ -286,6 +286,22 @@ For example:
     >>> print(f'{period.name} = {period}  # {period.desc}')
     Tclk = 10 ns  # clock period
 
+It is also possible to specify an arbitrary object as the value if the object 
+has the __quantity__ method that takes no arguments and returns a quantity.
+
+.. code-block:: python
+
+    >>> class Sample:
+    ...     def __init__(self, x, y):
+    ...         self.x = Quantity(x)
+    ...         self.y = Quantity(y)
+    ...     def __quantity__(self):
+    ...         return self.y
+
+    >>> sample = Sample('25ns', '2.5V')
+    >>> print(Quantity(sample))
+    2.5 V
+
 
 The second argument: the model
 """"""""""""""""""""""""""""""
@@ -1668,9 +1684,9 @@ convert between equivalent units even though both are found in either the first
 or second columns.
 
 :class:`UnitConversion` supports linear conversions (slope only), affine 
-conversions (slope and intercept) nonlinear conversions, parameterized 
-conversions (conversions with extra parameters) and dynamic conversions 
-(convertions that change over time).  Here are some examples:
+conversions (slope and offset) nonlinear conversions, parameterized conversions 
+(conversions with extra parameters) and dynamic conversions (convertions that 
+change over time).  Here are some examples:
 
 .. code-block:: python
 
