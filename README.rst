@@ -4,8 +4,8 @@ QuantiPhy — Physical Quantities
 |downloads| |build status| |coverage| |rtd status| |pypi version| |anaconda version| |python version|
 
 | Author: Ken Kundert
-| Version: 2.22.2
-| Released: 2026-09-06
+| Version: 2.23
+| Released: 2026-09-07
 |
 
 
